@@ -47,7 +47,7 @@ describe("online", () => {
     expect(await store.get(monthKey("SGR01", 2026, 11))).toMatchObject({ month: 11 });
 
     const day = await data.getDay("SGR01", "2026-10-17");
-    expect(day).toMatchObject({ status: "ok", source: "live", today: OCT.days[16], tomorrowImsak: OCT.days[17].times.imsak, fetchedAt: DEVICE_NOW });
+    expect(day).toMatchObject({ status: "ok", source: "live", today: OCT.days[16], tomorrowImsak: OCT.days[17].times.imsak, tomorrowSubuh: OCT.days[17].times.subuh, fetchedAt: DEVICE_NOW });
     expect(sync.status.lastDataSync).toBe(DEVICE_NOW);
     expect(sync.status.lastClockSync).toBe(DEVICE_NOW);
     expect(loadStoredClock(storage)?.offsetMs).toBe(getClockOffset());

@@ -13,6 +13,7 @@ const state = (when: string, extra: Partial<DisplayInputs> = {}) =>
     at: parseLocalDateTime(`2026-10-17T${when}`)!,
     today: dayTimes(17),
     tomorrowImsak: dayTimes(18).times.imsak,
+    tomorrowSubuh: dayTimes(18).times.subuh,
     clock24h: false,
     showArabic: true,
     ticker: [],

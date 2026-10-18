@@ -177,10 +177,10 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
   }
 
   // While a new day is loading just after midnight, yesterday's data still gives the right
-  // current/next (everything passed, next = tomorrowImsak), so it is safe to keep showing.
+  // current/next (everything passed, next = tomorrow's Subuh), so it is safe to keep showing.
   if (overrides.mode && !forced.current) {
     const sched = computeSchedule(
-      { today: day.today, tomorrowImsak: day.tomorrowImsak ?? NaN, forceFriday: overrides.forceFriday || undefined },
+      { today: day.today, tomorrowImsak: day.tomorrowImsak ?? NaN, tomorrowSubuh: day.tomorrowSubuh ?? NaN, forceFriday: overrides.forceFriday || undefined },
       at,
     );
     forced.current = { mode: overrides.mode, target: upcomingPrayer(sched), sinceMs: at };
@@ -190,6 +190,7 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
     at,
     today: day.today,
     tomorrowImsak: day.tomorrowImsak,
+    tomorrowSubuh: day.tomorrowSubuh,
     forceFriday: overrides.forceFriday || undefined,
     clock24h: config.clock24h,
     showArabic: config.showArabic,

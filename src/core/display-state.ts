@@ -60,8 +60,9 @@ export interface ForcedModeInput {
 export interface DisplayInputs {
   at: number;
   today: DayTimes;
-  /** null when tomorrow's data is not available: shown as "–", never guessed. */
+  /** Tomorrow's Imsak and Subuh; null when tomorrow's data is not available: shown as "–", never guessed. */
   tomorrowImsak: number | null;
+  tomorrowSubuh: number | null;
   forceFriday?: boolean;
   clock24h: boolean;
   showArabic: boolean;
@@ -73,15 +74,14 @@ export interface DisplayInputs {
   forced?: ForcedModeInput;
 }
 
-/** The prayer a forced mode should be about: the next prayer, skipping markers. */
+/** The prayer a forced mode should be about: the next prayer (never a marker). */
 export function upcomingPrayer(s: ScheduleState): PrayerKey {
-  const k = s.next.key;
-  return k === "imsak" ? "subuh" : k === "syuruk" ? "zohor" : k;
+  return s.next.key as PrayerKey;
 }
 
 export function buildDisplayState(i: DisplayInputs): DisplayState {
   const sched = computeSchedule(
-    { today: i.today, tomorrowImsak: i.tomorrowImsak ?? NaN, forceFriday: i.forceFriday },
+    { today: i.today, tomorrowImsak: i.tomorrowImsak ?? NaN, tomorrowSubuh: i.tomorrowSubuh ?? NaN, forceFriday: i.forceFriday },
     i.at,
   );
   const view = (w: WaktuEntry): WaktuView => ({

@@ -39,9 +39,11 @@ export function createPrayerData(deps: PrayerDataDeps) {
 
     const [ty, tm, td] = nextDateKey(dateKey).split("-").map(Number);
     const tomorrowMonth = ty === y && tm === m ? month : await getMonth(zone, ty, tm);
-    const tomorrowImsak = tomorrowMonth?.data.days[td - 1]?.times.imsak ?? null;
+    const tomorrowDay = tomorrowMonth?.data.days[td - 1];
+    const tomorrowImsak = tomorrowDay?.times.imsak ?? null;
+    const tomorrowSubuh = tomorrowDay?.times.subuh ?? null;
 
-    return { status: "ok", source: month.source, today, tomorrowImsak, fetchedAt: month.data.fetchedAt };
+    return { status: "ok", source: month.source, today, tomorrowImsak, tomorrowSubuh, fetchedAt: month.data.fetchedAt };
   }
 
   return { getDay, getMonth };

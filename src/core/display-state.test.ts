@@ -9,6 +9,7 @@ const base = (day: 16 | 17, when: string, extra: Partial<DisplayInputs> = {}): D
   at: at(when),
   today: dayTimes(day),
   tomorrowImsak: dayTimes((day + 1) as 17 | 18).times.imsak,
+  tomorrowSubuh: dayTimes((day + 1) as 17 | 18).times.subuh,
   clock24h: false,
   showArabic: true,
   ticker: ["[Teks pengumuman]"],
@@ -62,9 +63,10 @@ describe("buildDisplayState", () => {
     expect(s).toMatchObject({ isFriday: true, mode: "khutbah" });
   });
 
-  it("unknown tomorrow Imsak after Isyak: shows a dash, no countdown, nothing guessed", () => {
-    const s = buildDisplayState(base(17, "2026-10-17T22:00:00", { tomorrowImsak: null }));
-    expect(s.next).toMatchObject({ key: "imsak", time: "–" });
+  it("unknown tomorrow after Isyak: next Subuh shows a dash, no countdown, nothing guessed", () => {
+    const s = buildDisplayState(base(17, "2026-10-17T22:00:00", { tomorrowImsak: null, tomorrowSubuh: null }));
+    expect(s.next).toMatchObject({ key: "subuh", time: "–" });
+    expect(s.waktu[0]).toMatchObject({ key: "imsak", time: "–", state: "upcoming" });
     expect(s.countdownText).toBe("");
     expect(s.current?.key).toBe("isyak");
   });
@@ -78,9 +80,9 @@ describe("buildDisplayState", () => {
 });
 
 describe("upcomingPrayer", () => {
-  it("skips markers", () => {
-    expect(upcomingPrayer(computeSchedule(scheduleInput(17), at("2026-10-17T03:00:00")))).toBe("subuh"); // next imsak
-    expect(upcomingPrayer(computeSchedule(scheduleInput(17), at("2026-10-17T06:30:00")))).toBe("zohor"); // next syuruk
+  it("is the next prayer, never a marker", () => {
+    expect(upcomingPrayer(computeSchedule(scheduleInput(17), at("2026-10-17T03:00:00")))).toBe("subuh"); // before Imsak
+    expect(upcomingPrayer(computeSchedule(scheduleInput(17), at("2026-10-17T06:30:00")))).toBe("zohor"); // before Syuruk
     expect(upcomingPrayer(computeSchedule(scheduleInput(17), at("2026-10-17T14:00:00")))).toBe("asar");
   });
 });

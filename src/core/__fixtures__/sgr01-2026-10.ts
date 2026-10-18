@@ -31,7 +31,8 @@ export function dayTimes(day: 15 | 16 | 17 | 18): DayTimes {
 }
 
 export function scheduleInput(day: 15 | 16 | 17, forceFriday?: boolean): ScheduleInput {
-  return { today: dayTimes(day), tomorrowImsak: dayTimes((day + 1) as 16 | 17 | 18).times.imsak, forceFriday };
+  const next = dayTimes((day + 1) as 16 | 17 | 18).times;
+  return { today: dayTimes(day), tomorrowImsak: next.imsak, tomorrowSubuh: next.subuh, forceFriday };
 }
 
 /** screen.json defaults (PRD 9.4). */

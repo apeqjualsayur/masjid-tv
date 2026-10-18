@@ -35,30 +35,34 @@ describe("current and next", () => {
     expect(s.phase).toBe("subuh");
   });
 
-  it("Subuh to Syuruk: current Subuh, next is the Syuruk marker", () => {
+  it("Subuh to Syuruk: current Subuh, next is Zohor (Syuruk is only a marker)", () => {
     const s = computeSchedule(sat, at("06:30:00"));
     expect(s.current?.key).toBe("subuh");
-    expect(s.next.key).toBe("syuruk");
-    expect(s.countdownText).toBe("26 minit");
+    expect(s.next.key).toBe("zohor");
+    expect(s.countdownText).toBe("6 jam 31 minit");
+    expect(s.waktu.find((w) => w.key === "syuruk")!.state).toBe("upcoming");
   });
 
-  it("markers never become current", () => {
-    for (const t of ["05:40:00", "05:49:59", "06:56:00", "07:00:00", "12:00:00"]) {
-      const s = computeSchedule(sat, at(t));
+  it("markers are never current or next, at any minute of the day", () => {
+    const start = at("00:00:00");
+    for (let t = start; t < start + 24 * 3600_000; t += 60_000) {
+      const s = computeSchedule(sat, t);
       expect(s.current?.isMarker ?? false).toBe(false);
+      expect(s.next.isMarker).toBe(false);
+      for (const w of s.waktu.filter((x) => x.isMarker)) expect(["past", "upcoming"]).toContain(w.state);
     }
   });
 });
 
 describe("edge cases", () => {
-  it("just after midnight: current Isyak (previous night), next today's Imsak", () => {
+  it("just after midnight: current Isyak (previous night), next today's Subuh", () => {
     const s = computeSchedule(sat, at("00:00:30"));
     expect(s.phase).toBe("isyak");
     expect(s.current?.key).toBe("isyak");
-    expect(s.next.key).toBe("imsak");
+    expect(s.next.key).toBe("subuh");
     expect(s.nextIsTomorrow).toBe(false);
-    expect(s.next.time).toBe(dayTimes(17).times.imsak);
-    expect(s.countdownText).toBe("5 jam 40 minit");
+    expect(s.next.time).toBe(dayTimes(17).times.subuh);
+    expect(s.countdownText).toBe("5 jam 50 minit");
     expect(s.waktu.filter((w) => w.state === "past")).toHaveLength(0);
   });
 
@@ -74,15 +78,16 @@ describe("edge cases", () => {
     expect(onTheSecond.phase).toBe("zohor");
   });
 
-  it("Isyak to Imsak wrap: next is tomorrow's Imsak", () => {
+  it("after Isyak: next is tomorrow's Subuh; the morning rows show tomorrow's times", () => {
     const s = computeSchedule(sat, at("22:00:00"));
     expect(s.current?.key).toBe("isyak");
-    expect(s.next.key).toBe("imsak");
+    expect(s.next.key).toBe("subuh");
     expect(s.nextIsTomorrow).toBe(true);
-    expect(s.next.time).toBe(dayTimes(18).times.imsak);
-    expect(s.countdownText).toBe("7 jam 40 minit");
+    expect(s.next.time).toBe(dayTimes(18).times.subuh);
+    expect(s.waktu[0].time).toBe(dayTimes(18).times.imsak);
+    expect(s.countdownText).toBe("7 jam 50 minit");
     expect(states(s)).toEqual({
-      imsak: "next", subuh: "past", syuruk: "past", zohor: "past", asar: "past", maghrib: "past", isyak: "current",
+      imsak: "upcoming", subuh: "next", syuruk: "past", zohor: "past", asar: "past", maghrib: "past", isyak: "current",
     });
   });
 
@@ -95,8 +100,8 @@ describe("edge cases", () => {
   it("last second of the day", () => {
     const s = computeSchedule(sat, at("23:59:59"));
     expect(s.phase).toBe("isyak");
-    expect(s.next.key).toBe("imsak");
-    expect(s.countdownText).toBe("5 jam 41 minit");
+    expect(s.next.key).toBe("subuh");
+    expect(s.countdownText).toBe("5 jam 51 minit");
   });
 });
 

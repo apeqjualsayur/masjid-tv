@@ -36,6 +36,8 @@ export type DayResult =
        * available (e.g. 31 Dec before next year is published). Never guessed.
        */
       tomorrowImsak: number | null;
+      /** Tomorrow's Subuh: the next prayer after Isyak. null if not available. */
+      tomorrowSubuh: number | null;
       /** When today's month was fetched from the API (epoch ms), for the status overlay. */
       fetchedAt?: number;
     }

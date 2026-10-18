@@ -65,7 +65,7 @@ export interface ThemeDefinition {
 
 1. Stage is a fixed **1920×1080** box; the engine scales it. Use px inside the stage.
 2. **Current** prayer must be distinguishable from **next** at 5 m: different fill *and* weight, not colour alone.
-3. Past prayers may fade (opacity ≥ 0.42). Markers (Imsak, Syuruk) never get "Sekarang".
+3. Past prayers may fade (opacity ≥ 0.42). Markers (Imsak, Syuruk) are reference rows only: never "Sekarang" or "Seterusnya" (`state` is only ever `past` or `upcoming`).
 4. Times ≥ 54 px in Full and Side layouts, ≥ 44 px in Bottom bar.
 5. All colour comes from the theme's token table for the current `phase`; no hard-coded colours in components except those listed.
 6. `lite` mode: drop `backdrop-filter`, blurs, glows and large shadows; keep layout identical.

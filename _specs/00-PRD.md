@@ -30,9 +30,9 @@ A web display that runs full-screen on a TV in a masjid or surau, showing JAKIM 
 
 Seven entries, in order: **Imsak, Subuh, Syuruk, Zohor, Asar, Maghrib, Isyak**.
 
-- **Imsak** and **Syuruk** are *markers*, not prayers: no azan, no iqamah.
+- **Imsak** and **Syuruk** are *markers*, not prayers: shown in the list for reference only. No azan, no iqamah, never "Sekarang", never "Seterusnya", never the countdown target.
 - **Current** = the latest passed *prayer* (Subuh, Zohor, Asar, Maghrib, Isyak). Between Syuruk and Zohor there is **no current prayer**; only "next" (Zohor) is highlighted. Between Imsak and Subuh, next = Subuh; current = Isyak (of previous night).
-- **Next** = the next entry in time order (markers included), wrapping to tomorrow's Imsak after Isyak.
+- **Next** = the next *prayer* in time order (markers excluded), wrapping to tomorrow's Subuh after Isyak. Between Subuh and Zohor, next = Zohor. *(Changed 2026-10-18: markers were previously included.)*
 - **Phase** (drives colour palette): Imsak→Syuruk = `subuh`; Syuruk→Asar = `zohor`; Asar→Maghrib = `asar`; Maghrib→Isyak = `maghrib`; Isyak→next Imsak = `isyak`.
 - **Friday**: Zohor is labelled **Jumaat**; azan → **Khutbah mode** (no iqamah countdown).
 - Times display in **12-hour format without AM/PM** (Malaysian masjid convention), e.g. `1:05`, `7:06`. Configurable to 24h.

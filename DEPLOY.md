@@ -52,7 +52,10 @@ Within a minute GitHub starts testing the code by itself (see Part 5).
 ## Part 3 — Create the Pages project and connect GitHub
 
 1. In the Cloudflare dashboard, open **Workers & Pages** in the left menu (it may be under **Compute (Workers)**).
-2. Click **Create** (or **Create application**), then choose the **Pages** tab, then **Connect to Git** (or **Import an existing Git repository**).
+2. Click **Create** (or **Create application**). Cloudflare now shows Workers and Pages under one button, and it opens the **Workers** setup by default. **Do not use the Workers setup.** It asks for a "Deploy command" (`npx wrangler deploy`), which this project does not use.
+   - At the bottom of the first screen, click the small link **"Looking to deploy Pages? Get started"** (older dashboards have a **Pages** tab instead).
+   - Then choose **Import an existing Git repository** (or **Connect to Git**).
+   - You are in the right place when the settings page has **Framework preset** and **Build output directory** boxes, and **no** "Deploy command" box.
 3. Click **Connect GitHub**. A GitHub window opens:
    - Choose your account.
    - Select **Only select repositories** and pick **masjid-tv**.
@@ -79,7 +82,7 @@ Within a minute GitHub starts testing the code by itself (see Part 5).
 8. Wait 3 to 5 minutes. You can watch the build log. When it says **Success**, Cloudflare shows the address, for example `https://masjid-tv.pages.dev`.
 9. Open **`https://masjid-tv.pages.dev/tv/`** (use your project name). The prayer-time display should appear.
 
-That address is what the TV opens. Write it down for the TV setup (`_specs/04-pilot-setup.md`).
+That address is what the TV opens. Write it down for the TV setup (`_specs/04-pilot-setup.md`). Cloudflare may add a few letters to the name (for example `masjid-tv-6d8.pages.dev`); always use the address Cloudflare shows you.
 
 ---
 

@@ -52,3 +52,6 @@ If code and spec disagree, the spec wins — or update the spec first, deliberat
 ## Deployment
 
 Cloudflare Pages (static, preset None, build `npm run build`, output `out`, `NODE_VERSION=24`). Non-coder guide: `DEPLOY.md`. CI: `.github/workflows/test.yml`.
+
+- Production: https://masjid-tv-6d8.pages.dev/tv/ (Cloudflare Pages project `masjid-tv-6d8`, deploys from `main`)
+- Repository: https://github.com/apeqjualsayur/masjid-tv

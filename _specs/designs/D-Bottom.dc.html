@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Konsep D Bar Bawah</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@500;600;700&amp;family=Reem+Kufi:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#E3B04B}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: 'Barlow', sans-serif; background: #0B1114; color: #FFFFFF">
+
+<div style="position: absolute; top: 0; left: 0; right: 0; height: 730px; background: #123C30; box-sizing: border-box; padding: 64px 110px; display: grid; grid-template-columns: 420px minmax(0, 1fr); gap: 100px; align-items: center">
+<div style="height: 600px; box-sizing: border-box; border: 3px solid #E3B04B; border-radius: 210px 210px 24px 24px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; background: rgba(0,0,0,0.12)">
+<div style="font-size: 28px; font-weight: 600; letter-spacing: 0.24em; color: #E3B04B">SABTU</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-size: 230px; font-weight: 600; line-height: 0.9">24</div>
+<div style="font-size: 28px; font-weight: 600; letter-spacing: 0.18em">OKTOBER 2026</div>
+<div style="width: 80px; height: 2px; background: rgba(227,176,75,0.6); margin: 20px 0 14px"></div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-size: 48px; font-weight: 500">8:00 pagi</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 28px">
+<div style="display: flex">
+<div style="padding: 8px 18px; border-radius: 999px; border: 2px solid #E3B04B; color: #E3B04B; font-size: 20px; font-weight: 700; letter-spacing: 0.18em">PROGRAM</div>
+</div>
+<div style="font-size: 92px; font-weight: 700; letter-spacing: -2px; line-height: 1">[Nama Program]</div>
+<div style="font-size: 30px; font-weight: 400; line-height: 1.45; color: rgba(255,255,255,0.75)">[Penerangan ringkas program dalam satu atau dua ayat]</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; padding-top: 28px; border-top: 1px solid rgba(255,255,255,0.18)">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 19px; font-weight: 700; letter-spacing: 0.18em; color: #E3B04B">TEMPAT</div>
+<div style="font-size: 30px; font-weight: 500">[Tempat]</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 19px; font-weight: 700; letter-spacing: 0.18em; color: #E3B04B">ANJURAN</div>
+<div style="font-size: 30px; font-weight: 500">[Biro / AJK]</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 19px; font-weight: 700; letter-spacing: 0.18em; color: #E3B04B">HUBUNGI</div>
+<div style="font-size: 30px; font-weight: 500">[Nama · No. telefon]</div>
+</div>
+</div>
+</div>
+</div>
+
+<div style="position: absolute; left: 64px; right: 64px; bottom: 36px; height: 310px; display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 40px; align-items: end">
+<div style="display: flex; flex-direction: column; gap: 8px; padding-bottom: 6px">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="width: 40px; height: 40px; box-sizing: border-box; border-radius: 999px; border: 2px solid #E3B04B; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #E3B04B">NM</div>
+<div style="font-size: 22px; font-weight: 600">Nama Masjid / Surau</div>
+</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-size: 136px; font-weight: 600; letter-spacing: -2px; line-height: 0.88; font-variant-numeric: tabular-nums">{{p.clock}}</div>
+<div style="font-size: 22px; font-weight: 500; color: #E3B04B">{{p.countdown}}</div>
+<div style="font-size: 19px; font-weight: 400; color: rgba(255,255,255,0.6)">Sab, 17 Okt · 6 Jamadilawal 1448H</div>
+</div>
+<div style="display: flex; align-items: flex-end; gap: 14px">
+<sc-for list="{{arches}}" as="a" hint-placeholder-count="7">
+<div style="position: relative; flex: 1; min-width: 0; height: {{a.h}}; border-radius: 93px 93px 14px 14px; overflow: hidden; background: {{a.sky}}; opacity: {{a.op}}; box-shadow: {{a.ring}}">
+<div style="position: absolute; inset: 0; background: linear-gradient(0deg, rgba(5,10,12,0.8) 0%, rgba(5,10,12,0.3) 50%, rgba(5,10,12,0) 75%)"></div>
+<div style="position: absolute; left: 0; right: 0; bottom: 0; padding: 0 10px 20px; display: flex; flex-direction: column; align-items: center; gap: 2px">
+<sc-if value="{{a.cur}}" hint-placeholder-val="{{false}}">
+<div style="padding: 4px 10px; border-radius: 999px; background: #E3B04B; color: #1A1405; font-size: 13px; font-weight: 700; letter-spacing: 0.12em; margin-bottom: 8px">SEKARANG</div>
+</sc-if>
+<div style="font-size: 26px; font-weight: 600">{{a.name}}</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-size: 62px; font-weight: 600; line-height: 0.95; font-variant-numeric: tabular-nums">{{a.time}}</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"phase":{"editor":"enum","options":["subuh","zohor","asar","maghrib","isyak"],"default":"maghrib","section":"Waktu"},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = {
+      subuh:   { clock: '6:12', cur: 1, next: 2, countdown: 'Syuruk dalam 49 minit' },
+      zohor:   { clock: '1:20', cur: 3, next: 4, countdown: 'Asar dalam 2 jam 51 minit' },
+      asar:    { clock: '4:42', cur: 4, next: 5, countdown: 'Maghrib dalam 2 jam 24 minit' },
+      maghrib: { clock: '7:15', cur: 5, next: 6, countdown: 'Isyak dalam 1 jam 01 minit' },
+      isyak:   { clock: '9:30', cur: 6, next: 0, countdown: 'Imsak dalam 8 jam 12 minit' }
+    };
+    const p = P[this.props.phase ?? 'maghrib'] || P.maghrib;
+    const T = [
+      { name: 'Imsak',   time: '5:42', sky: 'linear-gradient(180deg,#0B1638 0%,#1F2F66 100%)' },
+      { name: 'Subuh',   time: '5:52', sky: 'linear-gradient(180deg,#1B2C5E 0%,#5C6FB0 60%,#E9A97A 100%)' },
+      { name: 'Syuruk',  time: '7:01', sky: 'linear-gradient(180deg,#5E86C4 0%,#F4C38E 100%)' },
+      { name: 'Zohor',   time: '1:05', sky: 'linear-gradient(180deg,#2F7FC6 0%,#8CC6EE 100%)' },
+      { name: 'Asar',    time: '4:11', sky: 'linear-gradient(180deg,#3D7DB8 0%,#E9B36A 100%)' },
+      { name: 'Maghrib', time: '7:06', sky: 'linear-gradient(180deg,#3B2D6B 0%,#C46A7A 60%,#F2A65E 100%)' },
+      { name: 'Isyak',   time: '8:16', sky: 'linear-gradient(180deg,#050B1A 0%,#0E2A44 100%)' }
+    ];
+    const arches = T.map((a, i) => {
+      const cur = i === p.cur, nxt = i === p.next, past = i < p.cur && !(p.cur === 6 && i === 0);
+      return Object.assign({}, a, {
+        cur,
+        h: cur ? '300px' : '250px',
+        op: cur ? 1 : (past ? 0.42 : 0.92),
+        ring: cur ? '0 0 0 4px #E3B04B, 0 0 50px rgba(227,176,75,0.35)' : (nxt ? '0 0 0 2px rgba(227,176,75,0.55)' : 'none')
+      });
+    });
+    return { p, arches };
+  }
+}
+</script>
+</body>
+</html>

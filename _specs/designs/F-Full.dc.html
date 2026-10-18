@@ -1,0 +1,94 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Konsep F Tenang Penuh</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700&amp;family=Noto+Naskh+Arabic:wght@400;500&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2D7FA8}a:hover{color:#14303D}
+</style>
+</helmet>
+<div style="position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: 'Manrope', sans-serif; background: {{t.bg}}; color: {{t.fg}}">
+
+<div style="position: absolute; top: 72px; left: 112px; right: 112px; display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; align-items: center; gap: 16px">
+<div style="width: 52px; height: 52px; box-sizing: border-box; border-radius: 999px; border: 1.5px solid {{t.fg}}; display: flex; align-items: center; justify-content: center; font-size: 17px; font-weight: 600">NM</div>
+<div style="font-size: 28px; font-weight: 500">Nama Masjid / Surau</div>
+</div>
+<div style="font-size: 26px; font-weight: 500; color: {{t.muted}}">Sabtu, 17 Oktober 2026 · 6 Jamadilawal 1448H</div>
+</div>
+
+<div style="position: absolute; top: 0; bottom: 0; left: 112px; width: 780px; display: flex; flex-direction: column; justify-content: center; gap: 36px">
+<div style="display: flex; align-items: baseline; gap: 16px">
+<div style="font-size: 280px; font-weight: 300; letter-spacing: -10px; line-height: 0.85; font-variant-numeric: tabular-nums">{{p.clock}}</div>
+<div style="font-size: 56px; font-weight: 400; color: {{t.muted}}; font-variant-numeric: tabular-nums">{{p.sec}}</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px">
+<div style="display: flex; align-items: center; gap: 14px; font-size: 36px; font-weight: 600; color: {{t.accent}}">
+<div style="width: 14px; height: 14px; border-radius: 999px; background: {{t.accent}}"></div>
+Waktu {{curW.name}}
+</div>
+<div style="font-size: 30px; font-weight: 500; color: {{t.muted}}">{{nextW.name}} dalam {{p.countdown}}</div>
+</div>
+</div>
+
+<div style="position: absolute; top: 0; bottom: 0; right: 112px; width: 760px; display: flex; flex-direction: column; justify-content: center">
+<sc-for list="{{waktu}}" as="w" hint-placeholder-count="7">
+<div style="display: grid; grid-template-columns: minmax(0, 1fr) auto 200px; align-items: center; gap: 28px; height: 100px; padding: 0 40px; border-radius: 999px; background: {{w.bg}}; box-shadow: {{w.shadow}}; border-bottom: 1px solid {{w.rule}}">
+<div style="font-size: 38px; font-weight: {{w.weight}}">{{w.name}}</div>
+<div style="font-family: 'Noto Naskh Arabic', serif; font-size: 30px; font-weight: 500; color: {{t.muted}}">{{w.ar}}</div>
+<div style="font-size: 62px; font-weight: {{w.tWeight}}; letter-spacing: -2px; text-align: right; font-variant-numeric: tabular-nums; color: {{w.tColor}}">{{w.time}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"phase":{"editor":"enum","options":["subuh","zohor","asar","maghrib","isyak"],"default":"zohor","section":"Waktu"},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const TH = {
+      subuh:   { bg: '#E8EAF6', fg: '#1F2440', muted: '#5F6585', accent: '#4F58AE', pill: '#FFFFFF', rule: 'rgba(31,36,64,0.12)' },
+      zohor:   { bg: '#EAF3F8', fg: '#14303D', muted: '#56707E', accent: '#23709A', pill: '#FFFFFF', rule: 'rgba(20,48,61,0.12)' },
+      asar:    { bg: '#F8EFE6', fg: '#3B2A1E', muted: '#7E6853', accent: '#A9612A', pill: '#FFFFFF', rule: 'rgba(59,42,30,0.12)' },
+      maghrib: { bg: '#F6E9EC', fg: '#3A2230', muted: '#80616E', accent: '#9C3F5E', pill: '#FFFFFF', rule: 'rgba(58,34,48,0.12)' },
+      isyak:   { bg: '#131A2B', fg: '#E9ECF5', muted: '#8F98B3', accent: '#9DB0EE', pill: 'rgba(255,255,255,0.09)', rule: 'rgba(255,255,255,0.10)' }
+    };
+    const P = {
+      subuh:   { clock: '6:12', sec: '08', cur: 1, next: 2, countdown: '49 minit' },
+      zohor:   { clock: '1:20', sec: '36', cur: 3, next: 4, countdown: '2 jam 51 minit' },
+      asar:    { clock: '4:42', sec: '15', cur: 4, next: 5, countdown: '2 jam 24 minit' },
+      maghrib: { clock: '7:15', sec: '50', cur: 5, next: 6, countdown: '1 jam 01 minit' },
+      isyak:   { clock: '9:30', sec: '04', cur: 6, next: 0, countdown: '8 jam 12 minit' }
+    };
+    const key = this.props.phase ?? 'zohor';
+    const t = TH[key] || TH.zohor, p = P[key] || P.zohor;
+    const T = [
+      { name: 'Imsak', ar: 'إمساك', time: '5:42' }, { name: 'Subuh', ar: 'صبح', time: '5:52' },
+      { name: 'Syuruk', ar: 'شروق', time: '7:01' }, { name: 'Zohor', ar: 'ظهر', time: '1:05' },
+      { name: 'Asar', ar: 'عصر', time: '4:11' }, { name: 'Maghrib', ar: 'مغرب', time: '7:06' },
+      { name: 'Isyak', ar: 'عشاء', time: '8:16' }
+    ];
+    const waktu = T.map((w, i) => {
+      const cur = i === p.cur;
+      return Object.assign({}, w, {
+        bg: cur ? t.pill : 'transparent',
+        shadow: cur ? '0 18px 40px rgba(20,30,50,0.10)' : 'none',
+        rule: cur || i === p.cur - 1 || i === 6 ? 'transparent' : t.rule,
+        weight: cur ? 800 : 500,
+        tWeight: cur ? 700 : 500,
+        tColor: cur ? t.accent : t.fg
+      });
+    });
+    return { t, p, waktu, curW: T[p.cur], nextW: T[p.next] };
+  }
+}
+</script>
+</body>
+</html>

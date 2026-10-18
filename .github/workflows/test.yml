@@ -1,0 +1,54 @@
+name: Tests
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  test:
+    name: Type check, unit tests, build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - name: Type check
+        run: npm run lint
+      - name: Unit tests
+        run: npm test
+      - name: Production build (same command as Cloudflare Pages)
+        run: npm run build
+      - name: Build contains the service worker
+        run: test -f out/sw.js && test -f out/tv/index.html && test -f out/data/SGR01-2026.json
+
+  e2e:
+    name: Browser acceptance checks (PRD 12)
+    # Uses real Chrome and the live prayer-time API, so only on main and on demand.
+    if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+    needs: test
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: .node-version
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - name: Browser checks
+        run: npm run e2e
+        env:
+          CHROME_PATH: /usr/bin/google-chrome
+      - name: Upload screenshots and report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-output
+          path: e2e-output/
+          retention-days: 14

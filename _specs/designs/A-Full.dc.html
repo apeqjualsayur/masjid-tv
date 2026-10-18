@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Paparan Penuh</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Noto+Naskh+Arabic:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#F5D33B}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; color: #FFFFFF">
+<div style="position: absolute; inset: 0; background: {{p.sky}}"></div>
+<svg aria-hidden="true" width="1920" height="1080" viewBox="0 0 1920 1080" style="position: absolute; inset: 0">
+<defs>
+<radialGradient id="glow">
+<stop offset="0" stop-color="{{p.sunC}}" stop-opacity="0.9"></stop>
+<stop offset="0.35" stop-color="{{p.sunC}}" stop-opacity="0.3"></stop>
+<stop offset="1" stop-color="{{p.sunC}}" stop-opacity="0"></stop>
+</radialGradient>
+</defs>
+<g fill="#FFFFFF" opacity="{{p.starOp}}">
+<circle cx="140" cy="120" r="2"></circle><circle cx="320" cy="210" r="1.5"></circle><circle cx="520" cy="90" r="2.2"></circle><circle cx="690" cy="260" r="1.4"></circle><circle cx="860" cy="140" r="1.8"></circle><circle cx="1040" cy="60" r="1.5"></circle><circle cx="1180" cy="230" r="2"></circle><circle cx="1330" cy="110" r="1.6"></circle><circle cx="1700" cy="320" r="1.8"></circle><circle cx="1820" cy="90" r="2.2"></circle><circle cx="420" cy="330" r="1.4"></circle><circle cx="980" cy="350" r="1.3"></circle><circle cx="1620" cy="60" r="1.5"></circle><circle cx="250" cy="400" r="1.2"></circle>
+</g>
+<circle cx="{{p.sx}}" cy="{{p.sy}}" r="{{p.glowR}}" fill="url(#glow)"></circle>
+<circle cx="{{p.sx}}" cy="{{p.sy}}" r="{{p.sr}}" fill="{{p.sunC}}"></circle>
+<g transform="translate(0,-120)">
+<path fill="{{p.l1}}" opacity="0.85" d="M0 760 L180 690 L340 730 L520 640 L700 700 L880 620 L1060 690 L1240 610 L1420 680 L1600 630 L1780 690 L1920 650 L1920 1200 L0 1200 Z"></path>
+<path fill="{{p.l2}}" d="M0 840 C200 780 380 800 560 820 S920 760 1120 800 S1500 840 1700 790 S1880 800 1920 810 L1920 1200 L0 1200 Z"></path>
+<g fill="{{p.l2}}">
+<rect x="1380" y="800" width="180" height="140"></rect>
+<path d="M1408 802 A62 62 0 0 1 1532 802 Z"></path>
+<path d="M1373 812 A22 22 0 0 1 1417 812 Z"></path>
+<path d="M1523 812 A22 22 0 0 1 1567 812 Z"></path>
+<rect x="1468" y="712" width="4" height="28"></rect>
+<circle cx="1470" cy="708" r="5"></circle>
+<rect x="1592" y="690" width="20" height="250"></rect>
+<rect x="1586" y="748" width="32" height="8"></rect>
+<path d="M1588 690 L1602 652 L1616 690 Z"></path>
+</g>
+<path fill="{{p.l3}}" d="M0 900 C260 860 520 880 760 900 S1240 940 1500 900 S1800 880 1920 890 L1920 1200 L0 1200 Z"></path>
+</g>
+</svg>
+<div style="position: absolute; inset: 0; background: linear-gradient(180deg, rgba(0,0,0,0.28) 0%, rgba(0,0,0,0) 30%, rgba(0,0,0,0) 50%, rgba(0,0,0,0.38) 100%)"></div>
+
+<div style="position: absolute; inset: 0; box-sizing: border-box; padding: 56px 72px 112px; display: flex; flex-direction: column; justify-content: space-between">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; align-items: center; gap: 22px">
+<div style="width: 84px; height: 84px; border-radius: 999px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 800; color: #1F7A55; box-shadow: 0 8px 24px rgba(0,0,0,0.2)">NM</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 40px; font-weight: 700; letter-spacing: -0.5px">Nama Masjid / Surau</div>
+<div style="font-size: 22px; font-weight: 500; opacity: 0.88">Zon JAKIM SGR01</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; align-items: flex-end; gap: 6px">
+<div style="font-size: 32px; font-weight: 700">Sabtu, 17 Oktober 2026</div>
+<div style="font-size: 26px; font-weight: 500; opacity: 0.9">6 Jamadilawal 1448H</div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 22px">
+<div style="display: flex; align-items: baseline; gap: 14px; text-shadow: 0 6px 40px rgba(0,0,0,0.28)">
+<div style="font-size: 250px; font-weight: 700; letter-spacing: -8px; line-height: 0.9; font-variant-numeric: tabular-nums">{{p.clock}}</div>
+<div style="font-size: 72px; font-weight: 600; opacity: 0.8; font-variant-numeric: tabular-nums">{{p.sec}}</div>
+</div>
+<div style="display: flex; align-items: center; gap: 18px">
+<div style="padding: 12px 26px; border-radius: 999px; background: rgba(255,255,255,0.94); color: #0F2E24; font-size: 28px; font-weight: 800">Waktu {{p.label}}</div>
+<div style="padding: 12px 26px; border-radius: 999px; background: rgba(8,18,28,0.32); border: 1px solid rgba(255,255,255,0.28); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); font-size: 28px; font-weight: 600">{{p.countdown}}</div>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 18px">
+<sc-for list="{{waktu}}" as="w" hint-placeholder-count="7">
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 22px 24px; border-radius: 26px; min-height: 196px; box-sizing: border-box; background: {{w.bg}}; border: {{w.border}}; color: {{w.fg}}; backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px)">
+<div style="display: flex; justify-content: space-between; align-items: center; height: 36px">
+<svg aria-hidden="true" width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{w.icon}}"></path></svg>
+<sc-if value="{{w.hasChip}}" hint-placeholder-val="{{false}}">
+<div style="padding: 6px 12px; border-radius: 999px; font-size: 15px; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; background: {{w.chipBg}}; color: {{w.chipFg}}">{{w.chip}}</div>
+</sc-if>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: baseline; margin-top: 6px">
+<div style="font-size: 28px; font-weight: 700">{{w.name}}</div>
+<sc-if value="{{showArabic}}" hint-placeholder-val="{{true}}">
+<div style="font-family: 'Noto Naskh Arabic', serif; font-size: 26px; opacity: 0.85">{{w.ar}}</div>
+</sc-if>
+</div>
+<div style="font-size: 56px; font-weight: 800; letter-spacing: -1.5px; font-variant-numeric: tabular-nums; line-height: 1">{{w.time}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="position: absolute; left: 0; right: 0; bottom: 0; height: 72px; background: rgba(6,24,18,0.74); display: flex; align-items: center; gap: 24px; padding: 0 72px; box-sizing: border-box; overflow: hidden">
+<div style="flex-shrink: 0; padding: 8px 16px; border-radius: 999px; background: #F5D33B; color: #2A2400; font-size: 18px; font-weight: 800; letter-spacing: 0.08em">PENGUMUMAN</div>
+<div style="font-size: 26px; font-weight: 500; white-space: nowrap">[Teks bergerak — jadual kuliah, gotong-royong, kutipan infaq dan pengumuman AJK]</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"phase":{"editor":"enum","options":["subuh","zohor","asar","maghrib","isyak"],"default":"zohor","section":"Waktu"},"showArabic":{"editor":"boolean","default":true,"section":"Bahasa"},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = {
+      subuh:   { label: 'Subuh',   clock: '6:12', sec: '08', countdown: 'Syuruk dalam 49 minit', cur: 1, next: 2,
+                 sky: 'linear-gradient(180deg,#0E1A3D 0%,#24407E 45%,#6F7FB8 72%,#F2B27A 100%)',
+                 sunC: '#FFD9A8', sx: 960, sy: 720, sr: 60, glowR: 420, starOp: 0.7, l1: '#3A4F8F', l2: '#22346A', l3: '#121F45' },
+      zohor:   { label: 'Zohor',   clock: '1:20', sec: '36', countdown: 'Asar dalam 2 jam 51 minit', cur: 3, next: 4,
+                 sky: 'linear-gradient(180deg,#F7CF6A 0%,#F2AE3C 45%,#E58A27 100%)',
+                 sunC: '#FFF4D2', sx: 1500, sy: 230, sr: 110, glowR: 520, starOp: 0, l1: '#D9822B', l2: '#B5611C', l3: '#7A3D10' },
+      asar:    { label: 'Asar',    clock: '4:42', sec: '15', countdown: 'Maghrib dalam 2 jam 24 minit', cur: 4, next: 5,
+                 sky: 'linear-gradient(180deg,#F6A15A 0%,#E2673A 48%,#9E3320 100%)',
+                 sunC: '#FFE0B0', sx: 1380, sy: 470, sr: 95, glowR: 480, starOp: 0, l1: '#9C3A1E', l2: '#6E2412', l3: '#3E1209' },
+      maghrib: { label: 'Maghrib', clock: '7:15', sec: '50', countdown: 'Isyak dalam 1 jam 01 minit', cur: 5, next: 6,
+                 sky: 'linear-gradient(180deg,#2E2D6B 0%,#6C5BA8 45%,#C89BC4 75%,#F4B8A0 100%)',
+                 sunC: '#FFD3B5', sx: 960, sy: 780, sr: 70, glowR: 460, starOp: 0.35, l1: '#6A5AA6', l2: '#463C82', l3: '#251F52' },
+      isyak:   { label: 'Isyak',   clock: '9:30', sec: '04', countdown: 'Imsak dalam 8 jam 12 minit', cur: 6, next: 0,
+                 sky: 'linear-gradient(180deg,#041E26 0%,#0B3F4C 52%,#1E7A85 100%)',
+                 sunC: '#E9F6F7', sx: 1520, sy: 190, sr: 44, glowR: 260, starOp: 0.9, l1: '#0F5662', l2: '#0A3B45', l3: '#05232A' }
+    };
+    const p = P[this.props.phase ?? 'zohor'] || P.zohor;
+    const T = [
+      { name: 'Imsak',   ar: 'إمساك', time: '5:42', icon: 'M20 14.5A8 8 0 1 1 9.5 4a6.5 6.5 0 0 0 10.5 10.5Z' },
+      { name: 'Subuh',   ar: 'صبح',   time: '5:52', icon: 'M3 18h18 M7 18a5 5 0 0 1 10 0 M12 5v3 M5.6 9.6l1.8 1.8 M18.4 9.6l-1.8 1.8' },
+      { name: 'Syuruk',  ar: 'شروق',  time: '7:01', icon: 'M3 20h18 M6 16a6 6 0 0 1 12 0 M12 3v5 M9 6l3-3 3 3' },
+      { name: 'Zohor',   ar: 'ظهر',   time: '1:05', icon: 'M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z M12 2v2 M12 20v2 M4.9 4.9l1.4 1.4 M17.7 17.7l1.4 1.4 M2 12h2 M20 12h2 M4.9 19.1l1.4-1.4 M17.7 6.3l1.4-1.4' },
+      { name: 'Asar',    ar: 'عصر',   time: '4:11', icon: 'M12 7a4 4 0 1 0 0 8 4 4 0 0 0 0-8Z M12 2v2 M5 5l1.4 1.4 M19 5l-1.4 1.4 M3 20h18' },
+      { name: 'Maghrib', ar: 'مغرب',  time: '7:06', icon: 'M3 18h18 M7 18a5 5 0 0 1 10 0 M12 10V3 M9 7l3 3 3-3' },
+      { name: 'Isyak',   ar: 'عشاء',  time: '8:16', icon: 'M19 14A7.5 7.5 0 1 1 10 5a6 6 0 0 0 9 9Z M17 3l.7 1.6 1.6.7-1.6.7-.7 1.6-.7-1.6-1.6-.7 1.6-.7Z' }
+    ];
+    const waktu = T.map((t, i) => {
+      const cur = i === p.cur, nxt = i === p.next;
+      return Object.assign({}, t, {
+        bg: cur ? 'rgba(255,255,255,0.95)' : 'rgba(8,18,28,0.32)',
+        border: nxt ? '2px solid #F5D33B' : (cur ? '2px solid rgba(255,255,255,0.95)' : '1px solid rgba(255,255,255,0.24)'),
+        fg: cur ? '#0F2E24' : '#FFFFFF',
+        hasChip: cur || nxt,
+        chip: cur ? 'Sekarang' : 'Seterusnya',
+        chipBg: cur ? '#1F7A55' : '#F5D33B',
+        chipFg: cur ? '#FFFFFF' : '#2A2400'
+      });
+    });
+    return { p, waktu, showArabic: this.props.showArabic ?? true };
+  }
+}
+</script>
+</body>
+</html>

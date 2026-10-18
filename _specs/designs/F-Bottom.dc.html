@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Konsep F Tenang Bar Bawah</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#2D7FA8}a:hover{color:#14303D}
+</style>
+</helmet>
+<div style="position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: 'Manrope', sans-serif; background: {{t.bg}}; color: {{t.fg}}">
+
+<div style="position: absolute; top: 56px; left: 96px; right: 96px; height: 690px; box-sizing: border-box; border-radius: 40px; background: {{t.card}}; box-shadow: 0 30px 70px rgba(20,30,50,0.08); padding: 88px 110px; display: flex; flex-direction: column; gap: 32px">
+<div style="display: flex; align-items: center; gap: 12px; font-size: 22px; font-weight: 600; letter-spacing: 0.16em; color: {{t.accent}}">
+<div style="width: 10px; height: 10px; border-radius: 999px; background: {{t.accent}}"></div>PENGUMUMAN
+</div>
+<div style="font-size: 92px; font-weight: 600; letter-spacing: -3px; line-height: 1.02; color: {{t.cardFg}}">[Tajuk pengumuman]</div>
+<div style="font-size: 36px; font-weight: 500; line-height: 1.5; color: {{t.cardMuted}}; max-width: 1300px">[Isi pengumuman ringkas dalam dua atau tiga baris. Ruang lapang dibiarkan supaya mudah dibaca dari jauh.]</div>
+<div style="margin-top: auto; display: flex; gap: 64px; font-size: 24px; font-weight: 500; color: {{t.cardMuted}}">
+<div>Daripada <span style="color: {{t.cardFg}}; font-weight: 600">[Biro / AJK]</span></div>
+<div>Sehingga <span style="color: {{t.cardFg}}; font-weight: 600">[Tarikh]</span></div>
+</div>
+</div>
+
+<div style="position: absolute; left: 96px; right: 96px; bottom: 56px; height: 230px; display: grid; grid-template-columns: 360px minmax(0, 1fr); gap: 40px; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 22px; font-weight: 500">Nama Masjid / Surau</div>
+<div style="font-size: 132px; font-weight: 300; letter-spacing: -6px; line-height: 0.9; font-variant-numeric: tabular-nums">{{p.clock}}</div>
+<div style="font-size: 21px; font-weight: 500; color: {{t.muted}}">Sab, 17 Okt · 6 Jamadilawal 1448H</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px; height: 190px">
+<sc-for list="{{waktu}}" as="w" hint-placeholder-count="7">
+<div style="display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 10px; border-radius: 32px; background: {{w.bg}}; box-shadow: {{w.shadow}}">
+<div style="font-size: 26px; font-weight: {{w.weight}}; color: {{w.nColor}}">{{w.name}}</div>
+<div style="font-size: 58px; font-weight: {{w.tWeight}}; letter-spacing: -2px; line-height: 1; font-variant-numeric: tabular-nums; color: {{w.tColor}}">{{w.time}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"phase":{"editor":"enum","options":["subuh","zohor","asar","maghrib","isyak"],"default":"asar","section":"Waktu"},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const TH = {
+      subuh:   { bg: '#E8EAF6', fg: '#1F2440', muted: '#5F6585', accent: '#4F58AE', pill: '#FFFFFF', card: '#FFFFFF', cardFg: '#1F2440', cardMuted: '#5F6585' },
+      zohor:   { bg: '#EAF3F8', fg: '#14303D', muted: '#56707E', accent: '#23709A', pill: '#FFFFFF', card: '#FFFFFF', cardFg: '#14303D', cardMuted: '#56707E' },
+      asar:    { bg: '#F8EFE6', fg: '#3B2A1E', muted: '#7E6853', accent: '#A9612A', pill: '#FFFFFF', card: '#FFFFFF', cardFg: '#3B2A1E', cardMuted: '#7E6853' },
+      maghrib: { bg: '#F6E9EC', fg: '#3A2230', muted: '#80616E', accent: '#9C3F5E', pill: '#FFFFFF', card: '#FFFFFF', cardFg: '#3A2230', cardMuted: '#80616E' },
+      isyak:   { bg: '#131A2B', fg: '#E9ECF5', muted: '#8F98B3', accent: '#9DB0EE', pill: 'rgba(255,255,255,0.09)', card: '#1B2338', cardFg: '#E9ECF5', cardMuted: '#8F98B3' }
+    };
+    const P = {
+      subuh: { clock: '6:12', cur: 1 }, zohor: { clock: '1:20', cur: 3 }, asar: { clock: '4:42', cur: 4 },
+      maghrib: { clock: '7:15', cur: 5 }, isyak: { clock: '9:30', cur: 6 }
+    };
+    const key = this.props.phase ?? 'asar';
+    const t = TH[key] || TH.asar, p = P[key] || P.asar;
+    const T = [
+      { name: 'Imsak', time: '5:42' }, { name: 'Subuh', time: '5:52' }, { name: 'Syuruk', time: '7:01' },
+      { name: 'Zohor', time: '1:05' }, { name: 'Asar', time: '4:11' }, { name: 'Maghrib', time: '7:06' },
+      { name: 'Isyak', time: '8:16' }
+    ];
+    const waktu = T.map((w, i) => {
+      const cur = i === p.cur;
+      return Object.assign({}, w, {
+        bg: cur ? t.pill : 'transparent',
+        shadow: cur ? '0 18px 40px rgba(20,30,50,0.10)' : 'none',
+        weight: cur ? 800 : 500,
+        tWeight: cur ? 700 : 500,
+        nColor: cur ? t.accent : t.muted,
+        tColor: cur ? t.accent : t.fg
+      });
+    });
+    return { t, p, waktu };
+  }
+}
+</script>
+</body>
+</html>

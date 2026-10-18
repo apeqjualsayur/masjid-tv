@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Bar Bawah dan Kuliah</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Noto+Naskh+Arabic:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#1F7A55}a:hover{color:#0F2E24}
+</style>
+</helmet>
+<div style="position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; color: #FFFFFF">
+<div style="position: absolute; inset: 0; background: {{p.sky}}"></div>
+<svg aria-hidden="true" width="1920" height="1080" viewBox="0 0 1920 1080" style="position: absolute; inset: 0">
+<defs>
+<radialGradient id="glow">
+<stop offset="0" stop-color="{{p.sunC}}" stop-opacity="0.9"></stop>
+<stop offset="0.35" stop-color="{{p.sunC}}" stop-opacity="0.3"></stop>
+<stop offset="1" stop-color="{{p.sunC}}" stop-opacity="0"></stop>
+</radialGradient>
+</defs>
+<circle cx="{{p.sx}}" cy="{{p.sy}}" r="{{p.glowR}}" fill="url(#glow)"></circle>
+<circle cx="{{p.sx}}" cy="{{p.sy}}" r="{{p.sr}}" fill="{{p.sunC}}"></circle>
+<path fill="{{p.l1}}" opacity="0.85" d="M0 760 L180 690 L340 730 L520 640 L700 700 L880 620 L1060 690 L1240 610 L1420 680 L1600 630 L1780 690 L1920 650 L1920 1080 L0 1080 Z"></path>
+<path fill="{{p.l2}}" d="M0 840 C200 780 380 800 560 820 S920 760 1120 800 S1500 840 1700 790 S1880 800 1920 810 L1920 1080 L0 1080 Z"></path>
+<path fill="{{p.l3}}" d="M0 900 C260 860 520 880 760 900 S1240 940 1500 900 S1800 880 1920 890 L1920 1080 L0 1080 Z"></path>
+</svg>
+
+<div style="position: absolute; top: 36px; left: 36px; right: 36px; height: 744px; border-radius: 32px; overflow: hidden; background: #F3F8F5; color: #0F2E24; box-shadow: 0 24px 60px rgba(0,0,0,0.25)">
+<svg aria-hidden="true" width="560" height="560" viewBox="0 0 100 100" style="position: absolute; top: -140px; right: -140px; opacity: 0.08" fill="none" stroke="{{accent}}" stroke-width="1.2">
+<rect x="18" y="18" width="64" height="64"></rect>
+<rect x="18" y="18" width="64" height="64" transform="rotate(45 50 50)"></rect>
+<circle cx="50" cy="50" r="18"></circle>
+</svg>
+<div style="position: relative; height: 100%; box-sizing: border-box; padding: 72px 80px; display: grid; grid-template-columns: minmax(0, 1fr) 440px; gap: 72px">
+<div style="display: flex; flex-direction: column; gap: 28px; justify-content: center">
+<div style="display: flex">
+<div style="padding: 10px 20px; border-radius: 999px; background: {{accent}}; color: #FFFFFF; font-size: 20px; font-weight: 800; letter-spacing: 0.1em">KULIAH MAGHRIB</div>
+</div>
+<div style="font-size: 84px; font-weight: 800; line-height: 1.02; letter-spacing: -2.5px">[Tajuk kuliah di sini]</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 24px; font-weight: 500; color: #4D6B5F">bersama</div>
+<div style="font-size: 42px; font-weight: 700">[Nama Penceramah]</div>
+</div>
+<div style="height: 2px; background: #D6E6DD; width: 100%"></div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px">
+<div style="display: flex; gap: 16px; align-items: flex-start">
+<div style="width: 56px; height: 56px; flex-shrink: 0; border-radius: 16px; background: color-mix(in srgb, {{accent}} 14%, #FFFFFF); display: flex; align-items: center; justify-content: center; color: {{accent}}">
+<svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"></rect><path d="M3 10h18 M8 3v4 M16 3v4"></path></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 17px; font-weight: 700; letter-spacing: 0.08em; color: #4D6B5F">TARIKH</div>
+<div style="font-size: 28px; font-weight: 700; line-height: 1.2">Selasa, 20 Okt 2026</div>
+</div>
+</div>
+<div style="display: flex; gap: 16px; align-items: flex-start">
+<div style="width: 56px; height: 56px; flex-shrink: 0; border-radius: 16px; background: color-mix(in srgb, {{accent}} 14%, #FFFFFF); display: flex; align-items: center; justify-content: center; color: {{accent}}">
+<svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"></circle><path d="M12 7v5l3 2"></path></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 17px; font-weight: 700; letter-spacing: 0.08em; color: #4D6B5F">MASA</div>
+<div style="font-size: 28px; font-weight: 700; line-height: 1.2">Selepas Maghrib</div>
+</div>
+</div>
+<div style="display: flex; gap: 16px; align-items: flex-start">
+<div style="width: 56px; height: 56px; flex-shrink: 0; border-radius: 16px; background: color-mix(in srgb, {{accent}} 14%, #FFFFFF); display: flex; align-items: center; justify-content: center; color: {{accent}}">
+<svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-6.2-7-12a7 7 0 0 1 14 0c0 5.8-7 12-7 12Z"></path><circle cx="12" cy="9" r="2.5"></circle></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 17px; font-weight: 700; letter-spacing: 0.08em; color: #4D6B5F">TEMPAT</div>
+<div style="font-size: 28px; font-weight: 700; line-height: 1.2">Dewan Solat Utama</div>
+</div>
+</div>
+</div>
+</div>
+<div style="border-radius: 28px; background: color-mix(in srgb, {{accent}} 12%, #FFFFFF); border: 2px dashed color-mix(in srgb, {{accent}} 40%, #FFFFFF); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; color: {{accent}}">
+<svg aria-hidden="true" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"></circle><path d="M4 21a8 8 0 0 1 16 0"></path></svg>
+<div style="font-size: 22px; font-weight: 600; color: #4D6B5F">Foto penceramah (pilihan)</div>
+</div>
+</div>
+<div style="position: absolute; bottom: 26px; left: 0; right: 0; display: flex; justify-content: center; gap: 10px">
+<div style="width: 32px; height: 8px; border-radius: 999px; background: {{accent}}"></div>
+<div style="width: 8px; height: 8px; border-radius: 999px; background: #C3D8CC"></div>
+<div style="width: 8px; height: 8px; border-radius: 999px; background: #C3D8CC"></div>
+<div style="width: 8px; height: 8px; border-radius: 999px; background: #C3D8CC"></div>
+</div>
+</div>
+
+<div style="position: absolute; left: 36px; right: 36px; bottom: 36px; height: 240px; box-sizing: border-box; padding: 28px 32px; border-radius: 30px; background: rgba(8,18,28,0.44); border: 1px solid rgba(255,255,255,0.22); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); display: grid; grid-template-columns: 340px 330px minmax(0, 1fr); gap: 32px; align-items: center">
+<div style="display: flex; align-items: center; gap: 18px">
+<div style="width: 76px; height: 76px; flex-shrink: 0; border-radius: 999px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 26px; font-weight: 800; color: {{accent}}">NM</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 28px; font-weight: 700; line-height: 1.15">Nama Masjid / Surau</div>
+<div style="font-size: 19px; font-weight: 500; opacity: 0.85">Zon JAKIM SGR01</div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding-left: 32px; border-left: 1px solid rgba(255,255,255,0.22)">
+<div style="font-size: 100px; font-weight: 700; letter-spacing: -3px; line-height: 0.95; font-variant-numeric: tabular-nums">{{p.clock}}</div>
+<div style="font-size: 21px; font-weight: 600; color: #F5D33B">{{p.countdown}}</div>
+<div style="font-size: 18px; font-weight: 500; opacity: 0.85">Sab, 17 Okt · 6 Jamadilawal 1448H</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 10px">
+<sc-for list="{{waktu}}" as="w" hint-placeholder-count="7">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 18px 6px; border-radius: 20px; background: {{w.bg}}; border: {{w.border}}; color: {{w.fg}}">
+<div style="font-size: 21px; font-weight: 700">{{w.name}}</div>
+<sc-if value="{{showArabic}}" hint-placeholder-val="{{true}}">
+<div style="font-family: 'Noto Naskh Arabic', serif; font-size: 20px; opacity: 0.85; line-height: 1.2">{{w.ar}}</div>
+</sc-if>
+<div style="font-size: 40px; font-weight: 800; letter-spacing: -1px; font-variant-numeric: tabular-nums; line-height: 1">{{w.time}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"phase":{"editor":"enum","options":["subuh","zohor","asar","maghrib","isyak"],"default":"maghrib","section":"Waktu"},"accent":{"editor":"color","options":["#1F7A55","#1E5FA8","#8A5A1E","#6B3FA0"],"default":"#1F7A55","section":"Jenama masjid"},"showArabic":{"editor":"boolean","default":true,"section":"Bahasa"},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = {
+      subuh:   { clock: '6:12', countdown: 'Syuruk dalam 49 minit', cur: 1, next: 2,
+                 sky: 'linear-gradient(180deg,#0E1A3D 0%,#24407E 45%,#6F7FB8 72%,#F2B27A 100%)',
+                 sunC: '#FFD9A8', sx: 960, sy: 820, sr: 60, glowR: 420, l1: '#3A4F8F', l2: '#22346A', l3: '#121F45' },
+      zohor:   { clock: '1:20', countdown: 'Asar dalam 2 jam 51 minit', cur: 3, next: 4,
+                 sky: 'linear-gradient(180deg,#F7CF6A 0%,#F2AE3C 45%,#E58A27 100%)',
+                 sunC: '#FFF4D2', sx: 1500, sy: 230, sr: 110, glowR: 520, l1: '#D9822B', l2: '#B5611C', l3: '#7A3D10' },
+      asar:    { clock: '4:42', countdown: 'Maghrib dalam 2 jam 24 minit', cur: 4, next: 5,
+                 sky: 'linear-gradient(180deg,#F6A15A 0%,#E2673A 48%,#9E3320 100%)',
+                 sunC: '#FFE0B0', sx: 1380, sy: 560, sr: 95, glowR: 480, l1: '#9C3A1E', l2: '#6E2412', l3: '#3E1209' },
+      maghrib: { clock: '7:15', countdown: 'Isyak dalam 1 jam 01 minit', cur: 5, next: 6,
+                 sky: 'linear-gradient(180deg,#2E2D6B 0%,#6C5BA8 45%,#C89BC4 75%,#F4B8A0 100%)',
+                 sunC: '#FFD3B5', sx: 960, sy: 860, sr: 70, glowR: 460, l1: '#6A5AA6', l2: '#463C82', l3: '#251F52' },
+      isyak:   { clock: '9:30', countdown: 'Imsak dalam 8 jam 12 minit', cur: 6, next: 0,
+                 sky: 'linear-gradient(180deg,#041E26 0%,#0B3F4C 52%,#1E7A85 100%)',
+                 sunC: '#E9F6F7', sx: 1520, sy: 190, sr: 44, glowR: 260, l1: '#0F5662', l2: '#0A3B45', l3: '#05232A' }
+    };
+    const p = P[this.props.phase ?? 'maghrib'] || P.maghrib;
+    const T = [
+      { name: 'Imsak', ar: 'إمساك', time: '5:42' }, { name: 'Subuh', ar: 'صبح', time: '5:52' },
+      { name: 'Syuruk', ar: 'شروق', time: '7:01' }, { name: 'Zohor', ar: 'ظهر', time: '1:05' },
+      { name: 'Asar', ar: 'عصر', time: '4:11' }, { name: 'Maghrib', ar: 'مغرب', time: '7:06' },
+      { name: 'Isyak', ar: 'عشاء', time: '8:16' }
+    ];
+    const waktu = T.map((t, i) => {
+      const cur = i === p.cur, nxt = i === p.next;
+      return Object.assign({}, t, {
+        bg: cur ? 'rgba(255,255,255,0.95)' : 'rgba(255,255,255,0.06)',
+        border: nxt ? '2px solid #F5D33B' : (cur ? '2px solid rgba(255,255,255,0.95)' : '1px solid rgba(255,255,255,0.16)'),
+        fg: cur ? '#0F2E24' : '#FFFFFF'
+      });
+    });
+    return { p, waktu, accent: this.props.accent ?? '#1F7A55', showArabic: this.props.showArabic ?? true };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@theme {
+  --font-jakarta: var(--font-plus-jakarta-sans);
+  --font-naskh: var(--font-noto-naskh-arabic);
+  --font-barlow: var(--font-barlow);
+  --font-barlow-condensed: var(--font-barlow-condensed);
+  --font-kufi: var(--font-reem-kufi);
+  --font-amiri: var(--font-amiri);
+  --font-manrope: var(--font-manrope);
+}
+
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+}

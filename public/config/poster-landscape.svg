@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="1080" viewBox="0 0 1920 1080">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#1E5FA8"/>
+      <stop offset="1" stop-color="#0B2547"/>
+    </linearGradient>
+  </defs>
+  <rect width="1920" height="1080" fill="url(#g)"/>
+  <circle cx="1560" cy="300" r="180" fill="#F5D33B" fill-opacity="0.9"/>
+  <path d="M0 860 C320 780 640 820 960 860 S1600 900 1920 840 L1920 1080 L0 1080 Z" fill="#081B33"/>
+  <text x="140" y="330" font-family="sans-serif" font-size="52" font-weight="700" fill="#F5D33B" letter-spacing="8">CONTOH POSTER LANDSKAP</text>
+  <text x="140" y="520" font-family="sans-serif" font-size="140" font-weight="800" fill="#FFFFFF">[Tajuk program]</text>
+  <text x="140" y="630" font-family="sans-serif" font-size="56" fill="#FFFFFF" fill-opacity="0.85">[Tarikh · Masa · Tempat]</text>
+  <text x="140" y="980" font-family="sans-serif" font-size="40" fill="#FFFFFF" fill-opacity="0.7">16:9 · dipapar tanpa dipotong</text>
+</svg>

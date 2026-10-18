@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Kiraan Iqamah</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Noto+Naskh+Arabic:wght@500;600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#F5D33B}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: 'Plus Jakarta Sans', sans-serif; color: #FFFFFF; background: radial-gradient(circle at 50% 48%, #175A42 0%, #0B2E22 52%, #061B14 100%)">
+<svg aria-hidden="true" width="1100" height="1100" viewBox="0 0 100 100" style="position: absolute; left: 410px; top: -10px; opacity: 0.05" fill="none" stroke="#FFFFFF" stroke-width="0.4">
+<rect x="18" y="18" width="64" height="64"></rect>
+<rect x="18" y="18" width="64" height="64" transform="rotate(45 50 50)"></rect>
+<rect x="28" y="28" width="44" height="44"></rect>
+<rect x="28" y="28" width="44" height="44" transform="rotate(45 50 50)"></rect>
+</svg>
+
+<div style="position: absolute; inset: 0; box-sizing: border-box; padding: 56px 72px; display: flex; flex-direction: column; justify-content: space-between; align-items: center">
+<div style="align-self: stretch; display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; align-items: center; gap: 18px">
+<div style="width: 68px; height: 68px; border-radius: 999px; background: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 800; color: #1F7A55">NM</div>
+<div style="font-size: 30px; font-weight: 700">Nama Masjid / Surau</div>
+</div>
+<div style="font-size: 28px; font-weight: 600; opacity: 0.85">Azan Zohor · 1:05</div>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 18px">
+<div style="font-family: 'Noto Naskh Arabic', serif; font-size: 60px; font-weight: 600; line-height: 1.1">إقامة</div>
+<div style="font-size: 32px; font-weight: 800; letter-spacing: 0.32em; color: #F5D33B">IQAMAH ZOHOR</div>
+<div style="position: relative; width: 560px; height: 560px; margin-top: 8px">
+<svg aria-hidden="true" width="560" height="560" viewBox="0 0 560 560" style="position: absolute; inset: 0; transform: rotate(-90deg)">
+<defs>
+<linearGradient id="ring" x1="0" y1="0" x2="1" y2="1">
+<stop offset="0" stop-color="#9BE15D"></stop>
+<stop offset="1" stop-color="#F5D33B"></stop>
+</linearGradient>
+</defs>
+<circle cx="280" cy="280" r="250" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="28"></circle>
+<circle cx="280" cy="280" r="250" fill="none" stroke="url(#ring)" stroke-width="28" stroke-linecap="round" stroke-dasharray="{{dash}}" stroke-dashoffset="{{offset}}"></circle>
+</svg>
+<div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+<div style="font-size: 168px; font-weight: 800; letter-spacing: -6px; line-height: 1; font-variant-numeric: tabular-nums">{{remaining}}</div>
+<div style="font-size: 30px; font-weight: 600; opacity: 0.8">minit lagi</div>
+</div>
+</div>
+</div>
+
+<div style="display: flex; gap: 20px">
+<div style="display: flex; align-items: center; gap: 14px; padding: 18px 30px; border-radius: 999px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); font-size: 28px; font-weight: 600">
+<svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F5D33B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.5"></circle><circle cx="12" cy="6" r="2.5"></circle><circle cx="18" cy="6" r="2.5"></circle><path d="M3 20v-5a3 3 0 0 1 6 0v5 M9 20v-5a3 3 0 0 1 6 0v5 M15 20v-5a3 3 0 0 1 6 0v5"></path></svg>
+Luruskan dan rapatkan saf
+</div>
+<div style="display: flex; align-items: center; gap: 14px; padding: 18px 30px; border-radius: 999px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.18); font-size: 28px; font-weight: 600">
+<svg aria-hidden="true" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#F5D33B" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2.5"></rect><path d="M3 3l18 18"></path></svg>
+Senyapkan telefon bimbit
+</div>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"progress":{"editor":"range","min":0,"max":1,"step":0.01,"default":0.23,"section":"Iqamah"},"totalMinutes":{"editor":"int","min":1,"max":30,"default":10,"section":"Iqamah"},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const progress = Math.min(1, Math.max(0, this.props.progress ?? 0.23));
+    const total = (this.props.totalMinutes ?? 10) * 60;
+    const left = Math.round(total * (1 - progress));
+    const mm = Math.floor(left / 60), ss = left % 60;
+    const C = 2 * Math.PI * 250;
+    return {
+      remaining: String(mm).padStart(2, '0') + ':' + String(ss).padStart(2, '0'),
+      dash: C.toFixed(1) + ' ' + C.toFixed(1),
+      offset: (C * progress).toFixed(1)
+    };
+  }
+}
+</script>
+</body>
+</html>

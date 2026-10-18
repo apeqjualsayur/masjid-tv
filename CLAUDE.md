@@ -1,0 +1,54 @@
+# Masjid TV
+
+Full-screen prayer-times display for masjid/surau TVs (JAKIM times, clock, azan/iqamah/solat modes, announcements). Must keep working offline for weeks.
+
+## Always read `_specs/` before changing behaviour
+
+- `_specs/00-PRD.md` — product rules: prayer list, current/next/phase rules, mode state machine, data + offline strategy, config, debug URL params, acceptance criteria.
+- `_specs/01-theme-contract.md` — `DisplayState` / `ThemeDefinition` interfaces and every theme's tokens, sizes and rules.
+- `_specs/02-claude-code-prompts.md` — the Phase 1 build order.
+- `_specs/designs/*.dc.html` — visual references (`A-*` alam, `D-*` serambi, `F-*` tenang). Design-tool source: read the markup and inline styles; they do not run standalone.
+
+If code and spec disagree, the spec wins — or update the spec first, deliberately.
+
+## Stack
+
+- Next.js (App Router) + TypeScript + Tailwind CSS v4, **static export** (`output: 'export'` → `out/`). No server code, API routes or runtime image optimisation.
+- Vitest for unit tests (`npm test`). `tsx` for scripts.
+- Fonts self-hosted via `next/font/google` in `src/app/fonts.ts` (downloaded at build time, no runtime Google requests). Use the CSS variables / Tailwind `font-*` utilities; never add a `<link>` to Google Fonts.
+
+## Folders
+
+| Path | Contains |
+|---|---|
+| `src/core/` | Prayer engine: time/`now()`, schedule (current/next/phase), mode state machine, formatting. **Pure TS** |
+| `src/data/` | API client (waktusolat.app), IndexedDB cache, bundled fallback, zones list |
+| `src/themes/` | `types.ts` (ThemeDefinition), `registry.ts`, `ThemeView.tsx` (picks layout vs full-screen mode). Theme render tests in `themes.test.tsx` |
+| `src/themes/{alam,serambi,tenang}/` | One self-contained folder per theme implementing `ThemeDefinition` |
+| `src/templates/` | Announcement template field schemas + sample data (no styling) |
+| `src/app/tv/` | The display page: config + URL overrides → `DisplayState` → selected theme on a 1920×1080 stage |
+| `scripts/` | Build-time scripts (e.g. `fetch-year.ts` for fallback data) |
+| `public/config/` | `screen.json` (Phase 1 config), logo, sample slides/posters |
+| `public/data/` | Bundled 12-month fallback prayer data: `{zone}-{year}.json` |
+
+## Folder rules (hard)
+
+- **No styling in `src/core`**: no React, no CSS, no colours, no DOM. Pure functions that take time/data/config and return values. Everything there is unit-tested.
+- **No prayer logic in themes**: themes only render the `DisplayState` they receive. Never compute current/next/phase/mode/countdown or format times inside a theme.
+- Themes never import from each other. All theme colours come from that theme's token table for the current `phase` (contract §2).
+- Never show guessed prayer times: read order is IndexedDB → bundled fallback → "Data waktu tidak tersedia".
+- All time reads go through the single `now()` in `src/core` (clock offset + debug sim/speed).
+
+## Commands
+
+- `npm run dev` — dev server (open `/tv/`; on localhost debug params work without `?debug=1`, e.g. `/tv/?theme=tenang&layout=side&slide=infaq&sim=2026-10-17T14:30`; `?debug=state` shows the raw DisplayState)
+- `npm test` — Vitest
+- `npm run build` — static export to `out/`, then writes `out/sw.js` (service worker from `scripts/sw-template.js` + precache list)
+- `npm run lint` — type-check
+- `npm run e2e` — browser acceptance checks for PRD §12 against the built `out/` (run `npm run build` first; see `_specs/03-test-plan.md`)
+- `npm run sample-slides` — regenerate `public/config/sample-slides.json` from `src/templates/samples.ts`
+- `npm run fetch-year -- SGR01 2027` — rebuild the bundled fallback `public/data/{zone}-{year}.json` (re-run when JAKIM publishes a new year)
+
+## Deployment
+
+Cloudflare Pages (static, preset None, build `npm run build`, output `out`, `NODE_VERSION=24`). Non-coder guide: `DEPLOY.md`. CI: `.github/workflows/test.yml`.

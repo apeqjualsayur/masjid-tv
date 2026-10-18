@@ -1,0 +1,11 @@
+{
+  "masjid": { "fullName": "Nama Masjid / Surau", "shortName": "NM", "logo": "/config/logo.png" },
+  "zone": "SGR01",
+  "theme": "alam",
+  "layout": "full",
+  "clock24h": false,
+  "showArabic": true,
+  "durations": { "preAzanMin": 5, "azanMin": 3, "solatMin": 12, "khutbahMin": 40 },
+  "iqamahMin": { "subuh": 10, "zohor": 10, "asar": 10, "maghrib": 7, "isyak": 10 },
+  "ticker": ["[Teks pengumuman]"]
+}

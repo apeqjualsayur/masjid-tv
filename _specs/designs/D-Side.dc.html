@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Konsep D Bar Sisi</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&amp;family=Barlow+Condensed:wght@500;600;700&amp;family=Amiri:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#E3B04B}a:hover{color:#FFFFFF}
+</style>
+</helmet>
+<div style="position: relative; width: 1920px; height: 1080px; overflow: hidden; font-family: 'Barlow', sans-serif; background: #0B1114; color: #FFFFFF; display: flex">
+
+<div style="flex: 1; position: relative; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse 60% 70% at 50% 60%, #15332B 0%, #0B1114 75%)">
+<div style="width: 920px; height: 960px; box-sizing: border-box; border: 2px solid rgba(227,176,75,0.8); border-radius: 460px 460px 28px 28px; padding: 200px 90px 80px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 30px; text-align: center">
+<div style="font-size: 22px; font-weight: 600; letter-spacing: 0.3em; color: #E3B04B">AYAT HARI INI</div>
+<div lang="ar" dir="rtl" style="font-family: 'Amiri', serif; font-size: 60px; line-height: 1.9">يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ ۚ إِنَّ اللَّهَ مَعَ الصَّابِرِينَ</div>
+<div style="width: 80px; height: 2px; background: rgba(227,176,75,0.6)"></div>
+<div style="font-size: 32px; font-weight: 400; line-height: 1.5; color: rgba(255,255,255,0.82)">Wahai orang-orang yang beriman, mohonlah pertolongan dengan sabar dan solat; sesungguhnya Allah bersama orang-orang yang sabar.</div>
+<div style="font-size: 24px; font-weight: 600; color: #E3B04B">Surah Al-Baqarah, 2:153</div>
+</div>
+</div>
+
+<div style="width: 600px; flex-shrink: 0; box-sizing: border-box; padding: 48px 44px; background: #111A1D; border-left: 1px solid rgba(227,176,75,0.3); display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; align-items: center; gap: 16px">
+<div style="width: 58px; height: 58px; flex-shrink: 0; box-sizing: border-box; border-radius: 999px; border: 2px solid #E3B04B; display: flex; align-items: center; justify-content: center; font-size: 20px; font-weight: 600; color: #E3B04B">NM</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="font-size: 26px; font-weight: 600; line-height: 1.15">Nama Masjid / Surau</div>
+<div style="font-size: 19px; font-weight: 400; color: rgba(255,255,255,0.6)">Sab, 17 Okt 2026 · <span style="color: #E3B04B">6 Jamadilawal 1448H</span></div>
+</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: baseline; gap: 10px">
+<div style="font-family: 'Barlow Condensed', sans-serif; font-size: 170px; font-weight: 600; letter-spacing: -3px; line-height: 0.82; font-variant-numeric: tabular-nums">{{p.clock}}</div>
+<div style="font-family: 'Barlow Condensed', sans-serif; font-size: 54px; font-weight: 500; color: #E3B04B; font-variant-numeric: tabular-nums">{{p.sec}}</div>
+</div>
+<div style="font-size: 24px; font-weight: 500; color: #E3B04B">{{p.countdown}}</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px">
+<sc-for list="{{rows}}" as="r" hint-placeholder-count="7">
+<div style="display: flex; align-items: center; gap: 18px; height: 78px; box-sizing: border-box; padding: 0 20px 0 14px; border-radius: 18px; background: {{r.bg}}; border: {{r.border}}; opacity: {{r.op}}">
+<div style="width: 38px; height: 54px; flex-shrink: 0; border-radius: 19px 19px 6px 6px; background: {{r.sky}}"></div>
+<div style="font-size: 34px; font-weight: {{r.weight}}">{{r.name}}</div>
+<sc-if value="{{r.cur}}" hint-placeholder-val="{{false}}">
+<div style="padding: 4px 10px; border-radius: 999px; background: #E3B04B; color: #1A1405; font-size: 13px; font-weight: 700; letter-spacing: 0.12em">SEKARANG</div>
+</sc-if>
+<div style="margin-left: auto; font-family: 'Barlow Condensed', sans-serif; font-size: 62px; font-weight: 600; font-variant-numeric: tabular-nums; color: {{r.timeColor}}">{{r.time}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"phase":{"editor":"enum","options":["subuh","zohor","asar","maghrib","isyak"],"default":"isyak","section":"Waktu"},"$preview":{"width":1920,"height":1080}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = {
+      subuh:   { clock: '6:12', sec: '08', cur: 1, next: 2, countdown: 'Syuruk dalam 49 minit' },
+      zohor:   { clock: '1:20', sec: '36', cur: 3, next: 4, countdown: 'Asar dalam 2 jam 51 minit' },
+      asar:    { clock: '4:42', sec: '15', cur: 4, next: 5, countdown: 'Maghrib dalam 2 jam 24 minit' },
+      maghrib: { clock: '7:15', sec: '50', cur: 5, next: 6, countdown: 'Isyak dalam 1 jam 01 minit' },
+      isyak:   { clock: '9:30', sec: '04', cur: 6, next: 0, countdown: 'Imsak dalam 8 jam 12 minit' }
+    };
+    const p = P[this.props.phase ?? 'isyak'] || P.isyak;
+    const T = [
+      { name: 'Imsak',   time: '5:42', sky: 'linear-gradient(180deg,#0B1638 0%,#1F2F66 100%)' },
+      { name: 'Subuh',   time: '5:52', sky: 'linear-gradient(180deg,#1B2C5E 0%,#5C6FB0 60%,#E9A97A 100%)' },
+      { name: 'Syuruk',  time: '7:01', sky: 'linear-gradient(180deg,#5E86C4 0%,#F4C38E 100%)' },
+      { name: 'Zohor',   time: '1:05', sky: 'linear-gradient(180deg,#2F7FC6 0%,#8CC6EE 100%)' },
+      { name: 'Asar',    time: '4:11', sky: 'linear-gradient(180deg,#3D7DB8 0%,#E9B36A 100%)' },
+      { name: 'Maghrib', time: '7:06', sky: 'linear-gradient(180deg,#3B2D6B 0%,#C46A7A 60%,#F2A65E 100%)' },
+      { name: 'Isyak',   time: '8:16', sky: 'linear-gradient(180deg,#050B1A 0%,#2A5A86 100%)' }
+    ];
+    const rows = T.map((r, i) => {
+      const cur = i === p.cur, nxt = i === p.next, past = i < p.cur && !(p.cur === 6 && i === 0);
+      return Object.assign({}, r, {
+        cur,
+        bg: cur ? 'rgba(227,176,75,0.14)' : 'transparent',
+        border: cur ? '2px solid #E3B04B' : (nxt ? '1px solid rgba(227,176,75,0.4)' : '1px solid transparent'),
+        op: past ? 0.45 : 1,
+        weight: cur ? 700 : 500,
+        timeColor: cur ? '#E3B04B' : '#FFFFFF'
+      });
+    });
+    return { p, rows };
+  }
+}
+</script>
+</body>
+</html>

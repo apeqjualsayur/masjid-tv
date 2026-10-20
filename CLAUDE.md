@@ -42,7 +42,7 @@ If code and spec disagree, the spec wins — or update the spec first, deliberat
 
 ## Commands
 
-- `npm run dev` — dev server (open `/tv/`; on localhost debug params work without `?debug=1`, e.g. `/tv/?theme=tenang&layout=side&slide=infaq&sim=2026-10-17T14:30`; `?debug=state` shows the raw DisplayState)
+- `npm run dev` — dev server on **port 3100** (LejarKu uses 3000), open http://localhost:3100/tv/ or /admin/ ( on localhost debug params work without `?debug=1`, e.g. `/tv/?theme=tenang&layout=side&slide=infaq&sim=2026-10-17T14:30`; `?debug=state` shows the raw DisplayState)
 - `npm test` — Vitest
 - `npm run build` — static export to `out/`, then writes `out/sw.js` (service worker from `scripts/sw-template.js` + precache list)
 - `npm run lint` — type-check

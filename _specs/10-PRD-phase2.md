@@ -97,7 +97,24 @@ Branding (logo, full name, short name, accent colour from 5 swatches), **zon JAK
 
 **Static export rule:** no dynamic route segments (`[id]`). Use query params as above.
 
-Admin visual system: deep green `#146C4A`, ink `#12261E`, ground `#F4F7F5`, cards `#FFFFFF`, muted `#51655C`, border `#C9D8D0`, gold `#E3B04B`; font Plus Jakarta Sans; radius 12–18; touch targets ≥ 44 px; designed at 390 px wide, must work 360–430 px and on tablet/desktop (max-width 480 px centred column).
+Admin visual system: deep green `#146C4A`, ink `#12261E`, ground `#F4F7F5`, cards `#FFFFFF`, muted `#51655C`, border `#C9D8D0`, gold `#E3B04B`; font Plus Jakarta Sans; radius 12–18; touch targets ≥ 44 px.
+
+### 5.1 Responsive layout (phone + computer, one app)
+
+| Width | Layout | Designs |
+|---|---|---|
+| < 768 px (phone) | Single column, bottom nav, sheets for dialogs | `Main` … `Admin` (390 px) |
+| 768–1023 px (tablet) | Phone layout in a centred column, max 640 px | — |
+| ≥ 1024 px (computer) | **Left sidebar** (248 px: logo, masjid switcher, nav incl. Ahli, user + BM/EN + sign out) and wide content area | `D-Home`, `D-Content`, `D-Editor`, `D-Poster` (1440×900) |
+
+Per screen on computer:
+- **Utama:** two columns — next prayer card with today's 7 times + "Sedang dipapar" list (with target screens) | screens list with mini previews. Primary actions top-right.
+- **Kandungan:** **table** (drag handle, type, title, dates, seconds, days, screens, show switch, ⋯ menu); tabs, search, screen filter in a toolbar. Drag to reorder with mouse.
+- **Template editor:** sticky top bar (back, title, status, Simpan draf, Terbit); **form left (440 px) | large live preview right** (≥ 720 px wide) with a screen selector; preview updates as you type.
+- **Poster:** recommended sizes + **drag-and-drop zone** + file check left | side-by-side previews per screen right, with a note when one poster suits only one layout.
+- **Skrin, Tetapan, Ahli, Platform:** same content as phone in 2-column card grids; Platform list becomes a table with filters.
+- Dialogs become centred modals instead of bottom sheets. Keyboard: Enter submits forms, Esc closes modals; visible focus rings.
+- Same components and data; only layout changes (CSS breakpoints + a `useIsDesktop()` hook where structure differs). No separate desktop app.
 
 ## 6. Posters
 
@@ -163,7 +180,7 @@ Supabase free (2 projects: `masjidview-dev`, `masjidview-prod`), Cloudflare Page
 7. Poster flow shows correct recommended sizes for the org's screens, fit labels, low-resolution warning; uploaded file ≤ 500 KB for a typical phone photo.
 8. Live preview in the template editor matches the TV rendering for all 10 templates × 3 themes.
 9. Kematian cannot be saved without an end date ≤ 7 days; purged 30 days after ending.
-10. Admin fully usable in BM and English at 360 px width; every tap target ≥ 44 px.
+10. Admin fully usable in BM and English at 360 px width; every tap target ≥ 44 px. Also fully usable on a computer at 1280×800 and 1920×1080 in Chrome, Edge and Safari (sidebar layout, table, side-by-side editor preview, drag-and-drop poster upload).
 11. Editor role cannot open Tetapan, Skrin actions or Ahli (UI hidden and DB rejects).
 12. Zone picker: "Guna lokasi saya" at a known masjid returns the correct zone; denying location falls back to the lists; a multi-zone area forces a choice; the confirmation card shows today's times matching JAKIM e-Solat for that zone.
 

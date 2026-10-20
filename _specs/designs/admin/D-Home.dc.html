@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Utama komputer</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#146C4A}a:hover{color:#0D4A33}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; overflow: hidden; display: flex; background: #F4F7F5; font-family: 'Plus Jakarta Sans', sans-serif; color: #12261E">
+<aside style="width: 248px; flex-shrink: 0; background: #FFFFFF; border-right: 1px solid #DCE6E1; box-sizing: border-box; padding: 24px 16px; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+<svg role="img" aria-label="Logo Masjid View" width="34" height="34" viewBox="0 0 76 76"><rect width="76" height="76" rx="22" fill="#146C4A"></rect><path d="M24 58V36a14 14 0 0 1 28 0v22Z" fill="#FFFFFF"></path><circle cx="38" cy="22" r="3.5" fill="#E3B04B"></circle><rect x="32" y="44" width="12" height="14" rx="6" fill="#146C4A"></rect></svg>
+<div style="font-size: 18px; font-weight: 800">Masjid View</div>
+</div>
+<button type="button" style="display: flex; align-items: center; gap: 10px; padding: 10px; border: 1px solid #DCE6E1; border-radius: 14px; background: #F7FAF8; font: inherit; text-align: left; color: #12261E">
+<div style="width: 36px; height: 36px; flex-shrink: 0; border-radius: 999px; background: #146C4A; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800">NM</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px"><div style="font-size: 14px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">Masjid [Nama]</div><div style="font-size: 12px; color: #51655C">Pentadbir · SGR01</div></div>
+<svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#51655C" stroke-width="2" stroke-linecap="round"><path d="M7 10l5 5 5-5"></path></svg>
+</button>
+<nav aria-label="Navigasi utama" style="display: flex; flex-direction: column; gap: 4px">
+<sc-for list="{{nav}}" as="n" hint-placeholder-count="5">
+<a href="{{n.href}}" aria-current="{{n.cur}}" style="display: flex; align-items: center; gap: 12px; height: 44px; padding: 0 12px; border-radius: 12px; text-decoration: none; font-size: 15px; font-weight: {{n.w}}; background: {{n.bg}}; color: {{n.fg}}">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{n.icon}}"></path></svg>{{n.label}}</a>
+</sc-for>
+</nav>
+<div style="margin-top: auto; display: flex; flex-direction: column; gap: 10px; padding: 12px; border-top: 1px solid #E6EEEA">
+<div style="font-size: 13px; font-weight: 700">[Nama pengguna]</div>
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; padding: 3px; border-radius: 10px; background: #E3ECE7"><div style="padding: 6px 10px; border-radius: 8px; background: #FFFFFF; font-size: 12px; font-weight: 800">BM</div><div style="padding: 6px 10px; font-size: 12px; font-weight: 700; color: #51655C">EN</div></div>
+<a href="Main.dc.html" style="font-size: 13px; font-weight: 700; color: #A3260F">Log keluar</a>
+</div>
+</div>
+</aside>
+
+<main style="flex: 1; min-width: 0; box-sizing: border-box; padding: 32px 40px; display: flex; flex-direction: column; gap: 24px">
+<div style="display: flex; justify-content: space-between; align-items: center">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="font-size: 28px; font-weight: 800; letter-spacing: -0.4px">Utama</div>
+<div style="font-size: 14px; color: #51655C">Isnin, 19 Oktober 2026 · 7 Jamadilawal 1448H</div>
+</div>
+<div style="display: flex; gap: 10px">
+<a href="D-Poster.dc.html" style="height: 44px; padding: 0 18px; border: 1.5px solid #146C4A; border-radius: 12px; display: flex; align-items: center; font-size: 14px; font-weight: 700; text-decoration: none">Muat naik poster</a>
+<a href="D-Editor.dc.html" style="height: 44px; padding: 0 18px; border-radius: 12px; background: #146C4A; color: #FFFFFF; display: flex; align-items: center; font-size: 14px; font-weight: 700; text-decoration: none">+ Pengumuman baru</a>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(0, 1fr); gap: 24px; flex: 1; min-height: 0">
+<div style="display: flex; flex-direction: column; gap: 24px; min-width: 0">
+<div style="border-radius: 20px; background: #146C4A; color: #FFFFFF; padding: 24px 26px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; justify-content: space-between; align-items: flex-end">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 13px; font-weight: 600; opacity: 0.85">Waktu seterusnya</div>
+<div style="font-size: 34px; font-weight: 800; letter-spacing: -0.5px">Asar 4:11</div>
+</div>
+<div style="font-size: 15px; font-weight: 700; color: #F2D287">dalam 2 jam 51 minit</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{times}}" as="t" hint-placeholder-count="7">
+<div style="border-radius: 12px; padding: 10px 12px; background: {{t.bg}}; color: {{t.fg}}; display: flex; flex-direction: column; gap: 2px">
+<div style="font-size: 12px; font-weight: 700; opacity: 0.85">{{t.n}}</div>
+<div style="font-size: 20px; font-weight: 800">{{t.v}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="flex: 1; min-height: 0; background: #FFFFFF; border-radius: 20px; box-shadow: 0 1px 3px rgba(18,38,30,0.08); padding: 20px 22px; display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 6px">
+<div style="font-size: 17px; font-weight: 800">Sedang dipapar</div>
+<a href="D-Content.dc.html" style="font-size: 14px; font-weight: 700">Urus kandungan</a>
+</div>
+<sc-for list="{{live}}" as="l" hint-placeholder-count="4">
+<div style="display: flex; align-items: center; gap: 14px; padding: 12px 0; border-top: 1px solid #EEF3F0">
+<div style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 10px; background: {{l.bg}}; color: {{l.fg}}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800">{{l.code}}</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><div style="font-size: 15px; font-weight: 700">{{l.title}}</div><div style="font-size: 13px; color: #51655C">{{l.meta}}</div></div>
+<div style="font-size: 13px; font-weight: 700; color: #51655C">{{l.screens}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border-radius: 20px; box-shadow: 0 1px 3px rgba(18,38,30,0.08); padding: 20px 22px; display: flex; flex-direction: column; gap: 14px">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<div style="font-size: 17px; font-weight: 800">Skrin</div>
+<a href="#skrin" style="font-size: 14px; font-weight: 700">+ Tambah skrin</a>
+</div>
+<sc-for list="{{screens}}" as="s" hint-placeholder-count="3">
+<div style="display: flex; gap: 14px; align-items: center; padding: 12px; border-radius: 14px; background: #F7FAF8">
+<div aria-hidden="true" style="width: 120px; height: 68px; flex-shrink: 0; border-radius: 8px; border: 3px solid #1B1B1B; box-sizing: border-box; background: {{s.thumb}}"></div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<div style="font-size: 15px; font-weight: 800">{{s.name}}</div>
+<div style="display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: {{s.c}}"><div style="width: 8px; height: 8px; border-radius: 999px; background: {{s.dot}}"></div>{{s.status}}</div>
+<div style="font-size: 12px; color: #51655C">{{s.cfg}}</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const I = {
+      home: 'M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z',
+      content: 'M12 3 2 8l10 5 10-5Z M2 13l10 5 10-5',
+      screen: 'M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z M8 21h8 M12 17v4',
+      settings: 'M4 7h9 M17 7h3 M4 17h3 M11 17h9 M15 5a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z M9 15a2 2 0 1 1 0 4 2 2 0 0 1 0-4Z',
+      people: 'M9 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z M2 21a7 7 0 0 1 14 0 M17 3.5a4 4 0 0 1 0 7.5 M22 21a7 7 0 0 0-4-6.3'
+    };
+    const active = 'home';
+    const nav = [['home', 'Utama', 'D-Home.dc.html'], ['content', 'Kandungan', 'D-Content.dc.html'], ['screen', 'Skrin', '#skrin'], ['settings', 'Tetapan', '#tetapan'], ['people', 'Ahli', '#ahli']]
+      .map(([k, label, href]) => ({ label, href, icon: I[k], cur: k === active ? 'page' : 'false', bg: k === active ? '#E3F1EA' : 'transparent', fg: k === active ? '#0D4A33' : '#3A4E45', w: k === active ? 800 : 600 }));
+    const times = [['Imsak', '5:42'], ['Subuh', '5:52'], ['Syuruk', '7:01'], ['Zohor', '1:05'], ['Asar', '4:11'], ['Maghrib', '7:06'], ['Isyak', '8:16']]
+      .map(([n, v], i) => ({ n, v, bg: i === 3 ? '#FFFFFF' : 'rgba(255,255,255,0.1)', fg: i === 3 ? '#0D4A33' : '#FFFFFF' }));
+    const live = [
+      { code: 'KEM', bg: '#ECECEC', fg: '#3A3A3A', title: '[Nama Allahyarham]', meta: 'Tamat auto 22 Okt · Keutamaan', screens: 'Semua skrin' },
+      { code: 'KUL', bg: '#E3F1EA', fg: '#146C4A', title: 'Kuliah Maghrib: [Tajuk]', meta: 'Hingga Sel, 20 Okt · 15 s', screens: 'Semua skrin' },
+      { code: 'IMG', bg: '#E6EEF8', fg: '#1F4E8A', title: '[Program Hujung Minggu]', meta: 'Hingga 26 Okt · 15 s', screens: 'Dewan Solat Utama' },
+      { code: 'INF', bg: '#FFF1D6', fg: '#8A5300', title: 'Tabung [Nama Projek]', meta: 'Berterusan · 15 s', screens: 'Semua skrin' }
+    ];
+    const screens = [
+      { name: 'Dewan Solat Utama', status: 'Dalam talian', c: '#137A4B', dot: '#1E9E62', cfg: 'Serambi · Bar bawah', thumb: 'linear-gradient(180deg,#0B1114 55%,#2F7FC6 55%,#E9B36A 100%)' },
+      { name: 'Serambi Wanita', status: 'Dalam talian', c: '#137A4B', dot: '#1E9E62', cfg: 'Alam · Bar sisi', thumb: 'linear-gradient(180deg,#F7CF6A,#E58A27)' },
+      { name: 'Pintu Masuk', status: 'Luar talian · 3 jam', c: '#B03A0A', dot: '#C2410C', cfg: 'Tenang · Penuh', thumb: '#EAF3F8' }
+    ];
+    return { nav, times, live, screens };
+  }
+}
+</script>
+</body>
+</html>

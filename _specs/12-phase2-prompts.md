@@ -5,7 +5,7 @@ Same method as Phase 1: **one prompt per session**, run in order, do the **Check
 Sections marked **🧑 You** are manual steps in a browser; the agent cannot do them.
 
 **Before 2.0:**
-1. Copy from this pack into the project: `_specs/10-PRD-phase2.md`, `_specs/11-schema.sql`, `_specs/12-phase2-prompts.md`, the updated `_specs/01-theme-contract.md`, the updated root `AGENTS.md`, and the folder `designs/admin/` (12 admin mockups).
+1. Copy from this pack into the project: `_specs/10-PRD-phase2.md`, `_specs/11-schema.sql`, `_specs/12-phase2-prompts.md`, the updated `_specs/01-theme-contract.md`, the updated root `AGENTS.md`, and the folder `designs/admin/` (12 phone + 4 computer admin mockups).
 2. Recommended: export a PNG of each admin mockup from the "Masjid View Admin" design canvas into `designs/admin/ref/` with the same names (`Main.png`, `Home.png`, …) so the agent can compare screenshots.
 3. **Antigravity:** Planning mode, review each plan, type `/verify` when it says done. **Claude Code:** ask it to run `npm test` and `npm run build` before saying done (AGENTS.md already requires this).
 
@@ -71,13 +71,13 @@ Build the admin app foundation per PRD §4.1, §5, §9 and designs/admin/Main.dc
 - Static export: NO dynamic route segments ([id]); use query params. All admin pages are client components.
 - /admin: sign-in page — "Teruskan dengan Google" (primary, signInWithOAuth) and email magic link (signInWithOtp); BM/EN toggle; link to /privasi (placeholder page for now).
 - After sign-in: call accept_invitations(), then route per PRD §4.1 (platform owner, 0 orgs → /admin/daftar, pending only → /admin/menunggu, else /admin/utama).
-- Admin layout: mobile-first column (max-width 480 px, centred on desktop), bottom nav (Utama, Kandungan, Skrin, Tetapan) hiding Skrin actions/Tetapan for editors, header with org switcher when the user has >1 org, sign-out.
+- Responsive admin layout per PRD §5.1: phone (< 768 px) bottom nav (Utama, Kandungan, Skrin, Tetapan); tablet centred column max 640 px; computer (≥ 1024 px) left sidebar per designs/admin/D-Home.dc.html (logo, masjid switcher, nav incl. Ahli, user, BM/EN, sign out). Hide Skrin actions/Tetapan/Ahli for editors. Org switcher when the user has > 1 org. Dialogs: bottom sheet on phone, centred modal on computer. One component tree; layout via CSS breakpoints + a useIsDesktop() hook only where structure differs.
 - i18n: src/admin/i18n/ms.json + en.json, a tiny useT() hook (no new dependency unless you justify it), language from profiles.lang + localStorage, default ms. No hard-coded UI strings.
 - Visual tokens from PRD §5 (green #146C4A, ink #12261E, ground #F4F7F5, Plus Jakarta Sans self-hosted), tap targets ≥ 44 px.
-- /admin/utama: real data — org name, role, next prayer (reuse Phase 1 engine with the org's zone), screens list with online/offline (last_seen within 3 min), "Sedang dipapar" (published, current slides).
+- /admin/utama: real data — org name, role, next prayer (reuse Phase 1 engine with the org's zone), screens list with online/offline (last_seen within 3 min), "Sedang dipapar" (published, current slides). Phone = designs/admin/Home.dc.html; computer = D-Home.dc.html (two columns, today's 7 times).
 - Route guard: unauthenticated → /admin.
 ```
-**Check:** on your phone (same WiFi, `npm run dev -- -H 0.0.0.0`, open `http://<laptop-ip>:3000/admin`) and laptop: Google sign-in works; magic link works; BM/EN switches every label; you land on Daftar masjid (no org yet).
+**Check:** on your phone (same WiFi, `npm run dev -- -H 0.0.0.0`, open `http://<laptop-ip>:3000/admin`) and laptop: Google sign-in works; magic link works; BM/EN switches every label; you land on Daftar masjid (no org yet). Resize the laptop browser from wide to narrow: sidebar switches to bottom nav at < 1024 px without losing your place.
 
 ---
 
@@ -165,6 +165,7 @@ Build /admin/poster per PRD §6 and designs/admin/Poster.dc.html.
 - Resolution warning if upscaled > 1.4× on any target screen; fit label per screen (Penuh ≥85%, Dengan latar kabur 50–85%, Kecil di skrin <50%) with a mini preview drawn with the real poster (contain + blurred fill) in each screen's layout proportions.
 - Next: schedule (shared component with 2.9) → upload to media/{org_id}/{uuid}.webp → media row → slide (type poster).
 - Edit mode (?id=): replace image (delete old file) or change schedule.
+- Computer (≥ 1024 px) per designs/admin/D-Poster.dc.html: drag-and-drop zone (also accepts paste from clipboard), recommended sizes + file check on the left, larger side-by-side previews per screen on the right, and a note when the poster fits only one layout well.
 Justify any compression library; prefer canvas/OffscreenCanvas without dependencies.
 ```
 **Check:** upload a phone photo → under 500 KB, appears on TV within ~60 s, uncropped with blurred edges.
@@ -181,6 +182,7 @@ Build /admin/baru (designs/admin/Picker.dc.html) and /admin/templat?key=&id= (de
 - Kematian: end date required, default +3 days, max 7, sober note in UI. Ayat: choose from src/templates/ayat-sources.json (create it with 10 well-known ayat/hadith entries, Arabic + Malay translation + reference, and mark the file "TO BE VERIFIED BY AN USTAZ" at the top) — no free-text translation.
 - Infaq: optional QR image upload (WebP ≤ 800 px). Imam & Bilal: 5×2 table. Kewangan: dynamic rows.
 - Buttons: Simpan draf, Terbit; edit existing; "Duplikasi untuk minggu depan" (+7 days) for kuliah/imam_bilal/kewangan.
+- Computer (≥ 1024 px) per designs/admin/D-Editor.dc.html: sticky top bar with Simpan draf/Terbit, form left (440 px), large live preview right (≥ 720 px) with a screen selector, updating as you type (debounce 150 ms).
 ```
 **Check:** create one of each template; each looks the same in preview and on the TV for all 3 themes.
 
@@ -194,6 +196,7 @@ Build /admin/kandungan per designs/admin/Content.dc.html.
 - Drag to reorder (justify @dnd-kit or similar; must work by touch) with up/down buttons as accessible fallback; save sort_order in one batch.
 - Pause/resume switch (status published ↔ paused), tap row → edit, swipe or menu → Duplikasi, Padam (confirm; deletes the poster/QR file too).
 - Priority and Kematian badges; "Tamat auto" text for kematian.
+- Computer (≥ 1024 px) per designs/admin/D-Content.dc.html: table with columns drag, type, title, dates, seconds, days, screens, show switch, ⋯ menu; toolbar with tabs, search and screen filter; mouse drag to reorder.
 ```
 **Check:** reorder on phone → TV order changes on next sync; pause → slide disappears from TV.
 

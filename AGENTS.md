@@ -46,7 +46,7 @@ Project rules for the coding agent (Antigravity / Gemini, Claude Code, Cursor, C
 - The TV never has a user session; it uses only `pair_start`, `pair_status`, `screen_bundle` with its device secret.
 - Static export: **no dynamic route segments** (`[id]`); use query params.
 - No hard-coded UI text in admin components: use `ms.json` / `en.json` (BM default).
-- Mobile-first: designed at 390 px, works 360–430 px; tap targets ≥ 44 px; real `<button>`, `<a>`, `<label>` elements.
+- Mobile-first and responsive: phone designs at 390 px (`designs/admin/*.dc.html`), computer designs at 1440 px (`designs/admin/D-*.dc.html`); one component tree, breakpoints < 768 / 768–1023 / ≥ 1024 px (PRD §5.1). Tap targets ≥ 44 px; real `<button>`, `<a>`, `<label>` elements; visible focus rings.
 - Images are compressed in the browser to WebP before upload (posters ≤ 1920 px long edge, logos ≤ 512 px).
 
 ## How to work (every task)

@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Editor templat komputer</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Manrope:wght@300;500;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#146C4A}a:hover{color:#0D4A33}
+</style>
+</helmet>
+<div style="width: 1440px; height: 900px; overflow: hidden; display: flex; background: #F4F7F5; font-family: 'Plus Jakarta Sans', sans-serif; color: #12261E">
+<aside style="width: 248px; flex-shrink: 0; background: #FFFFFF; border-right: 1px solid #DCE6E1; box-sizing: border-box; padding: 24px 16px; display: flex; flex-direction: column; gap: 22px">
+<div style="display: flex; align-items: center; gap: 10px; padding: 0 8px">
+<svg role="img" aria-label="Logo Masjid View" width="34" height="34" viewBox="0 0 76 76"><rect width="76" height="76" rx="22" fill="#146C4A"></rect><path d="M24 58V36a14 14 0 0 1 28 0v22Z" fill="#FFFFFF"></path><circle cx="38" cy="22" r="3.5" fill="#E3B04B"></circle><rect x="32" y="44" width="12" height="14" rx="6" fill="#146C4A"></rect></svg>
+<div style="font-size: 18px; font-weight: 800">Masjid View</div>
+</div>
+<nav aria-label="Navigasi utama" style="display: flex; flex-direction: column; gap: 4px">
+<a href="D-Home.dc.html" style="display: flex; align-items: center; height: 44px; padding: 0 12px; border-radius: 12px; text-decoration: none; font-size: 15px; font-weight: 600; color: #3A4E45">Utama</a>
+<a href="D-Content.dc.html" aria-current="page" style="display: flex; align-items: center; height: 44px; padding: 0 12px; border-radius: 12px; text-decoration: none; font-size: 15px; font-weight: 800; background: #E3F1EA; color: #0D4A33">Kandungan</a>
+<a href="#skrin" style="display: flex; align-items: center; height: 44px; padding: 0 12px; border-radius: 12px; text-decoration: none; font-size: 15px; font-weight: 600; color: #3A4E45">Skrin</a>
+<a href="#tetapan" style="display: flex; align-items: center; height: 44px; padding: 0 12px; border-radius: 12px; text-decoration: none; font-size: 15px; font-weight: 600; color: #3A4E45">Tetapan</a>
+<a href="#ahli" style="display: flex; align-items: center; height: 44px; padding: 0 12px; border-radius: 12px; text-decoration: none; font-size: 15px; font-weight: 600; color: #3A4E45">Ahli</a>
+</nav>
+</aside>
+
+<main style="flex: 1; min-width: 0; display: flex; flex-direction: column">
+<div style="display: flex; align-items: center; gap: 12px; height: 76px; padding: 0 32px; background: #FFFFFF; border-bottom: 1px solid #DCE6E1; box-sizing: border-box">
+<a href="D-Content.dc.html" aria-label="Kembali ke kandungan" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; color: #12261E"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M15 18l-6-6 6-6"></path></svg></a>
+<div style="font-size: 20px; font-weight: 800">Kuliah / Ceramah</div>
+<div style="padding: 4px 10px; border-radius: 999px; background: #E3ECE7; font-size: 12px; font-weight: 800; color: #3A4E45">Draf</div>
+<div style="margin-left: auto; display: flex; gap: 10px">
+<button type="button" style="height: 44px; padding: 0 18px; border: 1.5px solid #146C4A; border-radius: 12px; background: #FFFFFF; font: inherit; font-size: 14px; font-weight: 700; color: #146C4A">Simpan draf</button>
+<button type="button" style="height: 44px; padding: 0 22px; border: 0; border-radius: 12px; background: #146C4A; font: inherit; font-size: 14px; font-weight: 700; color: #FFFFFF">Terbit</button>
+</div>
+</div>
+
+<div style="flex: 1; min-height: 0; display: grid; grid-template-columns: 440px minmax(0, 1fr)">
+<div style="box-sizing: border-box; padding: 24px 28px; border-right: 1px solid #DCE6E1; display: flex; flex-direction: column; gap: 14px; overflow: hidden">
+<div style="font-size: 13px; font-weight: 800; color: #51655C; letter-spacing: 0.06em">BUTIRAN</div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="tp" style="font-size: 13px; font-weight: 700; color: #3A4E45">Tajuk</label><input id="tp" value="[Tajuk kuliah]" style="height: 44px; border: 1.5px solid #146C4A; border-radius: 10px; padding: 0 12px; font: inherit; font-size: 15px; box-sizing: border-box"></div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="se" style="font-size: 13px; font-weight: 700; color: #3A4E45">Siri</label><select id="se" style="height: 44px; border: 1px solid #C9D8D0; border-radius: 10px; padding: 0 10px; font: inherit; font-size: 14px; background: #FFFFFF"><option>Kuliah Maghrib</option></select></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="sp" style="font-size: 13px; font-weight: 700; color: #3A4E45">Penceramah</label><input id="sp" value="[Nama Penceramah]" style="height: 44px; border: 1px solid #C9D8D0; border-radius: 10px; padding: 0 12px; font: inherit; font-size: 14px; box-sizing: border-box"></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="dt" style="font-size: 13px; font-weight: 700; color: #3A4E45">Tarikh</label><input id="dt" type="date" value="2026-10-20" style="height: 44px; border: 1px solid #C9D8D0; border-radius: 10px; padding: 0 10px; font: inherit; font-size: 14px; box-sizing: border-box"></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="ms" style="font-size: 13px; font-weight: 700; color: #3A4E45">Masa</label><select id="ms" style="height: 44px; border: 1px solid #C9D8D0; border-radius: 10px; padding: 0 10px; font: inherit; font-size: 14px; background: #FFFFFF"><option>Selepas Maghrib</option></select></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="vn" style="font-size: 13px; font-weight: 700; color: #3A4E45">Tempat</label><input id="vn" value="Dewan Solat Utama" style="height: 44px; border: 1px solid #C9D8D0; border-radius: 10px; padding: 0 12px; font: inherit; font-size: 14px; box-sizing: border-box"></div>
+<div style="height: 1px; background: #E6EEEA; margin: 6px 0"></div>
+<div style="font-size: 13px; font-weight: 800; color: #51655C; letter-spacing: 0.06em">JADUAL PAPARAN</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="st" style="font-size: 13px; font-weight: 700; color: #3A4E45">Mula</label><input id="st" type="date" value="2026-10-17" style="height: 44px; border: 1px solid #C9D8D0; border-radius: 10px; padding: 0 10px; font: inherit; font-size: 14px; box-sizing: border-box"></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="en" style="font-size: 13px; font-weight: 700; color: #3A4E45">Tamat</label><input id="en" type="date" value="2026-10-20" style="height: 44px; border: 1px solid #C9D8D0; border-radius: 10px; padding: 0 10px; font: inherit; font-size: 14px; box-sizing: border-box"></div>
+</div>
+<div style="display: flex; gap: 6px">
+<sc-for list="{{days}}" as="d" hint-placeholder-count="7">
+<div style="flex: 1; height: 38px; border-radius: 10px; border: 1px solid {{d.bd}}; background: {{d.bg}}; color: {{d.fg}}; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800">{{d.l}}</div>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600"><div>Tempoh paparan</div><div style="font-weight: 800">15 s</div></div>
+<div style="display: flex; justify-content: space-between; align-items: center; font-size: 14px; font-weight: 600"><div>Papar di</div><div style="font-weight: 800">Semua skrin</div></div>
+</div>
+
+<div style="box-sizing: border-box; padding: 24px 32px; display: flex; flex-direction: column; gap: 16px; align-items: flex-start">
+<div style="display: flex; align-items: center; gap: 12px; width: 100%">
+<div style="font-size: 13px; font-weight: 800; color: #51655C; letter-spacing: 0.06em">PRATONTON LANGSUNG</div>
+<label for="pv" style="position: absolute; left: -9999px">Skrin pratonton</label>
+<select id="pv" style="margin-left: auto; height: 40px; border: 1px solid #C9D8D0; border-radius: 10px; padding: 0 10px; font: inherit; font-size: 14px; background: #FFFFFF"><option>Dewan Solat Utama · Tenang · Bar bawah</option></select>
+</div>
+<div aria-label="Pratonton pada TV" style="position: relative; width: 720px; height: 405px; border-radius: 14px; overflow: hidden; background: #F8EFE6; border: 8px solid #1B1B1B; box-shadow: 0 24px 50px rgba(18,38,30,0.18); font-family: 'Manrope', sans-serif; color: #3B2A1E">
+<div style="position: absolute; left: 36px; top: 20px; width: 648px; height: 270px; border-radius: 18px; background: #FFFFFF; box-shadow: 0 12px 28px rgba(20,30,50,0.06); box-sizing: border-box; padding: 34px 40px; display: flex; flex-direction: column; gap: 10px">
+<div style="font-size: 12px; font-weight: 800; letter-spacing: 0.14em; color: #A9612A">● KULIAH MAGHRIB</div>
+<div style="font-size: 40px; font-weight: 700; letter-spacing: -1px; line-height: 1">[Tajuk kuliah]</div>
+<div style="font-size: 15px; font-weight: 500; color: #7E6853">bersama [Nama Penceramah]</div>
+<div style="margin-top: auto; display: flex; gap: 32px; font-size: 13px; font-weight: 700"><div>Sel, 20 Okt</div><div>Selepas Maghrib</div><div>Dewan Solat Utama</div></div>
+</div>
+<div style="position: absolute; left: 36px; right: 36px; bottom: 14px; height: 76px; display: grid; grid-template-columns: 130px repeat(7, minmax(0, 1fr)); gap: 4px; align-items: center">
+<div style="font-size: 44px; font-weight: 300; letter-spacing: -2px">4:42</div>
+<sc-for list="{{mini}}" as="m" hint-placeholder-count="7">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 0; border-radius: 14px; background: {{m.bg}}; box-shadow: {{m.sh}}">
+<div style="font-size: 10px; font-weight: {{m.w}}; color: {{m.c}}">{{m.n}}</div>
+<div style="font-size: 20px; font-weight: {{m.w}}; color: {{m.c}}">{{m.t}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+<div style="font-size: 13px; line-height: 1.5; color: #51655C; max-width: 720px">Pratonton menggunakan tema dan susun atur sebenar skrin. Kawasan pengumuman berukuran 12:5 dalam susun atur bar bawah.</div>
+</div>
+</div>
+</main>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1440,"height":900}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const days = ['Isn', 'Sel', 'Rab', 'Kha', 'Jum', 'Sab', 'Ahd'].map((l) => {
+      const v = l === 'Sel';
+      return { l, bg: v ? '#146C4A' : '#FFFFFF', fg: v ? '#FFFFFF' : '#3A4E45', bd: v ? '#146C4A' : '#C9D8D0' };
+    });
+    const mini = [['Imsak', '5:42'], ['Subuh', '5:52'], ['Syuruk', '7:01'], ['Zohor', '1:05'], ['Asar', '4:11'], ['Maghrib', '7:06'], ['Isyak', '8:16']].map(([n, t], i) => {
+      const cur = i === 4;
+      return { n, t, bg: cur ? '#FFFFFF' : 'transparent', sh: cur ? '0 6px 14px rgba(20,30,50,0.12)' : 'none', w: cur ? 800 : 500, c: cur ? '#A9612A' : '#3B2A1E' };
+    });
+    return { days, mini };
+  }
+}
+</script>
+</body>
+</html>

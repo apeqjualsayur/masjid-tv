@@ -8,6 +8,22 @@
   --font-kufi: var(--font-reem-kufi);
   --font-amiri: var(--font-amiri);
   --font-manrope: var(--font-manrope);
+
+  /* Admin app (PRD Phase 2 §5) */
+  --color-adm-green: #146c4a;
+  --color-adm-green-dark: #0d4a33;
+  --color-adm-ink: #12261e;
+  --color-adm-ground: #f4f7f5;
+  --color-adm-card: #ffffff;
+  --color-adm-muted: #51655c;
+  --color-adm-line: #c9d8d0;
+  --color-adm-hair: #e6eeea;
+  --color-adm-soft: #e3f1ea;
+  --color-adm-gold: #e3b04b;
+  --color-adm-gold-soft: #f2d287;
+  --color-adm-ok: #137a4b;
+  --color-adm-bad: #b03a0a;
+  --color-adm-danger: #a3260f;
 }
 
 html,

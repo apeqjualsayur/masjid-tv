@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatRinggit, infaqProgress, kewanganTotals } from "./helpers";
+import { formatRinggit, infaqProgress, kewanganTotals, slideTitle } from "./helpers";
 import { SAMPLE_FIELDS, sampleSlide } from "./samples";
 import { TEMPLATE_KEYS } from "./types";
 
@@ -24,5 +24,16 @@ describe("template helpers", () => {
 
   it("there is a sample for every template", () => {
     for (const k of TEMPLATE_KEYS) expect(sampleSlide(k)).toMatchObject({ kind: "template", template: k });
+  });
+});
+
+describe("slideTitle", () => {
+  it("one line per template for admin lists", () => {
+    expect(slideTitle("kuliah", { series: "Kuliah Maghrib", topic: "[Tajuk]" })).toBe("Kuliah Maghrib: [Tajuk]");
+    expect(slideTitle("kematian", { name: "[Nama]" })).toBe("[Nama]");
+    expect(slideTitle("infaq", { fundName: "Tabung [X]" })).toBe("Tabung [X]");
+    expect(slideTitle("ucapan", { occasion: "aidilfitri", message: "x" })).toBe("Selamat Hari Raya Aidilfitri");
+    expect(slideTitle("pengumuman", { title: "  [Tajuk]  " })).toBe("[Tajuk]");
+    expect(slideTitle("poster", {})).toBe("");
   });
 });

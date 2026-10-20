@@ -1,5 +1,5 @@
 // Presentation-neutral helpers for template data (no styling).
-import type { InfaqFields, KewanganFields, UcapanOccasion } from "./types";
+import type { InfaqFields, KewanganFields, TemplateKey, UcapanOccasion } from "./types";
 
 /** 3250.5 to "RM 3,250.50" */
 export function formatRinggit(amount: number): string {
@@ -25,3 +25,27 @@ export const OCCASION_LABEL: Record<UcapanOccasion, string> = {
   maal_hijrah: "Salam Maal Hijrah",
   maulidur_rasul: "Salam Maulidur Rasul",
 };
+
+/** A one-line title for lists in the admin app ("Kuliah Maghrib: [Tajuk]"). Empty string if nothing usable. */
+export function slideTitle(templateKey: TemplateKey | "poster" | null, fields: Record<string, unknown>): string {
+  const s = (k: string) => (typeof fields[k] === "string" ? (fields[k] as string).trim() : "");
+  switch (templateKey) {
+    case "kuliah":
+      return [s("series"), s("topic")].filter(Boolean).join(": ");
+    case "kematian":
+      return s("name");
+    case "infaq":
+      return s("fundName");
+    case "imam_bilal":
+    case "kewangan":
+      return s("weekRange");
+    case "ayat":
+      return s("reference");
+    case "ucapan":
+      return typeof fields.occasion === "string" && fields.occasion in OCCASION_LABEL
+        ? OCCASION_LABEL[fields.occasion as UcapanOccasion]
+        : s("message");
+    default:
+      return s("title");
+  }
+}

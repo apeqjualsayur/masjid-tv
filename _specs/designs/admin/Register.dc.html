@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Daftar masjid</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#146C4A}a:hover{color:#0D4A33}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 1240px; overflow: hidden; background: #F4F7F5; font-family: 'Plus Jakarta Sans', sans-serif; color: #12261E; box-sizing: border-box; padding: 16px 20px 28px; display: flex; flex-direction: column; gap: 18px">
+<div style="display: flex; align-items: center; gap: 8px">
+<button type="button" aria-label="Kembali" style="width: 44px; height: 44px; border: 0; background: transparent; display: flex; align-items: center; justify-content: center; color: #12261E"><svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"></path></svg></button>
+<div style="flex: 1; font-size: 20px; font-weight: 800">Daftar masjid</div>
+<div style="font-size: 13px; font-weight: 600; color: #51655C">Langkah 1 / 2</div>
+</div>
+<div style="height: 6px; border-radius: 3px; background: #DCE7E1"><div style="width: 50%; height: 100%; border-radius: 3px; background: #146C4A"></div></div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 13px; font-weight: 700; color: #3A4E45">Jenis</div>
+<div role="group" aria-label="Jenis" style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); padding: 4px; border-radius: 14px; background: #E3ECE7">
+<button type="button" style="height: 44px; border: 0; border-radius: 11px; background: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700; color: #12261E; box-shadow: 0 1px 3px rgba(18,38,30,0.12)">Masjid</button>
+<button type="button" style="height: 44px; border: 0; border-radius: 11px; background: transparent; font: inherit; font-size: 15px; font-weight: 600; color: #51655C">Surau</button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="fn" style="font-size: 13px; font-weight: 700; color: #3A4E45">Nama penuh</label>
+<input id="fn" value="Masjid [Nama], [Taman]" style="height: 50px; border: 1px solid #C9D8D0; border-radius: 14px; background: #FFFFFF; padding: 0 16px; font: inherit; font-size: 16px; color: #12261E; box-sizing: border-box">
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="sn" style="font-size: 13px; font-weight: 700; color: #3A4E45">Nama ringkas</label>
+<input id="sn" value="[Nama ringkas]" style="height: 50px; border: 1px solid #C9D8D0; border-radius: 14px; background: #FFFFFF; padding: 0 16px; font: inherit; font-size: 16px; color: #12261E; box-sizing: border-box">
+<div style="font-size: 12px; color: #51655C">Untuk ruang kecil pada skrin, contoh dalam bar bawah.</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 16px; border-radius: 18px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(18,38,30,0.08)">
+<div style="display: flex; flex-direction: column; gap: 2px">
+<div style="font-size: 15px; font-weight: 800">Lokasi untuk waktu solat</div>
+<div style="font-size: 12px; line-height: 1.45; color: #51655C">Waktu solat diambil daripada JAKIM mengikut zon.</div>
+</div>
+<button type="button" style="height: 50px; border: 1.5px solid #146C4A; border-radius: 14px; background: #FFFFFF; font: inherit; font-size: 15px; font-weight: 700; color: #146C4A; display: flex; align-items: center; justify-content: center; gap: 10px">
+<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"></circle><path d="M12 2v3 M12 19v3 M2 12h3 M19 12h3"></path><circle cx="12" cy="12" r="8"></circle></svg>
+Guna lokasi saya
+</button>
+<div style="font-size: 12px; color: #51655C; text-align: center; margin-top: -4px">Paling tepat jika anda berada di masjid sekarang</div>
+<div style="display: flex; align-items: center; gap: 12px; color: #6A7D74; font-size: 12px; font-weight: 700">
+<div style="flex: 1; height: 1px; background: #DCE6E1"></div>atau pilih<div style="flex: 1; height: 1px; background: #DCE6E1"></div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="ng" style="font-size: 13px; font-weight: 700; color: #3A4E45">Negeri</label>
+<select id="ng" style="height: 48px; border: 1px solid #C9D8D0; border-radius: 12px; background: #FFFFFF; padding: 0 10px; font: inherit; font-size: 15px; color: #12261E"><option>{{state}}</option></select>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<label for="dr" style="font-size: 13px; font-weight: 700; color: #3A4E45">Daerah / kawasan</label>
+<select id="dr" style="height: 48px; border: 1px solid #C9D8D0; border-radius: 12px; background: #FFFFFF; padding: 0 10px; font: inherit; font-size: 15px; color: #12261E"><option>{{district}}</option></select>
+</div>
+</div>
+
+<sc-if value="{{multi}}" hint-placeholder-val="{{false}}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 13px; line-height: 1.45; color: #6B4A12; background: #FFF4DF; border-radius: 12px; padding: 10px 12px">Kawasan ini terbahagi kepada lebih daripada satu zon. Pilih yang merangkumi lokasi masjid anda:</div>
+<sc-for list="{{options}}" as="o" hint-placeholder-count="2">
+<button type="button" aria-pressed="{{o.sel}}" onClick="{{o.pick}}" style="display: flex; gap: 12px; align-items: flex-start; text-align: left; padding: 12px 14px; border-radius: 14px; border: 1.5px solid {{o.bd}}; background: {{o.bg}}; font: inherit; color: #12261E">
+<div style="width: 20px; height: 20px; flex-shrink: 0; box-sizing: border-box; border-radius: 999px; border: 2px solid {{o.dot}}; display: flex; align-items: center; justify-content: center; margin-top: 2px"><div style="width: 10px; height: 10px; border-radius: 999px; background: {{o.fill}}"></div></div>
+<div style="display: flex; flex-direction: column; gap: 2px"><div style="font-size: 14px; font-weight: 800">{{o.code}}</div><div style="font-size: 12px; line-height: 1.4; color: #51655C">{{o.areas}}</div></div>
+</button>
+</sc-for>
+</div>
+</sc-if>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 14px; background: #E3F1EA; color: #0D4A33">
+<div style="display: flex; justify-content: space-between; align-items: baseline">
+<div style="font-size: 15px; font-weight: 800">Zon JAKIM: {{zone.code}}</div>
+<div style="font-size: 12px; font-weight: 700">{{zone.via}}</div>
+</div>
+<div style="font-size: 12px; line-height: 1.45">{{zone.areas}}</div>
+<div style="font-size: 12px; font-weight: 700; margin-top: 2px">Waktu solat hari ini:</div>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{today}}" as="t" hint-placeholder-count="6">
+<div style="background: #FFFFFF; border-radius: 10px; padding: 6px 8px; display: flex; flex-direction: column; gap: 1px">
+<div style="font-size: 11px; font-weight: 600; color: #51655C">{{t.n}}</div>
+<div style="font-size: 16px; font-weight: 800; color: #12261E">{{t.v}}</div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-top: 2px">
+<div style="font-size: 13px; font-weight: 700">Sama dengan jadual di masjid anda?</div>
+<a href="#tukar-zon" style="font-size: 13px; font-weight: 800; white-space: nowrap">Tukar zon</a>
+</div>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 13px; font-weight: 700; color: #3A4E45">Logo (pilihan)</div>
+<button type="button" style="height: 96px; border: 1.5px dashed #A9C2B5; border-radius: 16px; background: #FFFFFF; font: inherit; display: flex; align-items: center; gap: 16px; padding: 0 18px; text-align: left; color: #12261E">
+<div style="width: 60px; height: 60px; flex-shrink: 0; border-radius: 999px; background: #146C4A; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 800">NM</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 15px; font-weight: 700">Tambah logo</div>
+<div style="font-size: 12px; line-height: 1.4; color: #51655C">PNG atau JPG. Tiada logo? Kami guna monogram ini.</div>
+</div>
+</button>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<label for="ph" style="font-size: 13px; font-weight: 700; color: #3A4E45">No. telefon pegawai untuk dihubungi</label>
+<input id="ph" type="tel" placeholder="01X-XXX XXXX" style="height: 50px; border: 1px solid #C9D8D0; border-radius: 14px; background: #FFFFFF; padding: 0 16px; font: inherit; font-size: 16px; color: #12261E; box-sizing: border-box">
+</div>
+
+<button type="button" style="margin-top: auto; height: 54px; border: 0; border-radius: 14px; background: #146C4A; color: #FFFFFF; font: inherit; font-size: 16px; font-weight: 700">Seterusnya</button>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"zoneCase":{"editor":"enum","options":["gps","pilih","berbilang"],"default":"gps","section":"Contoh zon"},"$preview":{"width":390,"height":1240}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const c = this.props.zoneCase ?? 'gps';
+    const Z = {
+      SGR01: { code: 'SGR01', areas: 'Gombak, Petaling, Sepang, Hulu Langat, Hulu Selangor, Shah Alam' },
+      PHG02: { code: 'PHG02', areas: '[Senarai kawasan zon A — daripada zones.json]' },
+      PHG03: { code: 'PHG03', areas: '[Senarai kawasan zon B — daripada zones.json]' }
+    };
+    const multi = c === 'berbilang';
+    const picked = (this.state && this.state.pick) || 'PHG02';
+    const options = ['PHG02', 'PHG03'].map((k) => {
+      const sel = k === picked;
+      return { code: Z[k].code, areas: Z[k].areas, sel, pick: () => this.setState({ pick: k }),
+        bd: sel ? '#146C4A' : '#C9D8D0', bg: sel ? '#F1F8F4' : '#FFFFFF', dot: sel ? '#146C4A' : '#9FB3A9', fill: sel ? '#146C4A' : 'transparent' };
+    });
+    const zone = multi ? { ...Z[picked], via: 'Dipilih' } : { ...Z.SGR01, via: c === 'gps' ? 'Dikesan melalui lokasi' : 'Daripada kawasan' };
+    const today = [['Subuh', '5:52'], ['Syuruk', '7:01'], ['Zohor', '1:05'], ['Asar', '4:11'], ['Maghrib', '7:06'], ['Isyak', '8:16']].map(([n, v]) => ({ n, v }));
+    return {
+      multi, options, zone, today,
+      state: multi ? 'Pahang' : 'Selangor',
+      district: multi ? '[Daerah berbilang zon]' : 'Gombak'
+    };
+  }
+}
+</script>
+</body>
+</html>

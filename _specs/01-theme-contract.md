@@ -72,6 +72,8 @@ export interface ThemeDefinition {
 7. Kematian template: no accent colours, no decoration, regardless of theme.
 8. Arabic text uses `lang="ar" dir="rtl"`.
 9. Labels in BM. Status words: **SEKARANG**, **SETERUSNYA**.
+10. **Poster/announcement area has a fixed aspect ratio in every theme** (so the admin app's recommended poster sizes fit all themes): **`bottom` layout = 12:5** (e.g. 1824×760 or 1920×800 inside the stage); **`side` layout = 5:4** (e.g. 1260×1008 or 1350×1080). The area may sit inside a card with padding, but the poster box itself must be exactly this ratio. Expose it as `posterArea: Record<'bottom'|'side', {x,y,w,h}>` on the `ThemeDefinition`. The mockups in `designs/` vary slightly — the ratio rule wins. (Added in Phase 2; see `10-PRD-phase2.md` §6.)
+11. Announcement templates must render correctly inside the poster area at both ratios and in the admin live preview (scaled stage).
 
 ---
 

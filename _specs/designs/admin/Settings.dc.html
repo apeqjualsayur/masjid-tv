@@ -1,0 +1,120 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Tetapan</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#146C4A}a:hover{color:#0D4A33}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 1400px; overflow: hidden; background: #F4F7F5; font-family: 'Plus Jakarta Sans', sans-serif; color: #12261E">
+<div style="box-sizing: border-box; padding: 18px 20px 100px; display: flex; flex-direction: column; gap: 16px">
+<div style="font-size: 26px; font-weight: 800; letter-spacing: -0.3px">{{t.title}}</div>
+
+<div style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 1px 3px rgba(18,38,30,0.08); padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="font-size: 15px; font-weight: 800">{{t.brand}}</div>
+<div style="display: flex; gap: 14px; align-items: center">
+<div style="width: 60px; height: 60px; border-radius: 999px; background: {{accent}}; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 19px; font-weight: 800">NM</div>
+<button type="button" style="height: 40px; padding: 0 14px; border: 1px solid #C9D8D0; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; color: #12261E">{{t.changeLogo}}</button>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="f1" style="font-size: 13px; font-weight: 700; color: #3A4E45">{{t.fullName}}</label><input id="f1" value="Masjid [Nama], [Taman]" style="height: 46px; border: 1px solid #C9D8D0; border-radius: 12px; padding: 0 14px; font: inherit; font-size: 15px; box-sizing: border-box"></div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 13px; font-weight: 700; color: #3A4E45">{{t.accent}}</div>
+<div style="display: flex; gap: 10px">
+<sc-for list="{{swatches}}" as="s" hint-placeholder-count="5">
+<button type="button" aria-label="{{s.label}}" aria-pressed="{{s.on}}" onClick="{{s.pick}}" style="width: 44px; height: 44px; border-radius: 999px; border: 3px solid {{s.ring}}; background: {{s.c}}; box-sizing: border-box"></button>
+</sc-for>
+</div>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 1px 3px rgba(18,38,30,0.08); padding: 16px; display: flex; flex-direction: column; gap: 4px">
+<div style="font-size: 15px; font-weight: 800">{{t.iqamah}}</div>
+<div style="font-size: 12px; color: #51655C; margin-bottom: 6px">{{t.iqamahHint}}</div>
+<sc-for list="{{iq}}" as="q" hint-placeholder-count="5">
+<div style="display: flex; align-items: center; justify-content: space-between; height: 56px; border-top: 1px solid #E6EEEA">
+<div style="font-size: 15px; font-weight: 700">{{q.name}}</div>
+<div style="display: flex; align-items: center; gap: 4px">
+<button type="button" aria-label="Kurang" onClick="{{q.dec}}" style="width: 40px; height: 40px; border: 1px solid #C9D8D0; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 20px; color: #12261E">−</button>
+<div style="width: 68px; text-align: center; font-size: 15px; font-weight: 800">{{q.val}} min</div>
+<button type="button" aria-label="Tambah" onClick="{{q.inc}}" style="width: 40px; height: 40px; border: 1px solid #C9D8D0; border-radius: 10px; background: #FFFFFF; font: inherit; font-size: 20px; color: #12261E">+</button>
+</div>
+</div>
+</sc-for>
+<div style="display: flex; align-items: center; justify-content: space-between; height: 56px; border-top: 1px solid #E6EEEA">
+<div style="font-size: 15px; font-weight: 700">{{t.khutbah}}</div>
+<div style="font-size: 15px; font-weight: 800">40 min</div>
+</div>
+</div>
+
+<div style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 1px 3px rgba(18,38,30,0.08); padding: 16px; display: flex; flex-direction: column; gap: 14px">
+<div style="font-size: 15px; font-weight: 800">{{t.display}}</div>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="font-size: 15px; font-weight: 600">{{t.arabic}}</div>
+<div aria-hidden="true" style="position: relative; width: 46px; height: 28px; border-radius: 999px; background: #146C4A"><div style="position: absolute; top: 3px; left: 21px; width: 22px; height: 22px; border-radius: 999px; background: #FFFFFF"></div></div>
+</div>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="font-size: 15px; font-weight: 600">{{t.clock}}</div>
+<div style="display: flex; padding: 3px; border-radius: 10px; background: #E3ECE7"><div style="padding: 8px 12px; border-radius: 8px; background: #FFFFFF; font-size: 13px; font-weight: 800">12j</div><div style="padding: 8px 12px; font-size: 13px; font-weight: 600; color: #51655C">24j</div></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px"><label for="tk" style="font-size: 13px; font-weight: 700; color: #3A4E45">{{t.ticker}}</label><textarea id="tk" rows="3" style="border: 1px solid #C9D8D0; border-radius: 12px; padding: 12px 14px; font: inherit; font-size: 14px; line-height: 1.45; resize: none">[Teks pengumuman bergerak]</textarea></div>
+</div>
+
+<div style="background: #FFFFFF; border-radius: 18px; box-shadow: 0 1px 3px rgba(18,38,30,0.08); padding: 16px; display: flex; flex-direction: column; gap: 12px">
+<div style="font-size: 15px; font-weight: 800">{{t.app}}</div>
+<div style="display: flex; align-items: center; justify-content: space-between">
+<div style="font-size: 15px; font-weight: 600">{{t.language}}</div>
+<div role="group" aria-label="Bahasa" style="display: flex; padding: 3px; border-radius: 10px; background: #E3ECE7">
+<button type="button" onClick="{{setMs}}" style="height: 36px; padding: 0 12px; border: 0; border-radius: 8px; font: inherit; font-size: 13px; font-weight: 800; background: {{msBg}}; color: {{msFg}}">BM</button>
+<button type="button" onClick="{{setEn}}" style="height: 36px; padding: 0 12px; border: 0; border-radius: 8px; font: inherit; font-size: 13px; font-weight: 800; background: {{enBg}}; color: {{enFg}}">English</button>
+</div>
+</div>
+<a href="#ahli" style="display: flex; justify-content: space-between; align-items: center; height: 48px; border-top: 1px solid #E6EEEA; text-decoration: none; color: #12261E; font-size: 15px; font-weight: 600">{{t.members}}<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#51655C" stroke-width="2" stroke-linecap="round"><path d="M9 6l6 6-6 6"></path></svg></a>
+<a href="Main.dc.html" style="height: 44px; display: flex; align-items: center; border-top: 1px solid #E6EEEA; font-size: 15px; font-weight: 700; color: #A3260F; text-decoration: none">{{t.logout}}</a>
+</div>
+</div>
+
+<nav aria-label="Navigasi utama" style="position: absolute; left: 0; right: 0; bottom: 0; height: 78px; background: #FFFFFF; border-top: 1px solid #DCE6E1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr))">
+<a href="Home.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: #51655C; font-size: 12px; font-weight: 600"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"></path></svg>{{t.navHome}}</a>
+<a href="Content.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: #51655C; font-size: 12px; font-weight: 600"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5Z"></path><path d="M2 13l10 5 10-5"></path></svg>{{t.navContent}}</a>
+<a href="Screens.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: #51655C; font-size: 12px; font-weight: 600"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"></rect><path d="M8 21h8 M12 17v4"></path></svg>{{t.navScreens}}</a>
+<a href="Settings.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: #146C4A; font-size: 12px; font-weight: 800"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h9 M17 7h3 M4 17h3 M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg>{{t.title}}</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":1400}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const lang = s.lang || 'ms';
+    const L = {
+      ms: { title: 'Tetapan', brand: 'Jenama masjid', changeLogo: 'Tukar logo', fullName: 'Nama penuh', accent: 'Warna aksen', iqamah: 'Waktu iqamah', iqamahHint: 'Minit selepas azan sebelum iqamah', khutbah: 'Khutbah Jumaat', display: 'Paparan TV', arabic: 'Nama waktu dalam Arab', clock: 'Format jam', ticker: 'Teks bergerak', app: 'Aplikasi', language: 'Bahasa', members: 'Urus ahli (3)', logout: 'Log keluar', navHome: 'Utama', navContent: 'Kandungan', navScreens: 'Skrin' },
+      en: { title: 'Settings', brand: 'Masjid branding', changeLogo: 'Change logo', fullName: 'Full name', accent: 'Accent colour', iqamah: 'Iqamah times', iqamahHint: 'Minutes after azan before iqamah', khutbah: 'Friday khutbah', display: 'TV display', arabic: 'Prayer names in Arabic', clock: 'Clock format', ticker: 'Ticker text', app: 'App', language: 'Language', members: 'Manage members (3)', logout: 'Log out', navHome: 'Home', navContent: 'Content', navScreens: 'Screens' }
+    };
+    const accent = s.accent || '#146C4A';
+    const swatches = [['#146C4A', 'Hijau'], ['#1F4E8A', 'Biru'], ['#8A5300', 'Emas'], ['#5B3D8F', 'Ungu'], ['#8A2A4A', 'Merah tua']].map(([c, label]) => ({ c, label, on: c === accent, ring: c === accent ? '#12261E' : '#FFFFFF', pick: () => this.setState({ accent: c }) }));
+    const vals = s.iq || { Subuh: 10, Zohor: 10, Asar: 10, Maghrib: 7, Isyak: 10 };
+    const iq = Object.keys(vals).map((name) => ({
+      name, val: vals[name],
+      dec: () => this.setState({ iq: { ...vals, [name]: Math.max(1, vals[name] - 1) } }),
+      inc: () => this.setState({ iq: { ...vals, [name]: Math.min(30, vals[name] + 1) } })
+    }));
+    const on = (k) => lang === k;
+    return {
+      t: L[lang], accent, swatches, iq,
+      setMs: () => this.setState({ lang: 'ms' }), setEn: () => this.setState({ lang: 'en' }),
+      msBg: on('ms') ? '#FFFFFF' : 'transparent', msFg: on('ms') ? '#12261E' : '#51655C',
+      enBg: on('en') ? '#FFFFFF' : 'transparent', enFg: on('en') ? '#12261E' : '#51655C'
+    };
+  }
+}
+</script>
+</body>
+</html>

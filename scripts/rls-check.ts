@@ -1,0 +1,326 @@
+// Row Level Security check against a Supabase project (PRD Phase 2 §12.3).
+//   npm run rls-check            (reads .env.local)
+// The service-role key is used ONLY to create/delete test users, make P a platform admin, and
+// verify afterwards that B's rows were not changed. Every permission check runs as a real signed-in
+// test user (anon key + session) or as anon. All test data is deleted at the end, even on failure.
+// Never prints any key.
+import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createHash } from "node:crypto";
+
+const URL = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+const ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "";
+const SERVICE = process.env.SUPABASE_SERVICE_ROLE_KEY ?? "";
+
+if (!URL || !ANON || !SERVICE) {
+  console.error("Missing NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY or SUPABASE_SERVICE_ROLE_KEY in .env.local (see .env.example).");
+  process.exit(2);
+}
+if (ANON === SERVICE) {
+  console.error("The anon key and the service-role key are the same value. Check .env.local.");
+  process.exit(2);
+}
+
+const RUN = Date.now().toString(36);
+const TAG = "rls-check";
+const opts = { auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } };
+const admin = createClient(URL, SERVICE, opts);
+const anon = createClient(URL, ANON, opts);
+
+// ---------------------------------------------------------------------------- reporting
+let passed = 0;
+let failed = 0;
+const failures: string[] = [];
+function report(ok: boolean, name: string, detail?: string) {
+  if (ok) passed++;
+  else {
+    failed++;
+    failures.push(`${name}${detail ? ` — ${detail}` : ""}`);
+  }
+  console.log(`${ok ? "PASS" : "FAIL"}  ${name}${!ok && detail ? `\n        ↳ ${detail}` : ""}`);
+}
+/** Stops the remaining checks (cleanup still runs). */
+class Fatal extends Error {}
+type PgErr = { code?: string; message?: string } | null | undefined;
+const fmt = (e: PgErr) => (e ? `${e.code ? `[${e.code}] ` : ""}${e.message ?? String(e)}` : "no error");
+function must<T>(label: string, res: { data: T; error: PgErr }): T {
+  if (res.error) throw new Fatal(`${label}: ${fmt(res.error)}`);
+  return res.data;
+}
+/** The call must fail; optionally with a message containing `want`. */
+function expectFail(name: string, res: { error: PgErr }, want?: string) {
+  const e = res.error;
+  if (!e) return report(false, name, "it succeeded but should have been rejected");
+  if (want && !(e.message ?? "").includes(want) && e.code !== want) return report(false, name, `rejected, but with an unexpected error: ${fmt(e)}`);
+  report(true, name);
+}
+function expectOk(name: string, res: { error: PgErr }) {
+  report(!res.error, name, fmt(res.error));
+}
+/** For reads/updates RLS hides rows instead of erroring: no error and zero rows means blocked. */
+function expectNoRows(name: string, res: { data: unknown[] | null; error: PgErr }) {
+  if (res.error) return report(true, name); // an error is also a refusal
+  report((res.data ?? []).length === 0, name, `returned ${(res.data ?? []).length} row(s)`);
+}
+
+// ---------------------------------------------------------------------------- users
+interface TestUser {
+  label: string;
+  id: string;
+  email: string;
+  db: SupabaseClient;
+}
+const created: { id: string; email: string }[] = [];
+
+async function makeUser(label: string): Promise<TestUser> {
+  const email = `${TAG}-${label.toLowerCase()}-${RUN}@example.com`;
+  const { data, error } = await admin.auth.admin.createUser({ email, email_confirm: true, user_metadata: { full_name: `RLS ${label}` } });
+  if (error || !data.user) throw new Fatal(`create test user ${label}: ${fmt(error)}`);
+  created.push({ id: data.user.id, email });
+  return { label, id: data.user.id, email, db: await signIn(email) };
+}
+
+/** Sign in AS the user with the anon key: one-time magic-link token, no password, no email sent. */
+async function signIn(email: string): Promise<SupabaseClient> {
+  const link = await admin.auth.admin.generateLink({ type: "magiclink", email });
+  if (link.error) throw new Fatal(`magic link for ${email}: ${fmt(link.error)}`);
+  const db = createClient(URL, ANON, opts);
+  const { error } = await db.auth.verifyOtp({ token_hash: link.data.properties.hashed_token, type: "magiclink" });
+  if (error) throw new Fatal(`sign in ${email}: ${fmt(error)}`);
+  return db;
+}
+
+/** Device secrets used in this run, so cleanup can remove their pairing codes. */
+const secrets: string[] = [];
+const secret = () => {
+  const s = Array.from(crypto.getRandomValues(new Uint8Array(32)), (b) => b.toString(16).padStart(2, "0")).join("");
+  secrets.push(s);
+  return s;
+};
+// 1x1 WebP
+const WEBP = Uint8Array.from(Buffer.from("UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==", "base64"));
+const kuliahFields = { series: "Kuliah Maghrib", topic: "[RLS check]", speaker: "[Ustaz]", date: "[Tarikh]", time: "[Masa]", venue: "[Dewan]" };
+const inDays = (d: number) => new Date(Date.now() + d * 86_400_000).toISOString();
+
+// ---------------------------------------------------------------------------- cleanup
+async function cleanup(orgIds: string[]) {
+  console.log("\nCleanup");
+  // Also sweep leftovers from earlier interrupted runs.
+  const { data: oldOrgs } = await admin.from("organisations").select("id").like("full_name", "RLS Check %");
+  const ids = [...new Set([...orgIds, ...(oldOrgs ?? []).map((o) => o.id as string)])];
+  for (const id of ids) {
+    const { data: files } = await admin.storage.from("media").list(id, { limit: 1000 });
+    if (files?.length) await admin.storage.from("media").remove(files.map((f) => `${id}/${f.name}`));
+  }
+  if (ids.length) {
+    // Order matters: slides reference media (on delete restrict); members must go with their org.
+    await admin.from("slides").delete().in("org_id", ids);
+    await admin.from("media").delete().in("org_id", ids);
+    const del = await admin.from("organisations").delete().in("id", ids);
+    if (del.error) console.log(`  could not delete test orgs: ${fmt(del.error)}`);
+  }
+  if (secrets.length) {
+    const hashes = secrets.map((s) => createHash("sha256").update(s).digest("hex"));
+    await admin.from("pairing_codes").delete().in("device_secret_hash", hashes);
+  }
+  // Users (cascades profiles, members, platform_admins, pair_attempts).
+  const users: { id: string; email: string }[] = [...created];
+  for (let page = 1; page <= 10; page++) {
+    const { data } = await admin.auth.admin.listUsers({ page, perPage: 200 });
+    const batch = data?.users ?? [];
+    for (const u of batch) if (u.email?.startsWith(`${TAG}-`) && !users.some((x) => x.id === u.id)) users.push({ id: u.id, email: u.email });
+    if (batch.length < 200) break;
+  }
+  for (const u of users) {
+    const { error } = await admin.auth.admin.deleteUser(u.id);
+    if (error) console.log(`  could not delete user ${u.email}: ${fmt(error)}`);
+  }
+  console.log(`  removed ${ids.length} test org(s) and ${users.length} test user(s)`);
+}
+
+// ---------------------------------------------------------------------------- checks
+async function run(orgIds: string[]) {
+  console.log(`Project: ${new globalThis.URL(URL).host}   run: ${RUN}\n`);
+
+  const A = await makeUser("A");
+  const B = await makeUser("B");
+  const C = await makeUser("C");
+  const P = await makeUser("P");
+
+  // 1. Registration ---------------------------------------------------------
+  console.log("Registration");
+  const regA = await A.db.rpc("register_org", { p_kind: "masjid", p_full_name: `RLS Check A ${RUN}`, p_short_name: "RA", p_state: "Selangor", p_district: "Petaling", p_zone: "SGR01" });
+  expectOk("A registers org A (register_org)", regA);
+  const regB = await B.db.rpc("register_org", { p_kind: "surau", p_full_name: `RLS Check B ${RUN}`, p_short_name: "RB", p_state: "Selangor", p_district: "Gombak", p_zone: "SGR01" });
+  expectOk("B registers org B (register_org)", regB);
+  if (regA.error || regB.error) throw new Fatal("registration failed; later checks depend on it");
+  const orgA = regA.data as string;
+  const orgB = regB.data as string;
+  orgIds.push(orgA, orgB);
+
+  // 2. Before approval --------------------------------------------------------
+  console.log("\nBefore approval (org A pending)");
+  expectFail("A cannot insert a slide while org A is pending",
+    await A.db.from("slides").insert({ org_id: orgA, type: "template", template_key: "kuliah", fields: kuliahFields }).select("id"));
+  expectOk("A can upload a logo file to storage path A/… while pending",
+    await A.db.storage.from("media").upload(`${orgA}/logo-${RUN}.webp`, WEBP, { contentType: "image/webp" }));
+
+  // 3. Approval ----------------------------------------------------------------
+  console.log("\nApproval");
+  must("make P a platform admin", await admin.from("platform_admins").insert({ user_id: P.id }));
+  const apA = await P.db.rpc("review_org", { p_org: orgA, p_action: "approve" });
+  report(apA.data === "active", "P approves org A (review_org)", fmt(apA.error));
+  const apB = await P.db.rpc("review_org", { p_org: orgB, p_action: "approve" });
+  report(apB.data === "active", "P approves org B (review_org)", fmt(apB.error));
+  if (apA.data !== "active" || apB.data !== "active") throw new Fatal("approval failed; later checks depend on it");
+  expectFail("A (not a platform admin) cannot approve orgs", await A.db.rpc("review_org", { p_org: orgB, p_action: "suspend", p_reason: "x" }));
+
+  // Data in org B for the isolation checks (created by B itself).
+  const bSlide = must("B creates a slide", await B.db.from("slides").insert({ org_id: orgB, type: "template", template_key: "kuliah", fields: kuliahFields, status: "published" }).select("id").single()) as { id: string };
+  const bFile = `${orgB}/poster-${RUN}.webp`;
+  must("B uploads a file", await B.db.storage.from("media").upload(bFile, WEBP, { contentType: "image/webp" }));
+  const bMedia = must("B adds a media row", await B.db.from("media").insert({ org_id: orgB, path: bFile, kind: "poster", width: 1, height: 1, bytes: WEBP.length, created_by: B.id }).select("id").single()) as { id: string };
+  const bPair = must("B's TV pair_start", await anon.rpc("pair_start", { p_secret: secret() })) as { code: string };
+  const bScreen = must("B pairs a screen", await B.db.rpc("pair_claim", { p_code: bPair.code, p_org: orgB, p_name: "TV B" })) as string;
+
+  // 4. Org A content + isolation from org B ----------------------------------
+  console.log("\nOrg A content, isolation from org B");
+  const aSlide = await A.db.from("slides").insert({ org_id: orgA, type: "template", template_key: "kuliah", fields: kuliahFields, status: "published" }).select("id").single();
+  expectOk("A can create a kuliah slide in org A", aSlide);
+
+  expectNoRows("A cannot read org B's organisation row", await A.db.from("organisations").select("id").eq("id", orgB));
+  expectNoRows("A cannot read org B's slides", await A.db.from("slides").select("id").eq("org_id", orgB));
+  expectNoRows("A cannot read org B's settings", await A.db.from("org_settings").select("org_id").eq("org_id", orgB));
+  expectNoRows("A cannot read org B's screens", await A.db.from("screens").select("id").eq("org_id", orgB));
+  expectNoRows("A cannot read org B's media", await A.db.from("media").select("id").eq("org_id", orgB));
+  expectNoRows("A cannot read org B's members", await A.db.from("members").select("user_id").eq("org_id", orgB));
+
+  expectFail("A cannot insert a slide into org B", await A.db.from("slides").insert({ org_id: orgB, type: "template", template_key: "kuliah", fields: kuliahFields }).select("id"));
+  expectFail("A cannot insert a media row into org B", await A.db.from("media").insert({ org_id: orgB, path: `${orgB}/x-${RUN}.webp`, kind: "poster", width: 1, height: 1, bytes: 10, created_by: A.id }).select("id"));
+  expectFail("A cannot invite someone into org B", await A.db.from("invitations").insert({ org_id: orgB, email: `${TAG}-x-${RUN}@example.com`, role: "pentadbir", invited_by: A.id }).select("id"));
+  expectFail("A cannot add itself as a member of org B", await A.db.from("members").insert({ org_id: orgB, user_id: A.id, role: "pentadbir" }).select("user_id"));
+
+  expectNoRows("A cannot update org B's slides", await A.db.from("slides").update({ fields: { hacked: true } }).eq("org_id", orgB).select("id"));
+  expectNoRows("A cannot update org B's settings", await A.db.from("org_settings").update({ ticker: ["hacked"] }).eq("org_id", orgB).select("org_id"));
+  expectNoRows("A cannot update org B's screens", await A.db.from("screens").update({ name: "hacked" }).eq("org_id", orgB).select("id"));
+  expectNoRows("A cannot update org B's organisation", await A.db.from("organisations").update({ full_name: "hacked hacked" }).eq("id", orgB).select("id"));
+  expectNoRows("A cannot delete org B's slides", await A.db.from("slides").delete().eq("org_id", orgB).select("id"));
+  expectNoRows("A cannot delete org B's media rows", await A.db.from("media").delete().eq("org_id", orgB).select("id"));
+
+  expectFail("A cannot upload to storage path B/…", await A.db.storage.from("media").upload(`${orgB}/evil-${RUN}.webp`, WEBP, { contentType: "image/webp" }));
+  const list = await A.db.storage.from("media").list(orgB);
+  report(!list.error && (list.data ?? []).length === 0, "A cannot list storage path B/…", list.error ? fmt(list.error) : `listed ${(list.data ?? []).length} file(s)`);
+  expectFail("A cannot download B/… through the storage API (public URLs are readable by design, PRD §7)", await A.db.storage.from("media").download(bFile));
+  await A.db.storage.from("media").remove([bFile]);
+  expectFail("A cannot point org A's logo at a file in B/… (set_org_logo)", await A.db.rpc("set_org_logo", { p_org: orgA, p_path: bFile }));
+
+  // Verify with the service role that B's data is untouched.
+  const bAfter = await admin.from("slides").select("fields").eq("id", bSlide.id).single();
+  report(!(bAfter.data?.fields as Record<string, unknown> | undefined)?.hacked, "Org B's slide is unchanged (checked with service role)");
+  const bScreenAfter = await admin.from("screens").select("name").eq("id", bScreen).single();
+  report(bScreenAfter.data?.name === "TV B", "Org B's screen is unchanged (checked with service role)");
+  const bFiles = await admin.storage.from("media").list(orgB);
+  report((bFiles.data ?? []).some((f) => bFile.endsWith(f.name)) && !(bFiles.data ?? []).some((f) => f.name.startsWith("evil-")), "Org B's storage folder is unchanged (checked with service role)");
+  const bMediaAfter = await admin.from("media").select("id").eq("id", bMedia.id);
+  report((bMediaAfter.data ?? []).length === 1, "Org B's media row still exists (checked with service role)");
+
+  // 5. Kematian rule -------------------------------------------------------------
+  console.log("\nKematian");
+  expectFail("kematian with ends_at more than 7 days ahead is rejected",
+    await A.db.from("slides").insert({ org_id: orgA, type: "template", template_key: "kematian", fields: { name: "[Nama]" }, starts_at: inDays(0), ends_at: inDays(8) }).select("id"), "23514");
+  expectFail("kematian without ends_at is rejected",
+    await A.db.from("slides").insert({ org_id: orgA, type: "template", template_key: "kematian", fields: { name: "[Nama]" } }).select("id"), "23514");
+  expectOk("kematian ending in 3 days is accepted",
+    await A.db.from("slides").insert({ org_id: orgA, type: "template", template_key: "kematian", fields: { name: "[Nama]" }, starts_at: inDays(0), ends_at: inDays(3) }).select("id"));
+
+  // 6. Invitation and editor role ----------------------------------------------
+  console.log("\nInvitation and editor role");
+  expectOk("A invites C as editor", await A.db.from("invitations").insert({ org_id: orgA, email: C.email, role: "editor", invited_by: A.id }).select("id"));
+  const acc = await C.db.rpc("accept_invitations");
+  report(acc.data === 1, "C signs in → accept_invitations → joins org A", acc.error ? fmt(acc.error) : `accepted ${acc.data}`);
+  expectOk("C (editor) can create a slide in org A", await C.db.from("slides").insert({ org_id: orgA, type: "template", template_key: "pengumuman", fields: { title: "[C]", body: "[C]" } }).select("id"));
+  expectNoRows("C (editor) cannot update org A's settings", await C.db.from("org_settings").update({ ticker: ["editor"] }).eq("org_id", orgA).select("org_id"));
+  expectNoRows("C (editor) cannot change members (promote self to pentadbir)", await C.db.from("members").update({ role: "pentadbir" }).eq("org_id", orgA).eq("user_id", C.id).select("user_id"));
+  expectNoRows("C (editor) cannot remove A from org A", await C.db.from("members").delete().eq("org_id", orgA).eq("user_id", A.id).select("user_id"));
+  expectFail("C (editor) cannot invite members", await C.db.from("invitations").insert({ org_id: orgA, email: `${TAG}-y-${RUN}@example.com`, role: "editor", invited_by: C.id }).select("id"));
+  expectNoRows("C (editor) cannot read org A's invitations", await C.db.from("invitations").select("id").eq("org_id", orgA));
+
+  // 7. Pairing --------------------------------------------------------------------
+  console.log("\nPairing");
+  const tvSecret = secret();
+  const start = await anon.rpc("pair_start", { p_secret: tvSecret });
+  const code = (start.data as { status?: string; code?: string } | null)?.code;
+  report(!start.error && /^[0-9]{6}$/.test(code ?? ""), "anon pair_start → 6-digit code", start.error ? fmt(start.error) : JSON.stringify(start.data));
+  if (!code) throw new Fatal("no pairing code; later checks depend on it");
+  const wrong = code === "000000" ? "000001" : "000000";
+  expectFail("A pair_claim with a wrong code fails", await A.db.rpc("pair_claim", { p_code: wrong, p_org: orgA, p_name: "TV A" }), "invalid_code");
+  const claim = await A.db.rpc("pair_claim", { p_code: code, p_org: orgA, p_name: "TV A", p_theme: "alam", p_layout: "bottom" });
+  expectOk("A pair_claim with the right code succeeds", claim);
+  const screenA = claim.data as string;
+  const status = await anon.rpc("pair_status", { p_secret: tvSecret });
+  report((status.data as { status?: string } | null)?.status === "paired", "anon pair_status → paired", JSON.stringify(status.data ?? status.error));
+  const cStart = await anon.rpc("pair_start", { p_secret: secret() });
+  const cCode = (cStart.data as { code?: string } | null)?.code ?? "";
+  expectFail("editor C pair_claim fails (valid code, not a pentadbir)", await C.db.rpc("pair_claim", { p_code: cCode, p_org: orgA, p_name: "TV C" }), "not_allowed");
+  expectNoRows("C (editor) cannot update org A's screens", await C.db.from("screens").update({ name: "editor" }).eq("id", screenA).select("id"));
+  expectFail("A cannot pair a TV into org B", await A.db.rpc("pair_claim", { p_code: cCode, p_org: orgB, p_name: "TV X" }), "not_allowed");
+  expectNoRows("anon cannot read the screens table directly", await anon.from("screens").select("id").limit(5));
+  expectNoRows("anon cannot read the pairing_codes table directly", await anon.from("pairing_codes").select("code").limit(5));
+
+  // Extra (PRD §10): brute-force limit of 10 failed pair_claim attempts per user per hour.
+  // Uses P (an active pentadbir is needed) so A and C are unaffected.
+  const pReg = must("P registers an org for the limit check", await P.db.rpc("register_org", { p_kind: "surau", p_full_name: `RLS Check P ${RUN}`, p_short_name: "RP", p_state: "Selangor", p_district: "Klang", p_zone: "SGR01" })) as string;
+  orgIds.push(pReg);
+  must("P approves its own org", await P.db.rpc("review_org", { p_org: pReg, p_action: "approve" }));
+  for (let i = 0; i < 10; i++) await P.db.rpc("pair_claim", { p_code: String(100000 + i), p_org: pReg, p_name: "x" });
+  const recorded = await admin.from("pair_attempts").select("id", { count: "exact", head: true }).eq("user_id", P.id);
+  expectFail(`after 10 wrong codes the 11th pair_claim is refused (too_many_attempts) [extra, PRD §10] — failed attempts recorded: ${recorded.count ?? "?"}`,
+    await P.db.rpc("pair_claim", { p_code: "199999", p_org: pReg, p_name: "x" }), "too_many_attempts");
+
+  // 8. screen_bundle --------------------------------------------------------------
+  console.log("\nScreen bundle (TV sync)");
+  const b1 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: 0 });
+  const v1 = (b1.data as { status?: string; version?: number } | null)?.version ?? 0;
+  report((b1.data as { status?: string } | null)?.status === "ok" && v1 > 0, "anon screen_bundle → status ok + version", JSON.stringify((b1.data as object) ?? b1.error).slice(0, 160));
+  const slidesInBundle = ((b1.data as { slides?: { templateKey?: string }[] } | null)?.slides ?? []).length;
+  report(slidesInBundle >= 1, "bundle contains org A's published slide", `${slidesInBundle} slide(s)`);
+  const b2 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v1 });
+  report((b2.data as { status?: string } | null)?.status === "unchanged", "second call with that version → unchanged", JSON.stringify(b2.data ?? b2.error));
+  const iq = await A.db.from("org_settings").update({ iqamah_min: { subuh: 10, zohor: 10, asar: 10, maghrib: 9, isyak: 10 } }).eq("org_id", orgA).select("org_id");
+  report(!iq.error && (iq.data ?? []).length === 1, "A updates org A's iqamah minutes", fmt(iq.error));
+  const b3 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v1 });
+  const v3 = (b3.data as { version?: number } | null)?.version ?? 0;
+  report((b3.data as { status?: string } | null)?.status === "ok" && v3 > v1, "after the iqamah change the version increases", `v${v1} → v${v3}`);
+  const maghrib = (b3.data as { settings?: { iqamahMin?: { maghrib?: number } } } | null)?.settings?.iqamahMin?.maghrib;
+  report(maghrib === 9, "bundle carries the new Maghrib iqamah (9)", `maghrib = ${maghrib}`);
+  const rev = await A.db.from("screens").update({ revoked_at: new Date().toISOString() }).eq("id", screenA).select("id");
+  report(!rev.error && (rev.data ?? []).length === 1, "A revokes the screen", fmt(rev.error));
+  const b4 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v3 });
+  report((b4.data as { status?: string } | null)?.status === "revoked", "after revoke → revoked", JSON.stringify(b4.data ?? b4.error));
+  const bOther = await anon.rpc("screen_bundle", { p_secret: secret(), p_since: 0 });
+  report((bOther.data as { status?: string } | null)?.status === "revoked", "an unknown device secret gets nothing (revoked)", JSON.stringify(bOther.data ?? bOther.error));
+
+  // 9. Last pentadbir --------------------------------------------------------------
+  console.log("\nLast pentadbir");
+  expectFail("removing the last pentadbir fails", await A.db.from("members").delete().eq("org_id", orgA).eq("user_id", A.id).select("user_id"), "last_pentadbir");
+  expectFail("demoting the last pentadbir to editor fails", await A.db.from("members").update({ role: "editor" }).eq("org_id", orgA).eq("user_id", A.id).select("user_id"), "last_pentadbir");
+  const stillA = await admin.from("members").select("role").eq("org_id", orgA).eq("user_id", A.id).single();
+  report(stillA.data?.role === "pentadbir", "A is still pentadbir of org A (checked with service role)");
+}
+
+async function main() {
+  const orgIds: string[] = [];
+  let fatal: string | null = null;
+  try {
+    await run(orgIds);
+  } catch (e) {
+    fatal = e instanceof Fatal ? e.message : `unexpected error: ${(e as Error).message}`;
+    console.log(`\nSTOPPED: ${fatal}`);
+  } finally {
+    await cleanup(orgIds);
+  }
+  console.log(`\n${passed} passed, ${failed} failed${fatal ? " (stopped early)" : ""}`);
+  if (failures.length) console.log(`\nFailed:\n${failures.map((f) => `  - ${f}`).join("\n")}`);
+  process.exit(failed || fatal ? 1 : 0);
+}
+
+main();

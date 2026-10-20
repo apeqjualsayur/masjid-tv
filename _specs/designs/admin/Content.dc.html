@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Kandungan</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+a{color:#146C4A}a:hover{color:#0D4A33}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; overflow: hidden; background: #F4F7F5; font-family: 'Plus Jakarta Sans', sans-serif; color: #12261E">
+<div style="box-sizing: border-box; padding: 18px 20px 100px; display: flex; flex-direction: column; gap: 16px">
+<div style="font-size: 26px; font-weight: 800; letter-spacing: -0.3px">Kandungan</div>
+<div role="tablist" aria-label="Status" style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 4px; border-radius: 14px; background: #E3ECE7">
+<sc-for list="{{tabs}}" as="tb" hint-placeholder-count="3">
+<button type="button" role="tab" aria-selected="{{tb.sel}}" onClick="{{tb.pick}}" style="height: 40px; border: 0; border-radius: 11px; font: inherit; font-size: 14px; font-weight: 700; background: {{tb.bg}}; color: {{tb.fg}}; box-shadow: {{tb.sh}}">{{tb.label}}</button>
+</sc-for>
+</div>
+<div style="font-size: 13px; color: #51655C">Seret untuk susun semula giliran paparan.</div>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{items}}" as="it" hint-placeholder-count="5">
+<div style="display: flex; align-items: center; gap: 12px; padding: 12px 14px 12px 8px; border-radius: 16px; background: #FFFFFF; box-shadow: 0 1px 3px rgba(18,38,30,0.08)">
+<button type="button" aria-label="Seret untuk susun" style="width: 28px; height: 44px; border: 0; background: transparent; color: #8DA096; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="16" height="20" viewBox="0 0 16 20" fill="currentColor"><circle cx="5" cy="4" r="1.6"></circle><circle cx="11" cy="4" r="1.6"></circle><circle cx="5" cy="10" r="1.6"></circle><circle cx="11" cy="10" r="1.6"></circle><circle cx="5" cy="16" r="1.6"></circle><circle cx="11" cy="16" r="1.6"></circle></svg></button>
+<div style="width: 44px; height: 44px; flex-shrink: 0; border-radius: 12px; background: {{it.bg}}; color: {{it.fg}}; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 800">{{it.code}}</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<div style="display: flex; align-items: center; gap: 6px">
+<div style="font-size: 12px; font-weight: 700; color: #51655C">{{it.type}}</div>
+<sc-if value="{{it.pri}}" hint-placeholder-val="{{false}}"><div style="padding: 2px 6px; border-radius: 6px; background: #FDE7E2; color: #9B2C14; font-size: 11px; font-weight: 800">Keutamaan</div></sc-if>
+</div>
+<div style="font-size: 15px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{it.title}}</div>
+<div style="font-size: 12px; color: #51655C">{{it.meta}}</div>
+</div>
+<label style="position: relative; width: 46px; height: 28px; flex-shrink: 0">
+<input type="checkbox" checked="{{it.on}}" aria-label="Papar" style="position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0">
+<span aria-hidden="true" style="position: absolute; inset: 0; border-radius: 999px; background: {{it.trk}}"></span>
+<span aria-hidden="true" style="position: absolute; top: 3px; left: {{it.knob}}; width: 22px; height: 22px; border-radius: 999px; background: #FFFFFF; box-shadow: 0 1px 2px rgba(0,0,0,0.25)"></span>
+</label>
+</div>
+</sc-for>
+</div>
+</div>
+
+<a href="Picker.dc.html" aria-label="Tambah kandungan" style="position: absolute; right: 20px; bottom: 98px; width: 60px; height: 60px; border-radius: 20px; background: #146C4A; color: #FFFFFF; display: flex; align-items: center; justify-content: center; box-shadow: 0 10px 24px rgba(20,108,74,0.35)"><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M12 5v14 M5 12h14"></path></svg></a>
+
+<nav aria-label="Navigasi utama" style="position: absolute; left: 0; right: 0; bottom: 0; height: 78px; background: #FFFFFF; border-top: 1px solid #DCE6E1; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr))">
+<a href="Home.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: #51655C; font-size: 12px; font-weight: 600"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z"></path></svg>Utama</a>
+<a href="Content.dc.html" aria-current="page" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: #146C4A; font-size: 12px; font-weight: 800"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 8l10 5 10-5Z"></path><path d="M2 13l10 5 10-5"></path></svg>Kandungan</a>
+<a href="Screens.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: #51655C; font-size: 12px; font-weight: 600"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="13" rx="2"></rect><path d="M8 21h8 M12 17v4"></path></svg>Skrin</a>
+<a href="Settings.dc.html" style="display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; text-decoration: none; color: #51655C; font-size: 12px; font-weight: 600"><svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h9 M17 7h3 M4 17h3 M11 17h9"></path><circle cx="15" cy="7" r="2"></circle><circle cx="9" cy="17" r="2"></circle></svg>Tetapan</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const tab = (this.state && this.state.tab) || 'aktif';
+    const C = {
+      kul: ['KUL', '#E3F1EA', '#146C4A'], pos: ['IMG', '#E6EEF8', '#1F4E8A'], kem: ['KEM', '#ECECEC', '#3A3A3A'],
+      inf: ['INF', '#FFF1D6', '#8A5300'], imb: ['I&B', '#EEE8F7', '#5B3D8F'], pro: ['PRG', '#E3F4F4', '#11666A'], mes: ['MES', '#F7EAE3', '#8A3F14']
+    };
+    const D = {
+      aktif: [
+        { k: 'kem', type: 'Kematian', title: '[Nama Allahyarham]', meta: 'Tamat auto: 3 hari · 20 s', pri: true, on: true },
+        { k: 'kul', type: 'Kuliah', title: 'Kuliah Maghrib: [Tajuk]', meta: 'Hingga 20 Okt · 15 s · Setiap Selasa', pri: false, on: true },
+        { k: 'pos', type: 'Poster', title: '[Program Hujung Minggu]', meta: 'Hingga 26 Okt · 15 s', pri: false, on: true },
+        { k: 'inf', type: 'Infaq', title: 'Tabung [Nama Projek]', meta: 'Berterusan · 15 s', pri: false, on: true },
+        { k: 'imb', type: 'Imam & Bilal', title: 'Jadual minggu ini', meta: 'Hingga 25 Okt · 20 s', pri: false, on: false }
+      ],
+      dijadual: [
+        { k: 'pro', type: 'Program', title: '[Gotong-royong Perdana]', meta: 'Mula 1 Nov · 15 s', pri: false, on: true },
+        { k: 'mes', type: 'Mesyuarat', title: '[Mesyuarat Agung]', meta: 'Mula 3 Nov · 15 s', pri: false, on: true }
+      ],
+      tamat: [
+        { k: 'kul', type: 'Kuliah', title: 'Kuliah Subuh: [Tajuk]', meta: 'Tamat 12 Okt', pri: false, on: false }
+      ]
+    };
+    const tabs = [['aktif', 'Aktif (5)'], ['dijadual', 'Dijadual (2)'], ['tamat', 'Tamat']].map(([id, label]) => {
+      const sel = id === tab;
+      return { label, sel, pick: () => this.setState({ tab: id }), bg: sel ? '#FFFFFF' : 'transparent', fg: sel ? '#12261E' : '#51655C', sh: sel ? '0 1px 3px rgba(18,38,30,0.12)' : 'none' };
+    });
+    const items = D[tab].map((it) => ({ ...it, code: C[it.k][0], bg: C[it.k][1], fg: C[it.k][2], trk: it.on ? '#146C4A' : '#C3D1CA', knob: it.on ? '21px' : '3px' }));
+    return { tabs, items };
+  }
+}
+</script>
+</body>
+</html>

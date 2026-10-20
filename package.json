@@ -11,9 +11,11 @@
     "test:watch": "vitest",
     "fetch-year": "tsx scripts/fetch-year.ts",
     "sample-slides": "tsx scripts/make-sample-slides.ts",
-    "e2e": "node scripts/e2e.mjs"
+    "e2e": "node scripts/e2e.mjs",
+    "rls-check": "node --env-file-if-exists=.env.local --import tsx scripts/rls-check.ts"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
     "next": "^16.4.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1"

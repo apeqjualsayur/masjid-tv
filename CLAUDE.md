@@ -8,7 +8,7 @@ Full-screen prayer-times display for masjid/surau TVs (JAKIM times, clock, azan/
 - `_specs/01-theme-contract.md` — `DisplayState` / `ThemeDefinition` interfaces and every theme's tokens, sizes and rules.
 - `_specs/02-claude-code-prompts.md` — the Phase 1 build order.
 - `_specs/designs/*.dc.html` — visual references (`A-*` alam, `D-*` serambi, `F-*` tenang). Design-tool source: read the markup and inline styles; they do not run standalone.
-- Phase 2 (admin + Supabase): `_specs/10-PRD-phase2.md`, `_specs/11-schema.sql` (= `supabase/migrations/0001_init.sql`), `_specs/12-phase2-prompts.md`, `_specs/designs/admin/*.dc.html`. Project rules for all agents: `AGENTS.md`.
+- Phase 2 (admin + Supabase): `_specs/10-PRD-phase2.md`, `_specs/11-schema.sql` (full current schema = `supabase/migrations/0001_init.sql` + later numbered migrations), `_specs/12-phase2-prompts.md`, `_specs/designs/admin/*.dc.html`. Project rules for all agents: `AGENTS.md`.
 
 If code and spec disagree, the spec wins — or update the spec first, deliberately.
 

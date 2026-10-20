@@ -26,7 +26,7 @@ Project rules for the coding agent (Antigravity / Gemini, Claude Code, Cursor, C
 - `src/app/tv/` — the display page that wires engine → theme.
 - `src/app/admin/**` — admin pages (client components). `src/admin/` — admin components, hooks, `i18n/ms.json` + `en.json`.
 - `src/lib/supabase.ts` — the single Supabase browser client.
-- `supabase/migrations/` — SQL migrations; `0001_init.sql` = `_specs/11-schema.sql`. New migrations are numbered and shown to the user before applying.
+- `supabase/migrations/` — SQL migrations; `0001_init.sql` = v0.1 of `_specs/11-schema.sql`, never edited. Every later change is a new numbered migration (shown to the user before applying) **and** is folded into `_specs/11-schema.sql`, which always describes the full current schema.
 
 ## Non-negotiables (display)
 - Never show guessed or hard-coded prayer times. Read order: IndexedDB → `public/data/{zone}-{year}.json` → "Data waktu tidak tersedia".

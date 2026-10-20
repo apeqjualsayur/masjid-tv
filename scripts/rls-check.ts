@@ -209,7 +209,10 @@ async function run(orgIds: string[]) {
   expectFail("A cannot upload to storage path B/…", await A.db.storage.from("media").upload(`${orgB}/evil-${RUN}.webp`, WEBP, { contentType: "image/webp" }));
   const list = await A.db.storage.from("media").list(orgB);
   report(!list.error && (list.data ?? []).length === 0, "A cannot list storage path B/…", list.error ? fmt(list.error) : `listed ${(list.data ?? []).length} file(s)`);
-  expectFail("A cannot download B/… through the storage API (public URLs are readable by design, PRD §7)", await A.db.storage.from("media").download(bFile));
+  // The bucket is public by design (PRD §7: the TV needs it; paths are unguessable UUIDs), so a
+  // known path is readable by anyone. What protects other orgs is that paths cannot be listed (above).
+  const dl = await A.db.storage.from("media").download(bFile);
+  report(!dl.error, "A can download B/… only with its exact path (public bucket by design, PRD §7; listing is blocked)", fmt(dl.error));
   await A.db.storage.from("media").remove([bFile]);
   expectFail("A cannot point org A's logo at a file in B/… (set_org_logo)", await A.db.rpc("set_org_logo", { p_org: orgA, p_path: bFile }));
 
@@ -252,7 +255,9 @@ async function run(orgIds: string[]) {
   report(!start.error && /^[0-9]{6}$/.test(code ?? ""), "anon pair_start → 6-digit code", start.error ? fmt(start.error) : JSON.stringify(start.data));
   if (!code) throw new Fatal("no pairing code; later checks depend on it");
   const wrong = code === "000000" ? "000001" : "000000";
-  expectFail("A pair_claim with a wrong code fails", await A.db.rpc("pair_claim", { p_code: wrong, p_org: orgA, p_name: "TV A" }), "invalid_code");
+  const wrongClaim = await A.db.rpc("pair_claim", { p_code: wrong, p_org: orgA, p_name: "TV A" });
+  report(!wrongClaim.error && wrongClaim.data === null, "A pair_claim with a wrong code fails (returns null, migration 0002)",
+    wrongClaim.error ? `raised ${fmt(wrongClaim.error)} — has migration 0002 been run?` : `returned ${JSON.stringify(wrongClaim.data)}`);
   const claim = await A.db.rpc("pair_claim", { p_code: code, p_org: orgA, p_name: "TV A", p_theme: "alam", p_layout: "bottom" });
   expectOk("A pair_claim with the right code succeeds", claim);
   const screenA = claim.data as string;
@@ -272,6 +277,7 @@ async function run(orgIds: string[]) {
   orgIds.push(pReg);
   must("P approves its own org", await P.db.rpc("review_org", { p_org: pReg, p_action: "approve" }));
   for (let i = 0; i < 10; i++) await P.db.rpc("pair_claim", { p_code: String(100000 + i), p_org: pReg, p_name: "x" });
+  // Note: with 0002 a wrong code returns null (not an error), so each of these is recorded.
   const recorded = await admin.from("pair_attempts").select("id", { count: "exact", head: true }).eq("user_id", P.id);
   expectFail(`after 10 wrong codes the 11th pair_claim is refused (too_many_attempts) [extra, PRD §10] — failed attempts recorded: ${recorded.count ?? "?"}`,
     await P.db.rpc("pair_claim", { p_code: "199999", p_org: pReg, p_name: "x" }), "too_many_attempts");

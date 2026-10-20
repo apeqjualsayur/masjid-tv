@@ -1,7 +1,8 @@
 -- =====================================================================
 -- Masjid View — Phase 2 database schema (Supabase / Postgres 15+)
--- v0.1 — source of truth for supabase/migrations/0001_init.sql
--- Run once on a fresh project (SQL editor or `supabase db push`).
+-- v0.2 — full current schema. A fresh project gets the same result from running this file once,
+-- or from supabase/migrations/0001_init.sql (= v0.1) followed by the numbered migrations after it.
+-- Changes since v0.1: 0002 pair_claim returns NULL on a wrong code (records the failed attempt).
 -- =====================================================================
 
 create extension if not exists pgcrypto;
@@ -515,6 +516,9 @@ create or replace function public.pair_claim(
   p_code text, p_org uuid, p_name text,
   p_theme public.theme_key default 'tenang', p_layout public.layout_key default 'full')
 returns uuid language plpgsql security definer set search_path = public as $$
+-- Returns the new screen id, or NULL when the code is wrong or expired.
+-- A wrong code must NOT raise an exception: that would roll back the pair_attempts row
+-- and the 10-per-hour brute-force limit (PRD §10) would never trigger.
 declare v_row pairing_codes; v_screen uuid;
 begin
   if auth.uid() is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
@@ -531,7 +535,7 @@ begin
    for update;
   if not found then
     insert into pair_attempts (user_id, succeeded) values (auth.uid(), false);
-    raise exception 'invalid_code' using errcode = 'P0001';
+    return null;   -- invalid_code: the admin app shows "Kod tidak sah"
   end if;
 
   -- a previously revoked screen with the same device secret is replaced

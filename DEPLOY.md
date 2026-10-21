@@ -84,6 +84,26 @@ Within a minute GitHub starts testing the code by itself (see Part 5).
 
 That address is what the TV opens. Write it down for the TV setup (`_specs/04-pilot-setup.md`). Cloudflare may add a few letters to the name (for example `masjid-tv-6d8.pages.dev`); always use the address Cloudflare shows you.
 
+### Admin app settings (Supabase)
+
+The admin app (`/admin/`) needs two settings, or it shows "Aplikasi belum disambungkan ke pangkalan data":
+
+1. Cloudflare → **Workers & Pages** → masjid-tv → **Settings** → **Variables and Secrets** → **+ Add**, type **Plaintext**, for **Production** (and Preview):
+
+   | Variable name | Value |
+   |---|---|
+   | `NEXT_PUBLIC_SUPABASE_URL` | Supabase Project URL (`https://….supabase.co`) |
+   | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Supabase **publishable** key (`sb_publishable_…`) |
+
+   Never add the secret key (`sb_secret_…`) here.
+2. **Save**, then **Deployments** → **All deployments** → **⋯** on the top row → **Retry deployment**. Settings only take effect in a new build.
+
+### Own web address (masjidview.my)
+
+The domain is bought at Hostinger and its DNS runs on Cloudflare (Cloudflare → **Domains** → **Onboard a domain**, then change the nameservers at Hostinger to the two Cloudflare gives you). Then Cloudflare → masjid-tv → **Custom domains** → add `masjidview.my` and `www.masjidview.my`. The TV opens `https://masjidview.my/tv/`; the `pages.dev` address keeps working too.
+
+After adding a domain, add it in Supabase → **Authentication** → **URL Configuration**: Site URL `https://masjidview.my/admin/`, and Redirect URLs `https://masjidview.my/**` and `https://www.masjidview.my/**` (plus `http://localhost:3100/**` and `https://*.masjid-tv-6d8.pages.dev/**`).
+
 ---
 
 ## Part 4 — Making changes, and preview links
@@ -164,6 +184,7 @@ npm run fetch-year -- SGR01 2027
 | Problem | What to do |
 |---|---|
 | Cloudflare build **failed** | Open the deployment and read the last red lines of the log. Most often: `NODE_VERSION` is missing or not `24` (Part 3 step 6). Fix it under **Settings → Environment variables**, then **Retry deployment**. |
+| `/admin/` says "Aplikasi belum disambungkan ke pangkalan data" | The two Supabase variables are missing or misspelled (Part 3, Admin app settings). Fix them, then **Retry deployment**. |
 | The address shows **404 Not Found** | Make sure you added `/tv/` at the end. If the whole site is 404, check **Build output directory** is `out` (Settings → Builds). |
 | Project name is taken | Pick another, e.g. `masjid-tv-shahalam`. The TV address changes to match. |
 | No preview link for a branch | Cloudflare → masjid-tv → **Settings → Builds & deployments → Preview branches**: set to **All non-production branches**. |

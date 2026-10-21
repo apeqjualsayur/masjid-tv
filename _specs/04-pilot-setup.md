@@ -7,7 +7,7 @@
 **Screen address (write it exactly):**
 
 ```
-https://masjid-tv-6d8.pages.dev/tv/
+https://masjidview.my/tv/
 ```
 
 Choose **one** setup:
@@ -53,7 +53,7 @@ Fully Kiosk Browser shows one web page full screen, starts it when the TV is swi
 1. Fully Kiosk opens with a welcome page. Allow the permissions it asks for (it needs them to start on boot and keep the screen on).
 2. Open Fully's **Settings**: on most remotes press **Back**, or swipe from the left edge on a touch screen, then choose **Settings**.
 3. **Web Content Settings** → **Start URL** → type:
-   `https://masjid-tv-6d8.pages.dev/tv/`
+   `https://masjidview.my/tv/`
    Press **OK**.
 4. Go back to the main page (press **Back** until you leave Settings). The prayer-time screen should appear. Wait 30 seconds for it to load the first time.
 
@@ -120,7 +120,7 @@ This lets an AJK member check or reload the screen from a phone on the masjid Wi
 2. In the box, paste **exactly** (one line):
 
    ```
-   "C:\Program Files\Google\Chrome\Application\chrome.exe" --kiosk "https://masjid-tv-6d8.pages.dev/tv/" --user-data-dir="C:\MasjidTV\chrome" --no-first-run --noerrdialogs --hide-crash-restore-bubble --disable-features=Translate --overscroll-history-navigation=0
+   "C:\Program Files\Google\Chrome\Application\chrome.exe" --kiosk "https://masjidview.my/tv/" --user-data-dir="C:\MasjidTV\chrome" --no-first-run --noerrdialogs --hide-crash-restore-bubble --disable-features=Translate --overscroll-history-navigation=0
    ```
 
    > If Chrome is installed somewhere else, right-click your normal Chrome icon → **Properties** and copy the path from **Target**.
@@ -168,7 +168,7 @@ This lets an AJK member check or reload the screen from a phone on the masjid Wi
 ## Checking the screen (both setups)
 
 Add `?debug=1` to the address to see a status bar at the bottom:
-`https://masjid-tv-6d8.pages.dev/tv/?debug=1`
+`https://masjidview.my/tv/?debug=1`
 
 | Line | What you want to see |
 |---|---|

@@ -1,6 +1,14 @@
 {
-  "app": { "name": "Masjid View", "loading": "Memuatkan…", "notConfigured": "Aplikasi belum disambungkan ke pangkalan data. Hubungi pentadbir sistem." },
-  "lang": { "label": "Bahasa", "ms": "BM", "en": "EN" },
+  "app": {
+    "name": "Masjid View",
+    "loading": "Memuatkan…",
+    "notConfigured": "Aplikasi belum disambungkan ke pangkalan data. Hubungi pentadbir sistem."
+  },
+  "lang": {
+    "label": "Bahasa",
+    "ms": "BM",
+    "en": "EN"
+  },
   "signin": {
     "tagline": "Paparan waktu solat dan pengumuman untuk TV masjid dan surau.",
     "google": "Teruskan dengan Google",
@@ -18,10 +26,30 @@
     "register": "Daftar percuma",
     "signingIn": "Sedang log masuk…"
   },
-  "nav": { "main": "Navigasi utama", "home": "Utama", "content": "Kandungan", "screens": "Skrin", "settings": "Tetapan", "members": "Ahli", "platform": "Platform" },
-  "account": { "menu": "Akaun", "signOut": "Log keluar", "switchOrg": "Tukar masjid", "currentOrg": "Masjid semasa", "close": "Tutup" },
-  "role": { "pentadbir": "Pentadbir", "editor": "Editor" },
-  "status": { "pending": "Menunggu kelulusan", "active": "Aktif", "rejected": "Ditolak", "suspended": "Digantung" },
+  "nav": {
+    "main": "Navigasi utama",
+    "home": "Utama",
+    "content": "Kandungan",
+    "screens": "Skrin",
+    "settings": "Tetapan",
+    "members": "Ahli",
+    "platform": "Platform"
+  },
+  "account": {
+    "menu": "Akaun",
+    "signOut": "Log keluar",
+    "currentOrg": "Masjid semasa",
+    "close": "Tutup"
+  },
+  "role": {
+    "pentadbir": "Pentadbir"
+  },
+  "status": {
+    "pending": "Menunggu kelulusan",
+    "active": "Aktif",
+    "rejected": "Ditolak",
+    "suspended": "Digantung"
+  },
   "home": {
     "title": "Utama",
     "next": "Waktu seterusnya",
@@ -51,14 +79,39 @@
     "oneScreen": "1 skrin",
     "loadError": "Data tidak dapat dimuatkan: {message}"
   },
-  "duration": { "hm": "{h} jam {m} minit", "m": "{m} minit", "h": "{h} jam", "d": "{d} hari" },
-  "theme": { "alam": "Alam", "serambi": "Serambi", "tenang": "Tenang" },
-  "layout": { "full": "Penuh", "bottom": "Bar bawah", "side": "Bar sisi" },
-  "template": {
-    "pengumuman": "Pengumuman", "kuliah": "Kuliah", "kematian": "Kematian", "program": "Program", "infaq": "Infaq",
-    "mesyuarat": "Mesyuarat", "imam_bilal": "Imam & Bilal", "kewangan": "Kewangan", "ayat": "Ayat", "ucapan": "Ucapan", "poster": "Poster"
+  "duration": {
+    "hm": "{h} jam {m} minit",
+    "m": "{m} minit",
+    "h": "{h} jam",
+    "d": "{d} hari"
   },
-  "placeholder": { "soon": "Halaman ini sedang dibina.", "back": "Kembali ke Utama" },
+  "theme": {
+    "alam": "Alam",
+    "serambi": "Serambi",
+    "tenang": "Tenang"
+  },
+  "layout": {
+    "full": "Penuh",
+    "bottom": "Bar bawah",
+    "side": "Bar sisi"
+  },
+  "template": {
+    "pengumuman": "Pengumuman",
+    "kuliah": "Kuliah",
+    "kematian": "Kematian",
+    "program": "Program",
+    "infaq": "Infaq",
+    "mesyuarat": "Mesyuarat",
+    "imam_bilal": "Imam & Bilal",
+    "kewangan": "Kewangan",
+    "ayat": "Ayat",
+    "ucapan": "Ucapan",
+    "poster": "Poster"
+  },
+  "placeholder": {
+    "soon": "Halaman ini sedang dibina.",
+    "back": "Kembali ke Utama"
+  },
   "pending": {
     "title": "Menunggu kelulusan",
     "received": "Pendaftaran diterima",
@@ -80,7 +133,7 @@
     "tip3": "Buka masjidview.my/tv pada TV untuk mendapatkan kod pemasangan.",
     "logoFailed": "Logo tidak dapat dimuat naik. Anda boleh menambahnya dalam Tetapan selepas diluluskan.",
     "checkAgain": "Semak status",
-    "registerAnother": "Daftar masjid lain"
+    "reregister": "Daftar semula"
   },
   "register": {
     "title": "Daftar masjid",
@@ -124,15 +177,16 @@
       "phoneRequired": "Masukkan nombor telefon.",
       "phoneInvalid": "Nombor telefon tidak sah. Contoh: 012-345 6789",
       "fixAbove": "Sila betulkan ruangan yang ditanda.",
-      "tooManyPending": "Anda sudah mempunyai 3 pendaftaran yang menunggu kelulusan. Tunggu sehingga ia disemak.",
       "signedOut": "Sesi anda telah tamat. Sila log masuk semula.",
       "invalid": "Sesetengah maklumat tidak sah. Semak semula borang.",
       "network": "Tiada sambungan internet. Cuba lagi.",
       "generic": "Pendaftaran tidak berjaya. Cuba lagi.",
       "logoType": "Gunakan fail PNG, JPG atau WebP.",
       "logoTooBig": "Fail logo terlalu besar.",
-      "logoDecode": "Logo tidak dapat dibaca. Cuba fail lain."
-    }
+      "logoDecode": "Logo tidak dapat dibaca. Cuba fail lain.",
+      "alreadyHasOrg": "Akaun ini sudah mengurus sebuah masjid. Setiap akaun hanya boleh mengurus satu masjid."
+    },
+    "goToMyOrg": "Pergi ke masjid saya"
   },
   "zone": {
     "title": "Lokasi untuk waktu solat",
@@ -241,7 +295,6 @@
   },
   "settings": {
     "title": "Tetapan",
-    "readOnly": "Hanya Pentadbir boleh mengubah tetapan. Anda boleh melihatnya sahaja.",
     "brand": "Jenama masjid",
     "logoAdd": "Tambah logo",
     "logoChange": "Tukar logo",
@@ -336,7 +389,6 @@
     "deleteConfirm": "Ya, padam",
     "deleted": "{name} dipadam.",
     "cancel": "Batal",
-    "readOnly": "Hanya Pentadbir boleh menambah atau mengurus skrin.",
     "loadError": "Senarai skrin tidak dapat dimuatkan: {message}",
     "error": "Tidak berjaya: {message}",
     "err": {
@@ -613,6 +665,59 @@
     },
     "untitled": "(tanpa tajuk)"
   },
-  "privacy": { "title": "Notis Privasi", "draft": "Notis privasi penuh akan diterbitkan sebelum perintis. Data yang disimpan: nama, e-mel dan telefon AJK, serta kandungan pengumuman (termasuk nama si mati)." },
-  "dialog": { "close": "Tutup" }
+  "members": {
+    "title": "Ahli",
+    "intro": "Setiap masjid boleh mempunyai sehingga 2 pentadbir. Kedua-duanya sama: boleh mengubah semua tetapan dan kandungan, serta membuang pentadbir yang satu lagi. Pilih pentadbir kedua dengan teliti.",
+    "slot": "Pentadbir {n}",
+    "me": "Anda",
+    "joined": "Menyertai {date}",
+    "emptySlot": "Tempat kosong",
+    "invite": "Jemput pentadbir kedua",
+    "inviteHint": "Masukkan e-mel Google atau e-mel yang akan digunakan untuk log masuk.",
+    "email": "E-mel",
+    "emailPlaceholder": "nama@contoh.com",
+    "send": "Jemput",
+    "sending": "Menjemput…",
+    "invitedTitle": "Jemputan dihantar",
+    "invited": "Dijemput: {email}",
+    "expires": "Tamat tempoh {date}",
+    "share": "Hantar mesej ini kepadanya (contoh melalui WhatsApp):",
+    "shareText": "Anda dijemput sebagai pentadbir paparan Masjid View untuk {masjid}. Log masuk dengan e-mel {email} di {url} dalam 14 hari.",
+    "copy": "Salin mesej",
+    "copied": "Mesej disalin.",
+    "whatsapp": "Hantar melalui WhatsApp",
+    "cancelInvite": "Batal",
+    "cancelled": "Jemputan dibatalkan.",
+    "remove": "Buang",
+    "removeTitle": "Buang {email}?",
+    "removeBody": "{email} akan hilang akses serta-merta.",
+    "removeConfirm": "Ya, buang",
+    "removed": "{email} dibuang.",
+    "leave": "Keluar dari masjid ini",
+    "leaveTitle": "Keluar dari {masjid}?",
+    "leaveBody": "Anda akan hilang akses serta-merta. {email} akan terus mengurus masjid ini.",
+    "leaveConfirm": "Ya, keluar",
+    "cancel": "Batal",
+    "full": "Masjid ini sudah mempunyai 2 pentadbir.",
+    "notActive": "Jemputan hanya boleh dibuat selepas masjid diluluskan.",
+    "loadError": "Senarai ahli tidak dapat dimuatkan: {message}",
+    "err": {
+      "user_has_org": "E-mel ini sudah mengurus masjid lain.",
+      "org_full": "Masjid ini sudah mempunyai 2 pentadbir.",
+      "invite_pending": "Sudah ada jemputan yang belum diterima. Batalkan dahulu untuk menjemput orang lain.",
+      "org_not_active": "Masjid ini belum aktif. Jemputan boleh dibuat selepas diluluskan.",
+      "bad_email": "E-mel tidak sah.",
+      "last_pentadbir": "Pentadbir terakhir tidak boleh dibuang.",
+      "not_allowed": "Anda tidak dibenarkan berbuat demikian.",
+      "network": "Tiada sambungan internet. Cuba lagi.",
+      "generic": "Tidak berjaya: {message}"
+    }
+  },
+  "privacy": {
+    "title": "Notis Privasi",
+    "draft": "Notis privasi penuh akan diterbitkan sebelum perintis. Data yang disimpan: nama, e-mel dan telefon AJK, serta kandungan pengumuman (termasuk nama si mati)."
+  },
+  "dialog": {
+    "close": "Tutup"
+  }
 }

@@ -46,7 +46,7 @@ describe("registerArgs", () => {
 
 describe("errorKeyOf", () => {
   it("maps database and network errors to friendly messages", () => {
-    expect(errorKeyOf({ message: "too_many_pending", code: "P0001" })).toBe("register.err.tooManyPending");
+    expect(errorKeyOf({ message: "already_has_org", code: "P0001" })).toBe("register.err.alreadyHasOrg");
     expect(errorKeyOf({ message: "not_authenticated", code: "28000" })).toBe("register.err.signedOut");
     expect(errorKeyOf({ message: "JWT expired" })).toBe("register.err.signedOut");
     expect(errorKeyOf({ message: "new row violates check constraint", code: "23514" })).toBe("register.err.invalid");
@@ -103,8 +103,8 @@ describe("submitRegistration order", () => {
   });
 
   it("a failed registration uploads nothing", async () => {
-    const { b, calls } = backend({ registerOrg: vi.fn(async () => Promise.reject({ message: "too_many_pending" })) });
-    await expect(submitRegistration(b, good, logo, () => "u1")).rejects.toEqual({ message: "too_many_pending" });
+    const { b, calls } = backend({ registerOrg: vi.fn(async () => Promise.reject({ message: "already_has_org" })) });
+    await expect(submitRegistration(b, good, logo, () => "u1")).rejects.toEqual({ message: "already_has_org" });
     expect(calls).toEqual([]);
   });
 

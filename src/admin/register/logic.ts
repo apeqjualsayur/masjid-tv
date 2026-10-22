@@ -55,7 +55,7 @@ export function registerArgs(f: RegisterForm & { zone: ZoneChoice }) {
 export function errorKeyOf(err: unknown): string {
   const e = (err ?? {}) as { message?: string; code?: string; name?: string };
   const msg = `${e.message ?? ""}`;
-  if (msg.includes("too_many_pending")) return "register.err.tooManyPending";
+  if (msg.includes("already_has_org")) return "register.err.alreadyHasOrg";
   if (msg.includes("not_authenticated") || e.code === "28000" || /jwt/i.test(msg)) return "register.err.signedOut";
   if (e.code === "23514" || e.code === "22001" || e.code === "23502") return "register.err.invalid";
   if (e.name === "TypeError" || /failed to fetch|network|load failed/i.test(msg)) return "register.err.network";

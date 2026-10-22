@@ -25,28 +25,33 @@ AJK manage their own screens from a phone, without the platform owner: register 
 
 ## 3. Roles & permissions
 
-| Action | Editor | Pentadbir | Platform owner |
-|---|---|---|---|
-| View own masjid's content, screens, settings | ✅ | ✅ | ✅ (all masjids) |
-| Create / edit / pause / delete slides & posters | ✅ | ✅ | — |
-| Change settings, branding, iqamah | — | ✅ | — |
-| Pair / rename / revoke screens; change theme & layout | — | ✅ | — |
-| Invite / remove members | — | ✅ | — |
-| Approve / reject / suspend masjids | — | — | ✅ |
+**Up to 2 equal admins per masjid; one masjid per account** (decided Oct 2026). Every member of a masjid is a Pentadbir with full rights. There is no editor role.
 
-- A user may belong to more than one masjid (org switcher in header).
-- A masjid must always keep at least one Pentadbir (enforced in DB).
-- Platform owners are listed in `platform_admins` (added manually via SQL).
+| Action | Masjid admin (max 2, equal) | Platform owner |
+|---|---|---|
+| View own masjid's content, screens, settings | ✅ | ✅ (all masjids) |
+| Create / edit / pause / delete slides & posters | ✅ | — |
+| Change settings, branding, iqamah | ✅ | — |
+| Pair / rename / revoke screens; change theme & layout | ✅ | — |
+| Invite the second admin; remove the other admin; leave | ✅ | — |
+| Approve / reject / suspend masjids | — | ✅ |
+| Add or replace an admin account (`transfer_org`) | — | ✅ |
+
+- **Database rules:** an account (email) belongs to at most one masjid (`members_one_per_user` unique index); a masjid has at most 2 members (trigger `members_max_two`, race-safe); members are added only by `register_org`, `accept_invitations` or `transfer_org` (no insert/update policy).
+- **Inviting:** `invite_member(org, email)` — only for an **active** masjid with 1 admin, no open invitation, and an email that does not already manage a masjid. Invitations expire after 14 days. The invited person signs in at `/admin` with that email and joins automatically (`accept_invitations()` after every sign-in).
+- **Removing:** either admin can remove the other or leave; the last admin can never be removed (`members_keep_pentadbir`). Because both are equal, either can remove the other: choose the second admin carefully.
+- **Lost access / committee change:** the new person signs in once; the platform owner uses **Tukar akaun** on the Platform page (`transfer_org(org, new_email, replace_email)`), or adds them if the masjid has only 1 admin.
+- A rejected registration can be replaced: registering again deletes the rejected one.
+- Platform owners are listed in `platform_admins` (added manually via SQL). A platform owner's own account can still manage one masjid.
 
 ## 4. Flows
 
 ### 4.1 Sign in
 `/admin` → **Teruskan dengan Google** (primary) or email → magic link. After sign-in:
-1. Accept any pending invitations for this email (`accept_invitations()`).
-2. Route: platform owner → can open Platform page; user with 0 masjids → Daftar masjid; with pending masjid only → Menunggu kelulusan; else → Utama.
+First call `accept_invitations()` (joins a masjid if this email was invited). Then route: platform owner → can open Platform page; user with no masjid → Daftar masjid; masjid pending → Menunggu kelulusan; masjid rejected → Menunggu screen shows the reason and a "Daftar semula" button; else → Utama.
 
 ### 4.2 Register masjid (`register_org`)
-Fields: jenis (Masjid/Surau), nama penuh, nama ringkas, **lokasi untuk waktu solat** (below), alamat (optional), logo (optional, else monogram), telefon pegawai. Creates org (`pending`), member (Pentadbir), default settings. Max 3 pending registrations per user.
+Fields: jenis (Masjid/Surau), nama penuh, nama ringkas, **lokasi untuk waktu solat** (below), alamat (optional), logo (optional, else monogram), telefon pegawai. Creates org (`pending`), member (Pentadbir), default settings. One masjid per account: `register_org` fails with `already_has_org` unless the existing one was rejected.
 
 **Choosing the JAKIM zone** (design `admin/Register`, tweak "Contoh zon"):
 1. **Guna lokasi saya** (primary): browser geolocation → zone lookup via the Waktu Solat API GPS endpoint (verify the current path in https://api.waktusolat.app/docs; the older `/v2/solat/{lat}/{long}` is marked deprecated). Hint: "Paling tepat jika anda berada di masjid sekarang". Coordinates are used for the lookup only and **not stored** (PDPA).
@@ -74,7 +79,7 @@ Platform page: tabs Menunggu / Aktif / Digantung. **Lulus**, **Tolak** (reason r
 - **Kandungan**: tabs Aktif / Dijadual / Tamat; drag to reorder; pause switch; duplicate; delete (also deletes the image file).
 
 ### 4.6 Settings (Tetapan)
-Branding (logo, full name, short name, accent colour from 5 swatches), **zon JAKIM (same zone picker + confirmation card as registration)**, iqamah minutes per waktu (1–30), khutbah minutes, pre-azan/azan/solat durations, Arabic names on/off, clock 12h/24h, ticker lines (max 5 × 140 chars), app language. Zone can be changed by Pentadbir (rare: masjid moved).
+Branding (logo, full name, short name, accent colour from 5 swatches), **zon JAKIM (same zone picker + confirmation card as registration)**, iqamah minutes per waktu (1–30), **Jumaat section** (khutbah minutes 10–60, Solat Jumaat minutes 5–30, "Papar info Jumaat" on/off with a live example line), pre-azan/azan/solat durations, Arabic names on/off, clock 12h/24h, ticker lines (max 5 × 140 chars), app language. Zone can be changed by Pentadbir (rare: masjid moved).
 
 ## 5. Screens (designs in `designs/admin/`)
 
@@ -90,7 +95,7 @@ Branding (logo, full name, short name, accent colour from 5 swatches), **zon JAK
 | `/admin/templat?key=kuliah&id=` | `Editor` | new or edit |
 | `/admin/skrin` (`?pair=`) | `Screens` | pairing sheet |
 | `/admin/tetapan` | `Settings` | |
-| `/admin/ahli` | — | members & invitations (simple list, same style) |
+| `/admin/ahli` | — | the 2 admin slots: list, invite (when 1), cancel invitation, remove / leave |
 | `/admin/platform` | `Admin` | platform owner only |
 | `/tv` (unpaired) | `TVPair` | |
 | `/privasi` | — | privacy notice BM/EN |
@@ -105,7 +110,7 @@ Admin visual system: deep green `#146C4A`, ink `#12261E`, ground `#F4F7F5`, card
 |---|---|---|
 | < 768 px (phone) | Single column, bottom nav, sheets for dialogs | `Main` … `Admin` (390 px) |
 | 768–1023 px (tablet) | Phone layout in a centred column, max 640 px | — |
-| ≥ 1024 px (computer) | **Left sidebar** (248 px: logo, masjid switcher, nav incl. Ahli, user + BM/EN + sign out) and wide content area | `D-Home`, `D-Content`, `D-Editor`, `D-Poster` (1440×900) |
+| ≥ 1024 px (computer) | **Left sidebar** (248 px: logo, masjid name, nav incl. Ahli, user + BM/EN + sign out) and wide content area | `D-Home`, `D-Content`, `D-Editor`, `D-Poster` (1440×900) |
 
 Per screen on computer:
 - **Utama:** two columns — next prayer card with today's 7 times + "Sedang dipapar" list (with target screens) | screens list with mini previews. Primary actions top-right.
@@ -148,7 +153,7 @@ TV /tv ──every 60 s: screen_bundle(secret, version)──┘  → IndexedDB 
 
 ## 8. Data model
 
-Full SQL: `11-schema.sql`. Tables: `platform_admins`, `profiles`, `organisations`, `members`, `invitations`, `org_settings`, `screens`, `pairing_codes`, `pair_attempts`, `media`, `slides`. Functions: `register_org`, `review_org`, `accept_invitations`, `pair_start`, `pair_status`, `pair_claim`, `screen_bundle`, plus RLS helpers. Nightly cleanup via `pg_cron`.
+Full SQL: `11-schema.sql`. Tables: `platform_admins`, `profiles`, `organisations`, `members` (max 2 per masjid, 1 masjid per account), `invitations`, `org_settings`, `screens`, `pairing_codes`, `pair_attempts`, `media`, `slides`. Functions: `register_org`, `review_org`, `invite_member`, `accept_invitations`, `org_members`, `transfer_org`, `pair_start`, `pair_status`, `pair_claim`, `screen_bundle`, plus RLS helpers. Nightly cleanup via `pg_cron`.
 
 ## 9. i18n
 
@@ -181,7 +186,7 @@ Supabase free (2 projects: `masjidview-dev`, `masjidview-prod`), Cloudflare Page
 8. Live preview in the template editor matches the TV rendering for all 10 templates × 3 themes.
 9. Kematian cannot be saved without an end date ≤ 7 days; purged 30 days after ending.
 10. Admin fully usable in BM and English at 360 px width; every tap target ≥ 44 px. Also fully usable on a computer at 1280×800 and 1920×1080 in Chrome, Edge and Safari (sidebar layout, table, side-by-side editor preview, drag-and-drop poster upload).
-11. Editor role cannot change Tetapan (page is read-only with a note), use Skrin actions or open Ahli (UI hidden or disabled, and DB rejects).
+11. Account rules: a masjid never has more than 2 admins (also under simultaneous accepts); an email can never manage 2 masjids; inviting needs an active masjid with 1 admin; the last admin cannot be removed; `transfer_org` is platform-owner only.
 12. Zone picker: "Guna lokasi saya" at a known masjid returns the correct zone; denying location falls back to the lists; a multi-zone area forces a choice; the confirmation card shows today's times matching JAKIM e-Solat for that zone.
 
 ## 13. Later (not Phase 2)

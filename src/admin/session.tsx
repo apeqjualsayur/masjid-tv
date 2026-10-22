@@ -21,7 +21,6 @@ interface AdminSession {
   isPlatformAdmin: boolean;
   current: Membership | null;
   role: MemberRole | null;
-  setCurrentOrg: (orgId: string) => void;
   refresh: () => Promise<void>;
   signOut: () => Promise<void>;
 }
@@ -145,12 +144,6 @@ function SessionInner({ children, langRef }: { children: ReactNode; langRef: { c
       isPlatformAdmin,
       current,
       role: current?.role ?? null,
-      setCurrentOrg: (id) => {
-        setCurrentId(id);
-        try {
-          localStorage.setItem(ORG_KEY, id);
-        } catch {}
-      },
       refresh: () => load(session),
       signOut: async () => {
         await getSupabase().auth.signOut();

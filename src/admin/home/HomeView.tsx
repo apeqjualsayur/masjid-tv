@@ -115,7 +115,7 @@ function ScreensCard({ screens, now }: { screens: ScreenRow[]; now: number }) {
         <h2 className="text-[16px] font-extrabold lg:text-[17px]">{t("home.screens")}</h2>
         <Link href={ROUTES.screens} className="flex min-h-11 items-center text-[14px] font-bold text-adm-green">
           <span className="lg:hidden">{t("home.manage")}</span>
-          <span className="hidden lg:inline">{role === "pentadbir" ? t("home.addScreen") : t("home.manage")}</span>
+          <span className="hidden lg:inline">{t("home.addScreen")}</span>
         </Link>
       </div>
       <ul className="rounded-[18px] bg-adm-card shadow-[0_1px_3px_rgba(18,38,30,0.08)] lg:flex lg:flex-col lg:gap-3 lg:rounded-none lg:bg-transparent lg:shadow-none">

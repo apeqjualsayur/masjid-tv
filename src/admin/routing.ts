@@ -1,7 +1,8 @@
 // Admin routing rules (PRD Phase 2 §4.1, §3). Pure: no React, no Supabase.
 
 export type OrgStatus = "pending" | "active" | "rejected" | "suspended";
-export type MemberRole = "pentadbir" | "editor";
+/** Every member is a Pentadbir with full rights (PRD §3 v0.3: up to 2 equal admins). */
+export type MemberRole = "pentadbir";
 
 export interface Membership {
   orgId: string;
@@ -47,14 +48,9 @@ export function routeAfterSignIn(p: { isPlatformAdmin: boolean; orgs: Membership
   return p.isPlatformAdmin ? ROUTES.platform : ROUTES.register;
 }
 
-/** The masjid to work on: the saved choice if still an active membership, else the first active one. */
+/** The masjid to work on: one masjid per account, so its active membership (savedId kept for old sessions). */
 export function pickCurrentOrg(orgs: Membership[], savedId: string | null): Membership | null {
   const active = orgs.filter((o) => o.status === "active");
   return active.find((o) => o.orgId === savedId) ?? active[0] ?? null;
 }
 
-/** Pages only a Pentadbir may open (PRD §3): Ahli. Editors see Tetapan and Skrin read-only. */
-export function canOpen(route: AdminRoute, role: MemberRole | null): boolean {
-  if (route === ROUTES.members) return role === "pentadbir";
-  return true;
-}

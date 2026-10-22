@@ -19,7 +19,7 @@ export interface ZonePickerProps {
   /** Error key to show under the card (e.g. register.err.zoneRequired). */
   error?: string;
   id?: string;
-  /** Read-only (editors in Tetapan). */
+  /** Read-only. */
   disabled?: boolean;
 }
 

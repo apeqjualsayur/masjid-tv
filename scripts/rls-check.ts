@@ -145,6 +145,7 @@ async function run(orgIds: string[]) {
   const B = await makeUser("B");
   const C = await makeUser("C");
   const P = await makeUser("P");
+  const D = await makeUser("D");
 
   // 1. Registration ---------------------------------------------------------
   console.log("Registration");
@@ -156,6 +157,9 @@ async function run(orgIds: string[]) {
   const orgA = regA.data as string;
   const orgB = regB.data as string;
   orgIds.push(orgA, orgB);
+  expectFail("A calls register_org a second time -> already_has_org",
+    await A.db.rpc("register_org", { p_kind: "masjid", p_full_name: `RLS Check A2 ${RUN}`, p_short_name: "RA2", p_state: "Selangor", p_district: "Petaling", p_zone: "SGR01" }), "already_has_org");
+  expectFail("A cannot insert rows into members directly (adding D to org A)", await A.db.from("members").insert({ org_id: orgA, user_id: D.id, role: "pentadbir" }).select("user_id"));
 
   // 2. Before approval --------------------------------------------------------
   console.log("\nBefore approval (org A pending)");
@@ -203,7 +207,8 @@ async function run(orgIds: string[]) {
 
   expectFail("A cannot insert a slide into org B", await A.db.from("slides").insert({ org_id: orgB, type: "template", template_key: "kuliah", fields: kuliahFields }).select("id"));
   expectFail("A cannot insert a media row into org B", await A.db.from("media").insert({ org_id: orgB, path: `${orgB}/x-${RUN}.webp`, kind: "poster", width: 1, height: 1, bytes: 10, created_by: A.id }).select("id"));
-  expectFail("A cannot invite someone into org B", await A.db.from("invitations").insert({ org_id: orgB, email: `${TAG}-x-${RUN}@example.com`, role: "pentadbir", invited_by: A.id }).select("id"));
+  expectFail("A cannot insert an invitation directly (only invite_member)", await A.db.from("invitations").insert({ org_id: orgA, email: `${TAG}-x-${RUN}@example.com`, invited_by: A.id }).select("id"));
+  expectFail("A cannot invite someone into org B (invite_member)", await A.db.rpc("invite_member", { p_org: orgB, p_email: `${TAG}-x-${RUN}@example.com` }), "not_allowed");
   expectFail("A cannot add itself as a member of org B", await A.db.from("members").insert({ org_id: orgB, user_id: A.id, role: "pentadbir" }).select("user_id"));
 
   expectNoRows("A cannot update org B's slides", await A.db.from("slides").update({ fields: { hacked: true } }).eq("org_id", orgB).select("id"));
@@ -262,17 +267,27 @@ async function run(orgIds: string[]) {
   expectOk("kematian ending in 3 days is accepted",
     await A.db.from("slides").insert({ org_id: orgA, type: "template", template_key: "kematian", fields: { name: "[Nama]" }, starts_at: inDays(0), ends_at: inDays(3) }).select("id"));
 
-  // 6. Invitation and editor role ----------------------------------------------
-  console.log("\nInvitation and editor role");
-  expectOk("A invites C as editor", await A.db.from("invitations").insert({ org_id: orgA, email: C.email, role: "editor", invited_by: A.id }).select("id"));
+  // 6. Second admin (v0.3: up to 2 equal admins, one masjid per account) -------
+  console.log("\nSecond admin");
+  expectFail("A invite_member(org A, B's email) -> user_has_org", await A.db.rpc("invite_member", { p_org: orgA, p_email: B.email }), "user_has_org");
+  expectOk("A invites C -> ok", await A.db.rpc("invite_member", { p_org: orgA, p_email: C.email }));
+  expectFail("A invites D while C's invitation is open -> invite_pending", await A.db.rpc("invite_member", { p_org: orgA, p_email: D.email }), "invite_pending");
+  expectFail("B invite_member into org A -> not_allowed", await B.db.rpc("invite_member", { p_org: orgA, p_email: D.email }), "not_allowed");
   const acc = await C.db.rpc("accept_invitations");
-  report(acc.data === 1, "C signs in → accept_invitations → joins org A", acc.error ? fmt(acc.error) : `accepted ${acc.data}`);
-  expectOk("C (editor) can create a slide in org A", await C.db.from("slides").insert({ org_id: orgA, type: "template", template_key: "pengumuman", fields: { title: "[C]", body: "[C]" } }).select("id"));
-  expectNoRows("C (editor) cannot update org A's settings", await C.db.from("org_settings").update({ ticker: ["editor"] }).eq("org_id", orgA).select("org_id"));
-  expectNoRows("C (editor) cannot change members (promote self to pentadbir)", await C.db.from("members").update({ role: "pentadbir" }).eq("org_id", orgA).eq("user_id", C.id).select("user_id"));
-  expectNoRows("C (editor) cannot remove A from org A", await C.db.from("members").delete().eq("org_id", orgA).eq("user_id", A.id).select("user_id"));
-  expectFail("C (editor) cannot invite members", await C.db.from("invitations").insert({ org_id: orgA, email: `${TAG}-y-${RUN}@example.com`, role: "editor", invited_by: C.id }).select("id"));
-  expectNoRows("C (editor) cannot read org A's invitations", await C.db.from("invitations").select("id").eq("org_id", orgA));
+  report(!acc.error && acc.data === orgA, "C signs in -> accept_invitations returns org A", acc.error ? fmt(acc.error) : `returned ${JSON.stringify(acc.data)}`);
+  const cSet = await C.db.from("org_settings").update({ ticker: ["[C]"] }).eq("org_id", orgA).select("org_id");
+  report(!cSet.error && (cSet.data ?? []).length === 1, "C can update org A settings (equal admin)", fmt(cSet.error));
+  expectFail("C register_org -> already_has_org",
+    await C.db.rpc("register_org", { p_kind: "surau", p_full_name: `RLS Check C ${RUN}`, p_short_name: "RC", p_state: "Selangor", p_district: "Gombak", p_zone: "SGR01" }), "already_has_org");
+  expectFail("C invites D -> org_full", await C.db.rpc("invite_member", { p_org: orgA, p_email: D.email }), "org_full");
+  const bSees = await B.db.rpc("org_members", { p_org: orgA });
+  report(!bSees.error && (bSees.data ?? []).length === 0, "B cannot read org_members(org A)", bSees.error ? fmt(bSees.error) : `saw ${(bSees.data ?? []).length} row(s)`);
+  const aSees = (await A.db.rpc("org_members", { p_org: orgA })).data as { email: string; is_me: boolean }[] | null;
+  report((aSees ?? []).length === 2 && (aSees ?? []).some((m) => m.email === A.email && m.is_me), "A reads org_members(org A): 2 admins, own row marked is_me");
+  expectNoRows("B cannot delete org A members", await B.db.from("members").delete().eq("org_id", orgA).eq("user_id", C.id).select("user_id"));
+  const rmC = await A.db.from("members").delete().eq("org_id", orgA).eq("user_id", C.id).select("user_id");
+  report(!rmC.error && (rmC.data ?? []).length === 1, "A removes C -> ok", fmt(rmC.error));
+  expectFail("A removes self as the last admin -> last_pentadbir", await A.db.from("members").delete().eq("org_id", orgA).eq("user_id", A.id).select("user_id"), "last_pentadbir");
 
   // 7. Pairing --------------------------------------------------------------------
   console.log("\nPairing");
@@ -292,14 +307,14 @@ async function run(orgIds: string[]) {
   report((status.data as { status?: string } | null)?.status === "paired", "anon pair_status → paired", JSON.stringify(status.data ?? status.error));
   const cStart = await anon.rpc("pair_start", { p_secret: secret() });
   const cCode = (cStart.data as { code?: string } | null)?.code ?? "";
-  expectFail("editor C pair_claim fails (valid code, not a pentadbir)", await C.db.rpc("pair_claim", { p_code: cCode, p_org: orgA, p_name: "TV C" }), "not_allowed");
-  expectNoRows("C (editor) cannot update org A's screens", await C.db.from("screens").update({ name: "editor" }).eq("id", screenA).select("id"));
+  expectFail("D (no masjid) pair_claim for org A fails", await D.db.rpc("pair_claim", { p_code: cCode, p_org: orgA, p_name: "TV D" }), "not_allowed");
+  expectNoRows("D (no masjid) cannot update org A's screens", await D.db.from("screens").update({ name: "D" }).eq("id", screenA).select("id"));
   expectFail("A cannot pair a TV into org B", await A.db.rpc("pair_claim", { p_code: cCode, p_org: orgB, p_name: "TV X" }), "not_allowed");
   expectNoRows("anon cannot read the screens table directly", await anon.from("screens").select("id").limit(5));
   expectNoRows("anon cannot read the pairing_codes table directly", await anon.from("pairing_codes").select("code").limit(5));
 
   // Extra (PRD §10): brute-force limit of 10 failed pair_claim attempts per user per hour.
-  // Uses P (an active pentadbir is needed) so A and C are unaffected.
+  // Uses P (an active admin is needed) so A is unaffected.
   const pReg = must("P registers an org for the limit check", await P.db.rpc("register_org", { p_kind: "surau", p_full_name: `RLS Check P ${RUN}`, p_short_name: "RP", p_state: "Selangor", p_district: "Klang", p_zone: "SGR01" })) as string;
   orgIds.push(pReg);
   must("P approves its own org", await P.db.rpc("review_org", { p_org: pReg, p_action: "approve" }));
@@ -332,12 +347,32 @@ async function run(orgIds: string[]) {
   const bOther = await anon.rpc("screen_bundle", { p_secret: secret(), p_since: 0 });
   report((bOther.data as { status?: string } | null)?.status === "revoked", "an unknown device secret gets nothing (revoked)", JSON.stringify(bOther.data ?? bOther.error));
 
-  // 9. Last pentadbir --------------------------------------------------------------
-  console.log("\nLast pentadbir");
-  expectFail("removing the last pentadbir fails", await A.db.from("members").delete().eq("org_id", orgA).eq("user_id", A.id).select("user_id"), "last_pentadbir");
-  expectFail("demoting the last pentadbir to editor fails", await A.db.from("members").update({ role: "editor" }).eq("org_id", orgA).eq("user_id", A.id).select("user_id"), "last_pentadbir");
+  // 9. Last admin ----------------------------------------------------------------
+  console.log("\nLast admin");
+  expectFail("removing the last admin fails", await A.db.from("members").delete().eq("org_id", orgA).eq("user_id", A.id).select("user_id"), "last_pentadbir");
+  expectNoRows("members rows cannot be changed by users (no update policy)", await A.db.from("members").update({ created_at: new Date().toISOString() }).eq("org_id", orgA).eq("user_id", A.id).select("user_id"));
   const stillA = await admin.from("members").select("role").eq("org_id", orgA).eq("user_id", A.id).single();
-  report(stillA.data?.role === "pentadbir", "A is still pentadbir of org A (checked with service role)");
+  report(stillA.data?.role === "pentadbir", "A is still admin of org A (checked with service role)");
+
+  // 10. Rejected registration can be replaced ----------------------------------------
+  console.log("\nRejected registration");
+  const rej = await P.db.rpc("review_org", { p_org: orgB, p_action: "reject", p_reason: "[RLS check]" });
+  report(rej.data === "rejected", "P rejects org B", fmt(rej.error));
+  const reB = await B.db.rpc("register_org", { p_kind: "surau", p_full_name: `RLS Check B2 ${RUN}`, p_short_name: "RB2", p_state: "Selangor", p_district: "Gombak", p_zone: "SGR01" });
+  if (reB.data) orgIds.push(reB.data as string);
+  const oldB = await admin.from("organisations").select("id").eq("id", orgB);
+  report(!reB.error && (oldB.data ?? []).length === 0, "B registers again -> succeeds and the rejected org is gone", reB.error ? fmt(reB.error) : `old org rows: ${(oldB.data ?? []).length}`);
+
+  // 11. transfer_org (platform owner only) ---------------------------------------------
+  console.log("\ntransfer_org");
+  expectFail("A calls transfer_org -> not_allowed", await A.db.rpc("transfer_org", { p_org: orgA, p_email: D.email }), "not_allowed");
+  expectOk("P adds D to org A (1 admin) -> ok", await P.db.rpc("transfer_org", { p_org: orgA, p_email: D.email }));
+  expectFail("P adds C to org A (already 2) -> org_full", await P.db.rpc("transfer_org", { p_org: orgA, p_email: C.email }), "org_full");
+  expectOk("P replaces A by C -> ok", await P.db.rpc("transfer_org", { p_org: orgA, p_email: C.email, p_replace_email: A.email }));
+  const cOrgs = await C.db.from("members").select("org_id").eq("user_id", C.id);
+  const aOrgs = await A.db.from("members").select("org_id").eq("user_id", A.id);
+  report((cOrgs.data ?? []).some((m) => m.org_id === orgA) && (aOrgs.data ?? []).length === 0, "after the replace: C sees org A, A sees no masjid", `C: ${(cOrgs.data ?? []).length}, A: ${(aOrgs.data ?? []).length}`);
+  expectFail("P adds an email that already manages a masjid (B) -> user_has_org", await P.db.rpc("transfer_org", { p_org: orgA, p_email: B.email }), "user_has_org");
 }
 
 async function main() {

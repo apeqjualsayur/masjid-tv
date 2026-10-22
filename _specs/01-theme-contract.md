@@ -1,4 +1,4 @@
-# Theme Contract (v0.1)
+# Theme Contract (v0.2 — adds Friday info)
 
 Every theme is a self-contained folder `src/themes/<id>/` that implements the interface below. The engine (time, modes, data, playlist) never contains theme styling; themes never contain prayer logic.
 
@@ -38,10 +38,20 @@ export interface DisplayState {
   modeRemainingSec?: number;   // for iqamah / khutbah
   modeProgress?: number;       // 0..1 elapsed
   isFriday: boolean;
+  friday?: FridayInfo;         // present on Friday from 00:00 until Solat Jumaat ends, if enabled
   masjid: { fullName: string; shortName: string; logoUrl?: string };
   showArabic: boolean;
   ticker: string[];
   lite: boolean;               // low-end device: no blur, fewer effects
+}
+
+export interface FridayInfo {
+  azan: string;          // "1:05"
+  khutbahStart: string;  // "1:08"
+  khutbahMin: number;    // 40
+  solatStart: string;    // "1:48"  (estimate)
+  solatEnd: string;      // "2:00"  (estimate)
+  khutbahEnd: Date;      // for the khutbah screen countdown
 }
 
 export interface ThemeDefinition {
@@ -54,8 +64,9 @@ export interface ThemeDefinition {
     azan: React.FC<{ s: DisplayState }>;
     iqamah: React.FC<{ s: DisplayState }>;
     solat: React.FC<{ s: DisplayState }>;
-    khutbah: React.FC<{ s: DisplayState }>;
+    khutbah: React.FC<{ s: DisplayState }>;   // must show "Dijangka tamat ±{s.friday.solatStart}" + thin progress line (s.modeProgress)
   };
+  fridayInfo: React.FC<{ s: DisplayState }>;   // the Friday strip (rule 12); render nothing if !s.friday
   templates: Record<TemplateKey, React.FC<{ s: DisplayState; fields: any }>>; // all 10
   posterFrame: React.FC<{ s: DisplayState; imageUrl: string }>;
 }
@@ -65,7 +76,7 @@ export interface ThemeDefinition {
 
 1. Stage is a fixed **1920×1080** box; the engine scales it. Use px inside the stage.
 2. **Current** prayer must be distinguishable from **next** at 5 m: different fill *and* weight, not colour alone.
-3. Past prayers may fade (opacity ≥ 0.42). Markers (Imsak, Syuruk) are reference rows only: never "Sekarang" or "Seterusnya" (`state` is only ever `past` or `upcoming`).
+3. Past prayers may fade (opacity ≥ 0.42). Markers (Imsak, Syuruk) never get "Sekarang".
 4. Times ≥ 54 px in Full and Side layouts, ≥ 44 px in Bottom bar.
 5. All colour comes from the theme's token table for the current `phase`; no hard-coded colours in components except those listed.
 6. `lite` mode: drop `backdrop-filter`, blurs, glows and large shadows; keep layout identical.
@@ -74,6 +85,14 @@ export interface ThemeDefinition {
 9. Labels in BM. Status words: **SEKARANG**, **SETERUSNYA**.
 10. **Poster/announcement area has a fixed aspect ratio in every theme** (so the admin app's recommended poster sizes fit all themes): **`bottom` layout = 12:5** (e.g. 1824×760 or 1920×800 inside the stage); **`side` layout = 5:4** (e.g. 1260×1008 or 1350×1080). The area may sit inside a card with padding, but the poster box itself must be exactly this ratio. Expose it as `posterArea: Record<'bottom'|'side', {x,y,w,h}>` on the `ThemeDefinition`. The mockups in `designs/` vary slightly — the ratio rule wins. (Added in Phase 2; see `10-PRD-phase2.md` §6.)
 11. Announcement templates must render correctly inside the poster area at both ratios and in the admin live preview (scaled stage).
+12. **Friday strip** (`fridayInfo`), shown by every layout when `s.friday` is set and mode is `normal` or `pre_azan`:
+    - Text: **SOLAT JUMAAT** label, then `Azan {azan} · Khutbah {khutbahStart} (±{khutbahMin} minit) · Solat ±{solatStart}`. Text ≥ 30 px; label weight ≥ 700.
+    - `full`: a pill directly under the date/countdown block, never covering the prayer list.
+    - `bottom`: a pill at the top edge of the prayer bar, left-aligned with the clock; the 12:5 poster area keeps its size (shrink the gap above the bar, not the poster).
+    - `side`: a card under the prayer list in the side column.
+    - Colours from the phase tokens (accent fill at low opacity + accent text); Serambi uses gold. No animation except a fade in/out.
+    - The Jumaat row in the prayer list keeps its normal look; the strip is extra information, not a replacement.
+13. Khutbah screen: title "Khutbah sedang disampaikan", clock, "Dijangka tamat ±{s.friday.solatStart}", thin progress line from `s.modeProgress`; calm, no countdown digits ticking every second.
 
 ---
 

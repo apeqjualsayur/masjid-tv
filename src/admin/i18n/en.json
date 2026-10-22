@@ -1,6 +1,14 @@
 {
-  "app": { "name": "Masjid View", "loading": "Loading…", "notConfigured": "The app is not connected to the database yet. Please contact the system administrator." },
-  "lang": { "label": "Language", "ms": "BM", "en": "EN" },
+  "app": {
+    "name": "Masjid View",
+    "loading": "Loading…",
+    "notConfigured": "The app is not connected to the database yet. Please contact the system administrator."
+  },
+  "lang": {
+    "label": "Language",
+    "ms": "BM",
+    "en": "EN"
+  },
   "signin": {
     "tagline": "Prayer times and announcements for masjid and surau TVs.",
     "google": "Continue with Google",
@@ -18,10 +26,30 @@
     "register": "Register free",
     "signingIn": "Signing in…"
   },
-  "nav": { "main": "Main navigation", "home": "Home", "content": "Content", "screens": "Screens", "settings": "Settings", "members": "Members", "platform": "Platform" },
-  "account": { "menu": "Account", "signOut": "Sign out", "switchOrg": "Switch masjid", "currentOrg": "Current masjid", "close": "Close" },
-  "role": { "pentadbir": "Administrator", "editor": "Editor" },
-  "status": { "pending": "Awaiting approval", "active": "Active", "rejected": "Rejected", "suspended": "Suspended" },
+  "nav": {
+    "main": "Main navigation",
+    "home": "Home",
+    "content": "Content",
+    "screens": "Screens",
+    "settings": "Settings",
+    "members": "Members",
+    "platform": "Platform"
+  },
+  "account": {
+    "menu": "Account",
+    "signOut": "Sign out",
+    "currentOrg": "Current masjid",
+    "close": "Close"
+  },
+  "role": {
+    "pentadbir": "Administrator"
+  },
+  "status": {
+    "pending": "Awaiting approval",
+    "active": "Active",
+    "rejected": "Rejected",
+    "suspended": "Suspended"
+  },
   "home": {
     "title": "Home",
     "next": "Next prayer",
@@ -51,14 +79,39 @@
     "oneScreen": "1 screen",
     "loadError": "Could not load data: {message}"
   },
-  "duration": { "hm": "{h} h {m} min", "m": "{m} min", "h": "{h} h", "d": "{d} days" },
-  "theme": { "alam": "Alam", "serambi": "Serambi", "tenang": "Tenang" },
-  "layout": { "full": "Full", "bottom": "Bottom bar", "side": "Side bar" },
-  "template": {
-    "pengumuman": "Announcement", "kuliah": "Lecture", "kematian": "Death notice", "program": "Programme", "infaq": "Donation",
-    "mesyuarat": "Meeting", "imam_bilal": "Imam & Bilal", "kewangan": "Finance", "ayat": "Verse", "ucapan": "Greeting", "poster": "Poster"
+  "duration": {
+    "hm": "{h} h {m} min",
+    "m": "{m} min",
+    "h": "{h} h",
+    "d": "{d} days"
   },
-  "placeholder": { "soon": "This page is being built.", "back": "Back to Home" },
+  "theme": {
+    "alam": "Alam",
+    "serambi": "Serambi",
+    "tenang": "Tenang"
+  },
+  "layout": {
+    "full": "Full",
+    "bottom": "Bottom bar",
+    "side": "Side bar"
+  },
+  "template": {
+    "pengumuman": "Announcement",
+    "kuliah": "Lecture",
+    "kematian": "Death notice",
+    "program": "Programme",
+    "infaq": "Donation",
+    "mesyuarat": "Meeting",
+    "imam_bilal": "Imam & Bilal",
+    "kewangan": "Finance",
+    "ayat": "Verse",
+    "ucapan": "Greeting",
+    "poster": "Poster"
+  },
+  "placeholder": {
+    "soon": "This page is being built.",
+    "back": "Back to Home"
+  },
   "pending": {
     "title": "Awaiting approval",
     "received": "Registration received",
@@ -80,7 +133,7 @@
     "tip3": "Open masjidview.my/tv on the TV to get the pairing code.",
     "logoFailed": "The logo could not be uploaded. You can add it in Settings after approval.",
     "checkAgain": "Check status",
-    "registerAnother": "Register another masjid"
+    "reregister": "Register again"
   },
   "register": {
     "title": "Register masjid",
@@ -124,15 +177,16 @@
       "phoneRequired": "Enter a phone number.",
       "phoneInvalid": "Invalid phone number. Example: 012-345 6789",
       "fixAbove": "Please fix the marked fields.",
-      "tooManyPending": "You already have 3 registrations awaiting approval. Please wait until they are reviewed.",
       "signedOut": "Your session has ended. Please sign in again.",
       "invalid": "Some details are not valid. Please check the form.",
       "network": "No internet connection. Please try again.",
       "generic": "Registration failed. Please try again.",
       "logoType": "Use a PNG, JPG or WebP file.",
       "logoTooBig": "The logo file is too large.",
-      "logoDecode": "The logo could not be read. Try another file."
-    }
+      "logoDecode": "The logo could not be read. Try another file.",
+      "alreadyHasOrg": "This account already manages a masjid. Each account can manage one masjid only."
+    },
+    "goToMyOrg": "Go to my masjid"
   },
   "zone": {
     "title": "Location for prayer times",
@@ -241,7 +295,6 @@
   },
   "settings": {
     "title": "Settings",
-    "readOnly": "Only a Pentadbir can change settings. You can view them only.",
     "brand": "Masjid branding",
     "logoAdd": "Add logo",
     "logoChange": "Change logo",
@@ -336,7 +389,6 @@
     "deleteConfirm": "Yes, delete",
     "deleted": "{name} deleted.",
     "cancel": "Cancel",
-    "readOnly": "Only a Pentadbir can add or manage screens.",
     "loadError": "The screen list could not be loaded: {message}",
     "error": "Failed: {message}",
     "err": {
@@ -613,6 +665,59 @@
     },
     "untitled": "(untitled)"
   },
-  "privacy": { "title": "Privacy Notice", "draft": "The full privacy notice will be published before the pilot. Data held: AJK names, emails and phone numbers, and announcement content (including names of the deceased)." },
-  "dialog": { "close": "Close" }
+  "members": {
+    "title": "Members",
+    "intro": "Each masjid can have up to 2 admins. Both are equal: they can change all settings and content, and remove the other admin. Choose the second admin carefully.",
+    "slot": "Admin {n}",
+    "me": "You",
+    "joined": "Joined {date}",
+    "emptySlot": "Empty slot",
+    "invite": "Invite a second admin",
+    "inviteHint": "Enter the Google email or the email they will sign in with.",
+    "email": "Email",
+    "emailPlaceholder": "name@example.com",
+    "send": "Invite",
+    "sending": "Inviting…",
+    "invitedTitle": "Invitation sent",
+    "invited": "Invited: {email}",
+    "expires": "Expires {date}",
+    "share": "Send them this message (for example on WhatsApp):",
+    "shareText": "You are invited as an admin of the Masjid View display for {masjid}. Sign in with the email {email} at {url} within 14 days.",
+    "copy": "Copy message",
+    "copied": "Message copied.",
+    "whatsapp": "Send on WhatsApp",
+    "cancelInvite": "Cancel",
+    "cancelled": "Invitation cancelled.",
+    "remove": "Remove",
+    "removeTitle": "Remove {email}?",
+    "removeBody": "{email} will lose access immediately.",
+    "removeConfirm": "Yes, remove",
+    "removed": "{email} removed.",
+    "leave": "Leave this masjid",
+    "leaveTitle": "Leave {masjid}?",
+    "leaveBody": "You will lose access immediately. {email} will keep managing this masjid.",
+    "leaveConfirm": "Yes, leave",
+    "cancel": "Cancel",
+    "full": "This masjid already has 2 admins.",
+    "notActive": "Invitations can be sent once the masjid is approved.",
+    "loadError": "The member list could not be loaded: {message}",
+    "err": {
+      "user_has_org": "This email already manages another masjid.",
+      "org_full": "This masjid already has 2 admins.",
+      "invite_pending": "There is already an open invitation. Cancel it first to invite someone else.",
+      "org_not_active": "This masjid is not active yet. Invitations can be sent once it is approved.",
+      "bad_email": "Invalid email.",
+      "last_pentadbir": "The last admin cannot be removed.",
+      "not_allowed": "You are not allowed to do that.",
+      "network": "No internet connection. Please try again.",
+      "generic": "Failed: {message}"
+    }
+  },
+  "privacy": {
+    "title": "Privacy Notice",
+    "draft": "The full privacy notice will be published before the pilot. Data held: AJK names, emails and phone numbers, and announcement content (including names of the deceased)."
+  },
+  "dialog": {
+    "close": "Close"
+  }
 }

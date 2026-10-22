@@ -26,8 +26,10 @@ function navItems(role: Membership["role"] | null, isPlatformAdmin: boolean): Na
     { key: "content", route: ROUTES.content, icon: ICON.content, phone: true },
     { key: "screens", route: ROUTES.screens, icon: ICON.screens, phone: true },
   ];
-  if (role) items.push({ key: "settings", route: ROUTES.settings, icon: ICON.settings, phone: true });
-  if (role === "pentadbir") items.push({ key: "members", route: ROUTES.members, icon: ICON.members, phone: false });
+  if (role) {
+    items.push({ key: "settings", route: ROUTES.settings, icon: ICON.settings, phone: true });
+    items.push({ key: "members", route: ROUTES.members, icon: ICON.members, phone: false });
+  }
   if (isPlatformAdmin) items.push({ key: "platform", route: ROUTES.platform, icon: ICON.platform, phone: false });
   return items;
 }
@@ -64,55 +66,15 @@ function OrgLine({ org }: { org: Membership }) {
   );
 }
 
-function OrgList({ onPick }: { onPick: () => void }) {
-  const a = useAdmin();
-  const { t } = useT();
-  return (
-    <ul className="flex flex-col gap-2">
-      {a.orgs.map((o) => {
-        const active = o.status === "active";
-        const selected = a.current?.orgId === o.orgId;
-        return (
-          <li key={o.orgId}>
-            <button
-              type="button"
-              disabled={!active}
-              onClick={() => {
-                a.setCurrentOrg(o.orgId);
-                onPick();
-              }}
-              className={`flex min-h-14 w-full items-center gap-3 rounded-[14px] border px-3 py-2 text-left focus-visible:outline-2 focus-visible:outline-adm-green ${selected ? "border-adm-green bg-adm-soft" : "border-adm-hair bg-white"} disabled:opacity-60`}
-            >
-              <OrgAvatar org={o} size={36} />
-              <span className="flex min-w-0 flex-1 flex-col">
-                <span className="truncate text-[15px] font-bold">{o.fullName}</span>
-                <span className="text-[13px] text-adm-muted">{active ? `${t(`role.${o.role}`)} · ${o.zone}` : t(`status.${o.status}`)}</span>
-              </span>
-              {selected && <Icon d={ICON.check} size={20} className="text-adm-green" />}
-            </button>
-          </li>
-        );
-      })}
-    </ul>
-  );
-}
-
-/** Phone/tablet account sheet: user, masjid switcher, language, platform, sign out. */
+/** Phone/tablet account sheet: user, language, platform, sign out. */
 function AccountSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const a = useAdmin();
   const { t } = useT();
   const router = useRouter();
-  const many = a.orgs.filter((o) => o.status === "active").length > 1;
   return (
     <Dialog open={open} onClose={onClose} title={t("account.menu")}>
       <div className="flex flex-col gap-5">
         <div className="text-[14px] font-bold">{a.displayName ?? a.email}</div>
-        {many && (
-          <section className="flex flex-col gap-2">
-            <h3 className="text-[13px] font-bold text-adm-muted">{t("account.switchOrg")}</h3>
-            <OrgList onPick={onClose} />
-          </section>
-        )}
         <div className="flex items-center justify-between">
           <span className="text-[14px] font-bold">{t("lang.label")}</span>
           <LangToggle />
@@ -142,8 +104,6 @@ function Sidebar({ items, path }: { items: NavItem[]; path: string | null }) {
   const a = useAdmin();
   const { t } = useT();
   const router = useRouter();
-  const [switching, setSwitching] = useState(false);
-  const many = a.orgs.filter((o) => o.status === "active").length > 1;
   const org = a.current;
   return (
     <aside className="fixed inset-y-0 left-0 hidden w-[248px] flex-col gap-[22px] border-r border-[#DCE6E1] bg-white px-4 py-6 lg:flex">
@@ -152,13 +112,7 @@ function Sidebar({ items, path }: { items: NavItem[]; path: string | null }) {
         <span className="text-[18px] font-extrabold">{t("app.name")}</span>
       </div>
       {org && (
-        <button
-          type="button"
-          onClick={() => many && setSwitching(true)}
-          aria-haspopup={many ? "dialog" : undefined}
-          aria-label={many ? t("account.switchOrg") : t("account.currentOrg")}
-          className={`flex items-center gap-2.5 rounded-[14px] border border-[#DCE6E1] bg-[#F7FAF8] p-2.5 text-left focus-visible:outline-2 focus-visible:outline-adm-green ${many ? "" : "cursor-default"}`}
-        >
+        <div aria-label={t("account.currentOrg")} className="flex items-center gap-2.5 rounded-[14px] border border-[#DCE6E1] bg-[#F7FAF8] p-2.5">
           <OrgAvatar org={org} size={36} />
           <span className="flex min-w-0 flex-1 flex-col gap-px">
             <span className="truncate text-[14px] font-extrabold">{org.fullName}</span>
@@ -166,8 +120,7 @@ function Sidebar({ items, path }: { items: NavItem[]; path: string | null }) {
               {t(`role.${org.role}`)} · {org.zone}
             </span>
           </span>
-          {many && <Icon d={ICON.chevronDown} size={16} className="text-adm-muted" />}
-        </button>
+        </div>
       )}
       <nav aria-label={t("nav.main")} className="flex flex-col gap-1">
         {items.map((n) => {
@@ -201,9 +154,6 @@ function Sidebar({ items, path }: { items: NavItem[]; path: string | null }) {
           </button>
         </div>
       </div>
-      <Dialog open={switching} onClose={() => setSwitching(false)} title={t("account.switchOrg")}>
-        <OrgList onPick={() => setSwitching(false)} />
-      </Dialog>
     </aside>
   );
 }

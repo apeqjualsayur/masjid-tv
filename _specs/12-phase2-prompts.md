@@ -52,10 +52,14 @@ Read _specs/10-PRD-phase2.md and _specs/11-schema.sql.
    - make test user P a platform admin; P approves both (review_org)
    - A can create a kuliah slide; A cannot read/insert/update anything of org B (slides, settings, screens, media, storage path B/…)
    - kematian with ends_at > 7 days is rejected
-   - A invites C as editor; C signs in → accept_invitations → C can create slides but cannot update org_settings, screens or members
-   - anon: pair_start → code; A pair_claim with wrong code fails, right code succeeds; editor C pair_claim fails
+   - A calls register_org a second time → already_has_org; A cannot insert rows into members directly
+   - A invite_member(org A, B's email) → user_has_org; A invites C → ok; A invites D while C is open → invite_pending; B invite_member into org A → not_allowed
+   - C signs in → accept_invitations returns org A → C can update org A settings (equal admin) → C register_org → already_has_org → C invites D → org_full
+   - B cannot read org_members(org A) or delete org A members; A removes C → ok; A removes self as last admin → last_pentadbir
+   - anon: pair_start → code; A pair_claim with wrong code fails, right code succeeds; D (no masjid) pair_claim for org A fails
    - anon screen_bundle returns status ok + version; second call with that version returns unchanged; after A updates iqamah the version increases; after revoke returns revoked
-   - removing the last pentadbir fails
+   - P rejects org B; B registers again → succeeds and the rejected org is gone
+   - transfer_org: A calls it → not_allowed; P adds D to org A (1 admin) → ok; P adds C → org_full; P replaces A by C → C sees org A, A sees no orgs; P adds an email that already owns a masjid → user_has_org
    - cleanup: delete all test users and orgs at the end (even if a test fails)
 5. Do not change the schema to make a test pass. If a test fails, stop and show me which and why.
 ```
@@ -70,8 +74,8 @@ Build the admin app foundation per PRD §4.1, §5, §9 and designs/admin/Main.dc
 - src/lib/supabase.ts: single browser client from NEXT_PUBLIC_ env vars; session persisted.
 - Static export: NO dynamic route segments ([id]); use query params. All admin pages are client components.
 - /admin: sign-in page — "Teruskan dengan Google" (primary, signInWithOAuth) and email magic link (signInWithOtp); BM/EN toggle; link to /privasi (placeholder page for now).
-- After sign-in: call accept_invitations(), then route per PRD §4.1 (platform owner, 0 orgs → /admin/daftar, pending only → /admin/menunggu, else /admin/utama).
-- Responsive admin layout per PRD §5.1: phone (< 768 px) bottom nav (Utama, Kandungan, Skrin, Tetapan); tablet centred column max 640 px; computer (≥ 1024 px) left sidebar per designs/admin/D-Home.dc.html (logo, masjid switcher, nav incl. Ahli, user, BM/EN, sign out). Hide Skrin actions/Tetapan/Ahli for editors. Org switcher when the user has > 1 org. Dialogs: bottom sheet on phone, centred modal on computer. One component tree; layout via CSS breakpoints + a useIsDesktop() hook only where structure differs.
+- After sign-in, call accept_invitations(), then route per PRD §4.1 (one masjid per account: none → /admin/daftar, pending or rejected → /admin/menunggu, active → /admin/utama; platform owner also gets the Platform link).
+- Responsive admin layout per PRD §5.1: phone (< 768 px) bottom nav (Utama, Kandungan, Skrin, Tetapan); tablet centred column max 640 px; computer (≥ 1024 px) left sidebar per designs/admin/D-Home.dc.html (logo, masjid name, nav incl. Ahli, user, BM/EN, sign out). PRD §3: one masjid per account and max 2 equal admins, so no masjid switcher and no editor role; ignore those elements if a design still shows them. On phone, Ahli is reached from Tetapan. Dialogs: bottom sheet on phone, centred modal on computer. One component tree; layout via CSS breakpoints + a useIsDesktop() hook only where structure differs.
 - i18n: src/admin/i18n/ms.json + en.json, a tiny useT() hook (no new dependency unless you justify it), language from profiles.lang + localStorage, default ms. No hard-coded UI strings.
 - Visual tokens from PRD §5 (green #146C4A, ink #12261E, ground #F4F7F5, Plus Jakarta Sans self-hosted), tap targets ≥ 44 px.
 - /admin/utama: real data — org name, role, next prayer (reuse Phase 1 engine with the org's zone), screens list with online/offline (last_seen within 3 min), "Sedang dipapar" (published, current slides). Phone = designs/admin/Home.dc.html; computer = D-Home.dc.html (two columns, today's 7 times).
@@ -104,7 +108,7 @@ Build /admin/daftar (2 steps) and /admin/menunggu per PRD §4.2 and designs/admi
 ```
 Build /admin/platform per PRD §4.3 and designs/admin/Admin.dc.html. Visible only if is_platform_admin().
 - Tabs Menunggu / Aktif / Digantung; cards with org details, registrant email (read via a new SECURITY DEFINER function platform_org_list() that joins auth.users — add it as migration 0002 with is_platform_admin() check; show me the SQL before applying).
-- Actions: Lulus, Tolak (reason required), Gantung (reason required), Aktifkan semula → review_org().
+- Actions: Lulus, Tolak (reason required), Gantung (reason required), Aktifkan semula → review_org(). On Aktif cards also **Tukar akaun**: shows the masjid's admins (org_members); enter a new email and either "Tambah" (only if 1 admin) or "Ganti <email>" → confirm dialog ("<email lama> akan hilang akses serta-merta") → transfer_org(org, email, replace_email or null); friendly messages for user_not_found ("Minta mereka log masuk di /admin sekali dahulu"), user_has_org and org_full.
 - Header counts: active, pending, screens online / total, total storage used (sum media.bytes) per org.
 - Emails (can be postponed): a Supabase Edge Function `notify` using Resend that emails (a) the platform owner when a new org registers, (b) the registrant when approved/rejected. Trigger it from the client after register_org/review_org succeed. Give me non-coder steps to create the Resend account, verify the domain later, and set the function secret. If I say "postpone", skip this part.
 ```
@@ -116,8 +120,8 @@ Build /admin/platform per PRD §4.3 and designs/admin/Admin.dc.html. Visible onl
 
 ```
 Build /admin/tetapan per PRD §4.6 and designs/admin/Settings.dc.html.
-Sections: Jenama (logo upload/replace with WebP ≤ 512 px, full/short name, 5 accent swatches), Zon JAKIM (reuse src/admin/ZonePicker; confirm dialog before saving a new zone: "Semua skrin akan menggunakan waktu solat zon baharu"), Waktu iqamah (5 steppers 1–30) + khutbah minutes, Paparan (Arabic on/off, 12j/24j, ticker up to 5 × 140 chars), Aplikasi (language BM/English saved to profiles.lang; link to Ahli; sign out).
-Editors: page read-only with a note. Save with optimistic UI and clear success/error toasts. Replacing a logo deletes the old file from storage.
+Sections: Jenama (logo upload/replace with WebP ≤ 512 px, full/short name, 5 accent swatches), Zon JAKIM (reuse src/admin/ZonePicker; confirm dialog before saving a new zone: "Semua skrin akan menggunakan waktu solat zon baharu"), Waktu iqamah (5 steppers 1–30), Jumaat (khutbah 10–60, Solat Jumaat 5–30, "Papar info Jumaat" switch — stored in durations.khutbahMin / jumaatSolatMin / showFridayInfo — with a live example line "Azan 1:05 · Khutbah 1:08 (±40 minit) · Solat ±1:48" using this Friday's Zohor), Paparan (Arabic on/off, 12j/24j, ticker up to 5 × 140 chars), Aplikasi (language BM/English saved to profiles.lang; link to Ahli; sign out).
+Save with optimistic UI and clear success/error toasts. Replacing a logo deletes the old file from storage.
 ```
 **Check:** change Maghrib iqamah to 8 → SQL editor `select bundle_version from organisations` increased.
 
@@ -202,13 +206,23 @@ Build /admin/kandungan per designs/admin/Content.dc.html.
 
 ---
 
-## 2.11 Ahli (members & invitations)
+## 2.11 Ahli — two equal admins
+
+PRD §3 (v0.3): max 2 equal admins per masjid, one masjid per account.
 
 ```
-Build /admin/ahli (same visual system): list members (name/email via a SECURITY DEFINER function org_members(p_org) that checks is_member — migration 0003, show me SQL first), roles, change role, remove (last pentadbir error handled), pending invitations with revoke, "Jemput ahli" (email + role) → insert invitation → show a share message the Pentadbir can copy to WhatsApp: "Anda dijemput mengurus paparan Masjid View untuk <masjid>. Log masuk dengan e-mel ini di https://<host>/admin".
-Editors cannot open this page.
+Read PRD §3 and _specs/11-schema.sql (v0.3: invitations, members_max_two, invite_member, accept_invitations, org_members, transfer_org).
+1. Check which schema the dev database has, using the two "Check" queries at the top of _specs/13-account-rules-migration.sql (tell me exactly where to paste them). If invite_member does not exist yet, copy the file to supabase/migrations/ as the next number, explain in plain words what it changes (including that open invitations are cancelled and, on an old v0.1 database, extra members beyond 2 are removed), and help me run it.
+2. Build /admin/ahli (same visual system; phone: reached from Tetapan; computer: sidebar item):
+   - Two slots from org_members(): name/email, "Anda" badge on my row, joined date.
+   - Slot 2 empty → "Jemput pentadbir kedua" (email) → invite_member → show a share message to copy to WhatsApp: "Anda dijemput sebagai pentadbir paparan Masjid View untuk <masjid>. Log masuk dengan e-mel <email> di https://<host>/admin dalam 14 hari." Show the open invitation with its expiry and "Batal" (delete from invitations).
+   - Remove the other admin (confirm: "<email> akan hilang akses serta-merta") and "Keluar dari masjid ini" for myself (hidden when I'm the only admin).
+   - Friendly BM/EN messages for user_has_org ("E-mel ini sudah mengurus masjid lain"), org_full, invite_pending, org_not_active, bad_email, last_pentadbir.
+3. Remove anything left from earlier attempts that conflicts: editor role branches, masjid switcher.
+4. Registration: if register_org returns already_has_org, show "Akaun ini sudah mengurus sebuah masjid" and route correctly. On /admin/menunggu for a rejected masjid, show the reason and a "Daftar semula" button.
+5. Update scripts/rls-check.ts to match prompt 2.1 (v0.3 list) and run `npm run rls-check`.
 ```
-**Check:** invite a second Google account as editor → it signs in → sees the masjid → cannot open Tetapan.
+**Check:** `npm run rls-check` → all PASS. Invite your second Google account → sign in with it → it lands on Utama of the same masjid and can open Tetapan. From the first account, try inviting a third email → the invite button is gone (2/2). Remove the second account → it lands on Daftar masjid on its next visit.
 
 ---
 

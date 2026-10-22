@@ -98,6 +98,10 @@ export function RegisterView() {
     setSubmitError(null);
     try {
       const sb = getSupabase();
+      for (const old of a.orgs.filter((o) => o.status === "rejected")) {
+        const { data: files } = await sb.storage.from("media").list(old.orgId);
+        if (files?.length) await sb.storage.from("media").remove(files.map((f) => `${old.orgId}/${f.name}`)).catch(() => undefined);
+      }
       const r = await submitRegistration(supabaseRegisterBackend(sb, a.session.user.id), { ...form, zone: form.zone }, logo, () => crypto.randomUUID());
       notify("registered", r.orgId);
       try {
@@ -277,9 +281,18 @@ export function RegisterView() {
           </button>
 
           {submitError && (
-            <p role="alert" className="rounded-xl bg-[#FDECE8] px-3.5 py-3 text-[14px] leading-[1.45] text-adm-danger">
-              {t(submitError)}
-            </p>
+            <div role="alert" className="flex flex-col gap-2 rounded-xl bg-[#FDECE8] px-3.5 py-3 text-[14px] leading-[1.45] text-adm-danger">
+              <p>{t(submitError)}</p>
+              {submitError === "register.err.alreadyHasOrg" && (
+                <button
+                  type="button"
+                  onClick={() => router.replace(ROUTES.signIn)}
+                  className="min-h-11 self-start font-bold text-adm-green"
+                >
+                  {t("register.goToMyOrg")}
+                </button>
+              )}
+            </div>
           )}
 
           <button

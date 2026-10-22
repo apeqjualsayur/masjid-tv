@@ -1,7 +1,7 @@
 "use client";
 // Skrin (PRD Phase 2 §4.4, designs/admin/Screens): list with mini previews and status,
 // "Tambah skrin" sheet (code from the TV or ?pair= from its QR) → pair_claim, and per-screen
-// rename / theme / layout / revoke / delete. Editors see the list only.
+// rename / theme / layout / revoke / delete.
 import { useCallback, useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { useDuration } from "../home/HomeView";
@@ -26,7 +26,7 @@ export function ScreensView() {
   const { t } = useT();
   const { toast, node: toasts } = useToasts();
   const orgId = a.current!.orgId;
-  const canEdit = a.role === "pentadbir";
+  const canEdit = true; // every member is a Pentadbir (PRD §3 v0.3)
   const now = useClock(30_000);
   const [screens, setScreens] = useState<Screen[] | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -80,7 +80,6 @@ export function ScreensView() {
           </button>
         )}
       </div>
-      {!canEdit && <p role="note" className="rounded-xl bg-[#FFF4DF] px-4 py-3 text-[14px] text-[#6B4A12]">{t("screens.readOnly")}</p>}
       {loadError && <p role="alert" className="rounded-xl bg-[#FDECE8] px-4 py-3 text-[14px] text-adm-danger">{t("screens.loadError", { message: loadError })}</p>}
 
       {!screens && !loadError ? (
@@ -125,9 +124,7 @@ export function ScreensView() {
 
 /** Desktop header button (AdminShell actions). */
 export function AddScreenAction() {
-  const a = useAdmin();
   const { t } = useT();
-  if (a.role !== "pentadbir") return null;
   return (
     <button
       type="button"

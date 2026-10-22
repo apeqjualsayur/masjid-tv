@@ -1,0 +1,491 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Masjid View — Paparan waktu solat untuk masjid dan surau</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800&amp;family=Plus+Jakarta+Sans:wght@500;800&amp;family=Manrope:wght@300;500;600;700;800&amp;family=Barlow+Condensed:wght@600&amp;family=Noto+Naskh+Arabic:wght@600&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0}
+.scr{container-type:inline-size}
+a{color:inherit}
+summary{cursor:pointer;list-style:none}
+summary::-webkit-details-marker{display:none}
+details[open] .pl{transform:rotate(45deg)}
+.lb-links{display:flex}
+.lb-burger{display:none}
+.lb-hide{display:block}
+@media (max-width: 900px){
+  .lb-links{display:none}
+  .lb-burger{display:flex}
+  .lb-hide{display:none}
+}
+</style>
+</helmet>
+<div style="font-family: 'Outfit', sans-serif; color: #10241B; background: #FFFFFF">
+
+<header style="position: sticky; top: 0; z-index: 5; background: rgba(255,255,255,0.95); border-bottom: 1px solid #EEF2EF">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; height: 70px; display: flex; align-items: center; gap: 32px">
+<a href="#" style="display: flex; align-items: center; gap: 10px; text-decoration: none"><svg role="img" aria-label="Logo Masjid View" width="36" height="36" viewBox="0 0 100 100"><path fill="#146C4A" fill-rule="evenodd" d="M18 92 V48 C18 30 34 18 50 6 C66 18 82 30 82 48 V92 Z M32 92 V53 C32 41 41 33 50 25 C59 33 68 41 68 53 V92 Z"></path><circle cx="50" cy="60" r="8" fill="#E3B04B"></circle></svg><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 21px; letter-spacing: -0.025em; line-height: 1"><span style="font-weight: 800; color: #12261E">Masjid</span><span style="font-weight: 500; color: #146C4A"> View</span></span></a>
+<nav aria-label="Utama" class="lb-links" style="margin: 0 auto; gap: 28px; font-size: 15px; font-weight: 500">
+<a href="#ciri" style="color: #4B5E55; text-decoration: none">Ciri-ciri</a>
+<a href="#panel" style="color: #4B5E55; text-decoration: none">Panel AJK</a>
+<a href="#peranti" style="color: #4B5E55; text-decoration: none">Peranti</a>
+<a href="#cara" style="color: #4B5E55; text-decoration: none">Cara bermula</a>
+<a href="#soalan" style="color: #4B5E55; text-decoration: none">Soalan lazim</a>
+</nav>
+<div style="margin-left: auto; display: flex; align-items: center; gap: 12px">
+<div class="lb-links" role="group" aria-label="Bahasa" style="padding: 3px; border-radius: 999px; background: #EEF4F0; font-size: 13px; font-weight: 700"><button type="button" style="border: 0; padding: 6px 12px; border-radius: 999px; background: #FFFFFF; font: inherit; color: #10241B">BM</button><button type="button" style="border: 0; padding: 6px 12px; border-radius: 999px; background: transparent; font: inherit; color: #5A6D64">EN</button></div>
+<a href="#login" class="lb-links" style="font-size: 15px; font-weight: 600; text-decoration: none">Log masuk</a>
+<a href="#daftar" style="height: 42px; padding: 0 20px; border-radius: 999px; background: #4FA36B; color: #FFFFFF; display: flex; align-items: center; font-size: 15px; font-weight: 600; text-decoration: none; white-space: nowrap">Daftar percuma</a>
+<button type="button" class="lb-burger" aria-label="Menu" style="width: 42px; height: 42px; border: 1px solid #DCE6E1; border-radius: 12px; background: #FFFFFF; align-items: center; justify-content: center; color: #10241B"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 7h16 M4 12h16 M4 17h16"></path></svg></button>
+</div>
+</div>
+</header>
+
+<section style="background: radial-gradient(1200px 560px at 75% 30%, {{t.glow}} 0%, #FFFFFF 70%)">
+<div style="max-width: 1200px; margin: 0 auto; padding: clamp(40px, 6vw, 84px) 20px clamp(40px, 5vw, 64px); display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+<div style="flex: 1 1 400px; min-width: 0; display: flex; flex-direction: column; gap: 22px">
+<div style="width: 64px; height: 64px; border-radius: 18px; background: #146C4A; display: flex; align-items: center; justify-content: center; box-shadow: 0 14px 30px rgba(20,108,74,0.3)"><svg aria-hidden="true" width="42" height="42" viewBox="0 0 100 100"><path fill="#FFFFFF" fill-rule="evenodd" d="M18 92 V48 C18 30 34 18 50 6 C66 18 82 30 82 48 V92 Z M32 92 V53 C32 41 41 33 50 25 C59 33 68 41 68 53 V92 Z"></path><circle cx="50" cy="60" r="8" fill="#E3B04B"></circle></svg></div>
+<div style="display: inline-flex; align-self: flex-start; align-items: center; gap: 8px; padding: 7px 14px; border-radius: 999px; background: #FFFFFF; border: 1px solid #DCEBE1; font-size: 14px; font-weight: 600; color: #2F7D4B"><span style="width: 8px; height: 8px; border-radius: 999px; background: #4FA36B"></span>Percuma untuk semua masjid dan surau</div>
+<h1 style="margin: 0; font-size: clamp(36px, 4.6vw, 56px); line-height: 1.08; font-weight: 700; letter-spacing: -1.4px">Skrin waktu solat masjid anda, terus dari pelayar TV.</h1>
+<p style="margin: 0; font-size: clamp(17px, 1.5vw, 19px); line-height: 1.65; color: #5A6D64; max-width: 520px">Tiada aplikasi khas, tiada kotak mahal. Buka <b style="color: #10241B">masjidview.my/tv</b> pada mana-mana TV yang ada pelayar web. AJK urus pengumuman dari telefon atau komputer, dan skrin berubah dalam seminit.</p>
+<div style="display: flex; gap: 12px; flex-wrap: wrap">
+<a href="#daftar" style="height: 52px; padding: 0 24px; border-radius: 12px; background: #10241B; color: #FFFFFF; display: flex; align-items: center; font-size: 16px; font-weight: 600; text-decoration: none">Daftar masjid percuma</a>
+<a href="#demo" style="height: 52px; padding: 0 22px; border-radius: 12px; background: #FFFFFF; border: 1px solid #D6E3DA; display: flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 600; text-decoration: none"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="#4FA36B"><path d="M8 5v14l11-7Z"></path></svg>Lihat demo langsung</a>
+</div>
+<div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; font-size: 14px; color: #5A6D64"><span style="margin-right: 4px">Berfungsi pada:</span>
+<sc-for list="{{devs}}" as="d" hint-placeholder-count="4"><span style="display: inline-flex; align-items: center; gap: 6px; padding: 6px 11px; border-radius: 999px; background: #FFFFFF; border: 1px solid #E1EBE4; color: #10241B; font-weight: 500"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#4FA36B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{d.icon}}"></path></svg>{{d.s}}</span></sc-for>
+</div>
+</div>
+
+<div style="flex: 1 1 560px; min-width: 0; position: relative; padding: 0 0 70px">
+<div aria-label="TV memaparkan Masjid View" style="position: relative">
+<div style="border-radius: 14px; background: #121614; padding: 10px; box-shadow: 0 40px 70px rgba(16,36,27,0.22)">
+<div class="scr" style="aspect-ratio: 16 / 9; border-radius: 4px; overflow: hidden; background: {{t.bg}}; color: {{t.fg}}; font-family: 'Manrope', sans-serif; display: flex; flex-direction: column">
+<div style="flex: 1; padding: 2.4cqw 3cqw 1.4cqw; display: flex; flex-direction: column; gap: 1.4cqw">
+<div style="display: flex; justify-content: space-between; align-items: center"><div style="font-size: 1.7cqw; font-weight: 800">Masjid Al-Hidayah</div><div style="font-size: 1.4cqw; font-weight: 500; color: {{t.muted}}">Khamis, 30 Rabiulakhir 1448</div></div>
+<div style="flex: 1; border-radius: 1.6cqw; background: {{t.card}}; box-shadow: 0 1cqw 3cqw rgba(20,48,61,0.08); display: flex; align-items: center; padding: 0 4cqw; gap: 4cqw">
+<div style="flex: 1; display: flex; flex-direction: column; gap: 0.8cqw">
+<div style="font-size: 1.3cqw; font-weight: 800; letter-spacing: 0.2cqw; color: {{t.accent}}">KULIAH MAGHRIB</div>
+<div style="font-size: 3.6cqw; font-weight: 800; line-height: 1.05">Adab Menuntut Ilmu</div>
+<div style="font-size: 1.6cqw; color: {{t.muted}}">Ustaz [Nama Penceramah] · Selepas solat Maghrib</div>
+</div>
+<div style="width: 11cqw; height: 11cqw; border-radius: 2cqw; background: {{t.chip}}; display: flex; flex-direction: column; align-items: center; justify-content: center"><div style="font-size: 1.2cqw; font-weight: 700; color: {{t.accent}}">KHAMIS</div><div style="font-size: 4.4cqw; font-weight: 800; line-height: 1">23</div><div style="font-size: 1.2cqw; font-weight: 700; color: {{t.accent}}">OKT</div></div>
+</div>
+</div>
+<div style="height: 26%; background: {{t.strip}}; display: flex; align-items: center; padding: 0 3cqw; gap: 2.4cqw">
+<div style="display: flex; flex-direction: column"><div style="font-size: 5.2cqw; font-weight: 300; letter-spacing: -0.2cqw; line-height: 1">{{t.clock}}</div><div style="font-size: 1.2cqw; font-weight: 700; color: {{t.accent}}">{{t.next}}</div></div>
+<div style="flex: 1; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 0.6cqw">
+<sc-for list="{{tv}}" as="w" hint-placeholder-count="7">
+<div style="border-radius: 1cqw; padding: 1cqw 0; text-align: center; background: {{w.bg}}; color: {{w.fg}}"><div style="font-size: 1.2cqw; font-weight: 700">{{w.n}}</div><div style="font-size: 2cqw; font-weight: 800">{{w.t}}</div></div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+<div style="margin: 0 auto; width: 18%; height: 26px; background: linear-gradient(180deg,#2A302D,#1A1E1C); clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%)"></div>
+<div style="margin: 0 auto; width: 34%; height: 6px; border-radius: 3px; background: #1A1E1C"></div>
+</div>
+<div class="lb-hide" aria-label="Panel AJK di telefon" style="position: absolute; right: -10px; bottom: 0; width: 150px; height: 300px; border-radius: 28px; background: #121614; padding: 6px; box-sizing: border-box; box-shadow: 0 24px 50px rgba(16,36,27,0.3)">
+<div style="height: 100%; border-radius: 22px; background: #F4F8F5; overflow: hidden; padding: 16px 10px; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px">
+<div style="font-size: 10px; font-weight: 700">Assalamualaikum, AJK</div>
+<div style="border-radius: 12px; background: #4FA36B; color: #FFFFFF; padding: 9px"><div style="font-size: 8px; opacity: 0.85">Skrin dewan utama</div><div style="font-size: 12px; font-weight: 700">● Dalam talian</div></div>
+<div style="font-size: 8px; font-weight: 700; color: #5A6D64">Sedang dipaparkan</div>
+<sc-for list="{{slides}}" as="s" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 6px; background: #FFFFFF; border-radius: 9px; padding: 5px"><div style="width: 26px; height: 16px; border-radius: 4px; background: {{s.c}}"></div><div style="font-size: 8px; font-weight: 600">{{s.n}}</div></div>
+</sc-for>
+<div style="margin-top: auto; height: 28px; border-radius: 10px; background: #10241B; color: #FFFFFF; font-size: 9px; font-weight: 700; display: flex; align-items: center; justify-content: center">+ Pengumuman baharu</div>
+</div>
+</div>
+</div>
+</div>
+</section>
+
+<section aria-label="Angka utama" style="padding: clamp(40px, 5vw, 64px) 0 0">
+<div style="max-width: 1000px; margin: 0 auto; padding: 0 20px; text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center">
+<h2 style="margin: 0; font-size: clamp(28px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.6px">Satu skrin, semua maklumat masjid</h2>
+<p style="margin: 0; font-size: 17px; color: #5A6D64; max-width: 620px; line-height: 1.6">Waktu solat berdasarkan data e-Solat JAKIM, kiraan iqamah dan pengumuman yang tersusun, di TV yang anda sudah ada.</p>
+</div>
+<div style="max-width: 1000px; margin: 32px auto 0; padding: 0 20px">
+<div style="border-radius: 24px; background: linear-gradient(180deg, #FFFFFF 0%, #E9F6EE 100%); border: 1px solid #E4EFE8; padding: 32px 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 24px; text-align: center">
+<sc-for list="{{stats}}" as="st" hint-placeholder-count="4">
+<div style="display: flex; flex-direction: column; gap: 6px; align-items: center"><div style="width: 30px; height: 30px; border-radius: 999px; background: #D4ECDC; color: #2F7D4B; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="{{st.icon}}"></path></svg></div><div style="font-size: 40px; font-weight: 600; color: #2F7D4B; letter-spacing: -1px">{{st.v}}</div><div style="font-size: 14px; font-weight: 600">{{st.l}}</div></div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section style="padding: clamp(64px, 8vw, 100px) 0">
+<div style="max-width: 1000px; margin: 0 auto; padding: 0 20px; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px">
+<div style="padding: 28px; border-radius: 22px; background: #F7F5F1; display: flex; flex-direction: column; gap: 14px">
+<div style="font-size: 15px; font-weight: 700; color: #8A5A22">Sebelum</div>
+<sc-for list="{{before}}" as="b" hint-placeholder-count="4"><div style="display: flex; gap: 12px; font-size: 16px; line-height: 1.5; color: #4A3D2E"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#C08A4A" stroke-width="2.2" stroke-linecap="round" style="flex-shrink: 0; margin-top: 2px"><path d="M6 6l12 12 M18 6 6 18"></path></svg>{{b}}</div></sc-for>
+</div>
+<div style="padding: 28px; border-radius: 22px; background: #E9F6EE; display: flex; flex-direction: column; gap: 14px">
+<div style="font-size: 15px; font-weight: 700; color: #2F7D4B">Dengan Masjid View</div>
+<sc-for list="{{after}}" as="a" hint-placeholder-count="4"><div style="display: flex; gap: 12px; font-size: 16px; line-height: 1.5"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#4FA36B" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 2px"><path d="M5 12l5 5L20 7"></path></svg>{{a}}</div></sc-for>
+</div>
+</div>
+</section>
+
+<section id="ciri" style="padding: 0 0 clamp(64px, 8vw, 100px)">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; flex-wrap: wrap; gap: 48px; align-items: flex-start">
+<div style="flex: 1 1 340px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<div style="font-size: 14px; font-weight: 700; letter-spacing: 0.14em; color: #4FA36B">CIRI-CIRI</div>
+<h2 style="margin: 0; font-size: clamp(28px, 3.2vw, 38px); line-height: 1.2; font-weight: 700; letter-spacing: -0.6px">Selamat tinggal notis bertampal. Masjid View menguruskannya.</h2>
+<p style="margin: 0; font-size: 17px; color: #5A6D64; line-height: 1.6">Setiap ciri dibina untuk rutin harian masjid, dari amaran azan hingga skrin senyap semasa solat.</p>
+<div style="display: flex; gap: 12px"><a href="#daftar" style="height: 46px; padding: 0 20px; border-radius: 10px; background: #4FA36B; color: #FFFFFF; display: flex; align-items: center; font-size: 15px; font-weight: 600; text-decoration: none">Daftar percuma</a><a href="#demo" style="height: 46px; padding: 0 12px; display: flex; align-items: center; font-size: 15px; font-weight: 600; text-decoration: none">Lihat demo →</a></div>
+</div>
+<div style="flex: 1.4 1 520px; min-width: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px">
+<sc-for list="{{features}}" as="f" hint-placeholder-count="8">
+<div style="padding: 22px; border-radius: 18px; background: #F7FAF8; border: 1px solid #EDF3EF; display: flex; gap: 14px">
+<div style="width: 40px; height: 40px; flex-shrink: 0; border-radius: 12px; background: #E1F1E6; color: #2F7D4B; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="{{f.icon}}"></path></svg></div>
+<div style="display: flex; flex-direction: column; gap: 6px"><div style="font-size: 17px; font-weight: 700">{{f.t}}</div><div style="font-size: 14px; line-height: 1.6; color: #5A6D64">{{f.d}}</div></div>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section style="padding: clamp(64px, 8vw, 100px) 0; background: #F4F9F6">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; gap: 40px">
+<div style="text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center">
+<div style="font-size: 14px; font-weight: 700; letter-spacing: 0.14em; color: #4FA36B">SATU HARI DI SKRIN MASJID</div>
+<h2 style="margin: 0; font-size: clamp(28px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.6px">Skrin tahu bila azan, bila iqamah, dan bila perlu senyap</h2>
+<p style="margin: 0; font-size: 17px; color: #5A6D64; max-width: 620px; line-height: 1.6">Mod bertukar secara automatik. Tiada sesiapa perlu menekan butang.</p>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 18px">
+<sc-for list="{{day}}" as="d" hint-placeholder-count="5">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="border-radius: 10px; background: #121614; padding: 5px"><div class="scr" style="aspect-ratio: 16 / 9; border-radius: 3px; background: {{d.bg}}; color: {{d.fg}}; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2cqw; font-family: 'Manrope', sans-serif"><div style="font-size: 6cqw; font-weight: 800; letter-spacing: 0.6cqw; opacity: 0.8">{{d.tag}}</div><div style="font-size: 19cqw; font-weight: 800; line-height: 1; font-family: {{d.font}}">{{d.big}}</div></div></div>
+<div style="font-size: 13px; font-weight: 700; color: #4FA36B">{{d.time}}</div>
+<div style="font-size: 17px; font-weight: 700">{{d.t}}</div>
+<div style="font-size: 14px; line-height: 1.55; color: #5A6D64">{{d.d}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section id="panel" style="padding: clamp(64px, 8vw, 100px) 0">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; gap: 40px">
+<div style="text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center">
+<div style="font-size: 14px; font-weight: 700; letter-spacing: 0.14em; color: #4FA36B">PANEL AJK</div>
+<h2 style="margin: 0; font-size: clamp(28px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.6px">Urus dari telefon atau komputer, hasilnya sama</h2>
+<p style="margin: 0; font-size: 17px; color: #5A6D64; max-width: 620px; line-height: 1.6">Kemas kini pengumuman semasa dalam perjalanan, atau susun jadual mingguan di pejabat masjid.</p>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 32px; align-items: flex-end; justify-content: center">
+<div style="flex: 2 1 520px; min-width: 0; max-width: 760px">
+<div aria-label="Panel AJK di komputer riba" style="border-radius: 14px 14px 0 0; background: #121614; padding: 10px 10px 12px">
+<div class="scr" style="aspect-ratio: 16 / 10; border-radius: 4px; background: #FFFFFF; overflow: hidden; display: flex">
+<div style="width: 19%; background: #F4F8F5; border-right: 1px solid #E4EDE7; padding: 2cqw 1.4cqw; box-sizing: border-box; display: flex; flex-direction: column; gap: 1.2cqw; font-size: 1.4cqw">
+<div style="font-weight: 700; font-size: 1.6cqw">Masjid View</div>
+<sc-for list="{{nav}}" as="n" hint-placeholder-count="5"><div style="padding: 0.8cqw 1cqw; border-radius: 0.8cqw; background: {{n.bg}}; color: {{n.fg}}; font-weight: 600">{{n.t}}</div></sc-for>
+</div>
+<div style="flex: 1; padding: 2.2cqw; display: grid; grid-template-columns: 1fr 1.3fr; gap: 2cqw; box-sizing: border-box">
+<div style="display: flex; flex-direction: column; gap: 1.2cqw; font-size: 1.3cqw">
+<div style="font-size: 2cqw; font-weight: 700">Templat: Kuliah</div>
+<sc-for list="{{fields}}" as="fl" hint-placeholder-count="4"><div style="display: flex; flex-direction: column; gap: 0.4cqw"><div style="color: #5A6D64; font-weight: 600">{{fl.l}}</div><div style="border: 1px solid #D6E3DA; border-radius: 0.8cqw; padding: 0.9cqw 1cqw">{{fl.v}}</div></div></sc-for>
+<div style="margin-top: auto; border-radius: 0.8cqw; background: #4FA36B; color: #FFFFFF; text-align: center; padding: 1cqw; font-weight: 700">Terbit ke skrin</div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 1cqw"><div style="font-size: 1.3cqw; font-weight: 700; color: #5A6D64">Pratonton langsung · Tenang</div><div style="aspect-ratio: 16 / 9; border-radius: 1cqw; border: 0.5cqw solid #121614; background: #EAF3F8; padding: 1.4cqw; box-sizing: border-box"><div style="height: 100%; border-radius: 0.8cqw; background: #FFFFFF; padding: 1.4cqw; box-sizing: border-box"><div style="font-size: 1cqw; font-weight: 800; color: #4FA36B">KULIAH MAGHRIB</div><div style="font-size: 2.2cqw; font-weight: 800; color: #14303D">Adab Menuntut Ilmu</div></div></div><div style="font-size: 1.2cqw; color: #5A6D64">Papar pada: Dewan utama, Ruang wanita</div></div>
+</div>
+</div>
+</div>
+<div style="height: 14px; margin: 0 -4%; border-radius: 0 0 14px 14px; background: linear-gradient(180deg,#D9DEDB,#B9C0BC)"></div>
+<div style="margin-top: 14px; text-align: center; font-size: 15px; font-weight: 600">Komputer · susun dan jadualkan</div>
+</div>
+<div style="flex: 0 0 210px">
+<div aria-label="Panel AJK di telefon" style="width: 210px; height: 420px; border-radius: 34px; background: #121614; padding: 8px; box-sizing: border-box">
+<div style="height: 100%; border-radius: 27px; background: #F4F8F5; overflow: hidden; padding: 20px 14px; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px">
+<div style="font-size: 13px; font-weight: 700">Pengumuman baharu</div>
+<div style="display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{tplMini}}" as="tp" hint-placeholder-count="6"><div style="border-radius: 10px; background: #FFFFFF; padding: 8px; display: flex; flex-direction: column; gap: 6px"><div style="height: 26px; border-radius: 6px; background: {{tp.c}}"></div><div style="font-size: 9px; font-weight: 700">{{tp.n}}</div></div></sc-for>
+</div>
+<div style="margin-top: auto; height: 36px; border-radius: 12px; background: #FFFFFF; border: 1px dashed #A9CDB4; font-size: 10px; font-weight: 700; color: #2F7D4B; display: flex; align-items: center; justify-content: center">Muat naik poster · 1920×800</div>
+</div>
+</div>
+<div style="margin-top: 14px; text-align: center; font-size: 15px; font-weight: 600">Telefon · kemas kini segera</div>
+</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px">
+<sc-for list="{{app}}" as="ap" hint-placeholder-count="4"><div style="padding: 18px; border-radius: 16px; background: #F7FAF8; border: 1px solid #EDF3EF; display: flex; flex-direction: column; gap: 6px"><div style="font-size: 16px; font-weight: 700">{{ap.t}}</div><div style="font-size: 14px; line-height: 1.55; color: #5A6D64">{{ap.d}}</div></div></sc-for>
+</div>
+</div>
+</section>
+
+<section style="padding: clamp(64px, 8vw, 100px) 0; background: #F4F9F6">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; gap: 36px">
+<div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 20px">
+<div style="display: flex; flex-direction: column; gap: 12px; max-width: 640px"><div style="font-size: 14px; font-weight: 700; letter-spacing: 0.14em; color: #4FA36B">10 TEMPLAT SIAP GUNA</div><h2 style="margin: 0; font-size: clamp(28px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.6px">Isi borang, tekan Terbit. Tiada reka poster.</h2></div>
+<div style="font-size: 16px; color: #5A6D64; max-width: 380px; line-height: 1.6">Setiap templat mengikut tema skrin anda secara automatik.</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 14px">
+<sc-for list="{{tpl}}" as="tp" hint-placeholder-count="10">
+<div style="border-radius: 16px; background: #FFFFFF; border: 1px solid #E4EFE8; overflow: hidden">
+<div aria-hidden="true" style="aspect-ratio: 12 / 5; background: {{tp.bg}}; padding: 12px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: center; gap: 5px"><div style="height: 5px; width: 40%; border-radius: 3px; background: {{tp.fg}}; opacity: 0.6"></div><div style="height: 10px; width: 75%; border-radius: 4px; background: {{tp.fg}}"></div><div style="height: 5px; width: 55%; border-radius: 3px; background: {{tp.fg}}; opacity: 0.4"></div></div>
+<div style="padding: 12px 14px; display: flex; flex-direction: column; gap: 3px"><div style="font-size: 15px; font-weight: 700">{{tp.n}}</div><div style="font-size: 13px; color: #5A6D64">{{tp.d}}</div></div>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section id="cuba" style="padding: clamp(64px, 8vw, 100px) 0">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; flex-wrap: wrap; gap: 48px; align-items: center">
+<div style="flex: 1 1 360px; min-width: 0; display: flex; flex-direction: column; gap: 16px">
+<div style="font-size: 14px; font-weight: 700; letter-spacing: 0.14em; color: #4FA36B">CUBA SEKARANG</div>
+<h2 style="margin: 0; font-size: clamp(28px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.6px">Lihat rupa skrin masjid anda</h2>
+<label for="nm" style="font-size: 14px; font-weight: 600; color: #5A6D64">Nama masjid atau surau</label>
+<input id="nm" value="{{name}}" onInput="{{setName}}" style="height: 52px; border-radius: 12px; border: 1px solid #C9D9CF; padding: 0 16px; font: inherit; font-size: 17px; color: #10241B; box-sizing: border-box">
+<div style="font-size: 14px; font-weight: 600; color: #5A6D64">Tema</div>
+<div role="group" aria-label="Tema" style="display: flex; gap: 8px; flex-wrap: wrap">
+<sc-for list="{{themeBtns}}" as="tb" hint-placeholder-count="3"><button type="button" aria-pressed="{{tb.on}}" onClick="{{tb.pick}}" style="height: 44px; padding: 0 18px; border-radius: 999px; border: 1px solid {{tb.bd}}; background: {{tb.bg}}; color: {{tb.fg}}; font: inherit; font-size: 15px; font-weight: 600">{{tb.label}}</button></sc-for>
+</div>
+<a href="#daftar" style="align-self: flex-start; margin-top: 6px; font-size: 16px; font-weight: 700; color: #2F7D4B">Suka? Daftar masjid ini secara percuma →</a>
+</div>
+<div style="flex: 1 1 560px; min-width: 0">
+<div style="border-radius: 14px; background: #121614; padding: 10px; box-shadow: 0 30px 60px rgba(16,36,27,0.18)">
+<div class="scr" aria-label="Pratonton skrin masjid anda" style="position: relative; aspect-ratio: 16 / 9; border-radius: 4px; overflow: hidden; background: {{pv.bg}}; color: {{pv.fg}}; font-family: 'Manrope', sans-serif">
+<sc-if value="{{pv.isAlam}}" hint-placeholder-val="{{false}}"><div style="position: absolute; right: 14%; top: 14%; width: 8cqw; height: 8cqw; border-radius: 999px; background: #FFE0B0; box-shadow: 0 0 9cqw 4cqw rgba(255,224,176,0.5)"></div><div style="position: absolute; left: 0; right: 0; bottom: 0; height: 40%; background: #6E2412; clip-path: polygon(0 40%, 18% 20%, 36% 38%, 55% 10%, 75% 32%, 100% 18%, 100% 100%, 0 100%)"></div></sc-if>
+<sc-if value="{{pv.isSerambi}}" hint-placeholder-val="{{false}}"><div style="position: absolute; left: 50%; right: 5%; bottom: 8%; height: 56%; display: flex; align-items: flex-end; gap: 0.8cqw"><sc-for list="{{arches}}" as="ar" hint-placeholder-count="7"><div style="flex: 1; height: {{ar.h}}; border-radius: 4cqw 4cqw 0.6cqw 0.6cqw; background: {{ar.sky}}; opacity: {{ar.op}}; box-shadow: {{ar.ring}}"></div></sc-for></div></sc-if>
+<div style="position: absolute; left: 6%; top: 9%; display: flex; align-items: center; gap: 1.6cqw">
+<div style="width: 6.4cqw; height: 6.4cqw; border-radius: 999px; background: {{pv.monoBg}}; color: {{pv.monoFg}}; border: {{pv.monoBd}}; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 2.2cqw; box-sizing: border-box">{{mono}}</div>
+<div style="font-size: 2.8cqw; font-weight: 800">{{name}}</div>
+</div>
+<div style="position: absolute; left: 6%; top: 33%; display: flex; flex-direction: column; gap: 0.8cqw">
+<div style="font-family: {{pv.numFont}}; font-size: 11cqw; font-weight: {{pv.numW}}; line-height: 0.9; letter-spacing: -0.3cqw">4:42</div>
+<div style="font-size: 1.9cqw; font-weight: 700; color: {{pv.accent}}">Maghrib dalam 2 jam 24 minit</div>
+</div>
+<sc-if value="{{pv.isTenang}}" hint-placeholder-val="{{true}}"><div style="position: absolute; right: 5%; top: 12%; width: 40%; display: flex; flex-direction: column; gap: 0.4cqw"><sc-for list="{{tvAsar}}" as="w" hint-placeholder-count="7"><div style="display: flex; justify-content: space-between; padding: 0.5cqw 1.6cqw; border-radius: 999px; background: {{w.bg}}; box-shadow: {{w.sh}}"><div style="font-size: 1.6cqw; font-weight: {{w.wn}}">{{w.n}}</div><div style="font-size: 2.4cqw; font-weight: {{w.wt}}; color: {{w.c}}">{{w.t}}</div></div></sc-for></div></sc-if>
+</div>
+</div>
+<div style="margin: 0 auto; width: 18%; height: 22px; background: linear-gradient(180deg,#2A302D,#1A1E1C); clip-path: polygon(30% 0, 70% 0, 100% 100%, 0 100%)"></div>
+<div style="margin: 0 auto; width: 34%; height: 6px; border-radius: 3px; background: #1A1E1C"></div>
+</div>
+</div>
+</section>
+
+<section id="peranti" style="padding: clamp(64px, 8vw, 100px) 0; background: #F4F9F6">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; gap: 36px">
+<div style="text-align: center; display: flex; flex-direction: column; gap: 14px; align-items: center">
+<div style="font-size: 14px; font-weight: 700; letter-spacing: 0.14em; color: #4FA36B">GUNA TV SEDIA ADA</div>
+<h2 style="margin: 0; font-size: clamp(28px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.6px">Ada pelayar web? Ia boleh jadi skrin masjid.</h2>
+<div style="display: inline-flex; align-items: center; gap: 10px; padding: 10px 18px; border-radius: 999px; background: #FFFFFF; border: 1px solid #DCEBE1; font-size: 17px; font-weight: 600"><svg aria-hidden="true" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4FA36B" stroke-width="2.2"><rect x="4" y="10" width="16" height="10" rx="2"></rect><path d="M8 10V7a4 4 0 0 1 8 0v3"></path></svg>masjidview.my/tv</div>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px">
+<sc-for list="{{devs}}" as="d" hint-placeholder-count="4">
+<div style="padding: 26px 22px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E4EFE8; display: flex; flex-direction: column; gap: 12px">
+<div style="width: 52px; height: 52px; border-radius: 16px; background: #E7F4EB; color: #2F7D4B; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="{{d.icon}}"></path></svg></div>
+<div style="font-size: 18px; font-weight: 700">{{d.t}}</div>
+<div style="font-size: 14px; line-height: 1.6; color: #5A6D64">{{d.d}}</div>
+</div>
+</sc-for>
+</div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; align-items: center; padding: 26px; border-radius: 22px; background: #FFFFFF; border: 1px solid #E4EFE8">
+<div style="display: flex; align-items: center; gap: 18px">
+<div aria-hidden="true" style="flex-shrink: 0; width: 150px; border-radius: 8px; background: #121614; padding: 5px"><div class="scr" style="aspect-ratio: 16 / 9; border-radius: 2px; background: #FFFFFF; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3cqw; font-family: 'Manrope', sans-serif"><svg aria-hidden="true" style="width: 12cqw; height: 12cqw" viewBox="0 0 100 100"><path fill="#146C4A" fill-rule="evenodd" d="M18 92 V48 C18 30 34 18 50 6 C66 18 82 30 82 48 V92 Z M32 92 V53 C32 41 41 33 50 25 C59 33 68 41 68 53 V92 Z"></path><circle cx="50" cy="60" r="8" fill="#E3B04B"></circle></svg><div style="font-size: 7cqw; color: #5A6D64">Kod pemasangan</div><div style="font-size: 17cqw; font-weight: 800; letter-spacing: 2cqw; color: #10241B">482 913</div></div></div>
+<div style="display: flex; flex-direction: column; gap: 4px"><div style="font-size: 17px; font-weight: 700">Pasang sekali, jalan sendiri</div><div style="font-size: 14px; line-height: 1.55; color: #5A6D64">TV memaparkan kod 6 digit. AJK masukkan kod di telefon, dan skrin terus dipautkan kepada masjid anda.</div></div>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding-left: 20px; border-left: 2px solid #E4EFE8"><div style="font-size: 17px; font-weight: 700">Tetap berjalan tanpa internet</div><div style="font-size: 14px; line-height: 1.55; color: #5A6D64">Waktu solat setahun disimpan dalam TV. Jika WiFi terputus, skrin terus berfungsi dan menyegerak semula apabila talian pulih.</div></div>
+</div>
+</div>
+</section>
+
+<section style="padding: clamp(64px, 8vw, 100px) 0">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; gap: 32px">
+<div style="text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center"><div style="font-size: 14px; font-weight: 700; letter-spacing: 0.14em; color: #4FA36B">TEMA PAPARAN</div><h2 style="margin: 0; font-size: clamp(28px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.6px">Tiga tema, warna ikut waktu solat</h2><p style="margin: 0; font-size: 17px; color: #5A6D64; max-width: 560px; line-height: 1.6">Tukar tema bila-bila masa tanpa menaip semula pengumuman. Lebih banyak tema akan datang.</p></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 22px">
+<sc-for list="{{themes}}" as="th" hint-placeholder-count="3">
+<div style="display: flex; flex-direction: column; gap: 10px">
+<div style="border-radius: 10px; background: #121614; padding: 6px"><div class="scr" style="aspect-ratio: 16 / 9; border-radius: 3px; background: {{th.bg}}; color: {{th.fg}}; display: flex; align-items: center; padding: 0 7cqw; gap: 6cqw; font-family: {{th.font}}"><div style="font-size: 16cqw; font-weight: {{th.w}}; letter-spacing: -0.5cqw">{{th.clock}}</div><div style="flex: 1; display: flex; flex-direction: column; gap: 2cqw"><div style="height: 3cqw; border-radius: 2cqw; background: {{th.bar}}"></div><div style="height: 3cqw; border-radius: 2cqw; background: {{th.bar}}"></div><div style="height: 6cqw; border-radius: 4cqw; background: {{th.hi}}"></div><div style="height: 3cqw; border-radius: 2cqw; background: {{th.bar}}"></div></div></div></div>
+<div style="font-size: 18px; font-weight: 700">{{th.n}}</div><div style="font-size: 14px; color: #5A6D64">{{th.d}}</div>
+</div>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section id="cara" style="padding: clamp(64px, 8vw, 100px) 0; background: #F4F9F6">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; gap: 36px">
+<div style="text-align: center; display: flex; flex-direction: column; gap: 12px; align-items: center"><div style="font-size: 14px; font-weight: 700; letter-spacing: 0.14em; color: #4FA36B">CARA BERMULA</div><h2 style="margin: 0; font-size: clamp(28px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.6px">Siap dalam satu petang</h2></div>
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 16px">
+<sc-for list="{{steps}}" as="s" hint-placeholder-count="4">
+<div style="padding: 24px; border-radius: 20px; background: #FFFFFF; border: 1px solid #E4EFE8; display: flex; flex-direction: column; gap: 12px">
+<div style="width: 40px; height: 40px; border-radius: 999px; background: #4FA36B; color: #FFFFFF; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: 700">{{s.n}}</div>
+<div style="font-size: 18px; font-weight: 700">{{s.t}}</div>
+<div style="font-size: 14px; line-height: 1.6; color: #5A6D64">{{s.d}}</div>
+</div>
+</sc-for>
+</div>
+<div style="display: flex; flex-wrap: wrap; gap: 12px 28px; justify-content: center; font-size: 15px; color: #5A6D64"><span style="font-weight: 700; color: #10241B">Apa yang diperlukan:</span><span>✓ TV dengan pelayar web (atau kotak Android TV / komputer riba)</span><span>✓ Sambungan WiFi</span><span>✓ Akaun Google atau e-mel AJK</span></div>
+</div>
+</section>
+
+<section style="padding: clamp(64px, 8vw, 100px) 0">
+<div style="max-width: 820px; margin: 0 auto; padding: 0 20px; text-align: center; display: flex; flex-direction: column; gap: 16px; align-items: center">
+<div style="width: 56px; height: 56px; border-radius: 18px; background: #E7F4EB; display: flex; align-items: center; justify-content: center"><svg aria-hidden="true" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#2F7D4B" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-9-9a5 5 0 0 1 9-3 5 5 0 0 1 9 3c-2 4.5-9 9-9 9Z"></path></svg></div>
+<h2 style="margin: 0; font-size: clamp(28px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.6px">Kenapa percuma?</h2>
+<p style="margin: 0; font-size: 18px; line-height: 1.7; color: #5A6D64">[Masjid View dibangunkan sebagai khidmat kepada masjid dan surau di Malaysia. Kos pelayan ditanggung oleh pembangun, jadi masjid dan surau tidak perlu membayar apa-apa: tiada yuran dan tiada langganan.]</p>
+</div>
+</section>
+
+<section id="soalan" style="padding: 0 0 clamp(64px, 8vw, 100px)">
+<div style="max-width: 860px; margin: 0 auto; padding: 0 20px; display: flex; flex-direction: column; gap: 28px">
+<h2 style="margin: 0; text-align: center; font-size: clamp(28px, 3.2vw, 38px); font-weight: 700; letter-spacing: -0.6px">Soalan lazim</h2>
+<div style="display: flex; flex-direction: column; gap: 10px">
+<sc-for list="{{faq}}" as="q" hint-placeholder-count="10">
+<details open="{{q.open}}" style="border-radius: 16px; background: #F7FAF8; border: 1px solid #EDF3EF; padding: 18px 22px">
+<summary style="display: flex; justify-content: space-between; gap: 16px; font-size: 17px; font-weight: 600">{{q.q}}<span class="pl" aria-hidden="true" style="color: #4FA36B; font-size: 22px; line-height: 1; transition: transform 0.2s">+</span></summary>
+<div style="margin-top: 10px; font-size: 15px; line-height: 1.65; color: #5A6D64">{{q.a}}</div>
+</details>
+</sc-for>
+</div>
+</div>
+</section>
+
+<section id="daftar" style="padding: 0 0 clamp(64px, 8vw, 100px)">
+<div style="max-width: 1200px; margin: 0 auto; padding: 0 20px">
+<div style="border-radius: 28px; background: linear-gradient(120deg, #4FA36B 0%, #2F7D4B 100%); color: #FFFFFF; padding: clamp(36px, 5vw, 60px); display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 24px">
+<div style="display: flex; flex-direction: column; gap: 10px; max-width: 620px"><h2 style="margin: 0; font-size: clamp(28px, 3.2vw, 40px); font-weight: 700; letter-spacing: -0.6px">Hidupkan TV masjid anda hari ini.</h2><div style="font-size: 17px; line-height: 1.6; opacity: 0.92">Percuma. Log masuk dengan Google, isi butiran masjid, dan pasang TV selepas diluluskan.</div></div>
+<div style="display: flex; gap: 12px; flex-wrap: wrap"><a href="#" style="height: 54px; padding: 0 26px; border-radius: 14px; background: #FFFFFF; color: #2F7D4B; display: flex; align-items: center; font-size: 17px; font-weight: 700; text-decoration: none">Daftar percuma</a><a href="#demo" style="height: 54px; padding: 0 22px; border-radius: 14px; border: 1.5px solid rgba(255,255,255,0.7); color: #FFFFFF; display: flex; align-items: center; font-size: 16px; font-weight: 600; text-decoration: none">Lihat demo</a></div>
+</div>
+</div>
+</section>
+
+<footer style="background: #10241B; color: rgba(255,255,255,0.75)">
+<div style="max-width: 1200px; margin: 0 auto; padding: 48px 20px 28px; display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 28px; font-size: 14px">
+<div style="display: flex; flex-direction: column; gap: 12px"><div style="display: flex; align-items: center; gap: 10px; color: #FFFFFF"><svg aria-hidden="true" width="32" height="32" viewBox="0 0 100 100"><path fill="#FFFFFF" fill-rule="evenodd" d="M18 92 V48 C18 30 34 18 50 6 C66 18 82 30 82 48 V92 Z M32 92 V53 C32 41 41 33 50 25 C59 33 68 41 68 53 V92 Z"></path><circle cx="50" cy="60" r="8" fill="#E3B04B"></circle></svg><span style="font-family: 'Plus Jakarta Sans', sans-serif; font-size: 19px; letter-spacing: -0.025em; line-height: 1"><span style="font-weight: 800">Masjid</span><span style="font-weight: 500; color: #CFE6DA"> View</span></span></div><div style="line-height: 1.6">Paparan waktu solat dan pengumuman untuk masjid dan surau.</div></div>
+<div style="display: flex; flex-direction: column; gap: 10px"><div style="color: #FFFFFF; font-weight: 700">Produk</div><a href="#ciri" style="text-decoration: none">Ciri-ciri</a><a href="#panel" style="text-decoration: none">Panel AJK</a><a href="#demo" style="text-decoration: none">Demo langsung</a></div>
+<div style="display: flex; flex-direction: column; gap: 10px"><div style="color: #FFFFFF; font-weight: 700">Bantuan</div><a href="#panduan" style="text-decoration: none">Panduan pemasangan TV</a><a href="#soalan" style="text-decoration: none">Soalan lazim</a><a href="#privasi" style="text-decoration: none">Notis Privasi</a></div>
+<div style="display: flex; flex-direction: column; gap: 10px"><div style="color: #FFFFFF; font-weight: 700">Hubungi</div><div>[e-mel]</div><div>[WhatsApp]</div></div>
+</div>
+<div style="max-width: 1200px; margin: 0 auto; padding: 18px 20px 28px; border-top: 1px solid rgba(255,255,255,0.12); display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; font-size: 13px; color: rgba(255,255,255,0.6)"><div>© 2026 Masjid View · [Dibangunkan oleh …]</div><div>Waktu solat berdasarkan data e-Solat JAKIM.</div></div>
+</footer>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"phase":{"editor":"enum","options":["subuh","zohor","asar","maghrib","isyak"],"default":"zohor","section":"TV hero · waktu semasa"},"$preview":{"width":1440,"height":8600}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const TH = {
+      subuh:   { clock: '6:12', cur: 1, next: 'Syuruk dalam 49m',  bg: '#E8EAF6', fg: '#1F2440', muted: '#5F6585', accent: '#4F58AE', card: '#FFFFFF', chip: '#ECEEF8', strip: '#FFFFFF', glow: '#E9ECF8' },
+      zohor:   { clock: '1:20', cur: 3, next: 'Asar dalam 2j 51m', bg: '#EAF3F8', fg: '#14303D', muted: '#56707E', accent: '#23709A', card: '#FFFFFF', chip: '#E7F4EB', strip: '#FFFFFF', glow: '#E7F4EB' },
+      asar:    { clock: '4:42', cur: 4, next: 'Maghrib dalam 2j 24m', bg: '#F8EFE6', fg: '#3B2A1E', muted: '#7E6853', accent: '#A9612A', card: '#FFFFFF', chip: '#FAF0E4', strip: '#FFFFFF', glow: '#F7EEE4' },
+      maghrib: { clock: '7:15', cur: 5, next: 'Isyak dalam 1j 01m', bg: '#F6E9EC', fg: '#3A2230', muted: '#80616E', accent: '#9C3F5E', card: '#FFFFFF', chip: '#F8ECEF', strip: '#FFFFFF', glow: '#F6EAEE' },
+      isyak:   { clock: '9:30', cur: 6, next: 'Imsak dalam 8j 12m', bg: '#131A2B', fg: '#E9ECF5', muted: '#8F98B3', accent: '#9DB0EE', card: 'rgba(255,255,255,0.06)', chip: 'rgba(255,255,255,0.08)', strip: '#0D1322', glow: '#E7EAF2' }
+    };
+    const t = TH[this.props.phase ?? 'zohor'] || TH.zohor;
+    const isNight = t.cur === 6;
+    const TIMES = [['Imsak','5:42'],['Subuh','5:52'],['Syuruk','7:01'],['Zohor','1:05'],['Asar','4:11'],['Maghrib','7:06'],['Isyak','8:16']];
+    const tv = TIMES.map(([n, v], i) => ({ n, t: v, bg: i === t.cur ? t.accent : (isNight ? 'rgba(255,255,255,0.06)' : '#F1F6F9'), fg: i === t.cur ? (isNight ? '#131A2B' : '#FFFFFF') : t.fg }));
+    const tvAsar = TIMES.map(([n, v], i) => { const c = i === 4; return { n, t: v, bg: c ? '#FFFFFF' : 'transparent', sh: c ? '0 0.8cqw 2cqw rgba(20,30,50,0.10)' : 'none', wn: c ? 800 : 500, wt: c ? 700 : 500, c: c ? '#A9612A' : 'inherit' }; });
+
+    const SKY = [['#0B1638','#1F2F66'],['#1B2C5E','#E9A97A'],['#5E86C4','#F4C38E'],['#2F7FC6','#8CC6EE'],['#3D7DB8','#E9B36A'],['#3B2D6B','#F2A65E'],['#050B1A','#0E2A44']];
+    const arches = SKY.map(([a, b], i) => ({ sky: 'linear-gradient(180deg,' + a + ',' + b + ')', h: i === 4 ? '100%' : '84%', op: i < 4 ? 0.45 : 0.95, ring: i === 4 ? '0 0 0 2px #E3B04B' : 'none' }));
+
+    const theme = s.theme || 'tenang';
+    const name = s.name !== undefined ? s.name : 'Masjid Al-Hidayah';
+    const words = name.trim().split(/\s+/).filter((w) => !/^(masjid|surau)$/i.test(w));
+    const mono = (words.slice(0, 2).map((w) => w[0] || '').join('') || 'MV').toUpperCase();
+    const PV = {
+      tenang:  { bg: '#F8EFE6', fg: '#3B2A1E', accent: '#A9612A', monoBg: '#A9612A', monoFg: '#FFFFFF', monoBd: 'none', numFont: "'Manrope', sans-serif", numW: 300 },
+      serambi: { bg: '#0B1114', fg: '#F3F1EA', accent: '#E3B04B', monoBg: 'transparent', monoFg: '#E3B04B', monoBd: '2px solid #E3B04B', numFont: "'Barlow Condensed', sans-serif", numW: 600 },
+      alam:    { bg: 'linear-gradient(180deg,#F6A15A 0%,#E2673A 48%,#9E3320 100%)', fg: '#FFFFFF', accent: '#FFE7B8', monoBg: '#FFFFFF', monoFg: '#9E3320', monoBd: 'none', numFont: "'Outfit', sans-serif", numW: 700 }
+    };
+    const pv = { ...PV[theme], isTenang: theme === 'tenang', isSerambi: theme === 'serambi', isAlam: theme === 'alam' };
+    const themeBtns = [['tenang', 'Tenang'], ['serambi', 'Serambi'], ['alam', 'Alam']].map(([id, label]) => {
+      const on = id === theme;
+      return { label, on, pick: () => this.setState({ theme: id }), bg: on ? '#4FA36B' : '#FFFFFF', fg: on ? '#FFFFFF' : '#10241B', bd: on ? '#4FA36B' : '#C9D9CF' };
+    });
+
+    return {
+      t, tv, tvAsar, arches, name, mono, pv, themeBtns,
+      setName: (e) => this.setState({ name: e.target.value }),
+      devs: [
+        { s: 'Smart TV', t: 'TV pintar Android / Google TV', d: 'Buka pelayar atau Fully Kiosk Browser, masukkan alamat, siap.', icon: 'M3 5h18v11H3Z M8 20h8 M12 16v4' },
+        { s: 'Kotak TV', t: 'TV biasa + kotak Android TV', d: 'Cucuk kotak Android TV ke port HDMI TV lama anda.', icon: 'M5 16h14v3H5Z M3 5h18v8H3Z' },
+        { s: 'Laptop', t: 'Komputer riba atau PC', d: 'Sambung ke TV dengan kabel HDMI, buka Chrome skrin penuh.', icon: 'M5 5h14v10H5Z M2 19h20' },
+        { s: 'Stik TV', t: 'Stik streaming dengan pelayar', d: 'Peranti kecil yang menyokong pelayar web moden.', icon: 'M9 3h6v12H9Z M10 15v6h4v-6' }
+      ],
+      slides: [{ n: 'Kuliah Maghrib', c: '#E7F4EB' }, { n: 'Kutipan Infaq', c: '#FFF1D6' }, { n: 'Poster Gotong-royong', c: '#E6EEF8' }],
+      stats: [
+        { v: '7', l: 'Waktu harian ikut zon', icon: 'M12 7v5l3 2 M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z' },
+        { v: '10', l: 'Templat pengumuman', icon: 'M5 5h14v14H5Z M9 9h6' },
+        { v: '3', l: 'Tema paparan', icon: 'M12 3a9 9 0 1 0 0 18 M12 3v18' },
+        { v: 'RM0', l: 'Yuran, selama-lamanya', icon: 'M5 12l5 5L20 7' }
+      ],
+      before: ['Jam dinding lambat atau mati bateri', 'Notis kertas bertampal dan koyak', 'Poster WhatsApp tidak sampai kepada jemaah', 'TV di dewan solat jarang digunakan'],
+      after: ['Waktu solat dan jam sentiasa tepat', 'Pengumuman tersusun di satu skrin', 'AJK kemas kini dari telefon dalam seminit', 'TV sedia ada menjadi papan maklumat masjid'],
+      features: [
+        { t: 'Waktu solat ikut zon JAKIM', d: 'Berdasarkan data e-Solat JAKIM dan tarikh Hijrah. Pilih lokasi, zon ditetapkan automatik.', icon: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z M12 7v5l3 2' },
+        { t: 'Azan, iqamah, solat', d: 'Amaran sebelum azan, kiraan iqamah dan skrin senyap semasa solat.', icon: 'M12 3v4 M5 21V10a7 7 0 0 1 14 0v11' },
+        { t: 'Mod khutbah Jumaat', d: 'Skrin bertukar secara automatik semasa khutbah dan solat Jumaat.', icon: 'M4 4h16v12H4Z M8 20h8 M9 9h6' },
+        { t: '10 templat siap', d: 'Kuliah, kematian, program, infaq, mesyuarat dan banyak lagi. Isi borang, tekan Terbit.', icon: 'M4 5h16v11H8l-4 4Z' },
+        { t: 'Poster saiz tepat', d: 'Saiz terbaik ditunjukkan semasa muat naik. Gambar dimampatkan automatik.', icon: 'M3 3h18v18H3Z M21 15l-5-5L5 21' },
+        { t: 'Logo dan nama masjid', d: 'Logo dan nama masjid anda di setiap skrin.', icon: 'M12 3l2.5 5 5.5.8-4 3.9.9 5.5L12 15.6 7.1 18.2l.9-5.5-4-3.9 5.5-.8Z' },
+        { t: 'Beberapa skrin', d: 'Dewan utama, ruang wanita, pintu masuk: tema dan susun atur berbeza.', icon: 'M2 4h13v9H2Z M17 8h5v9h-5' },
+        { t: 'Tanpa internet pun jalan', d: 'Waktu setahun disimpan dalam TV. Menyegerak semula bila talian pulih.', icon: 'M2 8.5a15 15 0 0 1 20 0 M5 12a10 10 0 0 1 14 0 M12 19h.01' }
+      ],
+      day: [
+        { tag: 'NORMAL', big: '1:20', bg: '#EAF3F8', fg: '#14303D', font: "'Manrope', sans-serif", time: 'Sepanjang hari', t: 'Waktu dan pengumuman', d: 'Jam, tarikh Hijrah dan poster bergilir.' },
+        { tag: 'SEBELUM AZAN', big: '5:00', bg: '#FFF1D6', fg: '#6B4A12', font: "'Manrope', sans-serif", time: '5 minit sebelum', t: 'Amaran awal', d: 'Jemaah tahu waktu hampir masuk.' },
+        { tag: 'AZAN', big: 'الظهر', bg: '#2F7D4B', fg: '#FFFFFF', font: "'Noto Naskh Arabic', serif", time: 'Masuk waktu', t: 'Skrin penuh', d: 'Nama waktu dalam rumi dan Arab.' },
+        { tag: 'IQAMAH', big: '07:42', bg: '#0A0F0D', fg: '#F5D33B', font: "'Manrope', sans-serif", time: 'Ikut tetapan AJK', t: 'Kiraan iqamah', d: '"Luruskan dan rapatkan saf."' },
+        { tag: 'SOLAT', big: '· · ·', bg: '#050505', fg: '#5A5A5A', font: "'Manrope', sans-serif", time: 'Semasa solat', t: 'Skrin senyap', d: 'Hampir gelap supaya tidak mengganggu.' }
+      ],
+      nav: ['Utama', 'Kandungan', 'Skrin', 'Tetapan', 'Ahli'].map((x, i) => ({ t: x, bg: i === 1 ? '#E1F1E6' : 'transparent', fg: i === 1 ? '#2F7D4B' : '#5A6D64' })),
+      fields: [{ l: 'Tajuk', v: 'Adab Menuntut Ilmu' }, { l: 'Penceramah', v: 'Ustaz [Nama]' }, { l: 'Masa', v: 'Selepas Maghrib' }, { l: 'Papar sehingga', v: 'Khamis, 23 Okt' }],
+      tplMini: [{ n: 'Kuliah', c: '#E7F4EB' }, { n: 'Kematian', c: '#ECECEC' }, { n: 'Program', c: '#E3F4F4' }, { n: 'Infaq', c: '#FFF1D6' }, { n: 'Mesyuarat', c: '#F7EAE3' }, { n: 'Imam & Bilal', c: '#EEE8F7' }],
+      app: [
+        { t: 'Log masuk dengan Google', d: 'Tiada kata laluan untuk diingat. E-mel pautan ajaib juga disokong.' },
+        { t: 'Pratonton sebelum terbit', d: 'Lihat rupa sebenar dalam tema skrin anda.' },
+        { t: 'Jadualkan pengumuman', d: 'Tarikh mula, tamat dan hari tertentu. Tamat sendiri.' },
+        { t: 'Dua pentadbir', d: 'Jemput seorang lagi AJK sebagai pentadbir. Kedua-duanya mempunyai akses penuh.' }
+      ],
+      tpl: [
+        { n: 'Pengumuman Am', d: 'Tajuk dan teks ringkas', bg: '#E6EEF8', fg: '#1F4E8A' },
+        { n: 'Kuliah / Ceramah', d: 'Tajuk, penceramah, masa', bg: '#E3F1EA', fg: '#2F7D4B' },
+        { n: 'Kematian', d: 'Solat jenazah, tamat automatik', bg: '#ECECEC', fg: '#3A3A3A' },
+        { n: 'Program', d: 'Tarikh, tempat, hubungi', bg: '#E3F4F4', fg: '#11666A' },
+        { n: 'Kutipan / Infaq', d: 'Sasaran, kemajuan, QR', bg: '#FFF1D6', fg: '#8A5300' },
+        { n: 'Mesyuarat', d: 'Notis rasmi AJK', bg: '#F7EAE3', fg: '#8A3F14' },
+        { n: 'Imam & Bilal', d: 'Jadual mingguan', bg: '#EEE8F7', fg: '#5B3D8F' },
+        { n: 'Penyata Kewangan', d: 'Kutipan, belanja, baki', bg: '#E8F0E3', fg: '#3E6A1F' },
+        { n: 'Ayat / Hadith', d: 'Daripada sumber sahih', bg: '#F3EEDF', fg: '#6E5A1E' },
+        { n: 'Ucapan Perayaan', d: 'Aidilfitri, Aidiladha dan lain-lain', bg: '#FBE8EE', fg: '#8A2A4A' }
+      ],
+      themes: [
+        { n: 'Tenang', d: 'Minimal dan lapang, warna pastel yang lembut.', bg: '#EAF3F8', fg: '#14303D', w: 300, font: "'Manrope', sans-serif", clock: '1:20', bar: '#D3E3EC', hi: '#FFFFFF' },
+        { n: 'Serambi', d: 'Gelap dengan gerbang langit dan sentuhan emas.', bg: '#0B1114', fg: '#F3F1EA', w: 600, font: "'Barlow Condensed', sans-serif", clock: '7:15', bar: '#1E2A30', hi: '#E3B04B' },
+        { n: 'Alam', d: 'Langit dan landskap yang berubah sepanjang hari.', bg: 'linear-gradient(180deg,#F6A15A,#9E3320)', fg: '#FFFFFF', w: 700, font: "'Outfit', sans-serif", clock: '7:06', bar: 'rgba(0,0,0,0.25)', hi: 'rgba(255,255,255,0.9)' }
+      ],
+      steps: [
+        { n: '1', t: 'Daftar', d: 'Log masuk dengan Google, isi nama masjid dan pilih lokasi. Zon JAKIM ditetapkan automatik.' },
+        { n: '2', t: 'Diluluskan', d: 'Kami semak pendaftaran, biasanya dalam 1–2 hari bekerja. Anda akan menerima e-mel.' },
+        { n: '3', t: 'Pasang TV', d: 'Buka masjidview.my/tv pada TV. Masukkan kod 6 digit di telefon anda.' },
+        { n: '4', t: 'Terbit pengumuman', d: 'Pilih templat atau muat naik poster. Ia muncul di TV dalam masa seminit.' }
+      ],
+      faq: [
+        { open: true, q: 'Adakah Masjid View benar-benar percuma?', a: 'Ya. Tiada yuran pendaftaran, langganan atau caj tersembunyi untuk masjid dan surau.' },
+        { open: false, q: 'TV jenis apa yang boleh digunakan?', a: 'Mana-mana TV yang ada pelayar web moden: TV pintar Android atau Google TV, TV biasa dengan kotak Android TV, atau komputer riba yang disambungkan ke TV melalui HDMI.' },
+        { open: false, q: 'Perlukah saya muat turun aplikasi?', a: 'Tidak. Masjid View berjalan dalam pelayar web. Untuk TV Android, kami cadangkan Fully Kiosk Browser supaya skrin dibuka secara automatik apabila TV dihidupkan.' },
+        { open: false, q: 'Dari mana waktu solat diambil?', a: 'Berdasarkan data e-Solat JAKIM mengikut zon masjid anda. Anda boleh semak waktu hari ini semasa mendaftar.' },
+        { open: false, q: 'Perlukah internet sepanjang masa?', a: 'Tidak. Internet diperlukan untuk mengemas kini pengumuman. Waktu solat disimpan dalam TV supaya skrin terus berfungsi jika WiFi terputus.' },
+        { open: false, q: 'Boleh ubah minit iqamah?', a: 'Boleh. Pentadbir menetapkan minit iqamah bagi setiap waktu, serta tempoh khutbah Jumaat.' },
+        { open: false, q: 'Berapa orang boleh mengurus satu masjid?', a: 'Dua orang pentadbir dengan akses yang sama. Pentadbir pertama menjemput yang kedua melalui e-mel. Setiap akaun hanya boleh mengurus satu masjid. Apabila AJK bertukar, pentadbir boleh membuang dan menjemput semula, atau hubungi kami.' },
+        { open: false, q: 'Boleh guna lebih daripada satu TV?', a: 'Boleh. Setiap skrin dipasang dengan kod tersendiri dan boleh menggunakan tema serta susun atur berbeza.' },
+        { open: false, q: 'Surau kecil pun boleh guna?', a: 'Boleh. Masjid View sesuai untuk masjid besar dan surau kecil.' },
+        { open: false, q: 'Bagaimana data peribadi dilindungi?', a: 'Kami hanya menyimpan maklumat yang perlu untuk menguruskan paparan. Pengumuman kematian dipadam secara automatik. Baca Notis Privasi untuk butiran.' }
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

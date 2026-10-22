@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { ROUTES, canOpen, pickCurrentOrg, routeAfterSignIn, type Membership, type OrgStatus } from "./routing";
+import { ROUTES, pickCurrentOrg, routeAfterSignIn, type Membership, type OrgStatus } from "./routing";
 
 const org = (id: string, status: OrgStatus, role: Membership["role"] = "pentadbir"): Membership => ({
   orgId: id, role, status, statusReason: null, fullName: `Masjid ${id}`, shortName: id, kind: "masjid", zone: "SGR01", state: "Selangor", district: "Gombak", logoPath: null, accentColor: "#146C4A",
@@ -29,14 +29,4 @@ describe("pickCurrentOrg", () => {
     expect(pickCurrentOrg(orgs, "gone")?.orgId).toBe("a");
   });
   it("none when nothing is active", () => expect(pickCurrentOrg([org("c", "pending")], null)).toBeNull());
-});
-
-describe("canOpen (PRD §3)", () => {
-  it("Ahli is Pentadbir-only; editors can open the rest (Tetapan read-only)", () => {
-    expect(canOpen(ROUTES.settings, "editor")).toBe(true);
-    expect(canOpen(ROUTES.members, "editor")).toBe(false);
-    expect(canOpen(ROUTES.settings, "pentadbir")).toBe(true);
-    expect(canOpen(ROUTES.content, "editor")).toBe(true);
-    expect(canOpen(ROUTES.screens, "editor")).toBe(true);
-  });
 });

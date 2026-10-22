@@ -1,5 +1,5 @@
 "use client";
-// Tetapan (PRD Phase 2 §4.6, designs/admin/Settings). Pentadbir edits; editors see it read-only.
+// Tetapan (PRD Phase 2 §4.6, designs/admin/Settings). Both admins of a masjid can change everything.
 // Optimistic saves: the screen changes at once; on error it goes back and a toast says why.
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -56,7 +56,6 @@ export function SettingsView() {
   const router = useRouter();
   const { toast, node: toasts } = useToasts();
   const orgId = a.current!.orgId;
-  const ro = a.role !== "pentadbir";
 
   const [org, setOrg] = useState<OrgRow | null>(null);
   const [set, setSet] = useState<SettingsRow | null>(null);
@@ -170,31 +169,24 @@ export function SettingsView() {
   return (
     <>
       <h1 className="text-[26px] font-extrabold tracking-[-0.3px] lg:hidden">{t("settings.title")}</h1>
-      {ro && (
-        <p role="note" className="flex items-start gap-2.5 rounded-xl bg-[#FFF4DF] px-4 py-3 text-[14px] leading-[1.45] text-[#6B4A12]">
-          {t("settings.readOnly")}
-        </p>
-      )}
       <div className="grid grid-cols-1 items-start gap-4 lg:grid-cols-2 lg:gap-5">
         <div className="flex flex-col gap-4 lg:gap-5">
-          <BrandCard org={org} ro={ro} orgId={orgId} saveOrg={saveOrg} toast={toast} onLogo={(p) => setOrg((o) => (o ? { ...o, logo_path: p } : o))} />
-          <ZoneCard org={org} ro={ro} saveOrg={saveOrg} />
+          <BrandCard org={org} orgId={orgId} saveOrg={saveOrg} toast={toast} onLogo={(p) => setOrg((o) => (o ? { ...o, logo_path: p } : o))} />
+          <ZoneCard org={org} saveOrg={saveOrg} />
         </div>
         <div className="flex flex-col gap-4 lg:gap-5">
-          <IqamahCard set={set} ro={ro} saveSet={saveSet} />
-          <DisplayCard set={set} ro={ro} saveSet={saveSet} />
+          <IqamahCard set={set} saveSet={saveSet} />
+          <DisplayCard set={set} saveSet={saveSet} />
           <section aria-labelledby="set-app" className={`${card} gap-3`}>
             <h2 id="set-app" className={h2}>{t("settings.app")}</h2>
             <div className="flex items-center justify-between gap-3">
               <span id="set-lang" className="text-[15px] font-semibold">{t("settings.language")}</span>
               <Segmented labelledBy="set-lang" value={lang} options={[["ms", t("lang.ms")], ["en", t("settings.langEn")]]} onChange={(v) => saveLang(v as Lang)} />
             </div>
-            {!ro && (
-              <Link href={ROUTES.members} className="flex h-12 items-center justify-between border-t border-adm-hair text-[15px] font-semibold text-adm-ink hover:text-adm-green">
-                {t("settings.members", { n: members ?? "–" })}
-                <Icon d="M9 6l6 6-6 6" size={18} className="text-adm-muted" />
-              </Link>
-            )}
+            <Link href={ROUTES.members} className="flex h-12 items-center justify-between border-t border-adm-hair text-[15px] font-semibold text-adm-ink hover:text-adm-green">
+              {t("settings.members", { n: members ?? "–" })}
+              <Icon d="M9 6l6 6-6 6" size={18} className="text-adm-muted" />
+            </Link>
             <button
               type="button"
               onClick={async () => {
@@ -242,8 +234,8 @@ function Segmented({ value, options, onChange, disabled, labelledBy }: { value: 
   );
 }
 
-function BrandCard({ org, ro, orgId, saveOrg, toast, onLogo }: {
-  org: OrgRow; ro: boolean; orgId: string;
+function BrandCard({ org, orgId, saveOrg, toast, onLogo }: {
+  org: OrgRow; orgId: string;
   saveOrg: (p: Partial<OrgRow>, okText?: string) => Promise<boolean>;
   toast: (k: "ok" | "warn" | "error", text: string) => void;
   onLogo: (path: string | null) => void;
@@ -322,10 +314,10 @@ function BrandCard({ org, ro, orgId, saveOrg, toast, onLogo }: {
           </div>
         )}
         <input ref={fileRef} type="file" accept="image/png,image/jpeg,image/webp" className="sr-only" tabIndex={-1} aria-hidden="true" onChange={(e) => pickLogo(e.target.files?.[0])} />
-        <button type="button" disabled={ro || busy} onClick={() => fileRef.current?.click()} className={smallBtn}>
+        <button type="button" disabled={busy} onClick={() => fileRef.current?.click()} className={smallBtn}>
           {busy ? t("settings.logoWorking") : org.logo_path ? t("settings.logoChange") : t("settings.logoAdd")}
         </button>
-        {org.logo_path && !ro && (
+        {org.logo_path && (
           <button type="button" disabled={busy} onClick={dropLogo} className="h-10 px-1 text-[13px] font-bold text-adm-danger disabled:opacity-50">
             {t("settings.logoRemove")}
           </button>
@@ -335,7 +327,7 @@ function BrandCard({ org, ro, orgId, saveOrg, toast, onLogo }: {
         className="flex flex-col gap-3"
         onSubmit={async (e) => {
           e.preventDefault();
-          if (ro || !dirty || fullErr || shortErr) return;
+          if (!dirty || fullErr || shortErr) return;
           setSaving(true);
           await saveOrg({ full_name: full.trim(), short_name: short.trim() });
           setSaving(false);
@@ -343,15 +335,15 @@ function BrandCard({ org, ro, orgId, saveOrg, toast, onLogo }: {
       >
         <div className="flex flex-col gap-1.5">
           <label htmlFor="set-fn" className={fieldLabel}>{t("register.fullName")}</label>
-          <input id="set-fn" value={full} disabled={ro} maxLength={LIMITS.fullNameMax} onChange={(e) => setFull(e.target.value)} aria-invalid={Boolean(fullErr)} className={input} />
+          <input id="set-fn" value={full} maxLength={LIMITS.fullNameMax} onChange={(e) => setFull(e.target.value)} aria-invalid={Boolean(fullErr)} className={input} />
           {fullErr && dirty && <p className="text-[13px] font-semibold text-adm-danger">{t(fullErr)}</p>}
         </div>
         <div className="flex flex-col gap-1.5">
           <label htmlFor="set-sn" className={fieldLabel}>{t("register.shortName")}</label>
-          <input id="set-sn" value={short} disabled={ro} maxLength={LIMITS.shortNameMax} onChange={(e) => setShort(e.target.value)} aria-invalid={Boolean(shortErr)} aria-describedby="set-sn-hint" className={input} />
+          <input id="set-sn" value={short} maxLength={LIMITS.shortNameMax} onChange={(e) => setShort(e.target.value)} aria-invalid={Boolean(shortErr)} aria-describedby="set-sn-hint" className={input} />
           <p id="set-sn-hint" className={`text-[12px] ${shortErr && dirty ? "font-semibold text-adm-danger" : "text-adm-muted"}`}>{shortErr && dirty ? t(shortErr) : t("register.shortNameHint")}</p>
         </div>
-        {!ro && dirty && (
+        {dirty && (
           <button type="submit" disabled={saving || Boolean(fullErr || shortErr)} className={`${primaryBtn} self-start`}>
             {saving ? t("settings.saving") : t("settings.saveNames")}
           </button>
@@ -369,7 +361,7 @@ function BrandCard({ org, ro, orgId, saveOrg, toast, onLogo }: {
                 role="radio"
                 aria-checked={on}
                 aria-label={t(`settings.swatch.${s.key}`)}
-                disabled={ro}
+               
                 onClick={() => !on && saveOrg({ accent_color: s.color })}
                 style={{ background: s.color }}
                 className={`flex h-11 w-11 items-center justify-center rounded-full border-[3px] text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green disabled:cursor-not-allowed ${on ? "border-adm-ink" : "border-white shadow-[0_0_0_1px_#C9D8D0]"}`}
@@ -384,7 +376,7 @@ function BrandCard({ org, ro, orgId, saveOrg, toast, onLogo }: {
   );
 }
 
-function ZoneCard({ org, ro, saveOrg }: { org: OrgRow; ro: boolean; saveOrg: (p: Partial<OrgRow>, okText?: string) => Promise<boolean> }) {
+function ZoneCard({ org, saveOrg }: { org: OrgRow; saveOrg: (p: Partial<OrgRow>, okText?: string) => Promise<boolean> }) {
   const { t } = useT();
   const saved = useMemo<ZoneChoice>(() => ({ zone: org.zone, state: org.state, district: org.district, source: "current" }), [org.zone, org.state, org.district]);
   const [draft, setDraft] = useState<ZoneChoice | null>(saved);
@@ -407,8 +399,8 @@ function ZoneCard({ org, ro, saveOrg }: { org: OrgRow; ro: boolean; saveOrg: (p:
 
   return (
     <div className="flex flex-col gap-3">
-      <ZonePicker key={key} value={draft} onChange={setDraft} disabled={ro} id="set-zone" />
-      {!ro && changed && (
+      <ZonePicker key={key} value={draft} onChange={setDraft} id="set-zone" />
+      {changed && (
         <div className="flex flex-wrap gap-2">
           <button type="button" onClick={() => setConfirm(true)} className={primaryBtn}>
             {t("settings.saveZone")}
@@ -440,19 +432,19 @@ function ZoneCard({ org, ro, saveOrg }: { org: OrgRow; ro: boolean; saveOrg: (p:
   );
 }
 
-function Stepper({ label, value, display, onStep, disabled, atMin, atMax, lessLabel, moreLabel }: {
-  label: ReactNode; value: number; display: string; onStep: (d: number) => void; disabled: boolean; atMin: boolean; atMax: boolean; lessLabel: string; moreLabel: string;
+function Stepper({ label, value, display, onStep, atMin, atMax, lessLabel, moreLabel }: {
+  label: ReactNode; value: number; display: string; onStep: (d: number) => void; atMin: boolean; atMax: boolean; lessLabel: string; moreLabel: string;
 }) {
   const btn = "flex h-11 w-11 items-center justify-center rounded-[10px] border border-adm-line bg-white text-[20px] text-adm-ink hover:bg-adm-ground focus-visible:outline-2 focus-visible:outline-adm-green disabled:opacity-40";
   return (
     <div className="flex h-14 items-center justify-between border-t border-adm-hair">
       <span className="text-[15px] font-bold">{label}</span>
       <div className="flex items-center gap-1">
-        <button type="button" aria-label={lessLabel} disabled={disabled || atMin} onClick={() => onStep(-1)} className={btn}>
+        <button type="button" aria-label={lessLabel} disabled={atMin} onClick={() => onStep(-1)} className={btn}>
           −
         </button>
         <output aria-live="polite" data-value={value} className="w-[68px] text-center text-[15px] font-extrabold">{display}</output>
-        <button type="button" aria-label={moreLabel} disabled={disabled || atMax} onClick={() => onStep(1)} className={btn}>
+        <button type="button" aria-label={moreLabel} disabled={atMax} onClick={() => onStep(1)} className={btn}>
           +
         </button>
       </div>
@@ -460,7 +452,7 @@ function Stepper({ label, value, display, onStep, disabled, atMin, atMax, lessLa
   );
 }
 
-function IqamahCard({ set, ro, saveSet }: { set: SettingsRow; ro: boolean; saveSet: (p: Partial<SettingsRow>, debounce?: number) => Promise<boolean | undefined> }) {
+function IqamahCard({ set, saveSet }: { set: SettingsRow; saveSet: (p: Partial<SettingsRow>, debounce?: number) => Promise<boolean | undefined> }) {
   const { t } = useT();
   return (
     <section aria-labelledby="set-iq" className={`${card} gap-1`}>
@@ -475,7 +467,7 @@ function IqamahCard({ set, ro, saveSet }: { set: SettingsRow; ro: boolean; saveS
             label={name}
             value={v}
             display={t("settings.minutes", { n: v })}
-            disabled={ro}
+           
             atMin={v <= IQAMAH.min}
             atMax={v >= IQAMAH.max}
             lessLabel={t("settings.less", { name })}
@@ -488,7 +480,7 @@ function IqamahCard({ set, ro, saveSet }: { set: SettingsRow; ro: boolean; saveS
         label={t("settings.khutbah")}
         value={set.durations.khutbahMin}
         display={t("settings.minutes", { n: set.durations.khutbahMin })}
-        disabled={ro}
+       
         atMin={set.durations.khutbahMin <= KHUTBAH.min}
         atMax={set.durations.khutbahMin >= KHUTBAH.max}
         lessLabel={t("settings.less", { name: t("settings.khutbah") })}
@@ -499,7 +491,7 @@ function IqamahCard({ set, ro, saveSet }: { set: SettingsRow; ro: boolean; saveS
   );
 }
 
-function DisplayCard({ set, ro, saveSet }: { set: SettingsRow; ro: boolean; saveSet: (p: Partial<SettingsRow>, debounce?: number) => Promise<boolean | undefined> }) {
+function DisplayCard({ set, saveSet }: { set: SettingsRow; saveSet: (p: Partial<SettingsRow>, debounce?: number) => Promise<boolean | undefined> }) {
   const { t } = useT();
   const [lines, setLines] = useState<string[]>(set.ticker.length ? set.ticker : [""]);
   const [saving, setSaving] = useState(false);
@@ -516,7 +508,7 @@ function DisplayCard({ set, ro, saveSet }: { set: SettingsRow; ro: boolean; save
           role="switch"
           aria-checked={set.show_arabic}
           aria-labelledby="set-ar"
-          disabled={ro}
+         
           onClick={() => saveSet({ show_arabic: !set.show_arabic })}
           className={`relative h-7 w-[46px] flex-none rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green disabled:opacity-60 ${set.show_arabic ? "bg-adm-green" : "bg-[#B9C8C0]"}`}
         >
@@ -525,13 +517,13 @@ function DisplayCard({ set, ro, saveSet }: { set: SettingsRow; ro: boolean; save
       </div>
       <div className="flex items-center justify-between gap-3">
         <span id="set-clock" className="text-[15px] font-semibold">{t("settings.clock")}</span>
-        <Segmented labelledBy="set-clock" disabled={ro} value={set.clock_24h ? "24" : "12"} options={[["12", t("settings.clock12")], ["24", t("settings.clock24")]]} onChange={(v) => saveSet({ clock_24h: v === "24" })} />
+        <Segmented labelledBy="set-clock" value={set.clock_24h ? "24" : "12"} options={[["12", t("settings.clock12")], ["24", t("settings.clock24")]]} onChange={(v) => saveSet({ clock_24h: v === "24" })} />
       </div>
       <form
         className="flex flex-col gap-2"
         onSubmit={async (e) => {
           e.preventDefault();
-          if (ro || !dirty || cleaned.error) return;
+          if (!dirty || cleaned.error) return;
           setSaving(true);
           const ok = await saveSet({ ticker: cleaned.lines });
           setSaving(false);
@@ -547,7 +539,7 @@ function DisplayCard({ set, ro, saveSet }: { set: SettingsRow; ro: boolean; save
               <div className="flex flex-1 flex-col gap-1">
                 <input
                   value={l}
-                  disabled={ro}
+                 
                   maxLength={TICKER.chars}
                   aria-label={t("settings.tickerLine", { n: i + 1 })}
                   onChange={(e) => setLines((ls) => ls.map((x, j) => (j === i ? e.target.value : x)))}
@@ -555,7 +547,7 @@ function DisplayCard({ set, ro, saveSet }: { set: SettingsRow; ro: boolean; save
                 />
                 <span aria-hidden="true" className={`self-end text-[11px] ${len > TICKER.chars ? "font-bold text-adm-danger" : "text-adm-muted"}`}>{len}/{TICKER.chars}</span>
               </div>
-              {!ro && lines.length > 1 && (
+              {lines.length > 1 && (
                 <button type="button" aria-label={t("settings.tickerRemove", { n: i + 1 })} onClick={() => setLines((ls) => ls.filter((_, j) => j !== i))} className="flex h-[46px] w-11 flex-none items-center justify-center rounded-xl text-adm-muted hover:bg-adm-ground hover:text-adm-danger">
                   <Icon d={ICON.close} size={18} />
                 </button>
@@ -565,12 +557,12 @@ function DisplayCard({ set, ro, saveSet }: { set: SettingsRow; ro: boolean; save
         })}
         {cleaned.error && <p className="text-[13px] font-semibold text-adm-danger">{t(cleaned.error)}</p>}
         <div className="flex flex-wrap items-center gap-2">
-          {!ro && lines.length < TICKER.lines && (
+          {lines.length < TICKER.lines && (
             <button type="button" onClick={() => setLines((ls) => [...ls, ""])} className="h-11 px-1 text-[14px] font-bold text-adm-green">
               {t("settings.tickerAdd")}
             </button>
           )}
-          {!ro && dirty && (
+          {dirty && (
             <button type="submit" disabled={saving || Boolean(cleaned.error)} className={`${primaryBtn} ml-auto`}>
               {saving ? t("settings.saving") : t("settings.saveTicker")}
             </button>

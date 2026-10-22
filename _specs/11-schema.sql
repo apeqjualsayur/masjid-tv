@@ -1,11 +1,12 @@
 -- =====================================================================
 -- Masjid View — Phase 2 database schema (Supabase / Postgres 15+)
--- v0.5 — full current schema. A fresh project gets the same result from running this file once,
--- or from supabase/migrations/0001_init.sql (= v0.1) followed by the numbered migrations after it.
--- Changes since v0.1: 0002 pair_claim returns NULL on a wrong code (records the failed attempt);
--- 0003 platform_org_list() for the Platform page (registrant e-mail, screens, storage; owners only);
--- 0004 storage select policy for own-folder files (Storage only deletes files the user can select);
--- 0005 reorder_slides() saves the playlist order in one request (SECURITY INVOKER, RLS applies).
+-- v0.3 — up to 2 equal admins (Pentadbir) per masjid; one masjid per account
+-- plus this repo's applied migrations, merged in: 0002 pair_claim records failed attempts (returns NULL
+-- on a wrong code), 0003 platform_org_list(), 0004 storage select policy (so deletes work),
+-- 0005 reorder_slides(). Account rules = 0006_account_rules.sql (= 13-account-rules-migration.sql).
+-- Note: the Friday fields in org_settings.durations come from 14-friday-migration.sql.
+-- source of truth for supabase/migrations/0001_init.sql
+-- Run once on a fresh project (SQL editor or `supabase db push`).
 -- =====================================================================
 
 create extension if not exists pgcrypto;
@@ -15,7 +16,7 @@ create extension if not exists pgcrypto;
 -- 1. Types
 -- ---------------------------------------------------------------------
 create type public.org_status   as enum ('pending', 'active', 'rejected', 'suspended');
-create type public.member_role  as enum ('pentadbir', 'editor');
+create type public.member_role  as enum ('pentadbir');   -- every member is an equal admin
 create type public.slide_type   as enum ('poster', 'template');
 create type public.slide_status as enum ('draft', 'published', 'paused');
 create type public.theme_key    as enum ('alam', 'serambi', 'tenang');
@@ -64,24 +65,26 @@ create table public.members (
   created_at timestamptz not null default now(),
   primary key (org_id, user_id)
 );
-create index members_user_idx on public.members (user_id);
+-- One masjid per account; at most 2 accounts per masjid (trigger members_max_two).
+create index members_org_idx on public.members (org_id);
+create unique index members_one_per_user on public.members (user_id);
 
 create table public.invitations (
   id          uuid primary key default gen_random_uuid(),
   org_id      uuid not null references public.organisations on delete cascade,
   email       text not null check (email = lower(email) and position('@' in email) > 1),
-  role        public.member_role not null default 'editor',
   invited_by  uuid references auth.users on delete set null,
   created_at  timestamptz not null default now(),
   expires_at  timestamptz not null default now() + interval '14 days',
   accepted_at timestamptz
 );
-create unique index invitations_open_uniq on public.invitations (org_id, email) where accepted_at is null;
+-- a masjid can have only one open invitation (it can only ever add one more admin)
+create unique index invitations_one_open on public.invitations (org_id) where accepted_at is null;
 
 create table public.org_settings (
   org_id      uuid primary key references public.organisations on delete cascade,
   iqamah_min  jsonb not null default '{"subuh":10,"zohor":10,"asar":10,"maghrib":7,"isyak":10}',
-  durations   jsonb not null default '{"preAzanMin":5,"azanMin":3,"solatMin":12,"khutbahMin":40}',
+  durations   jsonb not null default '{"preAzanMin":5,"azanMin":3,"solatMin":12,"khutbahMin":40,"jumaatSolatMin":12,"showFridayInfo":true}',
   clock_24h   boolean not null default false,
   show_arabic boolean not null default true,
   ticker      text[] not null default '{}' check (cardinality(ticker) <= 5),
@@ -295,6 +298,19 @@ create constraint trigger members_keep_pentadbir after update or delete on publi
   deferrable initially deferred
   for each row execute function public.members_keep_pentadbir();
 
+-- members: at most 2 per masjid (locks the org row so two accepts cannot race)
+create or replace function public.members_max_two()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  perform 1 from organisations where id = new.org_id for update;
+  if (select count(*) from members where org_id = new.org_id and user_id <> new.user_id) >= 2 then
+    raise exception 'org_full' using errcode = 'P0001';
+  end if;
+  return new;
+end $$;
+create trigger members_max_two before insert or update of org_id on public.members
+  for each row execute function public.members_max_two();
+
 -- profile row on signup
 create or replace function public.handle_new_user()
 returns trigger language plpgsql security definer set search_path = public as $$
@@ -341,16 +357,14 @@ create policy org_update on public.organisations for update to authenticated
 -- members
 create policy members_select on public.members for select to authenticated
   using (public.is_member(org_id) or public.is_platform_admin());
-create policy members_update on public.members for update to authenticated
-  using (public.is_pentadbir(org_id)) with check (public.is_pentadbir(org_id));
+-- either admin may remove the other or leave (never the last one: members_keep_pentadbir)
 create policy members_delete on public.members for delete to authenticated
-  using (public.is_pentadbir(org_id) or user_id = auth.uid());
+  using (public.is_pentadbir(org_id));
+-- no insert/update policies: rows are written only by register_org, accept_invitations, transfer_org
 
--- invitations
+-- invitations (created only via invite_member)
 create policy inv_select on public.invitations for select to authenticated
   using (public.is_pentadbir(org_id) or public.is_platform_admin());
-create policy inv_insert on public.invitations for insert to authenticated
-  with check (public.is_pentadbir(org_id) and public.is_active_org(org_id) and invited_by = auth.uid());
 create policy inv_delete on public.invitations for delete to authenticated
   using (public.is_pentadbir(org_id));
 
@@ -377,7 +391,7 @@ create policy media_insert on public.media for insert to authenticated
 create policy media_delete on public.media for delete to authenticated
   using (public.is_pentadbir(org_id) or created_by = auth.uid());
 
--- slides (editors + pentadbir of active orgs)
+-- slides (the masjid's account, active orgs only)
 create policy slides_select on public.slides for select to authenticated
   using (public.is_member(org_id) or public.is_platform_admin());
 create policy slides_insert on public.slides for insert to authenticated
@@ -388,7 +402,6 @@ create policy slides_update on public.slides for update to authenticated
 create policy slides_delete on public.slides for delete to authenticated
   using (public.is_member(org_id));
 
--- members.role changes, screens, settings: editors blocked by is_pentadbir above.
 
 -- ---------------------------------------------------------------------
 -- 6. RPC functions — admin
@@ -397,11 +410,19 @@ create or replace function public.register_org(
   p_kind text, p_full_name text, p_short_name text, p_state text, p_district text,
   p_zone text, p_address text default null, p_phone text default null)
 returns uuid language plpgsql security definer set search_path = public as $$
-declare v_id uuid;
+declare v_id uuid; v_old uuid; v_old_status public.org_status;
 begin
   if auth.uid() is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
-  if (select count(*) from organisations where created_by = auth.uid() and status = 'pending') >= 3 then
-    raise exception 'too_many_pending' using errcode = 'P0001';
+  -- one masjid per account; a rejected registration may be replaced by a new one
+  select m.org_id, o.status into v_old, v_old_status
+    from members m join organisations o on o.id = m.org_id
+   where m.user_id = auth.uid();
+  if v_old is not null then
+    if v_old_status = 'rejected' then
+      delete from organisations where id = v_old;
+    else
+      raise exception 'already_has_org' using errcode = 'P0001';
+    end if;
   end if;
   insert into organisations (kind, full_name, short_name, state, district, zone, address, contact_phone, created_by)
   values (p_kind, trim(p_full_name), trim(p_short_name), p_state, p_district, upper(p_zone), p_address, p_phone, auth.uid())
@@ -442,6 +463,28 @@ begin
   update organisations set logo_path = p_path where id = p_org;
 end $$;
 
+-- Invite the second admin. Only an admin of an active masjid with 1 member and no open invitation.
+create or replace function public.invite_member(p_org uuid, p_email text)
+returns uuid language plpgsql security definer set search_path = public as $$
+declare v_email text := lower(trim(p_email)); v_id uuid;
+begin
+  if not public.is_pentadbir(p_org) then raise exception 'not_allowed' using errcode = '42501'; end if;
+  if not public.is_active_org(p_org) then raise exception 'org_not_active' using errcode = 'P0001'; end if;
+  if v_email !~ '^[^@[:space:]]+@[^@[:space:]]+\.[^@[:space:]]+$' then raise exception 'bad_email' using errcode = 'P0001'; end if;
+  if (select count(*) from members where org_id = p_org) >= 2 then raise exception 'org_full' using errcode = 'P0001'; end if;
+  if exists (select 1 from members m join auth.users u on u.id = m.user_id where lower(u.email) = v_email) then
+    raise exception 'user_has_org' using errcode = 'P0001';
+  end if;
+  delete from invitations where org_id = p_org and accepted_at is null and expires_at < now();
+  if exists (select 1 from invitations where org_id = p_org and accepted_at is null) then
+    raise exception 'invite_pending' using errcode = 'P0001';
+  end if;
+  insert into invitations (org_id, email, invited_by) values (p_org, v_email, auth.uid()) returning id into v_id;
+  return v_id;
+end $$;
+
+-- Called after every sign-in. Joins the masjid if this email has a valid invitation
+-- and the account has no masjid yet. Returns the org id joined, or null.
 -- Platform page list (0003): registrant e-mail from auth.users, screen + storage totals. Owners only.
 create or replace function public.platform_org_list()
 returns table (
@@ -510,19 +553,55 @@ begin
 end $;
 
 create or replace function public.accept_invitations()
-returns int language plpgsql security definer set search_path = public as $$
-declare v_email text := lower(auth.jwt() ->> 'email'); v_count int := 0; r record;
+returns uuid language plpgsql security definer set search_path = public as $$
+declare v_email text := lower(auth.jwt() ->> 'email'); r record;
 begin
-  if auth.uid() is null or v_email is null then return 0; end if;
-  for r in select * from invitations
-           where email = v_email and accepted_at is null and expires_at > now()
-  loop
-    insert into members (org_id, user_id, role) values (r.org_id, auth.uid(), r.role)
-      on conflict (org_id, user_id) do nothing;
-    update invitations set accepted_at = now() where id = r.id;
-    v_count := v_count + 1;
-  end loop;
-  return v_count;
+  if auth.uid() is null or v_email is null then return null; end if;
+  if exists (select 1 from members where user_id = auth.uid()) then return null; end if;
+  select * into r from invitations
+   where email = v_email and accepted_at is null and expires_at > now()
+   order by created_at limit 1;
+  if r.id is null then return null; end if;
+  if not public.is_active_org(r.org_id) or (select count(*) from members where org_id = r.org_id) >= 2 then
+    return null;
+  end if;
+  insert into members (org_id, user_id, role) values (r.org_id, auth.uid(), 'pentadbir');
+  update invitations set accepted_at = now() where id = r.id;
+  return r.org_id;
+end $$;
+
+-- Names and emails of the (max 2) admins of a masjid, for the Ahli page.
+create or replace function public.org_members(p_org uuid)
+returns table (user_id uuid, email text, display_name text, created_at timestamptz, is_me boolean)
+language sql stable security definer set search_path = public as $$
+  select m.user_id, u.email::text, p.display_name, m.created_at, m.user_id = auth.uid()
+    from members m join auth.users u on u.id = m.user_id
+    left join profiles p on p.user_id = m.user_id
+   where m.org_id = p_org and (public.is_member(p_org) or public.is_platform_admin())
+   order by m.created_at;
+$$;
+
+-- Platform owner only: give a masjid to another account (lost access, AJK changed).
+-- p_replace_email null: add the account (masjid must have fewer than 2 admins).
+-- p_replace_email set:  that admin is replaced by the new account.
+create or replace function public.transfer_org(p_org uuid, p_email text, p_replace_email text default null)
+returns void language plpgsql security definer set search_path = public as $$
+declare v_user uuid; v_old uuid;
+begin
+  if not public.is_platform_admin() then raise exception 'not_allowed' using errcode = '42501'; end if;
+  if not exists (select 1 from organisations where id = p_org) then raise exception 'org_not_found' using errcode = 'P0001'; end if;
+  select id into v_user from auth.users where lower(email) = lower(trim(p_email));
+  if v_user is null then raise exception 'user_not_found' using errcode = 'P0001'; end if;
+  if exists (select 1 from members where user_id = v_user) then raise exception 'user_has_org' using errcode = 'P0001'; end if;
+  if p_replace_email is null then
+    insert into members (org_id, user_id, role) values (p_org, v_user, 'pentadbir');  -- org_full if already 2
+  else
+    select m.user_id into v_old from members m join auth.users u on u.id = m.user_id
+     where m.org_id = p_org and lower(u.email) = lower(trim(p_replace_email));
+    if v_old is null then raise exception 'member_not_found' using errcode = 'P0001'; end if;
+    update members set user_id = v_user where org_id = p_org and user_id = v_old;
+  end if;
+  delete from invitations where org_id = p_org and accepted_at is null;
 end $$;
 
 -- ---------------------------------------------------------------------
@@ -582,6 +661,7 @@ begin
   return jsonb_build_object('status', 'waiting', 'code', v_row.code, 'expires_at', v_row.expires_at);
 end $$;
 
+-- 0002: a wrong code records the attempt and returns NULL (raising would roll the attempt back).
 create or replace function public.pair_claim(
   p_code text, p_org uuid, p_name text,
   p_theme public.theme_key default 'tenang', p_layout public.layout_key default 'full')
@@ -680,7 +760,10 @@ grant execute on function public.pair_status(text)                      to anon,
 grant execute on function public.screen_bundle(text, bigint, text)      to anon, authenticated;
 grant execute on function public.register_org(text,text,text,text,text,text,text,text) to authenticated;
 grant execute on function public.review_org(uuid, text, text)           to authenticated;
+grant execute on function public.transfer_org(uuid, text, text)         to authenticated;
+grant execute on function public.invite_member(uuid, text)              to authenticated;
 grant execute on function public.accept_invitations()                   to authenticated;
+grant execute on function public.org_members(uuid)                      to authenticated;
 grant execute on function public.set_org_logo(uuid, text)               to authenticated;
 grant execute on function public.platform_org_list()                    to authenticated;
 grant execute on function public.reorder_slides(uuid, uuid[])           to authenticated;

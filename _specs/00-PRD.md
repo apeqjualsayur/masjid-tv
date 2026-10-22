@@ -30,31 +30,45 @@ A web display that runs full-screen on a TV in a masjid or surau, showing JAKIM 
 
 Seven entries, in order: **Imsak, Subuh, Syuruk, Zohor, Asar, Maghrib, Isyak**.
 
-- **Imsak** and **Syuruk** are *markers*, not prayers: shown in the list for reference only. No azan, no iqamah, never "Sekarang", never "Seterusnya", never the countdown target.
+- **Imsak** and **Syuruk** are *markers*, not prayers: no azan, no iqamah.
 - **Current** = the latest passed *prayer* (Subuh, Zohor, Asar, Maghrib, Isyak). Between Syuruk and Zohor there is **no current prayer**; only "next" (Zohor) is highlighted. Between Imsak and Subuh, next = Subuh; current = Isyak (of previous night).
-- **Next** = the next *prayer* in time order (markers excluded), wrapping to tomorrow's Subuh after Isyak. Between Subuh and Zohor, next = Zohor. *(Changed 2026-10-18: markers were previously included.)*
+- **Next** = the next entry in time order (markers included), wrapping to tomorrow's Imsak after Isyak.
 - **Phase** (drives colour palette): Imsak→Syuruk = `subuh`; Syuruk→Asar = `zohor`; Asar→Maghrib = `asar`; Maghrib→Isyak = `maghrib`; Isyak→next Imsak = `isyak`.
-- **Friday**: Zohor is labelled **Jumaat**; azan → **Khutbah mode** (no iqamah countdown).
+- **Friday**: Zohor is labelled **Jumaat**; azan → **Khutbah mode** (no iqamah countdown) → **Solat Jumaat** (own duration). From 00:00 Friday until Solat Jumaat ends, the normal screen shows a **Friday info strip** (§5.1).
 - Times display in **12-hour format without AM/PM** (Malaysian masjid convention), e.g. `1:05`, `7:06`. Configurable to 24h.
 
 ## 5. Display modes (state machine)
 
 ```
 NORMAL ──(T−preAzanMin)──▶ PRE_AZAN ──(T)──▶ AZAN ──(+azanMin)──▶ IQAMAH ──(+iqamahMin[waktu])──▶ SOLAT ──(+solatMin)──▶ NORMAL
-Friday Zohor:  ... AZAN ──▶ KHUTBAH (+khutbahMin) ──▶ SOLAT ──▶ NORMAL
+Friday Zohor:  ... AZAN ──▶ KHUTBAH (+khutbahMin) ──▶ SOLAT (+jumaatSolatMin) ──▶ NORMAL
 Markers (Imsak, Syuruk): no mode change; optional small banner only.
 ```
 
 | Mode | Screen | Default duration |
 |---|---|---|
 | NORMAL | Selected layout (Full / Bottom / Side) | — |
-| PRE_AZAN | Normal layout + banner "Zohor dalam 5 minit" | 5 min before |
+| PRE_AZAN | Normal layout + banner "Zohor dalam 5 minit" (Friday: "Azan Jumaat dalam 5 minit") | 5 min before |
 | AZAN | Full-screen: waktu name (BM + Arabic), "Azan" | 3 min |
 | IQAMAH | Full-screen countdown, "Luruskan dan rapatkan saf", "Senyapkan telefon bimbit" | Subuh 10, Zohor 10, Asar 10, Maghrib 7, Isyak 10 *(placeholder — confirm with pilot AJK)* |
-| SOLAT | Near-black screen, tiny clock only (no distraction) | 12 min |
-| KHUTBAH | Full-screen calm: "Khutbah sedang disampaikan", clock | 40 min |
+| SOLAT | Near-black screen, tiny clock only (no distraction) | 12 min (Friday: `jumaatSolatMin`, default 12) |
+| KHUTBAH | Full-screen calm: "Khutbah sedang disampaikan", clock, **"Dijangka tamat ±1:48"** and a thin progress line | 40 min |
 
 All durations are config values. **Azan/iqamah/solat/khutbah always take over the full screen regardless of layout.**
+
+### 5.1 Friday info strip
+Shown on Fridays in NORMAL and PRE_AZAN modes, from 00:00 until Solat Jumaat ends, if `durations.showFridayInfo` is true (default).
+
+All times are estimates computed from the Zohor time and the masjid's durations, rounded to the minute:
+
+| Item | Formula | Example (Zohor 1:05, azan 3, khutbah 40, solat 12) |
+|---|---|---|
+| Azan | Zohor | 1:05 |
+| Khutbah starts | Zohor + azanMin | 1:08 |
+| Khutbah ends ≈ Solat starts | + khutbahMin | ±1:48 |
+| Solat ends | + jumaatSolatMin | ±2:00 |
+
+Strip text (BM): **SOLAT JUMAAT · Azan 1:05 · Khutbah 1:08 (±40 minit) · Solat ±1:48**. Estimated times always carry "±". The strip never hides the prayer times; each theme places it per the theme contract rule 12.
 
 ## 6. Layouts (per screen)
 
@@ -117,7 +131,7 @@ Switching theme must not change content. Theme is per screen.
   "layout": "full",
   "clock24h": false,
   "showArabic": true,
-  "durations": { "preAzanMin": 5, "azanMin": 3, "solatMin": 12, "khutbahMin": 40 },
+  "durations": { "preAzanMin": 5, "azanMin": 3, "solatMin": 12, "khutbahMin": 40, "jumaatSolatMin": 12, "showFridayInfo": true },
   "iqamahMin": { "subuh": 10, "zohor": 10, "asar": 10, "maghrib": 7, "isyak": 10 },
   "ticker": ["[Teks pengumuman]"]
 }
@@ -152,7 +166,7 @@ Switching theme must not change content. Theme is per screen.
 ## 12. Acceptance criteria — Phase 1
 
 1. With `?sim=` at 13:04:00 on a weekday (SGR01, Oct 2026 data), screen shows PRE_AZAN banner; at Zohor time switches to AZAN; then IQAMAH counting down from the configured minutes; then SOLAT; then NORMAL with Asar as next.
-2. Same on a Friday → AZAN → KHUTBAH → SOLAT.
+2. Same on a Friday → AZAN → KHUTBAH (shows "Dijangka tamat ±…") → SOLAT for `jumaatSolatMin` → NORMAL. Before Zohor on Friday the normal screen shows the Friday strip with correct estimates; it disappears after Solat Jumaat ends and never appears on other days.
 3. Between Syuruk and Zohor: no "Sekarang" highlight; Zohor shows as next.
 4. All 3 themes × 3 layouts render correctly at 1080p; current and next prayers clearly distinguishable from 5 m away (manual check on pilot TV).
 5. Disconnect WiFi for 48 h (simulated with `sim` + offline) → times still correct from cache/fallback.
@@ -163,5 +177,5 @@ Switching theme must not change content. Theme is per screen.
 ## 13. Open items (needed before pilot)
 
 - Pilot site: area → JAKIM zone code; TV size; viewing distance.
-- Pilot AJK's actual iqamah minutes per waktu and khutbah length.
+- Pilot AJK's actual iqamah minutes per waktu, khutbah length and Solat Jumaat length.
 - Platform name (domain, `_brand/`).

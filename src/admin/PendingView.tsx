@@ -1,5 +1,6 @@
 "use client";
-// Menunggu kelulusan (designs/admin/Pending): each registration that is not active yet, setup tips, sign out.
+// Menunggu kelulusan (designs/admin/Pending): the registration that is not active yet, setup tips, sign out.
+// Rejected: the reason and "Daftar semula" (register_org replaces a rejected registration).
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -17,7 +18,6 @@ const badge: Record<Membership["status"], string> = {
   suspended: "bg-[#FDECE8] text-adm-danger",
   active: "bg-adm-soft text-adm-green-dark",
 };
-const MAX_PENDING = 3;
 
 function Illustration() {
   return (
@@ -114,18 +114,19 @@ export function PendingView() {
       )}
 
       <div className="flex flex-col gap-2">
-        <button
-          type="button"
-          onClick={checkAgain}
-          disabled={checking}
-          className="h-[52px] rounded-[14px] bg-adm-green text-[15px] font-bold text-white hover:bg-adm-green-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green disabled:opacity-70"
-        >
-          {checking ? t("app.loading") : t("pending.checkAgain")}
-        </button>
-        {pendingCount < MAX_PENDING && (
-          <Link href={ROUTES.register} className="flex min-h-11 items-center justify-center text-[14px] font-bold text-adm-green">
-            {t("pending.registerAnother")}
+        {waiting.some((o) => o.status === "rejected") ? (
+          <Link href={ROUTES.register} className="flex h-[52px] items-center justify-center rounded-[14px] bg-adm-green text-[15px] font-bold text-white hover:bg-adm-green-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green">
+            {t("pending.reregister")}
           </Link>
+        ) : (
+          <button
+            type="button"
+            onClick={checkAgain}
+            disabled={checking}
+            className="h-[52px] rounded-[14px] bg-adm-green text-[15px] font-bold text-white hover:bg-adm-green-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green disabled:opacity-70"
+          >
+            {checking ? t("app.loading") : t("pending.checkAgain")}
+          </button>
         )}
       </div>
     </SimplePage>

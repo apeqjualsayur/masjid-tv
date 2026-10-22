@@ -80,7 +80,7 @@ Within a minute GitHub starts testing the code by itself (see Part 5).
 
 7. Click **Save and Deploy**.
 8. Wait 3 to 5 minutes. You can watch the build log. When it says **Success**, Cloudflare shows the address, for example `https://masjid-tv.pages.dev`.
-9. Open **`https://masjid-tv.pages.dev/tv/`** (use your project name). The prayer-time display should appear.
+9. Open **`https://masjid-tv.pages.dev/tv/?local=1`** (use your project name). The prayer-time display from `public/config/screen.json` should appear. Without `?local=1` the TV shows the pairing screen (code + QR) for screens managed from the admin app.
 
 That address is what the TV opens. Write it down for the TV setup (`_specs/04-pilot-setup.md`). Cloudflare may add a few letters to the name (for example `masjid-tv-6d8.pages.dev`); always use the address Cloudflare shows you.
 
@@ -163,7 +163,7 @@ Cloudflare's free plan allows 500 builds a month.
 
 ## Part 6 — Checking a TV remotely
 
-Add `?debug=1` to the address, e.g. `https://masjid-tv.pages.dev/tv/?debug=1`. A bar at the bottom shows where the prayer times came from (`live`, `cache` or `fallback`), when the data and clock last synced, the app version, and whether offline support is active. Remove `?debug=1` for normal use.
+Add `?debug=1` to the address, e.g. `https://masjid-tv.pages.dev/tv/?local=1&debug=1`. A bar at the bottom shows where the prayer times came from (`live`, `cache` or `fallback`), when the data and clock last synced, the app version, and whether offline support is active. Remove `?debug=1` for normal use.
 
 ---
 

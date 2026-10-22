@@ -151,7 +151,7 @@ async function main() {
   const b = await launch(profileDir("main"));
 
   await check("12.1", "Weekday: PRE_AZAN, AZAN, IQAMAH (10:00), SOLAT, NORMAL with Asar next", async () => {
-    const { modes, seen, lastText } = await watchModes(b, "/tv/?debug=state&sim=2026-10-17T12:57:30&speed=60", 34);
+    const { modes, seen, lastText } = await watchModes(b, "/tv/?local=1&debug=state&sim=2026-10-17T12:57:30&speed=60", 34);
     assert(JSON.stringify(modes) === JSON.stringify(["pre_azan", "azan", "iqamah", "solat", "normal"]), `modes ${modes.join(" > ")}`);
     const iq = seen.find((x) => x.mode === "iqamah").text;
     assert(/baki (10:00|9:5\d)/.test(iq), `iqamah started at "${iq}"`);
@@ -160,19 +160,19 @@ async function main() {
   });
 
   await check("12.2", "Friday: AZAN, KHUTBAH, SOLAT, NORMAL", async () => {
-    const { modes } = await watchModes(b, "/tv/?debug=state&sim=2026-10-16T12:59:00&speed=60", 62);
+    const { modes } = await watchModes(b, "/tv/?local=1&debug=state&sim=2026-10-16T12:59:00&speed=60", 62);
     assert(JSON.stringify(modes) === JSON.stringify(["pre_azan", "azan", "khutbah", "solat", "normal"]), `modes ${modes.join(" > ")}`);
     return modes.join(" > ");
   });
 
   await check("12.3", "Between Syuruk and Zohor: no Sekarang, Zohor next", async () => {
-    await b.go("/tv/?debug=state&sim=2026-10-17T09:00:00");
+    await b.go("/tv/?local=1&debug=state&sim=2026-10-17T09:00:00");
     const t = await b.text();
     assert(/Sekarang:\s*—/.test(t), "something is current");
     assert(!/\bSEKARANG\b/.test(t), "a card says SEKARANG");
     assert(/Seterusnya:\s*Zohor/.test(t), "next is not Zohor");
     for (const theme of ["alam", "serambi", "tenang"]) {
-      await b.go(`/tv/?theme=${theme}&layout=full&sim=2026-10-17T09:00:00`);
+      await b.go(`/tv/?local=1&theme=${theme}&layout=full&sim=2026-10-17T09:00:00`);
       const tt = await b.text();
       assert(!/sekarang/i.test(tt), `${theme} shows Sekarang`);
     }
@@ -183,7 +183,7 @@ async function main() {
     const bad = [];
     for (const theme of ["alam", "serambi", "tenang"]) {
       for (const layout of ["full", "bottom", "side"]) {
-        await b.go(`/tv/?theme=${theme}&layout=${layout}&sim=2026-10-17T14:30:00`, 3500);
+        await b.go(`/tv/?local=1&theme=${theme}&layout=${layout}&sim=2026-10-17T14:30:00`, 3500);
         const t = await b.text();
         const ok = t.includes("4:18") && t.includes("1:01") && !t.includes("Ralat paparan") && !t.includes("tidak tersedia");
         const size = await b.evaluate("(() => { const r = document.querySelector('[data-stage]').getBoundingClientRect(); return Math.round(r.width) + 'x' + Math.round(r.height); })()");
@@ -203,14 +203,14 @@ async function main() {
     ];
     const wrong = [];
     for (const [time, phase] of cases) {
-      await b.go(`/tv/?debug=state&sim=2026-10-17T${time}`, 2200);
+      await b.go(`/tv/?local=1&debug=state&sim=2026-10-17T${time}`, 2200);
       const m = /phase\s+(\w+)/.exec(await b.text());
       if (m?.[1] !== phase) wrong.push(`${time}: ${m?.[1]} (want ${phase})`);
     }
     // And the theme colours really change: Alam scene per phase.
-    await b.go("/tv/?theme=alam&sim=2026-10-17T06:30:00");
+    await b.go("/tv/?local=1&theme=alam&sim=2026-10-17T06:30:00");
     const s1 = await b.evaluate("document.querySelector('[data-scene]')?.dataset.scene");
-    await b.go("/tv/?theme=alam&sim=2026-10-17T14:30:00");
+    await b.go("/tv/?local=1&theme=alam&sim=2026-10-17T14:30:00");
     const s2 = await b.evaluate("document.querySelector('[data-scene]')?.dataset.scene");
     if (s1 !== "subuh" || s2 !== "zohor") wrong.push(`alam scene ${s1}/${s2}`);
     assert(!wrong.length, wrong.join("; "));
@@ -227,7 +227,7 @@ async function main() {
       await b.send("Fetch.fulfillRequest", { requestId: m.params.requestId, responseCode: 200, responseHeaders: [{ name: "content-type", value: "application/json" }, { name: "access-control-allow-origin", value: "*" }], body: Buffer.from(body).toString("base64") });
     });
     await b.evaluate("localStorage.removeItem('masjid-tv:clock'), true");
-    await b.go("/tv/?debug=state", 4000);
+    await b.go("/tv/?local=1&debug=state", 4000);
     const offset = await waitFor(async () => {
       const v = await b.status("offset");
       return v && Math.abs(parseFloat(v) - 180) <= 2 ? v : null;
@@ -247,7 +247,7 @@ async function main() {
   await check("12.5", "Offline: works from service worker + cache, 48 h later, then fallback, never guessed", async () => {
     const profile = profileDir("offline");
     const on = await launch(profile);
-    await on.go("/tv/?debug=1&sim=2026-10-17T14:30:00", 3000);
+    await on.go("/tv/?local=1&debug=1&sim=2026-10-17T14:30:00", 3000);
     const sw = await waitFor(async () => ((await on.status("sw"))?.startsWith("aktif") ? on.status("sw") : null), 15000);
     assert(sw, `service worker not active: ${await on.status("sw")}`);
     const live = await waitFor(async () => ((await on.status("source")) === "live" ? "live" : null), 15000);
@@ -260,7 +260,7 @@ async function main() {
     await sleep(500);
     const off = await launch(profile, ["--host-resolver-rules=MAP * ~NOTFOUND"]);
     const steps = [];
-    await off.go("/tv/?debug=1&sim=2026-10-17T14:30:00", 4000);
+    await off.go("/tv/?local=1&debug=1&sim=2026-10-17T14:30:00", 4000);
     let t = await off.text();
     assert(t.includes("4:18") && t.includes("1:01"), "offline page did not render prayer times");
     steps.push(`today: ${await off.status("source")}`);
@@ -270,16 +270,16 @@ async function main() {
     assert((await off.status("online")) === "offline" || true, "");
     await off.shot("12.5-offline-today");
 
-    await off.go("/tv/?debug=1&sim=2026-10-19T14:30:00", 4000); // 48 h later, still offline
+    await off.go("/tv/?local=1&debug=1&sim=2026-10-19T14:30:00", 4000); // 48 h later, still offline
     t = await off.text();
     assert(t.includes("4:18") || t.includes("4:17") || t.includes("4:19"), "48 h later: no times");
     steps.push(`+48 h: ${await off.status("source")}`);
 
-    await off.go("/tv/?debug=1&sim=2026-12-01T14:30:00", 4000); // outside cached months: bundled file
+    await off.go("/tv/?local=1&debug=1&sim=2026-12-01T14:30:00", 4000); // outside cached months: bundled file
     steps.push(`1 Dec: ${await off.status("source")}`);
     assert((await off.status("source")) === "fallback", "December did not use the bundled fallback");
 
-    await off.go("/tv/?debug=1&sim=2027-01-05T14:30:00", 4000); // no data anywhere
+    await off.go("/tv/?local=1&debug=1&sim=2027-01-05T14:30:00", 4000); // no data anywhere
     t = await off.text();
     assert(t.includes("Data waktu tidak tersedia"), "2027 did not show the unavailable state");
     steps.push("Jan 2027: tidak tersedia");

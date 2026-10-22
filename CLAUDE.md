@@ -27,7 +27,7 @@ If code and spec disagree, the spec wins — or update the spec first, deliberat
 | `src/themes/` | `types.ts` (ThemeDefinition), `registry.ts`, `ThemeView.tsx` (picks layout vs full-screen mode). Theme render tests in `themes.test.tsx` |
 | `src/themes/{alam,serambi,tenang}/` | One self-contained folder per theme implementing `ThemeDefinition` |
 | `src/templates/` | Announcement template field schemas + sample data (no styling) |
-| `src/app/tv/` | The display page: config + URL overrides → `DisplayState` → selected theme on a 1920×1080 stage |
+| `src/app/tv/` | The display page: config + URL overrides → `DisplayState` → selected theme on a 1920×1080 stage. `pairing/`: Phase 2 pairing screen (device secret, pair_start/pair_status, QR). Without `?local=1` (and with Supabase configured) /tv shows pairing |
 | `scripts/` | Build-time scripts (e.g. `fetch-year.ts` for fallback data) |
 | `public/config/` | `screen.json` (Phase 1 config), logo, sample slides/posters |
 | `public/data/` | Bundled 12-month fallback prayer data: `{zone}-{year}.json` |
@@ -42,7 +42,7 @@ If code and spec disagree, the spec wins — or update the spec first, deliberat
 
 ## Commands
 
-- `npm run dev` — dev server on **port 3100** (LejarKu uses 3000), open http://localhost:3100/tv/ or /admin/ ( on localhost debug params work without `?debug=1`, e.g. `/tv/?theme=tenang&layout=side&slide=infaq&sim=2026-10-17T14:30`; `?debug=state` shows the raw DisplayState)
+- `npm run dev` — dev server on **port 3100** (LejarKu uses 3000), open http://localhost:3100/admin/, or http://localhost:3100/tv/?local=1 for the Phase 1 display from `public/config/screen.json` (plain `/tv/` shows the pairing screen). On localhost debug params work without `?debug=1`, e.g. `/tv/?local=1&theme=tenang&layout=side&slide=infaq&sim=2026-10-17T14:30`; `?debug=state` shows the raw DisplayState
 - `npm test` — Vitest
 - `npm run build` — static export to `out/`, then writes `out/sw.js` (service worker from `scripts/sw-template.js` + precache list)
 - `npm run lint` — type-check

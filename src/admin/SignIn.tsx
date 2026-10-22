@@ -6,6 +6,7 @@ import { useEffect, useState, type FormEvent } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { useT } from "./i18n";
 import { ROUTES, routeAfterSignIn } from "./routing";
+import { PENDING_PAIR_KEY } from "./screens/logic";
 import { useAdmin } from "./session";
 import { LangToggle } from "./shell/AdminShell";
 import { LogoMark } from "./shell/icons";
@@ -23,7 +24,14 @@ export function SignIn() {
 
   // Already signed in (or just returned from Google / the email link): go to the right page.
   useEffect(() => {
-    if (a.status === "ready") router.replace(routeAfterSignIn(a));
+    if (a.status === "ready") {
+      let pair = false;
+      try {
+        pair = Boolean(sessionStorage.getItem(PENDING_PAIR_KEY));
+      } catch {}
+      const next = routeAfterSignIn(a);
+      router.replace(pair && next === ROUTES.home ? ROUTES.screens : next);
+    }
   }, [a, router]);
 
   // Errors handed back on the return URL (e.g. the link expired).

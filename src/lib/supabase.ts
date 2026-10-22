@@ -24,3 +24,20 @@ export function getSupabase(): SupabaseClient {
   });
   return client;
 }
+
+let tvClient: SupabaseClient | null = null;
+
+/**
+ * The TV has no user account: it only calls pair_start / pair_status / screen_bundle with its
+ * device secret (PRD §7). No session is stored or refreshed, so it never touches the admin login.
+ */
+export function getTvSupabase(): SupabaseClient {
+  if (tvClient) return tvClient;
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+  if (!url || !key) throw new Error("Supabase is not configured (NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY).");
+  tvClient = createClient(url, key, {
+    auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false, storageKey: "masjid-view-tv" },
+  });
+  return tvClient;
+}

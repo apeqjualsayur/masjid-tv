@@ -2,7 +2,7 @@ import { readFileSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { localToEpoch } from "@/core";
-import { DEFAULT_SCREEN_CONFIG, parseScreenConfig, parseUrlOverrides } from "./config";
+import { DEFAULT_SCREEN_CONFIG, isLocalMode, parseScreenConfig, parseUrlOverrides } from "./config";
 import { loadScreenConfig } from "./config-loader";
 
 const shipped = JSON.parse(readFileSync(join(process.cwd(), "public", "config", "screen.json"), "utf8"));
@@ -92,5 +92,15 @@ describe("loadScreenConfig", () => {
     expect(await loadScreenConfig(ok, st)).toMatchObject({ source: "network", config: { theme: "tenang" } });
     expect(await loadScreenConfig(down, st)).toMatchObject({ source: "saved", config: { theme: "tenang" } });
     expect(await loadScreenConfig(down, storage())).toMatchObject({ source: "default", config: DEFAULT_SCREEN_CONFIG });
+  });
+});
+describe("isLocalMode (Phase 2 pairing vs Phase 1 local display)", () => {
+  it("local with ?local=1 or without Supabase settings; otherwise pairing", () => {
+    expect(isLocalMode("?local=1", true)).toBe(true);
+    expect(isLocalMode("?debug=state&local=1", true)).toBe(true);
+    expect(isLocalMode("", false)).toBe(true);
+    expect(isLocalMode("", true)).toBe(false);
+    expect(isLocalMode("?theme=alam", true)).toBe(false);
+    expect(isLocalMode("?local=0", true)).toBe(false);
   });
 });

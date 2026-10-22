@@ -1,5 +1,5 @@
 "use client";
-// The TV display: config + URL overrides, data + clock sync, DisplayState every second,
+// The TV display (local mode): config + URL overrides, data + clock sync, DisplayState every second,
 // rendered by the selected theme on the stage.
 import {
   buildDisplayState,
@@ -33,13 +33,15 @@ import { SAMPLE_POSTER, SAMPLE_POSTER_LANDSCAPE, sampleSlide, type SlideView } f
 import { getTheme } from "@/themes/registry";
 import { ThemeView, UnavailableView } from "@/themes/ThemeView";
 import { useEffect, useRef, useState } from "react";
-import { parseUrlOverrides, type ScreenConfig, type UrlOverrides } from "./config";
+import { isLocalMode, parseUrlOverrides, type ScreenConfig, type UrlOverrides } from "./config";
 import { loadScreenConfig, type ConfigSource } from "./config-loader";
 import { DebugView, MetaFooter, type DebugMeta } from "./debug-view";
 import { ErrorBoundary } from "./error-boundary";
 import { useAutoLite, useDailyReload, useNow } from "./hooks";
 import { Stage } from "./stage";
 import { APP_VERSION, useOnline, useServiceWorker } from "./status";
+import { PairingFlow } from "./pairing/PairingFlow";
+import { supabaseConfigured } from "@/lib/supabase";
 
 interface Boot {
   config: ScreenConfig;
@@ -52,11 +54,11 @@ interface Boot {
 }
 
 export function TvRoot() {
+  const [mode, setMode] = useState<"local" | "paired" | null>(null);
+  useEffect(() => setMode(isLocalMode(window.location.search, supabaseConfigured()) ? "local" : "paired"), []);
   return (
     <ErrorBoundary>
-      <Stage>
-        <TvApp />
-      </Stage>
+      <Stage>{mode === "local" ? <TvApp /> : mode === "paired" ? <PairingFlow /> : <div className="h-full bg-black" />}</Stage>
     </ErrorBoundary>
   );
 }

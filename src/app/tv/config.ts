@@ -174,3 +174,11 @@ export function parseUrlOverrides(search: string, hostname: string): { overrides
 
   return { overrides: o, warnings };
 }
+/**
+ * Phase 2 (PRD §4.4): a TV pairs with a masjid and gets its content from Supabase.
+ * Local mode = Phase 1 behaviour from public/config/screen.json: `?local=1` (development,
+ * emergencies), or a build without Supabase settings.
+ */
+export function isLocalMode(search: string, configured: boolean): boolean {
+  return !configured || new URLSearchParams(search).get("local") === "1";
+}

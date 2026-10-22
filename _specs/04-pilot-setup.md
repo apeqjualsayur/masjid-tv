@@ -1,5 +1,7 @@
 # Masjid TV — Pilot Setup Guide
 
+> **Pairing note (Phase 2, 2026-10-22):** plain `/tv/` now shows the pairing screen (code + QR) for TVs managed from the admin app. Until content sync is built (Phase 2 step 2.7), a pilot TV that uses `public/config/screen.json` must open `/tv/?local=1`, as in the addresses below.
+
 **For:** the AJK member setting up the prayer-time screen.
 **Time needed:** about 45 minutes for a Google TV, 30 minutes for a laptop.
 **You need:** the TV or laptop, the masjid WiFi name and password, and this page.
@@ -7,7 +9,7 @@
 **Screen address (write it exactly):**
 
 ```
-https://masjidview.my/tv/
+https://masjidview.my/tv/?local=1
 ```
 
 Choose **one** setup:
@@ -53,7 +55,7 @@ Fully Kiosk Browser shows one web page full screen, starts it when the TV is swi
 1. Fully Kiosk opens with a welcome page. Allow the permissions it asks for (it needs them to start on boot and keep the screen on).
 2. Open Fully's **Settings**: on most remotes press **Back**, or swipe from the left edge on a touch screen, then choose **Settings**.
 3. **Web Content Settings** → **Start URL** → type:
-   `https://masjidview.my/tv/`
+   `https://masjidview.my/tv/?local=1`
    Press **OK**.
 4. Go back to the main page (press **Back** until you leave Settings). The prayer-time screen should appear. Wait 30 seconds for it to load the first time.
 
@@ -120,7 +122,7 @@ This lets an AJK member check or reload the screen from a phone on the masjid Wi
 2. In the box, paste **exactly** (one line):
 
    ```
-   "C:\Program Files\Google\Chrome\Application\chrome.exe" --kiosk "https://masjidview.my/tv/" --user-data-dir="C:\MasjidTV\chrome" --no-first-run --noerrdialogs --hide-crash-restore-bubble --disable-features=Translate --overscroll-history-navigation=0
+   "C:\Program Files\Google\Chrome\Application\chrome.exe" --kiosk "https://masjidview.my/tv/?local=1" --user-data-dir="C:\MasjidTV\chrome" --no-first-run --noerrdialogs --hide-crash-restore-bubble --disable-features=Translate --overscroll-history-navigation=0
    ```
 
    > If Chrome is installed somewhere else, right-click your normal Chrome icon → **Properties** and copy the path from **Target**.
@@ -168,7 +170,7 @@ This lets an AJK member check or reload the screen from a phone on the masjid Wi
 ## Checking the screen (both setups)
 
 Add `?debug=1` to the address to see a status bar at the bottom:
-`https://masjidview.my/tv/?debug=1`
+`https://masjidview.my/tv/?local=1&debug=1`
 
 | Line | What you want to see |
 |---|---|

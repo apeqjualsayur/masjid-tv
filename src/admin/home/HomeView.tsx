@@ -13,7 +13,7 @@ import { useHomeData } from "./useHomeData";
 
 const card = "rounded-[18px] bg-adm-card shadow-[0_1px_3px_rgba(18,38,30,0.08)] lg:rounded-[20px]";
 
-function useDuration() {
+export function useDuration() {
   const { t } = useT();
   /** coarse: whole hours or days only once over an hour ("Luar talian · 3 jam"). */
   return (ms: number, coarse = false) => {

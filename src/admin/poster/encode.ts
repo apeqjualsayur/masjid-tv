@@ -1,5 +1,5 @@
-// Poster encoding shared by the Web Worker and the main-thread fallback (no libraries):
-// long edge ≤ 1920 px, WebP quality 0.82. Browsers that cannot encode WebP (older Safari) return
+// Image encoding shared by the Web Worker and the main-thread fallback (no libraries):
+// long edge ≤ 1920 px for posters (≤ 800 px QR, ≤ 512 px photos), WebP quality 0.82. Browsers that cannot encode WebP (older Safari) return
 // PNG from the canvas; a PNG photo can exceed the 2 MB storage limit, so JPEG is used instead.
 import { LONG_EDGE, QUALITY, outputSize } from "./logic";
 
@@ -21,8 +21,9 @@ export async function encodeScaled(
   originalWidth: number,
   originalHeight: number,
   prepare: (w: number, h: number) => ToBlob,
+  longEdge: number = LONG_EDGE,
 ): Promise<Encoded | null> {
-  const { w, h } = outputSize(originalWidth, originalHeight, LONG_EDGE);
+  const { w, h } = outputSize(originalWidth, originalHeight, longEdge);
   const toBlob = prepare(w, h);
   for (const q of [QUALITY, 0.72, 0.6]) {
     let blob = await toBlob("image/webp", q);

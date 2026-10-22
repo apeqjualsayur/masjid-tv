@@ -466,6 +466,76 @@
       "screens": "Pilih sekurang-kurangnya satu skrin."
     }
   },
+  "picker": {
+    "title": "Kandungan baru",
+    "close": "Tutup",
+    "poster": "Muat naik poster",
+    "posterHint": "Saiz disyorkan ditunjukkan ikut skrin anda",
+    "orTemplate": "Atau pilih templat"
+  },
+  "editor": {
+    "back": "Kembali",
+    "statusNew": "Baru",
+    "statusDraft": "Draf",
+    "statusPublished": "Diterbitkan",
+    "details": "Butiran",
+    "preview": "Pratonton pada TV",
+    "previewOf": "Pratonton: {screen}",
+    "change": "Tukar",
+    "previewTitle": "Pratonton skrin",
+    "screenOption": "{name} · {theme} · {layout}",
+    "themeOption": "Tema {theme} · {layout}",
+    "fullNote": "susun atur penuh tidak memaparkan kandungan",
+    "livePreview": "Pratonton langsung",
+    "previewNote": "Pratonton menggunakan tema dan susun atur sebenar skrin, dengan waktu solat hari ini untuk zon {zone}.",
+    "noTimes": "Waktu solat hari ini tidak dapat dimuatkan, jadi pratonton tidak tersedia. Anda masih boleh menyimpan.",
+    "loadingPreview": "Memuatkan pratonton…",
+    "saveDraft": "Simpan draf",
+    "publish": "Terbit",
+    "saving": "Menyimpan…",
+    "duplicate": "Duplikasi untuk minggu depan",
+    "duplicated": "Salinan untuk minggu depan sedia (tarikh +7 hari). Semak dan tekan Terbit.",
+    "published": "Diterbitkan. TV akan memaparkannya dalam masa 1 minit.",
+    "savedDraft": "Draf disimpan. Ia tidak dipapar sehingga diterbitkan.",
+    "updated": "Disimpan. TV akan dikemas kini dalam masa 1 minit.",
+    "oldKept": "Disimpan, tetapi fail gambar lama tidak dapat dipadam.",
+    "another": "Buat kandungan lain",
+    "home": "Ke Utama",
+    "fixErrors": "Sila betulkan ruangan yang ditanda.",
+    "saveError": "Tidak dapat disimpan: {message}",
+    "loadError": "Kandungan tidak dapat dimuatkan: {message}",
+    "notFound": "Kandungan ini tidak dijumpai.",
+    "unknownTemplate": "Templat tidak dikenali.",
+    "image": {
+      "add": "Pilih gambar",
+      "change": "Tukar gambar",
+      "remove": "Buang",
+      "working": "Memproses gambar…",
+      "hint": "JPG, PNG atau WebP · maksimum 10 MB"
+    },
+    "time": {
+      "choose": "Pilih masa…",
+      "other": "Masa lain…",
+      "otherLabel": "Masa lain"
+    },
+    "date": {
+      "from": "Dari",
+      "to": "Hingga"
+    },
+    "addRow": "+ Tambah baris",
+    "removeRow": "Buang baris {n}",
+    "kematianNote": "Notis kematian dipapar dengan gaya ringkas tanpa hiasan. Ia berhenti dipapar pada tarikh tamat (maksimum 7 hari) dan dipadam sepenuhnya 30 hari kemudian.",
+    "ayatNote": "Senarai ini belum disemak oleh ustaz. Pada TV, terjemahan ditandakan \"Terjemahan draf, belum disemak\" sehingga disemak.",
+    "err": {
+      "required": "Wajib diisi.",
+      "tooLong": "Maksimum {max} aksara.",
+      "number": "Masukkan nombor.",
+      "range": "Di luar julat yang dibenarkan.",
+      "option": "Pilih daripada senarai.",
+      "rows": "Bilangan baris tidak sah.",
+      "ayat": "Pilih semula daripada senarai."
+    }
+  },
   "privacy": { "title": "Notis Privasi", "draft": "Notis privasi penuh akan diterbitkan sebelum perintis. Data yang disimpan: nama, e-mel dan telefon AJK, serta kandungan pengumuman (termasuk nama si mati)." },
   "dialog": { "close": "Tutup" }
 }

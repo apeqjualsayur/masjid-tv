@@ -1,0 +1,86 @@
+{
+  "_status": "TO BE VERIFIED BY AN USTAZ",
+  "_note": "Draft list for Phase 2. The Arabic text, references and especially the Malay translations below have NOT been checked by a qualified person. Translations are draft renderings, not quoted from Tafsir Pimpinan Ar-Rahman (JAKIM), so they carry source 'draf-belum-disemak' and the TV labels them as unverified. Before the pilot: an ustaz checks every entry, replaces each translation with the approved JAKIM text and changes its source to 'jakim-pimpinan-ar-rahman'. AJK can only choose from this list; free-text translations are not allowed (PRD Phase 2 §4.5).",
+  "entries": [
+    {
+      "id": "baqarah-153",
+      "kind": "ayat",
+      "reference": "Surah Al-Baqarah 2:153",
+      "arabic": "يَا أَيُّهَا الَّذِينَ آمَنُوا اسْتَعِينُوا بِالصَّبْرِ وَالصَّلَاةِ ۚ إِنَّ اللَّهَ مَعَ الصَّابِرِينَ",
+      "translation": "Wahai orang-orang yang beriman, mohonlah pertolongan dengan sabar dan solat. Sesungguhnya Allah bersama orang-orang yang sabar.",
+      "source": "draf-belum-disemak"
+    },
+    {
+      "id": "baqarah-152",
+      "kind": "ayat",
+      "reference": "Surah Al-Baqarah 2:152",
+      "arabic": "فَاذْكُرُونِي أَذْكُرْكُمْ وَاشْكُرُوا لِي وَلَا تَكْفُرُونِ",
+      "translation": "Maka ingatlah kamu kepada-Ku, nescaya Aku ingat kepada kamu; dan bersyukurlah kepada-Ku dan janganlah kamu kufur.",
+      "source": "draf-belum-disemak"
+    },
+    {
+      "id": "baqarah-286",
+      "kind": "ayat",
+      "reference": "Surah Al-Baqarah 2:286 (sebahagian)",
+      "arabic": "لَا يُكَلِّفُ اللَّهُ نَفْسًا إِلَّا وُسْعَهَا",
+      "translation": "Allah tidak membebani seseorang melainkan sesuai dengan kesanggupannya.",
+      "source": "draf-belum-disemak"
+    },
+    {
+      "id": "rad-28",
+      "kind": "ayat",
+      "reference": "Surah Ar-Ra'd 13:28",
+      "arabic": "الَّذِينَ آمَنُوا وَتَطْمَئِنُّ قُلُوبُهُم بِذِكْرِ اللَّهِ ۗ أَلَا بِذِكْرِ اللَّهِ تَطْمَئِنُّ الْقُلُوبُ",
+      "translation": "Orang-orang yang beriman dan tenang hati mereka dengan mengingati Allah. Ketahuilah, dengan mengingati Allah hati menjadi tenang.",
+      "source": "draf-belum-disemak"
+    },
+    {
+      "id": "insyirah-5-6",
+      "kind": "ayat",
+      "reference": "Surah Al-Insyirah 94:5–6",
+      "arabic": "فَإِنَّ مَعَ الْعُسْرِ يُسْرًا ۝ إِنَّ مَعَ الْعُسْرِ يُسْرًا",
+      "translation": "Maka sesungguhnya bersama kesukaran ada kemudahan. Sesungguhnya bersama kesukaran ada kemudahan.",
+      "source": "draf-belum-disemak"
+    },
+    {
+      "id": "ankabut-45",
+      "kind": "ayat",
+      "reference": "Surah Al-'Ankabut 29:45 (sebahagian)",
+      "arabic": "إِنَّ الصَّلَاةَ تَنْهَىٰ عَنِ الْفَحْشَاءِ وَالْمُنكَرِ",
+      "translation": "Sesungguhnya solat itu mencegah daripada perbuatan keji dan mungkar.",
+      "source": "draf-belum-disemak"
+    },
+    {
+      "id": "hujurat-10",
+      "kind": "ayat",
+      "reference": "Surah Al-Hujurat 49:10",
+      "arabic": "إِنَّمَا الْمُؤْمِنُونَ إِخْوَةٌ فَأَصْلِحُوا بَيْنَ أَخَوَيْكُمْ ۚ وَاتَّقُوا اللَّهَ لَعَلَّكُمْ تُرْحَمُونَ",
+      "translation": "Sesungguhnya orang-orang yang beriman itu bersaudara, maka damaikanlah antara saudara-saudara kamu dan bertakwalah kepada Allah supaya kamu dirahmati.",
+      "source": "draf-belum-disemak"
+    },
+    {
+      "id": "hadith-niat",
+      "kind": "hadith",
+      "reference": "Hadith riwayat al-Bukhari dan Muslim",
+      "arabic": "إِنَّمَا الْأَعْمَالُ بِالنِّيَّاتِ",
+      "translation": "Sesungguhnya setiap amalan itu bergantung kepada niat.",
+      "source": "draf-belum-disemak"
+    },
+    {
+      "id": "hadith-quran",
+      "kind": "hadith",
+      "reference": "Hadith riwayat al-Bukhari",
+      "arabic": "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ",
+      "translation": "Sebaik-baik kamu ialah orang yang mempelajari al-Quran dan mengajarkannya.",
+      "source": "draf-belum-disemak"
+    },
+    {
+      "id": "hadith-taharah",
+      "kind": "hadith",
+      "reference": "Hadith riwayat Muslim",
+      "arabic": "الطُّهُورُ شَطْرُ الْإِيمَانِ",
+      "translation": "Kebersihan itu sebahagian daripada iman.",
+      "source": "draf-belum-disemak"
+    }
+  ]
+}

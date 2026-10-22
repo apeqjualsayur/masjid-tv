@@ -26,6 +26,7 @@ export const ROUTES = {
   pending: "/admin/menunggu/",
   content: "/admin/kandungan/",
   picker: "/admin/baru/",
+  template: "/admin/templat/",
   poster: "/admin/poster/",
   screens: "/admin/skrin/",
   settings: "/admin/tetapan/",

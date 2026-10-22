@@ -9,7 +9,7 @@ export type SlideStatus = "draft" | "published";
 
 export interface PosterBackend {
   uploadObject(path: string, blob: Blob, contentType: string): Promise<void>;
-  insertMedia(row: { org_id: string; path: string; kind: "poster"; width: number; height: number; bytes: number }): Promise<string>;
+  insertMedia(row: { org_id: string; path: string; kind: "poster" | "qr" | "photo"; width: number; height: number; bytes: number }): Promise<string>;
   insertSlide(row: Record<string, unknown>): Promise<string>;
   updateSlide(id: string, patch: Record<string, unknown>): Promise<void>;
   deleteMedia(path: string): Promise<void>;

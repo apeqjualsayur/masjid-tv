@@ -100,6 +100,8 @@ export interface KewanganFields {
 /** Translations must come from an approved source, never free text (PRD section 7). */
 export const APPROVED_TRANSLATION_SOURCES = {
   "jakim-pimpinan-ar-rahman": "Tafsir Pimpinan Ar-Rahman (JAKIM)",
+  /** Entries in ayat-sources.json until an ustaz replaces them with the approved text (shown honestly on the TV). */
+  "draf-belum-disemak": "Terjemahan draf, belum disemak",
 } as const;
 export type ApprovedSourceId = keyof typeof APPROVED_TRANSLATION_SOURCES;
 

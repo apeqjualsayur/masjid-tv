@@ -466,6 +466,76 @@
       "screens": "Choose at least one screen."
     }
   },
+  "picker": {
+    "title": "New content",
+    "close": "Close",
+    "poster": "Upload poster",
+    "posterHint": "Recommended sizes shown for your screens",
+    "orTemplate": "Or choose a template"
+  },
+  "editor": {
+    "back": "Back",
+    "statusNew": "New",
+    "statusDraft": "Draft",
+    "statusPublished": "Published",
+    "details": "Details",
+    "preview": "Preview on the TV",
+    "previewOf": "Preview: {screen}",
+    "change": "Change",
+    "previewTitle": "Preview screen",
+    "screenOption": "{name} · {theme} · {layout}",
+    "themeOption": "{theme} theme · {layout}",
+    "fullNote": "full layout does not show content",
+    "livePreview": "Live preview",
+    "previewNote": "The preview uses the screen's real theme and layout, with today's prayer times for zone {zone}.",
+    "noTimes": "Today's prayer times could not be loaded, so the preview is not available. You can still save.",
+    "loadingPreview": "Loading preview…",
+    "saveDraft": "Save draft",
+    "publish": "Publish",
+    "saving": "Saving…",
+    "duplicate": "Duplicate for next week",
+    "duplicated": "Copy for next week ready (dates +7 days). Check it and tap Publish.",
+    "published": "Published. The TV shows it within 1 minute.",
+    "savedDraft": "Draft saved. It is not shown until published.",
+    "updated": "Saved. The TV updates within 1 minute.",
+    "oldKept": "Saved, but the old picture file could not be deleted.",
+    "another": "Create other content",
+    "home": "Go to Home",
+    "fixErrors": "Please fix the marked fields.",
+    "saveError": "Could not save: {message}",
+    "loadError": "The content could not be loaded: {message}",
+    "notFound": "This content was not found.",
+    "unknownTemplate": "Unknown template.",
+    "image": {
+      "add": "Choose picture",
+      "change": "Change picture",
+      "remove": "Remove",
+      "working": "Processing picture…",
+      "hint": "JPG, PNG or WebP · up to 10 MB"
+    },
+    "time": {
+      "choose": "Choose a time…",
+      "other": "Other time…",
+      "otherLabel": "Other time"
+    },
+    "date": {
+      "from": "From",
+      "to": "To"
+    },
+    "addRow": "+ Add row",
+    "removeRow": "Remove row {n}",
+    "kematianNote": "Death notices are shown plainly, without decoration. They stop showing on the end date (at most 7 days) and are deleted completely 30 days later.",
+    "ayatNote": "This list has not yet been checked by an ustaz. On the TV, translations are labelled \"Terjemahan draf, belum disemak\" (draft, not yet checked) until then.",
+    "err": {
+      "required": "Required.",
+      "tooLong": "At most {max} characters.",
+      "number": "Enter a number.",
+      "range": "Outside the allowed range.",
+      "option": "Choose from the list.",
+      "rows": "Invalid number of rows.",
+      "ayat": "Choose again from the list."
+    }
+  },
   "privacy": { "title": "Privacy Notice", "draft": "The full privacy notice will be published before the pilot. Data held: AJK names, emails and phone numbers, and announcement content (including names of the deceased)." },
   "dialog": { "close": "Close" }
 }

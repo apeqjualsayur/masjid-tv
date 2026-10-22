@@ -1,11 +1,12 @@
 // Compress a picked poster: Web Worker with OffscreenCanvas when available (keeps the page
 // responsive on phones), otherwise the same encoding on the main thread with a <canvas>.
 import { encodeScaled, type Encoded } from "./encode";
+import { LONG_EDGE } from "./logic";
 
 export type CompressError = "decode" | "tooBig";
 export type CompressResult = { ok: true; result: Encoded; worker: boolean } | { ok: false; error: CompressError };
 
-function viaWorker(file: Blob): Promise<CompressResult | null> {
+function viaWorker(file: Blob, longEdge: number): Promise<CompressResult | null> {
   if (typeof Worker === "undefined" || typeof OffscreenCanvas === "undefined") return Promise.resolve(null);
   return new Promise((resolve) => {
     let worker: Worker;
@@ -30,7 +31,7 @@ function viaWorker(file: Blob): Promise<CompressResult | null> {
       clearTimeout(timer);
       done(null);
     };
-    worker.postMessage({ file });
+    worker.postMessage({ file, longEdge });
   });
 }
 
@@ -55,7 +56,7 @@ async function decodeMain(file: Blob): Promise<{ img: CanvasImageSource; w: numb
   return { img, w: img.naturalWidth, h: img.naturalHeight, close: () => URL.revokeObjectURL(url) };
 }
 
-async function viaMainThread(file: Blob): Promise<CompressResult> {
+async function viaMainThread(file: Blob, longEdge: number): Promise<CompressResult> {
   let src: Awaited<ReturnType<typeof decodeMain>>;
   try {
     src = await decodeMain(file);
@@ -71,7 +72,7 @@ async function viaMainThread(file: Blob): Promise<CompressResult> {
       ctx.imageSmoothingQuality = "high";
       ctx.drawImage(src.img, 0, 0, w, h);
       return (type, quality) => new Promise((r) => canvas.toBlob(r, type, quality));
-    });
+    }, longEdge);
     return result ? { ok: true, result, worker: false } : { ok: false, error: "tooBig" };
   } catch {
     return { ok: false, error: "decode" };
@@ -80,6 +81,12 @@ async function viaMainThread(file: Blob): Promise<CompressResult> {
   }
 }
 
+/** Poster: long edge ≤ 1920 px (PRD §6). */
 export async function compressPoster(file: Blob): Promise<CompressResult> {
-  return (await viaWorker(file)) ?? viaMainThread(file);
+  return compressImage(file, LONG_EDGE);
+}
+
+/** Any picture with its own long-edge limit (template QR ≤ 800 px, speaker photo ≤ 512 px). */
+export async function compressImage(file: Blob, longEdge: number): Promise<CompressResult> {
+  return (await viaWorker(file, longEdge)) ?? viaMainThread(file, longEdge);
 }

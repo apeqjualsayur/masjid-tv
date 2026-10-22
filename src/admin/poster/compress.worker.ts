@@ -1,7 +1,7 @@
 // Web Worker: decode + resize + encode a poster off the main thread (OffscreenCanvas).
 import { encodeScaled } from "./encode";
 
-const scope = self as unknown as { onmessage: ((e: MessageEvent<{ file: Blob }>) => void) | null; postMessage: (m: unknown) => void };
+const scope = self as unknown as { onmessage: ((e: MessageEvent<{ file: Blob; longEdge?: number }>) => void) | null; postMessage: (m: unknown) => void };
 
 scope.onmessage = async (e) => {
   try {
@@ -13,7 +13,7 @@ scope.onmessage = async (e) => {
       ctx.imageSmoothingQuality = "high";
       ctx.drawImage(bmp, 0, 0, w, h);
       return (type, quality) => canvas.convertToBlob({ type, quality });
-    });
+    }, e.data.longEdge);
     bmp.close();
     scope.postMessage(result ? { ok: true, result } : { ok: false, error: "tooBig" });
   } catch (err) {

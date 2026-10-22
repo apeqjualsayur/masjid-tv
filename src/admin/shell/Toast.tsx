@@ -29,11 +29,16 @@ export function useToasts() {
     },
     [dismiss],
   );
+  const clear = useCallback(() => {
+    timers.current.forEach((x) => clearTimeout(x));
+    timers.current.clear();
+    setItems([]);
+  }, []);
   useEffect(() => {
     const map = timers.current;
     return () => map.forEach((t) => clearTimeout(t));
   }, []);
-  return { toast, node: <Toasts items={items} onDismiss={dismiss} /> };
+  return { toast, clear, node: <Toasts items={items} onDismiss={dismiss} /> };
 }
 
 const tone: Record<ToastKind, string> = {

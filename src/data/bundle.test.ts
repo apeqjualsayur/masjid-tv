@@ -224,3 +224,18 @@ describe("startBundleSync", () => {
     expect(l.mem.value()?.bundle.version).toBe(7);
   });
 });
+describe("template images (QR, speaker photo)", () => {
+  const withQr = () =>
+    okBundle({
+      slides: [
+        { id: "s-infaq", type: "template", templateKey: "infaq", fields: { fundName: "Tabung", collected: 10, target: 100, qrImage: `${ORG}/qr.webp` }, startsAt: null, endsAt: null, durationS: 15, daysOfWeek: null, priority: false, sortOrder: 0, media: null },
+      ],
+    });
+  it("bucket paths become public URLs on the TV", () => {
+    const { items } = bundleSlides(withQr(), SB);
+    expect((items[0].payload as { fields: { qrImage: string } }).fields.qrImage).toBe(`${SB}/storage/v1/object/public/media/${ORG}/qr.webp`);
+  });
+  it("are kept by the media cache", () => {
+    expect(referencedMedia(withQr(), SB)).toContain(`${SB}/storage/v1/object/public/media/${ORG}/qr.webp`);
+  });
+});

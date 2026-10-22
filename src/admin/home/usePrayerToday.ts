@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { computeSchedule, localDateKey, type ScheduleState } from "@/core";
 import { createFallbackLoader, createPrayerData, idbMonthStore, refreshMonths, type DayResult } from "@/data";
 
-export function usePrayerToday(zone: string | null, now: number): { schedule: ScheduleState | null; hijri: string | null; loading: boolean } {
+export function usePrayerToday(zone: string | null, now: number): { schedule: ScheduleState | null; hijri: string | null; loading: boolean; day: DayResult | null } {
   const dateKey = localDateKey(now);
   const [day, setDay] = useState<DayResult | null>(null);
   const [loading, setLoading] = useState(true);
@@ -32,7 +32,7 @@ export function usePrayerToday(zone: string | null, now: number): { schedule: Sc
     };
   }, [zone, dateKey]);
 
-  if (!day || day.status !== "ok") return { schedule: null, hijri: null, loading };
+  if (!day || day.status !== "ok") return { schedule: null, hijri: null, loading, day: null };
   const schedule = computeSchedule({ today: day.today, tomorrowImsak: day.tomorrowImsak ?? NaN, tomorrowSubuh: day.tomorrowSubuh ?? NaN }, now);
-  return { schedule, hijri: day.today.hijri, loading };
+  return { schedule, hijri: day.today.hijri, loading, day };
 }

@@ -51,3 +51,11 @@ describe("validateSchedule", () => {
     expect(validateSchedule({ ...ok, hasEnd: true, endDate: "2026-10-29", endTime: "21:08" }, rules).end).toBe("schedule.err.endTooLate");
   });
 });
+describe("shiftSchedule", () => {
+  it("moves start and end by whole days", async () => {
+    const { shiftSchedule } = await import("./logic");
+    const s = { ...defaultSchedule(NOW), hasEnd: true, endDate: "2026-10-29", endTime: "22:00" };
+    expect(shiftSchedule(s, 7)).toMatchObject({ startDate: "2026-10-29", startTime: "21:07", endDate: "2026-11-05", endTime: "22:00" });
+    expect(shiftSchedule({ ...s, startDate: "2026-12-30" }, 7).startDate).toBe("2027-01-06");
+  });
+});

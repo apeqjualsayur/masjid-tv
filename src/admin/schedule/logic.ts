@@ -124,3 +124,11 @@ export function scheduleToRow(s: Schedule): SlideScheduleRow {
     screen_ids: s.screenIds && s.screenIds.length ? [...s.screenIds] : null,
   };
 }
+/** Same schedule a number of days later ("Duplikasi untuk minggu depan"). */
+export function shiftSchedule(s: Schedule, days: number): Schedule {
+  const add = (date: string) => {
+    const ms = toEpoch(date, "12:00");
+    return ms === null ? date : dateOf(ms + days * 86_400_000);
+  };
+  return { ...s, startDate: add(s.startDate), endDate: add(s.endDate) };
+}

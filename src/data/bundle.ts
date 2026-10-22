@@ -4,6 +4,7 @@
 // the screen. Pure parts are exported for tests; I/O is injected.
 import type { PlaylistItem } from "@/core";
 import type { SlideView } from "@/templates";
+import { IMAGE_FIELD_KEYS } from "@/templates/schema";
 import { parseSlides, type RawSlide } from "./slides";
 
 export interface BundleScreen {
@@ -128,13 +129,22 @@ export function isoForPlaylist(v: string | null): string | undefined {
   return v.trim().replace(" ", "T").replace(/\.(\d{3})\d+/, ".$1");
 }
 
+/** Template image fields (QR, speaker photo) hold a bucket path; anything else is left as is. */
+const isPath = (v: unknown): v is string => typeof v === "string" && v.length > 0 && !v.includes("://") && !v.startsWith("/");
+
+function withImageUrls(fields: Record<string, unknown>, supabaseUrl: string): Record<string, unknown> {
+  const out = { ...fields };
+  for (const k of IMAGE_FIELD_KEYS) if (isPath(out[k])) out[k] = mediaUrl(supabaseUrl, out[k] as string);
+  return out;
+}
+
 /** Bundle slides → playlist items, through the same validation as Phase 1 slides. */
 export function bundleSlides(b: Bundle, supabaseUrl: string): { items: PlaylistItem<SlideView>[]; warnings: string[] } {
   const raw: RawSlide[] = b.slides.map((x) => ({
     id: x.id,
     type: x.type as RawSlide["type"],
     template_key: (x.templateKey ?? undefined) as RawSlide["template_key"],
-    fields: x.fields,
+    fields: withImageUrls(x.fields, supabaseUrl),
     image_url: x.media ? mediaUrl(supabaseUrl, x.media.path) : undefined,
     starts_at: isoForPlaylist(x.startsAt),
     ends_at: isoForPlaylist(x.endsAt),
@@ -148,11 +158,14 @@ export function bundleSlides(b: Bundle, supabaseUrl: string): { items: PlaylistI
   return { items: r.items, warnings: r.warnings.map((w) => w.replace("sample-slides.json", "bundle")) };
 }
 
-/** Every image the current bundle needs offline: the logo and the posters. */
+/** Every image the current bundle needs offline: the logo, the posters and template images. */
 export function referencedMedia(b: Bundle, supabaseUrl: string): string[] {
   const urls = new Set<string>();
   if (b.org.logoPath) urls.add(mediaUrl(supabaseUrl, b.org.logoPath));
-  for (const x of b.slides) if (x.media) urls.add(mediaUrl(supabaseUrl, x.media.path));
+  for (const x of b.slides) {
+    if (x.media) urls.add(mediaUrl(supabaseUrl, x.media.path));
+    for (const k of IMAGE_FIELD_KEYS) if (isPath(x.fields[k])) urls.add(mediaUrl(supabaseUrl, x.fields[k] as string));
+  }
   return [...urls];
 }
 

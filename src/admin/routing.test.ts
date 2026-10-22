@@ -32,8 +32,8 @@ describe("pickCurrentOrg", () => {
 });
 
 describe("canOpen (PRD §3)", () => {
-  it("Tetapan and Ahli are Pentadbir-only; editors can open the rest", () => {
-    expect(canOpen(ROUTES.settings, "editor")).toBe(false);
+  it("Ahli is Pentadbir-only; editors can open the rest (Tetapan read-only)", () => {
+    expect(canOpen(ROUTES.settings, "editor")).toBe(true);
     expect(canOpen(ROUTES.members, "editor")).toBe(false);
     expect(canOpen(ROUTES.settings, "pentadbir")).toBe(true);
     expect(canOpen(ROUTES.content, "editor")).toBe(true);

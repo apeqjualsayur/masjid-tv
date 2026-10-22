@@ -26,10 +26,8 @@ function navItems(role: Membership["role"] | null, isPlatformAdmin: boolean): Na
     { key: "content", route: ROUTES.content, icon: ICON.content, phone: true },
     { key: "screens", route: ROUTES.screens, icon: ICON.screens, phone: true },
   ];
-  if (role === "pentadbir") {
-    items.push({ key: "settings", route: ROUTES.settings, icon: ICON.settings, phone: true });
-    items.push({ key: "members", route: ROUTES.members, icon: ICON.members, phone: false });
-  }
+  if (role) items.push({ key: "settings", route: ROUTES.settings, icon: ICON.settings, phone: true });
+  if (role === "pentadbir") items.push({ key: "members", route: ROUTES.members, icon: ICON.members, phone: false });
   if (isPlatformAdmin) items.push({ key: "platform", route: ROUTES.platform, icon: ICON.platform, phone: false });
   return items;
 }

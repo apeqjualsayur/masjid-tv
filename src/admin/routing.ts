@@ -52,8 +52,8 @@ export function pickCurrentOrg(orgs: Membership[], savedId: string | null): Memb
   return active.find((o) => o.orgId === savedId) ?? active[0] ?? null;
 }
 
-/** Pages only a Pentadbir may open (PRD §3): Tetapan and Ahli. Editors see Skrin read-only. */
+/** Pages only a Pentadbir may open (PRD §3): Ahli. Editors see Tetapan and Skrin read-only. */
 export function canOpen(route: AdminRoute, role: MemberRole | null): boolean {
-  if (route === ROUTES.settings || route === ROUTES.members) return role === "pentadbir";
+  if (route === ROUTES.members) return role === "pentadbir";
   return true;
 }

@@ -28,8 +28,10 @@ export function supabaseRegisterBackend(sb: SupabaseClient, userId: string): Reg
       if (error) throw error;
     },
     async removeObject(path) {
-      const { error } = await media().remove([path]);
+      const { data, error } = await media().remove([path]);
       if (error) throw error;
+      // Storage answers "ok" even when it removed nothing (e.g. no permission to see the file).
+      if (!data || data.length === 0) throw new Error("not_removed");
     },
   };
 }

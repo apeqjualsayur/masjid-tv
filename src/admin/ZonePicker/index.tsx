@@ -19,9 +19,11 @@ export interface ZonePickerProps {
   /** Error key to show under the card (e.g. register.err.zoneRequired). */
   error?: string;
   id?: string;
+  /** Read-only (editors in Tetapan). */
+  disabled?: boolean;
 }
 
-export function ZonePicker({ value, onChange, error, id = "zone" }: ZonePickerProps) {
+export function ZonePicker({ value, onChange, error, id = "zone", disabled = false }: ZonePickerProps) {
   const { t } = useT();
   const allStates = useMemo(() => states(), []);
   const [state, setState] = useState(value?.state ?? "");
@@ -79,7 +81,7 @@ export function ZonePicker({ value, onChange, error, id = "zone" }: ZonePickerPr
       <button
         type="button"
         onClick={useLocation}
-        disabled={locating}
+        disabled={locating || disabled}
         className="flex h-[50px] items-center justify-center gap-2.5 rounded-[14px] border-[1.5px] border-adm-green bg-white text-[15px] font-bold text-adm-green focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green disabled:opacity-70"
       >
         <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={locating ? "animate-spin" : undefined}>
@@ -106,7 +108,7 @@ export function ZonePicker({ value, onChange, error, id = "zone" }: ZonePickerPr
       <div className="grid grid-cols-2 gap-2.5">
         <div className="flex min-w-0 flex-col gap-1.5">
           <label htmlFor={`${id}-state`} className={label}>{t("zone.state")}</label>
-          <select id={`${id}-state`} value={state} onChange={(e) => pickState(e.target.value)} className={select}>
+          <select id={`${id}-state`} value={state} disabled={disabled} onChange={(e) => pickState(e.target.value)} className={select}>
             <option value="">{t("zone.choose")}</option>
             {allStates.map((s) => (
               <option key={s} value={s}>{s}</option>
@@ -115,7 +117,7 @@ export function ZonePicker({ value, onChange, error, id = "zone" }: ZonePickerPr
         </div>
         <div className="flex min-w-0 flex-col gap-1.5">
           <label htmlFor={`${id}-district`} className={label}>{t("zone.district")}</label>
-          <select id={`${id}-district`} value={areaName} disabled={!state} onChange={(e) => pickArea(e.target.value)} className={select}>
+          <select id={`${id}-district`} value={areaName} disabled={!state || disabled} onChange={(e) => pickArea(e.target.value)} className={select}>
             <option value="">{t("zone.choose")}</option>
             {areas.map((a) => (
               <option key={a.name} value={a.name}>{a.name}</option>
@@ -135,6 +137,7 @@ export function ZonePicker({ value, onChange, error, id = "zone" }: ZonePickerPr
                 type="button"
                 role="radio"
                 aria-checked={sel}
+                disabled={disabled}
                 onClick={() => onChange(choiceFromArea(state, multi, code))}
                 className={`flex items-start gap-3 rounded-[14px] border-[1.5px] px-3.5 py-3 text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green ${sel ? "border-adm-green bg-[#F1F8F4]" : "border-adm-line bg-white"}`}
               >
@@ -151,8 +154,8 @@ export function ZonePicker({ value, onChange, error, id = "zone" }: ZonePickerPr
         </div>
       )}
 
-      {value && <ConfirmCard value={value} onChange={() => setChangeOpen(true)} />}
-      {!value && (
+      {value && <ConfirmCard value={value} onChange={disabled ? undefined : () => setChangeOpen(true)} />}
+      {!value && !disabled && (
         <button type="button" onClick={() => setChangeOpen(true)} className="min-h-11 self-start text-[13px] font-extrabold text-adm-green underline-offset-2 hover:underline">
           {t("zone.change")}
         </button>
@@ -164,7 +167,7 @@ export function ZonePicker({ value, onChange, error, id = "zone" }: ZonePickerPr
   );
 }
 
-function ConfirmCard({ value, onChange }: { value: ZoneChoice; onChange: () => void }) {
+function ConfirmCard({ value, onChange }: { value: ZoneChoice; onChange?: () => void }) {
   const { t } = useT();
   const [now] = useState(() => Date.now());
   const { schedule, loading } = usePrayerToday(value.zone, now);
@@ -193,9 +196,11 @@ function ConfirmCard({ value, onChange }: { value: ZoneChoice; onChange: () => v
       )}
       <div className="mt-0.5 flex items-center justify-between gap-2.5">
         <span className="text-[13px] font-bold">{t("zone.confirm")}</span>
+        {onChange && (
         <button type="button" onClick={onChange} className="min-h-11 whitespace-nowrap text-[13px] font-extrabold text-adm-green underline-offset-2 hover:underline">
           {t("zone.change")}
         </button>
+        )}
       </div>
     </div>
   );

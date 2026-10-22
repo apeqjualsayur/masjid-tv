@@ -2,8 +2,8 @@
 // Areas come from the zone descriptions in src/data/zones.json ("Gombak, Petaling, …").
 import { ZONES, findZone, type Zone } from "@/data/zones";
 
-/** How the zone was chosen; shown on the confirmation card. */
-export type ZoneSource = "gps" | "area" | "picked";
+/** How the zone was chosen; shown on the confirmation card ("current" = already saved, Tetapan). */
+export type ZoneSource = "gps" | "area" | "picked" | "current";
 
 /** What registration (and Tetapan) stores. Coordinates are never part of it. */
 export interface ZoneChoice {

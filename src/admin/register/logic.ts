@@ -82,7 +82,7 @@ export interface RegisterBackend {
   registerOrg(args: ReturnType<typeof registerArgs>): Promise<string>;
   uploadObject(path: string, blob: Blob, contentType: string): Promise<void>;
   insertMedia(row: { org_id: string; path: string; kind: "logo"; width: number; height: number; bytes: number }): Promise<void>;
-  setOrgLogo(orgId: string, path: string): Promise<void>;
+  setOrgLogo(orgId: string, path: string | null): Promise<void>;
   deleteMedia(path: string): Promise<void>;
   removeObject(path: string): Promise<void>;
 }

@@ -181,7 +181,7 @@ Supabase free (2 projects: `masjidview-dev`, `masjidview-prod`), Cloudflare Page
 8. Live preview in the template editor matches the TV rendering for all 10 templates × 3 themes.
 9. Kematian cannot be saved without an end date ≤ 7 days; purged 30 days after ending.
 10. Admin fully usable in BM and English at 360 px width; every tap target ≥ 44 px. Also fully usable on a computer at 1280×800 and 1920×1080 in Chrome, Edge and Safari (sidebar layout, table, side-by-side editor preview, drag-and-drop poster upload).
-11. Editor role cannot open Tetapan, Skrin actions or Ahli (UI hidden and DB rejects).
+11. Editor role cannot change Tetapan (page is read-only with a note), use Skrin actions or open Ahli (UI hidden or disabled, and DB rejects).
 12. Zone picker: "Guna lokasi saya" at a known masjid returns the correct zone; denying location falls back to the lists; a multi-zone area forces a choice; the confirmation card shows today's times matching JAKIM e-Solat for that zone.
 
 ## 13. Later (not Phase 2)

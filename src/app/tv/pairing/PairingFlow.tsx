@@ -1,48 +1,15 @@
 "use client";
 // Unpaired TV (PRD Phase 2 §4.4, designs/admin/TVPair): code + QR + countdown on the 1920×1080
-// stage; once paired, "Disambungkan" + screen name until sync arrives (2.7). TV text stays BM.
-import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { formatGregorian, formatTime } from "@/core";
-import { restoreClockOffset } from "@/data";
+// stage; once paired, the synced display (BundleDisplay). TV text stays BM.
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { idbBundleStore, restoreClockOffset } from "@/data";
 import { getTvSupabase } from "@/lib/supabase";
 import { useNow } from "../hooks";
+import { BundleDisplay, postMediaSync } from "./BundleDisplay";
 import { browserDeviceStore } from "./device";
-import { PAIRED_CHECK_MS, bundleSaysUnpaired, countdown, newSecret, pairUrl, qrModules, type PairView } from "./logic";
+import { Frame, GREEN, INK, MUTED } from "./frame";
+import { countdown, newSecret, pairUrl, qrModules, type PairView } from "./logic";
 import { createPairingRunner } from "./runner";
-
-const INK = "#12261E";
-const MUTED = "#51655C";
-const GREEN = "#146C4A";
-
-function Logo({ size }: { size: number }) {
-  return (
-    <svg role="img" aria-label="Logo Masjid View" width={size} height={size} viewBox="0 0 76 76">
-      <rect width="76" height="76" rx="22" fill={GREEN} />
-      <path d="M24 58V36a14 14 0 0 1 28 0v22Z" fill="#FFFFFF" />
-      <circle cx="38" cy="22" r="3.5" fill="#E3B04B" />
-      <rect x="32" y="44" width="12" height="14" rx="6" fill={GREEN} />
-    </svg>
-  );
-}
-
-function Frame({ children, footer }: { children: ReactNode; footer?: ReactNode }) {
-  const t = useNow();
-  return (
-    <div className="font-jakarta" style={{ position: "absolute", inset: 0, background: "#EEF5F1", color: INK, padding: "72px 110px", display: "flex", flexDirection: "column" }}>
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-        <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
-          <Logo size={64} />
-          <div style={{ fontSize: 36, fontWeight: 800 }}>Masjid View</div>
-        </div>
-        <div style={{ fontSize: 26, fontWeight: 600, color: MUTED }}>
-          {formatTime(t)} · {formatGregorian(t)}
-        </div>
-      </div>
-      {children}
-      {footer}
-    </div>
-  );
-}
 
 function Qr({ text }: { text: string }) {
   const m = useMemo(() => qrModules(text), [text]);
@@ -119,29 +86,12 @@ function PairingView({ view, host }: { view: PairView; host: string }) {
   );
 }
 
-function PairedView({ name, masjid }: { name: string | null; masjid: string | null }) {
-  return (
-    <Frame>
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 28, textAlign: "center" }}>
-        <svg aria-hidden="true" width="160" height="160" viewBox="0 0 24 24" fill="none" stroke={GREEN} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-          <circle cx="12" cy="12" r="10" />
-          <path d="M7.5 12.5l3 3 6-6.5" />
-        </svg>
-        <div style={{ fontSize: 88, fontWeight: 800, letterSpacing: -2 }}>Disambungkan</div>
-        {name && <div style={{ fontSize: 44, fontWeight: 700 }}>{name}</div>}
-        {masjid && <div style={{ fontSize: 30, fontWeight: 500, color: MUTED }}>{masjid}</div>}
-      </div>
-    </Frame>
-  );
-}
-
-type Mode = { kind: "pairing"; view: PairView } | { kind: "paired"; secret: string; name: string | null; masjid: string | null };
+type Mode = { kind: "pairing"; view: PairView } | { kind: "paired"; secret: string };
 
 /** The whole unpaired → paired → (revoked) → unpaired cycle. */
 export function PairingFlow() {
   const [mode, setMode] = useState<Mode>({ kind: "pairing", view: { kind: "starting" } });
   const [cycle, setCycle] = useState(0);
-  const runner = useRef<ReturnType<typeof createPairingRunner> | null>(null);
   const host = typeof window === "undefined" ? "masjidview.my" : window.location.host;
 
   // Pairing: runs until the TV is paired.
@@ -159,14 +109,17 @@ export function PairingFlow() {
       now: () => Date.now(),
       online: () => navigator.onLine !== false,
       onView: (view) => !cancelled && setMode((m) => (m.kind === "pairing" ? { kind: "pairing", view } : m)),
-      onPaired: (secret) => !cancelled && setMode({ kind: "paired", secret, name: null, masjid: null }),
+      onPaired: async (secret) => {
+        // A new pairing may be another masjid: never start from an older stored bundle.
+        await idbBundleStore().clear();
+        if (!cancelled) setMode({ kind: "paired", secret });
+      },
     });
-    runner.current = r;
     (async () => {
       const secret = await store.loadSecret();
       if (cancelled) return;
       if (secret && store.pairedScreen()) {
-        setMode({ kind: "paired", secret, name: null, masjid: null }); // checked below via screen_bundle
+        setMode({ kind: "paired", secret }); // offline boot: BundleDisplay shows the stored bundle at once
         return;
       }
       await r.start(secret);
@@ -177,36 +130,14 @@ export function PairingFlow() {
     };
   }, [cycle]);
 
-  // Paired: screen name now, and every 60 s check that the screen still exists (revoke → new code).
-  const pairedSecret = mode.kind === "paired" ? mode.secret : null;
-  useEffect(() => {
-    if (!pairedSecret) return;
-    const sb = getTvSupabase();
-    let cancelled = false;
-    let since = 0;
-    const check = async () => {
-      const { data, error } = await sb.rpc("screen_bundle", { p_secret: pairedSecret, p_since: since });
-      if (cancelled || error) return;
-      if (bundleSaysUnpaired(data)) {
-        browserDeviceStore.markPaired(null);
-        await browserDeviceStore.saveSecret(newSecret()); // the old secret can never pair again
-        setMode({ kind: "pairing", view: { kind: "starting" } });
-        setCycle((c) => c + 1);
-        return;
-      }
-      const b = data as { status?: string; version?: number; screen?: { name?: string }; org?: { fullName?: string } };
-      if (b.status === "ok") {
-        since = b.version ?? since;
-        setMode((m) => (m.kind === "paired" ? { ...m, name: b.screen?.name ?? m.name, masjid: b.org?.fullName ?? m.masjid } : m));
-      }
-    };
-    check();
-    const id = setInterval(check, PAIRED_CHECK_MS);
-    return () => {
-      cancelled = true;
-      clearInterval(id);
-    };
-  }, [pairedSecret]);
+  // Revoked or deleted in the admin app: forget this pairing, new secret, new code.
+  const onRevoked = useCallback(async () => {
+    browserDeviceStore.markPaired(null);
+    await browserDeviceStore.saveSecret(newSecret()); // the old secret can never pair again
+    postMediaSync([]);
+    setMode({ kind: "pairing", view: { kind: "starting" } });
+    setCycle((c) => c + 1);
+  }, []);
 
-  return mode.kind === "paired" ? <PairedView name={mode.name} masjid={mode.masjid} /> : <PairingView view={mode.view} host={host} />;
+  return mode.kind === "paired" ? <BundleDisplay secret={mode.secret} onRevoked={onRevoked} /> : <PairingView view={mode.view} host={host} />;
 }

@@ -7,6 +7,10 @@
  *   /data/*.json ..... cache-first (bundled per build)
  *   /config/*.json ... network-first, so AJK edits show up; cached copy when offline
  *   posters/images ... cache-first, stored in the runtime cache on first view
+ *   bundle media ..... (Supabase public bucket 'media': logo + posters) cache-first in its own cache,
+ *                      fetched in CORS mode (no opaque responses filling the quota); the app sends
+ *                      {type:"media-sync", urls} after each bundle: unreferenced files are deleted,
+ *                      missing ones downloaded, so the TV has every poster before going offline
  *   prayer API ....... network-first, fall back to the last cached response, marked x-sw-cache: hit
  *                      so the app knows it is offline (never reported as a fresh sync)
  *   /chrono .......... network only, never cached: a stale time would set a wrong clock offset
@@ -18,11 +22,14 @@ const PRECACHE = __PRECACHE__;
 const SHELL = "masjid-tv-shell-" + VERSION;
 const RUNTIME = "masjid-tv-runtime"; // posters + API responses, kept across versions
 const RUNTIME_MAX = 80;
+const MEDIA = "masjid-view-media"; // only what the current bundle references (pruned by media-sync)
+const MEDIA_PATH = "/storage/v1/object/public/media/";
 const API_HOST = "api.waktusolat.app";
 
 function classify(url, request) {
   if (request.method !== "GET") return "passthrough";
   const u = new URL(url);
+  if (u.pathname.startsWith(MEDIA_PATH)) return "media";
   if (u.hostname === API_HOST) return u.pathname === "/chrono" ? "passthrough" : "network-first";
   const isImage = request.destination === "image" || /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(u.pathname);
   if (u.origin !== self.location.origin) return isImage ? "cache-first" : "passthrough";
@@ -79,6 +86,39 @@ async function networkFirst(request, timeoutMs) {
   }
 }
 
+function corsGet(url) {
+  return fetch(new Request(url, { mode: "cors", credentials: "omit" }));
+}
+
+async function mediaFirst(request) {
+  const cache = await caches.open(MEDIA);
+  const hit = await cache.match(request.url);
+  if (hit) return hit;
+  try {
+    const res = await corsGet(request.url);
+    if (res.ok) await cache.put(request.url, res.clone());
+    return res;
+  } catch (e) {
+    return fetch(request);
+  }
+}
+
+/** Keep exactly the media the bundle references: delete the rest, download what is missing. */
+async function mediaSync(urls) {
+  const keep = new Set(urls);
+  const cache = await caches.open(MEDIA);
+  for (const req of await cache.keys()) if (!keep.has(req.url)) await cache.delete(req);
+  for (const url of keep) {
+    if (await cache.match(url)) continue;
+    try {
+      const res = await corsGet(url);
+      if (res.ok) await cache.put(url, res);
+    } catch (e) {
+      // offline: fetched on first view later
+    }
+  }
+}
+
 async function page(request) {
   try {
     return await withTimeout(fetch(request), 3000);
@@ -106,6 +146,11 @@ self.addEventListener("activate", (event) => {
 
 self.addEventListener("message", (event) => {
   if (event.data === "version") event.source && event.source.postMessage({ type: "version", version: VERSION });
+  if (event.data && event.data.type === "media-sync" && Array.isArray(event.data.urls)) {
+    const urls = event.data.urls.filter((u) => typeof u === "string" && new URL(u).pathname.startsWith(MEDIA_PATH));
+    const done = mediaSync(urls);
+    if (event.waitUntil) event.waitUntil(done);
+  }
 });
 
 self.addEventListener("fetch", (event) => {
@@ -113,5 +158,6 @@ self.addEventListener("fetch", (event) => {
   if (kind === "passthrough") return;
   if (kind === "page") return event.respondWith(page(event.request));
   if (kind === "cache-first") return event.respondWith(cacheFirst(event.request));
+  if (kind === "media") return event.respondWith(mediaFirst(event.request));
   event.respondWith(networkFirst(event.request, 5000));
 });

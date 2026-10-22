@@ -71,11 +71,6 @@ export function afterStartError(message: string, online: boolean, rotatedAlready
   return { view: { kind: "error" }, next: "start" };
 }
 
-/** screen_bundle answer while paired: revoked/deleted → back to pairing with a new secret. */
-export function bundleSaysUnpaired(r: unknown): boolean {
-  return (r as { status?: string } | null)?.status === "revoked";
-}
-
 export const POLL_MS = 5_000;
 export const RETRY_MS = 10_000;
 export const PAIRED_CHECK_MS = 60_000;

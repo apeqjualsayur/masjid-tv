@@ -1,0 +1,52 @@
+import { describe, expect, it } from "vitest";
+import { parseBundleAnswer } from "@/data/bundle";
+import { bundleToScreenConfig } from "./bundle-config";
+
+const SB = "https://abc.supabase.co";
+function bundle(org: Record<string, unknown> = {}, screen: Record<string, unknown> = {}, settings: Record<string, unknown> = {}) {
+  const a = parseBundleAnswer({
+    status: "ok",
+    version: 3,
+    screen: { id: "s", name: "Dewan", theme: "tenang", layout: "side", ...screen },
+    org: { fullName: "Masjid Al-Hidayah", shortName: "Al-Hidayah", kind: "masjid", zone: "WLY01", accentColor: "#8A2A4A", logoPath: "org/logo.webp", ...org },
+    settings: { iqamahMin: { subuh: 12, zohor: 10, asar: 10, maghrib: 9, isyak: 10 }, durations: { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 45 }, clock24h: true, showArabic: false, ticker: ["Satu", "Dua"], ...settings },
+    slides: [],
+  });
+  if (a.kind !== "ok") throw new Error("fixture");
+  return a.bundle;
+}
+
+describe("bundleToScreenConfig", () => {
+  it("maps every setting the engine and themes use", () => {
+    const { config, accentColor, warnings } = bundleToScreenConfig(bundle(), SB);
+    expect(warnings).toEqual([]);
+    expect(config).toEqual({
+      masjid: { fullName: "Masjid Al-Hidayah", shortName: "Al-Hidayah", logo: `${SB}/storage/v1/object/public/media/org/logo.webp` },
+      zone: "WLY01",
+      theme: "tenang",
+      layout: "side",
+      clock24h: true,
+      showArabic: false,
+      durations: { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 45 },
+      iqamahMin: { subuh: 12, zohor: 10, asar: 10, maghrib: 9, isyak: 10 },
+      ticker: ["Satu", "Dua"],
+    });
+    expect(accentColor).toBe("#8A2A4A");
+  });
+
+  it("no logo means no logo (never the sample logo); empty ticker stays empty", () => {
+    const { config } = bundleToScreenConfig(bundle({ logoPath: null }, {}, { ticker: [] }), SB);
+    expect(config.masjid.logo).toBeUndefined();
+    expect(config.ticker).toEqual([]);
+  });
+
+  it("bad values fall back to safe defaults with warnings", () => {
+    const { config, accentColor, warnings } = bundleToScreenConfig(bundle({ accentColor: "red" }, { theme: "neon", layout: "diagonal" }, { iqamahMin: { subuh: -4 } }), SB);
+    expect(config.theme).toBe("alam");
+    expect(config.layout).toBe("full");
+    expect(config.iqamahMin.subuh).toBe(10);
+    expect(accentColor).toBeNull();
+    expect(warnings.length).toBeGreaterThanOrEqual(3);
+    expect(warnings.every((w) => w.startsWith("bundle: "))).toBe(true);
+  });
+});

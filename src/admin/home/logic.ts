@@ -41,11 +41,9 @@ export function offlineFor(lastSeenAt: string | null, now: number): number | nul
   return Number.isFinite(t) ? Math.max(0, now - t) : null;
 }
 
-/** Database weekdays are 1 = Isnin … 7 = Ahad; the playlist uses 0 = Ahad … 6 = Sabtu. */
-export function dbDaysToPlaylist(days: number[] | null): number[] | undefined {
-  if (!days || days.length === 0) return undefined;
-  return days.map((d) => d % 7);
-}
+/** Database weekdays → playlist weekdays (shared with the TV bundle sync). */
+export { dbDaysToPlaylist } from "@/data/bundle";
+import { dbDaysToPlaylist } from "@/data/bundle";
 
 export function toPlaylistItem(s: SlideRow): PlaylistItem<SlideRow> {
   return {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { afterStart, afterStartError, afterStatus, bundleSaysUnpaired, countdown, isSecret, newSecret, pairUrl, qrModules } from "./logic";
+import { afterStart, afterStartError, afterStatus, countdown, isSecret, newSecret, pairUrl, qrModules } from "./logic";
 
 describe("device secret", () => {
   it("is 64 hex characters from 32 random bytes", () => {
@@ -62,11 +62,5 @@ describe("pairing steps", () => {
   it("offline and other errors retry", () => {
     expect(afterStartError("Failed to fetch", false, false)).toEqual({ view: { kind: "offline" }, next: "start" });
     expect(afterStartError("bad_secret", true, false)).toEqual({ view: { kind: "error" }, next: "start" });
-  });
-  it("screen_bundle 'revoked' (revoked or deleted) unpairs", () => {
-    expect(bundleSaysUnpaired({ status: "revoked" })).toBe(true);
-    expect(bundleSaysUnpaired({ status: "ok" })).toBe(false);
-    expect(bundleSaysUnpaired({ status: "suspended" })).toBe(false);
-    expect(bundleSaysUnpaired(null)).toBe(false);
   });
 });

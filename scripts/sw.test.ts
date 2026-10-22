@@ -179,3 +179,53 @@ describe("offline behaviour", () => {
     expect(cachesMap.get("masjid-tv-runtime")!.store.size).toBe(80);
   });
 });
+describe("bundle media (Supabase public bucket)", () => {
+  const MEDIA_URL = "https://abc.supabase.co/storage/v1/object/public/media/org-1/";
+
+  it("is routed to its own cache-first strategy", () => {
+    const { classify } = loadSw();
+    expect(classify(`${MEDIA_URL}poster.webp`, { mode: "no-cors", destination: "image", method: "GET" })).toBe("media");
+    expect(classify(`${MEDIA_URL}poster.webp`, { mode: "cors", destination: "", method: "POST" })).toBe("passthrough");
+  });
+
+  it("fetched once, then served offline from the media cache (not the capped runtime cache)", async () => {
+    const sw = loadSw();
+    const poster = `${MEDIA_URL}kuliah.webp`;
+    expect((await sw.get(poster, { destination: "image", mode: "no-cors" }))!.status).toBe(200);
+    await sw.get(poster, { destination: "image", mode: "no-cors" });
+    expect(fetched.filter((u) => u === poster)).toHaveLength(1);
+    expect(cachesMap.get("masjid-view-media")!.store.has(poster)).toBe(true);
+    expect(cachesMap.get("masjid-tv-runtime")?.store.has(poster) ?? false).toBe(false);
+    online = false;
+    expect(await (await sw.get(poster, { destination: "image", mode: "no-cors" }))!.text()).toBe("/storage/v1/object/public/media/org-1/kuliah.webp v1");
+  });
+
+  it("media-sync keeps the logo and current posters, deletes the rest, downloads what is missing", async () => {
+    const sw = loadSw();
+    const logo = `${MEDIA_URL}logo.webp`;
+    const oldPoster = `${MEDIA_URL}old.webp`;
+    const newPoster = `${MEDIA_URL}new.webp`;
+    await sw.get(logo, { destination: "image" });
+    await sw.get(oldPoster, { destination: "image" });
+    await sw.fire("message", { data: { type: "media-sync", urls: [logo, newPoster, "https://evil.example/x.webp"] } });
+    const keys = [...cachesMap.get("masjid-view-media")!.store.keys()].sort();
+    expect(keys).toEqual([logo, newPoster].sort());
+    expect(fetched.filter((u) => u === logo)).toHaveLength(1);
+    expect(fetched).not.toContain("https://evil.example/x.webp");
+  });
+
+  it("media-sync with an empty list (screen revoked) clears the media cache", async () => {
+    const sw = loadSw();
+    await sw.get(`${MEDIA_URL}a.webp`, { destination: "image" });
+    await sw.fire("message", { data: { type: "media-sync", urls: [] } });
+    expect(cachesMap.get("masjid-view-media")!.store.size).toBe(0);
+  });
+
+  it("activate keeps the media cache", async () => {
+    const sw = loadSw("new2");
+    await sw.get(`${MEDIA_URL}a.webp`, { destination: "image" });
+    await sw.fire("install");
+    await sw.fire("activate");
+    expect(cachesMap.has("masjid-view-media")).toBe(true);
+  });
+});

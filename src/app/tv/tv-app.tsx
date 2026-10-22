@@ -43,14 +43,33 @@ import { APP_VERSION, useOnline, useServiceWorker } from "./status";
 import { PairingFlow } from "./pairing/PairingFlow";
 import { supabaseConfigured } from "@/lib/supabase";
 
+/** Bundle details for the debug overlay (paired TVs only). */
+export interface BundleMeta {
+  version: number | null;
+  lastSync: number | null;
+  status: string;
+  screenName: string | null;
+  from: string | null;
+}
+
+/** What the display shows: screen.json + sample slides (local mode) or the synced bundle (paired). */
+export interface DisplaySource {
+  config: ScreenConfig;
+  configSource: ConfigSource | string;
+  slides: PlaylistItem<SlideView>[];
+  warnings: string[];
+  bundle?: BundleMeta;
+}
+
 interface Boot {
   config: ScreenConfig;
-  configSource: ConfigSource;
+  configSource: ConfigSource | string;
   overrides: UrlOverrides;
   warnings: string[];
   data: PrayerData;
   status: SyncStatus;
   slides: PlaylistItem<SlideView>[];
+  bundle?: BundleMeta;
 }
 
 export function TvRoot() {
@@ -63,36 +82,63 @@ export function TvRoot() {
   );
 }
 
+/** Local mode (Phase 1): public/config/screen.json + sample-slides.json. */
 function TvApp() {
-  const [boot, setBoot] = useState<Boot | null>(null);
+  const [source, setSource] = useState<DisplaySource | null>(null);
   const [bootError, setBootError] = useState<unknown>(null);
-  const [dataVersion, setDataVersion] = useState(0);
-  useDailyReload();
 
   useEffect(() => {
     let cancelled = false;
-    let stop: (() => void) | undefined;
     (async () => {
-      const { overrides, warnings: urlWarnings } = parseUrlOverrides(window.location.search, window.location.hostname);
-      const [{ config, warnings: configWarnings, source: configSource }, slides] = await Promise.all([loadScreenConfig(), loadSlides()]);
-      if (cancelled) return;
-      const storedClock = restoreClockOffset();
-      const debugTime = overrides.simStartMs !== undefined || overrides.speed !== undefined;
-      setDebugTime(debugTime ? { simStartMs: overrides.simStartMs, speed: overrides.speed } : null);
-      const store = idbMonthStore();
-      const sync = startSync({ zone: config.zone, store, initialClockSync: storedClock?.syncedAt, onMonths: () => setDataVersion((v) => v + 1) });
-      stop = sync.stop;
-      const data = createPrayerData({ store, loadYear: createFallbackLoader(), liveKeys: sync.status.liveKeys });
-      setBoot({ config, configSource, overrides, warnings: [...urlWarnings, ...configWarnings, ...slides.warnings], data, status: sync.status, slides: slides.items });
+      const [{ config, warnings, source: configSource }, slides] = await Promise.all([loadScreenConfig(), loadSlides()]);
+      if (!cancelled) setSource({ config, configSource, slides: slides.items, warnings: [...warnings, ...slides.warnings] });
     })().catch((e) => !cancelled && setBootError(e));
     return () => {
       cancelled = true;
-      stop?.();
     };
   }, []);
 
   if (bootError) throw bootError; // caught by the ErrorBoundary: reload in 30 s
-  if (!boot) return <div className="h-full bg-black" />;
+  if (!source) return <div className="h-full bg-black" />;
+  return <DisplayHost source={source} />;
+}
+
+/**
+ * Runs the Phase 1 data layer (clock + prayer months) for the source's zone and renders the
+ * display. A zone change (Tetapan) restarts the sync, so the new zone's months are fetched.
+ */
+export function DisplayHost({ source }: { source: DisplaySource }) {
+  const [url] = useState(() => parseUrlOverrides(window.location.search, window.location.hostname));
+  const [storedClock] = useState(() => {
+    const stored = restoreClockOffset();
+    const o = url.overrides;
+    const debugTime = o.simStartMs !== undefined || o.speed !== undefined;
+    setDebugTime(debugTime ? { simStartMs: o.simStartMs, speed: o.speed } : null);
+    return stored;
+  });
+  const [dataVersion, setDataVersion] = useState(0);
+  const [sync, setSync] = useState<{ data: PrayerData; status: SyncStatus } | null>(null);
+  const zone = source.config.zone;
+  useDailyReload();
+
+  useEffect(() => {
+    const store = idbMonthStore();
+    const s = startSync({ zone, store, initialClockSync: storedClock?.syncedAt, onMonths: () => setDataVersion((v) => v + 1) });
+    setSync({ data: createPrayerData({ store, loadYear: createFallbackLoader(), liveKeys: s.status.liveKeys }), status: s.status });
+    return () => s.stop();
+  }, [zone, storedClock]);
+
+  if (!sync) return <div className="h-full bg-black" />;
+  const boot: Boot = {
+    config: source.config,
+    configSource: source.configSource,
+    overrides: url.overrides,
+    warnings: [...url.warnings, ...source.warnings],
+    data: sync.data,
+    status: sync.status,
+    slides: source.slides,
+    bundle: source.bundle,
+  };
   return <Display boot={boot} dataVersion={dataVersion} />;
 }
 
@@ -159,6 +205,7 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
     swState: sw.state,
     swVersion: sw.version,
     online,
+    bundle: boot.bundle,
     warnings: [
       ...(themeWarning ? [themeWarning] : []),
       ...(layout !== configuredLayout ? [`no slides to show; ${configuredLayout} layout shown as full`] : []),

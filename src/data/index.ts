@@ -7,3 +7,4 @@ export * from "./fallback";
 export * from "./prayer-data";
 export * from "./zones";
 export * from "./slides";
+export * from "./bundle";

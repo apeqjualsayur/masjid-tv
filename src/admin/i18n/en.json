@@ -536,6 +536,83 @@
       "ayat": "Choose again from the list."
     }
   },
+  "content": {
+    "title": "Content",
+    "tabs": "Status",
+    "tab": {
+      "aktif": "Active",
+      "dijadual": "Scheduled",
+      "tamat": "Ended"
+    },
+    "tabCount": "{label} ({n})",
+    "dragHint": "Drag to change the display order.",
+    "dragHintDesktop": "Drag ⋮⋮ to change the display order",
+    "drag": "Drag to reorder: {title}",
+    "moveUp": "Move up: {title}",
+    "moveDown": "Move down: {title}",
+    "moved": "{title} is now at position {n} of {total}.",
+    "search": "Search titles…",
+    "screenFilter": "Filter by screen",
+    "allScreens": "All screens",
+    "newPoster": "Upload poster",
+    "newAnnouncement": "+ New announcement",
+    "add": "Add content",
+    "col": {
+      "type": "Type",
+      "title": "Title",
+      "dates": "Period",
+      "secs": "Secs",
+      "days": "Days",
+      "screens": "Screens",
+      "show": "Show"
+    },
+    "priority": "Priority",
+    "kematian": "Death notice",
+    "date": {
+      "until": "Until {to}",
+      "ongoing": "Ongoing",
+      "starts": "Starts {from}",
+      "ended": "Ended {to}",
+      "range": "{from} – {to}"
+    },
+    "autoEnd": "Ends automatically: {n} days",
+    "seconds": "{n} s",
+    "everyDay": "Every day",
+    "show": "Show on TV: {title}",
+    "draft": "Draft",
+    "paused": "Paused",
+    "more": "More actions: {title}",
+    "edit": "Edit",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "deleteTitle": "Delete \"{title}\"?",
+    "deleteBody": "This content is removed from all screens within 1 minute. Its poster picture or QR code is deleted too, unless other content still uses it.",
+    "deleteConfirm": "Yes, delete",
+    "cancel": "Cancel",
+    "deleted": "Deleted.",
+    "deletedKept": "Deleted, but the picture file could not be removed from storage.",
+    "duplicated": "Copy saved as a draft in the Scheduled tab.",
+    "shown": "Shown on the TV within 1 minute.",
+    "pausedDone": "Paused. The TV stops showing it within 1 minute.",
+    "reordered": "Order saved. The TV follows it within 1 minute.",
+    "error": "Failed: {message}",
+    "needsMigration": "The order could not be saved: the reorder_slides function is not installed in the database yet (migration 0005).",
+    "loadError": "Content could not be loaded: {message}",
+    "empty": {
+      "aktif": "Nothing is showing right now.",
+      "dijadual": "Nothing scheduled and no drafts.",
+      "tamat": "Nothing has ended."
+    },
+    "noMatch": "Nothing matches.",
+    "dnd": {
+      "pickedUp": "{title} picked up, position {n} of {total}. Use the up/down arrows to move, Space to drop, Escape to cancel.",
+      "over": "{title} is at position {n} of {total}.",
+      "dropped": "{title} dropped at position {n} of {total}.",
+      "cancelled": "Moving {title} cancelled.",
+      "instructions": "To reorder, press Space on a drag button, use the up/down arrows, then Space to drop."
+    },
+    "untitled": "(untitled)"
+  },
   "privacy": { "title": "Privacy Notice", "draft": "The full privacy notice will be published before the pilot. Data held: AJK names, emails and phone numbers, and announcement content (including names of the deceased)." },
   "dialog": { "close": "Close" }
 }

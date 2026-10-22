@@ -224,6 +224,17 @@ async function run(orgIds: string[]) {
   expectFail("A cannot point org A's logo at a file in B/… (set_org_logo)", await A.db.rpc("set_org_logo", { p_org: orgA, p_path: bFile }));
 
   // Verify with the service role that B's data is untouched.
+  // Playlist order (migration 0005): only members of the masjid can reorder its slides.
+  const aSlideId = (aSlide.data as { id: string } | null)?.id;
+  if (aSlideId) {
+    const own = await A.db.rpc("reorder_slides", { p_org: orgA, p_ids: [aSlideId] });
+    report(!own.error, "A can reorder org A's slides (reorder_slides)", fmt(own.error));
+  }
+  expectFail("A cannot reorder org B's slides (reorder_slides)", await A.db.rpc("reorder_slides", { p_org: orgB, p_ids: [bSlide.id] }), "not_allowed");
+  const sneaky = await A.db.rpc("reorder_slides", { p_org: orgA, p_ids: [bSlide.id] });
+  report(!sneaky.error && sneaky.data === 0, "A cannot move org B's slide by passing it under org A (0 rows changed)", fmt(sneaky.error) || `changed ${String(sneaky.data)}`);
+  expectFail("anon cannot call reorder_slides", await anon.rpc("reorder_slides", { p_org: orgB, p_ids: [bSlide.id] }));
+
   const bAfter = await admin.from("slides").select("fields").eq("id", bSlide.id).single();
   report(!(bAfter.data?.fields as Record<string, unknown> | undefined)?.hacked, "Org B's slide is unchanged (checked with service role)");
   const bScreenAfter = await admin.from("screens").select("name").eq("id", bScreen).single();

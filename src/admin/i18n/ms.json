@@ -536,6 +536,83 @@
       "ayat": "Pilih semula daripada senarai."
     }
   },
+  "content": {
+    "title": "Kandungan",
+    "tabs": "Status",
+    "tab": {
+      "aktif": "Aktif",
+      "dijadual": "Dijadual",
+      "tamat": "Tamat"
+    },
+    "tabCount": "{label} ({n})",
+    "dragHint": "Seret untuk susun semula giliran paparan.",
+    "dragHintDesktop": "Seret ⋮⋮ untuk susun giliran paparan",
+    "drag": "Seret untuk susun: {title}",
+    "moveUp": "Naikkan: {title}",
+    "moveDown": "Turunkan: {title}",
+    "moved": "{title} kini di kedudukan {n} daripada {total}.",
+    "search": "Cari tajuk…",
+    "screenFilter": "Tapis skrin",
+    "allScreens": "Semua skrin",
+    "newPoster": "Muat naik poster",
+    "newAnnouncement": "+ Pengumuman baru",
+    "add": "Tambah kandungan",
+    "col": {
+      "type": "Jenis",
+      "title": "Tajuk",
+      "dates": "Tempoh",
+      "secs": "Saat",
+      "days": "Hari",
+      "screens": "Skrin",
+      "show": "Papar"
+    },
+    "priority": "Keutamaan",
+    "kematian": "Kematian",
+    "date": {
+      "until": "Hingga {to}",
+      "ongoing": "Berterusan",
+      "starts": "Mula {from}",
+      "ended": "Tamat {to}",
+      "range": "{from} – {to}"
+    },
+    "autoEnd": "Tamat auto: {n} hari",
+    "seconds": "{n} s",
+    "everyDay": "Setiap hari",
+    "show": "Papar di TV: {title}",
+    "draft": "Draf",
+    "paused": "Dijeda",
+    "more": "Lagi tindakan: {title}",
+    "edit": "Ubah",
+    "duplicate": "Duplikasi",
+    "delete": "Padam",
+    "deleteTitle": "Padam \"{title}\"?",
+    "deleteBody": "Kandungan ini dibuang daripada semua skrin dalam masa 1 minit. Gambar poster atau kod QR juga dipadam, kecuali jika masih digunakan oleh kandungan lain.",
+    "deleteConfirm": "Ya, padam",
+    "cancel": "Batal",
+    "deleted": "Dipadam.",
+    "deletedKept": "Dipadam, tetapi fail gambar tidak dapat dipadam daripada storan.",
+    "duplicated": "Salinan disimpan sebagai draf dalam tab Dijadual.",
+    "shown": "Dipapar di TV dalam masa 1 minit.",
+    "pausedDone": "Dijeda. TV berhenti memaparkannya dalam masa 1 minit.",
+    "reordered": "Susunan disimpan. TV mengikutnya dalam masa 1 minit.",
+    "error": "Tidak berjaya: {message}",
+    "needsMigration": "Susunan tidak dapat disimpan: fungsi reorder_slides belum dipasang dalam pangkalan data (migrasi 0005).",
+    "loadError": "Kandungan tidak dapat dimuatkan: {message}",
+    "empty": {
+      "aktif": "Tiada kandungan dipapar sekarang.",
+      "dijadual": "Tiada kandungan dijadualkan atau draf.",
+      "tamat": "Tiada kandungan yang telah tamat."
+    },
+    "noMatch": "Tiada padanan.",
+    "dnd": {
+      "pickedUp": "{title} diangkat, kedudukan {n} daripada {total}. Guna anak panah atas/bawah untuk alih, Space untuk lepas, Escape untuk batal.",
+      "over": "{title} di kedudukan {n} daripada {total}.",
+      "dropped": "{title} dilepaskan di kedudukan {n} daripada {total}.",
+      "cancelled": "Alihan {title} dibatalkan.",
+      "instructions": "Untuk menyusun, tekan Space pada butang seret, guna anak panah atas/bawah, kemudian Space untuk lepas."
+    },
+    "untitled": "(tanpa tajuk)"
+  },
   "privacy": { "title": "Notis Privasi", "draft": "Notis privasi penuh akan diterbitkan sebelum perintis. Data yang disimpan: nama, e-mel dan telefon AJK, serta kandungan pengumuman (termasuk nama si mati)." },
   "dialog": { "close": "Tutup" }
 }

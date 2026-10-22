@@ -1,10 +1,11 @@
 -- =====================================================================
 -- Masjid View — Phase 2 database schema (Supabase / Postgres 15+)
--- v0.4 — full current schema. A fresh project gets the same result from running this file once,
+-- v0.5 — full current schema. A fresh project gets the same result from running this file once,
 -- or from supabase/migrations/0001_init.sql (= v0.1) followed by the numbered migrations after it.
 -- Changes since v0.1: 0002 pair_claim returns NULL on a wrong code (records the failed attempt);
 -- 0003 platform_org_list() for the Platform page (registrant e-mail, screens, storage; owners only);
--- 0004 storage select policy for own-folder files (Storage only deletes files the user can select).
+-- 0004 storage select policy for own-folder files (Storage only deletes files the user can select);
+-- 0005 reorder_slides() saves the playlist order in one request (SECURITY INVOKER, RLS applies).
 -- =====================================================================
 
 create extension if not exists pgcrypto;
@@ -490,6 +491,24 @@ begin
    order by o.created_at desc;
 end $;
 
+-- Playlist order (0005): SECURITY INVOKER, so slides_update RLS decides.
+create or replace function public.reorder_slides(p_org uuid, p_ids uuid[])
+returns int language plpgsql security invoker set search_path = public as $
+declare v_count int;
+begin
+  if not public.is_member(p_org) or not public.is_active_org(p_org) then
+    raise exception 'not_allowed' using errcode = '42501';
+  end if;
+  update slides s
+     set sort_order = x.ord::int
+    from unnest(p_ids) with ordinality as x(id, ord)
+   where s.id = x.id
+     and s.org_id = p_org
+     and s.sort_order is distinct from x.ord::int;
+  get diagnostics v_count = row_count;
+  return v_count;
+end $;
+
 create or replace function public.accept_invitations()
 returns int language plpgsql security definer set search_path = public as $$
 declare v_email text := lower(auth.jwt() ->> 'email'); v_count int := 0; r record;
@@ -664,6 +683,7 @@ grant execute on function public.review_org(uuid, text, text)           to authe
 grant execute on function public.accept_invitations()                   to authenticated;
 grant execute on function public.set_org_logo(uuid, text)               to authenticated;
 grant execute on function public.platform_org_list()                    to authenticated;
+grant execute on function public.reorder_slides(uuid, uuid[])           to authenticated;
 grant execute on function public.pair_claim(text, uuid, text, public.theme_key, public.layout_key) to authenticated;
 grant execute on function public.is_platform_admin()                    to authenticated;
 grant execute on function public.member_role_of(uuid)                   to authenticated;

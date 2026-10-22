@@ -1,8 +1,9 @@
 -- =====================================================================
 -- Masjid View — Phase 2 database schema (Supabase / Postgres 15+)
--- v0.2 — full current schema. A fresh project gets the same result from running this file once,
+-- v0.3 — full current schema. A fresh project gets the same result from running this file once,
 -- or from supabase/migrations/0001_init.sql (= v0.1) followed by the numbered migrations after it.
--- Changes since v0.1: 0002 pair_claim returns NULL on a wrong code (records the failed attempt).
+-- Changes since v0.1: 0002 pair_claim returns NULL on a wrong code (records the failed attempt);
+-- 0003 platform_org_list() for the Platform page (registrant e-mail, screens, storage; owners only).
 -- =====================================================================
 
 create extension if not exists pgcrypto;
@@ -439,6 +440,55 @@ begin
   update organisations set logo_path = p_path where id = p_org;
 end $$;
 
+-- Platform page list (0003): registrant e-mail from auth.users, screen + storage totals. Owners only.
+create or replace function public.platform_org_list()
+returns table (
+  id               uuid,
+  kind             text,
+  full_name        text,
+  short_name       text,
+  state            text,
+  district         text,
+  zone             text,
+  address          text,
+  contact_phone    text,
+  logo_path        text,
+  accent_color     text,
+  status           public.org_status,
+  status_reason    text,
+  created_at       timestamptz,
+  reviewed_at      timestamptz,
+  registrant_email text,
+  screens_total    int,     -- paired screens that are not revoked
+  screens_online   int,     -- of those, seen in the last 3 minutes (PRD §7)
+  storage_bytes    bigint   -- sum of media.bytes
+)
+language plpgsql stable security definer set search_path = public as $
+#variable_conflict use_column
+begin
+  if not public.is_platform_admin() then
+    raise exception 'not_allowed' using errcode = '42501';
+  end if;
+  return query
+  select o.id, o.kind, o.full_name, o.short_name, o.state, o.district, o.zone,
+         o.address, o.contact_phone, o.logo_path, o.accent_color,
+         o.status, o.status_reason, o.created_at, o.reviewed_at,
+         u.email::text,
+         coalesce(s.total, 0)::int, coalesce(s.online, 0)::int, coalesce(m.bytes, 0)::bigint
+    from organisations o
+    left join auth.users u on u.id = o.created_by
+    left join lateral (
+      select count(*) as total,
+             count(*) filter (where sc.last_seen_at > now() - interval '3 minutes') as online
+        from screens sc
+       where sc.org_id = o.id and sc.revoked_at is null
+    ) s on true
+    left join lateral (
+      select sum(md.bytes) as bytes from media md where md.org_id = o.id
+    ) m on true
+   order by o.created_at desc;
+end $;
+
 create or replace function public.accept_invitations()
 returns int language plpgsql security definer set search_path = public as $$
 declare v_email text := lower(auth.jwt() ->> 'email'); v_count int := 0; r record;
@@ -612,6 +662,7 @@ grant execute on function public.register_org(text,text,text,text,text,text,text
 grant execute on function public.review_org(uuid, text, text)           to authenticated;
 grant execute on function public.accept_invitations()                   to authenticated;
 grant execute on function public.set_org_logo(uuid, text)               to authenticated;
+grant execute on function public.platform_org_list()                    to authenticated;
 grant execute on function public.pair_claim(text, uuid, text, public.theme_key, public.layout_key) to authenticated;
 grant execute on function public.is_platform_admin()                    to authenticated;
 grant execute on function public.member_role_of(uuid)                   to authenticated;

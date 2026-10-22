@@ -174,6 +174,13 @@ async function run(orgIds: string[]) {
   if (apA.data !== "active" || apB.data !== "active") throw new Fatal("approval failed; later checks depend on it");
   expectFail("A (not a platform admin) cannot approve orgs", await A.db.rpc("review_org", { p_org: orgB, p_action: "suspend", p_reason: "x" }));
 
+  // Platform list (migration 0003): registrant e-mails for platform owners only.
+  const plP = await P.db.rpc("platform_org_list");
+  const rowA = (plP.data as { id: string; registrant_email: string | null; status: string }[] | null)?.find((r) => r.id === orgA);
+  report(!plP.error && rowA?.registrant_email === A.email && rowA?.status === "active", "P lists orgs with the registrant's e-mail (platform_org_list)", fmt(plP.error));
+  expectFail("A (not a platform admin) cannot call platform_org_list", await A.db.rpc("platform_org_list"), "not_allowed");
+  expectFail("anon cannot call platform_org_list", await anon.rpc("platform_org_list"));
+
   // Data in org B for the isolation checks (created by B itself).
   const bSlide = must("B creates a slide", await B.db.from("slides").insert({ org_id: orgB, type: "template", template_key: "kuliah", fields: kuliahFields, status: "published" }).select("id").single()) as { id: string };
   const bFile = `${orgB}/poster-${RUN}.webp`;

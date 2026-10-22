@@ -169,6 +169,75 @@
       "fallback": "Please choose your state and district below."
     }
   },
+  "platform": {
+    "title": "Platform admin",
+    "owner": "Owner",
+    "stat": {
+      "active": "Active masjids",
+      "pending": "Pending",
+      "screens": "Screens online",
+      "storage": "Storage used"
+    },
+    "tab": {
+      "pending": "Pending",
+      "active": "Active",
+      "suspended": "Suspended"
+    },
+    "tabCount": "{label} ({n})",
+    "tabs": "Masjid status",
+    "search": "Search name, area, zone or e-mail",
+    "refresh": "Refresh",
+    "registeredBy": "Registered by",
+    "phone": "Phone",
+    "date": "Date",
+    "address": "Address",
+    "screens": "Screens",
+    "screensValue": "{online} / {total} online",
+    "storage": "Storage",
+    "reason": "Reason",
+    "unknown": "Unknown",
+    "action": {
+      "approve": "Approve",
+      "reject": "Reject",
+      "suspend": "Suspend",
+      "reactivate": "Reactivate"
+    },
+    "reasonTitle": {
+      "reject": "Reject {name}",
+      "suspend": "Suspend {name}"
+    },
+    "reasonLabel": "Reason (the registrant will see it)",
+    "reasonPlaceholder": "Example: Masjid details are incomplete. Please register again.",
+    "reasonHint": "Required. At most 500 characters.",
+    "cancel": "Cancel",
+    "reasonRequired": "Enter a reason.",
+    "reasonTooLong": "The reason can be at most 500 characters.",
+    "empty": {
+      "pending": "No registrations waiting.",
+      "active": "No active masjids.",
+      "suspended": "No suspended or rejected masjids."
+    },
+    "noMatch": "Nothing matches.",
+    "tip": "Tip: contact the registrant if details are unclear before approving. Rejected or suspended masjids see the reason when they sign in.",
+    "loadError": "The list could not be loaded: {message}",
+    "needsMigration": "The platform_org_list function is not installed in the database yet (migration 0003).",
+    "actionError": "The action failed: {message}",
+    "done": {
+      "approve": "{name} approved.",
+      "reject": "{name} rejected.",
+      "suspend": "{name} suspended.",
+      "reactivate": "{name} reactivated."
+    },
+    "col": {
+      "masjid": "Masjid",
+      "area": "Area · zone",
+      "registrant": "Registrant",
+      "date": "Date",
+      "screens": "Screens",
+      "storage": "Storage",
+      "actions": "Actions"
+    }
+  },
   "privacy": { "title": "Privacy Notice", "draft": "The full privacy notice will be published before the pilot. Data held: AJK names, emails and phone numbers, and announcement content (including names of the deceased)." },
   "dialog": { "close": "Close" }
 }

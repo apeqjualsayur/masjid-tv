@@ -169,6 +169,75 @@
       "fallback": "Sila pilih negeri dan daerah di bawah."
     }
   },
+  "platform": {
+    "title": "Pentadbir platform",
+    "owner": "Pemilik",
+    "stat": {
+      "active": "Masjid aktif",
+      "pending": "Menunggu",
+      "screens": "Skrin dalam talian",
+      "storage": "Storan digunakan"
+    },
+    "tab": {
+      "pending": "Menunggu",
+      "active": "Aktif",
+      "suspended": "Digantung"
+    },
+    "tabCount": "{label} ({n})",
+    "tabs": "Status masjid",
+    "search": "Cari nama, kawasan, zon atau e-mel",
+    "refresh": "Muat semula",
+    "registeredBy": "Didaftar oleh",
+    "phone": "Telefon",
+    "date": "Tarikh",
+    "address": "Alamat",
+    "screens": "Skrin",
+    "screensValue": "{online} / {total} dalam talian",
+    "storage": "Storan",
+    "reason": "Sebab",
+    "unknown": "Tidak diketahui",
+    "action": {
+      "approve": "Lulus",
+      "reject": "Tolak",
+      "suspend": "Gantung",
+      "reactivate": "Aktifkan semula"
+    },
+    "reasonTitle": {
+      "reject": "Tolak {name}",
+      "suspend": "Gantung {name}"
+    },
+    "reasonLabel": "Sebab (pendaftar akan melihatnya)",
+    "reasonPlaceholder": "Contoh: Butiran masjid tidak lengkap. Sila daftar semula.",
+    "reasonHint": "Wajib. Maksimum 500 aksara.",
+    "cancel": "Batal",
+    "reasonRequired": "Masukkan sebab.",
+    "reasonTooLong": "Sebab maksimum 500 aksara.",
+    "empty": {
+      "pending": "Tiada pendaftaran menunggu.",
+      "active": "Tiada masjid aktif.",
+      "suspended": "Tiada masjid digantung atau ditolak."
+    },
+    "noMatch": "Tiada padanan.",
+    "tip": "Tip: hubungi pendaftar jika butiran tidak jelas sebelum meluluskan. Masjid yang ditolak atau digantung melihat sebabnya apabila log masuk.",
+    "loadError": "Senarai tidak dapat dimuatkan: {message}",
+    "needsMigration": "Fungsi platform_org_list belum dipasang dalam pangkalan data (migrasi 0003).",
+    "actionError": "Tindakan tidak berjaya: {message}",
+    "done": {
+      "approve": "{name} diluluskan.",
+      "reject": "{name} ditolak.",
+      "suspend": "{name} digantung.",
+      "reactivate": "{name} diaktifkan semula."
+    },
+    "col": {
+      "masjid": "Masjid",
+      "area": "Kawasan · zon",
+      "registrant": "Pendaftar",
+      "date": "Tarikh",
+      "screens": "Skrin",
+      "storage": "Storan",
+      "actions": "Tindakan"
+    }
+  },
   "privacy": { "title": "Notis Privasi", "draft": "Notis privasi penuh akan diterbitkan sebelum perintis. Data yang disimpan: nama, e-mel dan telefon AJK, serta kandungan pengumuman (termasuk nama si mati)." },
   "dialog": { "close": "Tutup" }
 }

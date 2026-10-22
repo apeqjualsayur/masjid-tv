@@ -6,3 +6,4 @@ export * from "./schedule";
 export * from "./modes";
 export * from "./display-state";
 export * from "./playlist";
+export * from "./friday";

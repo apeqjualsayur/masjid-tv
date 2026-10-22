@@ -23,7 +23,7 @@ describe("iqamah and khutbah", () => {
   });
   it("khutbah steps by 5 between 10 and 90, other durations kept", () => {
     const d = readDurations({ preAzanMin: 6, khutbahMin: 40 });
-    expect(stepKhutbah(d, 1)).toEqual({ preAzanMin: 6, azanMin: 3, solatMin: 12, khutbahMin: 45 });
+    expect(stepKhutbah(d, 1)).toEqual({ preAzanMin: 6, azanMin: 3, solatMin: 12, khutbahMin: 45, jumaatSolatMin: 12, showFridayInfo: true });
     expect(stepKhutbah({ ...d, khutbahMin: 90 }, 1).khutbahMin).toBe(90);
     expect(stepKhutbah({ ...d, khutbahMin: 10 }, -1).khutbahMin).toBe(10);
   });

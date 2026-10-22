@@ -1,4 +1,5 @@
 // Tetapan rules (PRD Phase 2 §4.6, designs/admin/Settings). Pure: no React, no Supabase.
+import { withDurationDefaults, type ModeDurations } from "@/core";
 import type { LogoFile, RegisterBackend } from "../register/logic";
 
 /** The 5 accent colours of the design, with their i18n key. */
@@ -17,12 +18,8 @@ export const IQAMAH = { min: 1, max: 30 } as const;
 export const KHUTBAH = { min: 10, max: 90, step: 5 } as const;
 export const TICKER = { lines: 5, chars: 140 } as const;
 
-export interface Durations {
-  preAzanMin: number;
-  azanMin: number;
-  solatMin: number;
-  khutbahMin: number;
-}
+/** org_settings.durations: the engine's ModeDurations (incl. the Friday keys). */
+export type Durations = ModeDurations;
 
 export const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, Math.round(n)));
 
@@ -34,11 +31,9 @@ export function readIqamah(raw: unknown): IqamahMin {
   return d;
 }
 
+/** Every key with its default, so saving (e.g. khutbah minutes) never drops the Friday keys. */
 export function readDurations(raw: unknown): Durations {
-  const r = (raw ?? {}) as Partial<Record<keyof Durations, unknown>>;
-  const d: Durations = { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 40 };
-  for (const k of Object.keys(d) as (keyof Durations)[]) if (typeof r[k] === "number") d[k] = r[k] as number;
-  return d;
+  return withDurationDefaults(raw as Partial<Durations>);
 }
 
 export function stepIqamah(v: IqamahMin, key: IqamahKey, delta: number): IqamahMin {

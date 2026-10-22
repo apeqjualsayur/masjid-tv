@@ -23,7 +23,7 @@ export const DEFAULT_SCREEN_CONFIG: ScreenConfig = {
   layout: "full",
   clock24h: false,
   showArabic: true,
-  durations: { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 40 },
+  durations: { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 40, jumaatSolatMin: 12, showFridayInfo: true },
   iqamahMin: { subuh: 10, zohor: 10, asar: 10, maghrib: 7, isyak: 10 },
   ticker: ["[Teks pengumuman]"],
 };
@@ -96,6 +96,9 @@ export function parseScreenConfig(raw: unknown): { config: ScreenConfig; warning
         azanMin: minutes(dur.azanMin, d.durations.azanMin, "durations.azanMin"),
         solatMin: minutes(dur.solatMin, d.durations.solatMin, "durations.solatMin"),
         khutbahMin: minutes(dur.khutbahMin, d.durations.khutbahMin, "durations.khutbahMin"),
+        // Added for Friday (PRD §5.1): older screen.json files / bundles without them get the defaults.
+        jumaatSolatMin: minutes(dur.jumaatSolatMin, d.durations.jumaatSolatMin, "durations.jumaatSolatMin"),
+        showFridayInfo: bool(dur.showFridayInfo, d.durations.showFridayInfo, "durations.showFridayInfo"),
       },
       iqamahMin: {
         subuh: minutes(iq.subuh, d.iqamahMin.subuh, "iqamahMin.subuh"),

@@ -37,6 +37,6 @@ export function scheduleInput(day: 15 | 16 | 17, forceFriday?: boolean): Schedul
 
 /** screen.json defaults (PRD 9.4). */
 export const CONFIG = {
-  durations: { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 40 },
+  durations: { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 40, jumaatSolatMin: 12, showFridayInfo: true },
   iqamahMin: { subuh: 10, zohor: 10, asar: 10, maghrib: 7, isyak: 10 },
 };

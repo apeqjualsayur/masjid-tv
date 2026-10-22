@@ -27,7 +27,7 @@ describe("bundleToScreenConfig", () => {
       layout: "side",
       clock24h: true,
       showArabic: false,
-      durations: { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 45 },
+      durations: { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 45, jumaatSolatMin: 12, showFridayInfo: true }, // old bundle without the Friday keys: defaults
       iqamahMin: { subuh: 12, zohor: 10, asar: 10, maghrib: 9, isyak: 10 },
       ticker: ["Satu", "Dua"],
     });

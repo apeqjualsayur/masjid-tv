@@ -104,3 +104,17 @@ describe("isLocalMode (Phase 2 pairing vs Phase 1 local display)", () => {
     expect(isLocalMode("?local=0", true)).toBe(false);
   });
 });
+
+describe("Friday durations (PRD §9.4)", () => {
+  it("an old screen.json without jumaatSolatMin / showFridayInfo gets the defaults, no warnings", () => {
+    const { config, warnings } = parseScreenConfig({ durations: { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 40 } });
+    expect(config.durations).toEqual({ preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 40, jumaatSolatMin: 12, showFridayInfo: true });
+    expect(warnings).toEqual([]);
+  });
+  it("custom and invalid values", () => {
+    expect(parseScreenConfig({ durations: { jumaatSolatMin: 15, showFridayInfo: false } }).config.durations).toMatchObject({ jumaatSolatMin: 15, showFridayInfo: false });
+    const bad = parseScreenConfig({ durations: { jumaatSolatMin: -1, showFridayInfo: "yes" } });
+    expect(bad.config.durations).toMatchObject({ jumaatSolatMin: 12, showFridayInfo: true });
+    expect(bad.warnings).toHaveLength(2);
+  });
+});

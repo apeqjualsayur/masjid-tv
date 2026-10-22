@@ -1,6 +1,7 @@
 // Builds the DisplayState that every theme renders (_specs/01-theme-contract.md section 1).
 // Pure: same inputs, same output. Themes never compute any of this themselves.
 import { formatGregorian, formatHijri, formatSeconds, formatTime } from "./format";
+import { fridayInfo, type FridayInfo } from "./friday";
 import { computeMode, forcedMode, type ModeConfig } from "./modes";
 import { computeSchedule, type ScheduleState, type WaktuEntry } from "./schedule";
 import type { DayTimes, ModeKey, PhaseKey, PrayerKey, WaktuKey, WaktuState } from "./types";
@@ -44,6 +45,8 @@ export interface DisplayState {
   /** 0..1 elapsed */
   modeProgress?: number;
   isFriday: boolean;
+  /** Friday strip data: on Friday from 00:00 until Solat Jumaat ends, if enabled (PRD §5.1). */
+  friday?: FridayInfo;
   masjid: { fullName: string; shortName: string; logoUrl?: string };
   showArabic: boolean;
   ticker: string[];
@@ -79,6 +82,16 @@ export function upcomingPrayer(s: ScheduleState): PrayerKey {
   return s.next.key as PrayerKey;
 }
 
+/**
+ * The waktu a mode is about. Friday Zohor PRE_AZAN is labelled "Azan Jumaat", so the banner the
+ * themes build ("{label} dalam N minit") reads "Azan Jumaat dalam 5 minit" (PRD section 5).
+ */
+function modeTargetView(mode: ModeKey, target: PrayerKey | undefined, waktu: WaktuView[], isFriday: boolean): WaktuView | undefined {
+  const w = target ? waktu.find((x) => x.key === target) : undefined;
+  if (w && mode === "pre_azan" && isFriday && target === "zohor") return { ...w, label: "Azan Jumaat" };
+  return w;
+}
+
 export function buildDisplayState(i: DisplayInputs): DisplayState {
   const sched = computeSchedule(
     { today: i.today, tomorrowImsak: i.tomorrowImsak ?? NaN, tomorrowSubuh: i.tomorrowSubuh ?? NaN, forceFriday: i.forceFriday },
@@ -94,7 +107,7 @@ export function buildDisplayState(i: DisplayInputs): DisplayState {
   });
   const waktu = sched.waktu.map(view);
   const m = i.forced
-    ? forcedMode(i.forced.mode, i.forced.target, i.forced.sinceMs, i.modeConfig, i.at)
+    ? forcedMode(i.forced.mode, i.forced.target, i.forced.sinceMs, i.modeConfig, i.at, sched.isFriday)
     : computeMode(i.today.times, sched.isFriday, i.modeConfig, i.at);
 
   return {
@@ -109,10 +122,11 @@ export function buildDisplayState(i: DisplayInputs): DisplayState {
     next: waktu.find((w) => w.state === "next")!,
     countdownText: Number.isFinite(sched.msToNext) ? sched.countdownText : "",
     mode: m.mode,
-    modeTarget: m.target ? waktu.find((w) => w.key === m.target) : undefined,
+    modeTarget: modeTargetView(m.mode, m.target, waktu, sched.isFriday),
     modeRemainingSec: m.remainingSec,
     modeProgress: m.progress,
     isFriday: sched.isFriday,
+    friday: fridayInfo(i.today, i.modeConfig.durations, i.at, i.clock24h, sched.isFriday),
     masjid: i.masjid,
     showArabic: i.showArabic,
     ticker: i.ticker,

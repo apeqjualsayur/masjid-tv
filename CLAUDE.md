@@ -23,7 +23,7 @@ If code and spec disagree, the spec wins — or update the spec first, deliberat
 | Path | Contains |
 |---|---|
 | `src/core/` | Prayer engine: time/`now()`, schedule (current/next/phase), mode state machine, formatting. **Pure TS** |
-| `src/data/` | API client (waktusolat.app), IndexedDB cache, bundled fallback, zones list |
+| `src/data/` | API client (waktusolat.app), IndexedDB cache, bundled fallback, zones list; `bundle.ts`: Phase 2 TV content sync (screen_bundle every 60 s, stored bundle in IndexedDB) |
 | `src/themes/` | `types.ts` (ThemeDefinition), `registry.ts`, `ThemeView.tsx` (picks layout vs full-screen mode). Theme render tests in `themes.test.tsx` |
 | `src/themes/{alam,serambi,tenang}/` | One self-contained folder per theme implementing `ThemeDefinition` |
 | `src/templates/` | Announcement template field schemas + sample data (no styling) |

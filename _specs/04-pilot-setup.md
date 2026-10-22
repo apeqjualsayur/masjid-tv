@@ -1,6 +1,6 @@
 # Masjid TV — Pilot Setup Guide
 
-> **Pairing note (Phase 2, 2026-10-22):** plain `/tv/` now shows the pairing screen (code + QR) for TVs managed from the admin app. Until content sync is built (Phase 2 step 2.7), a pilot TV that uses `public/config/screen.json` must open `/tv/?local=1`, as in the addresses below.
+> **Pairing note (Phase 2):** plain `/tv/` shows the pairing screen (code + QR); once paired in the admin app (Skrin → Tambah skrin) the TV shows that masjid's prayer times and content, synced every 60 s and kept offline. This guide describes the older local setup from `public/config/screen.json`, which needs `/tv/?local=1` as in the addresses below.
 
 **For:** the AJK member setting up the prayer-time screen.
 **Time needed:** about 45 minutes for a Google TV, 30 minutes for a laptop.

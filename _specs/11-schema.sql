@@ -1,9 +1,10 @@
 -- =====================================================================
 -- Masjid View — Phase 2 database schema (Supabase / Postgres 15+)
--- v0.3 — full current schema. A fresh project gets the same result from running this file once,
+-- v0.4 — full current schema. A fresh project gets the same result from running this file once,
 -- or from supabase/migrations/0001_init.sql (= v0.1) followed by the numbered migrations after it.
 -- Changes since v0.1: 0002 pair_claim returns NULL on a wrong code (records the failed attempt);
--- 0003 platform_org_list() for the Platform page (registrant e-mail, screens, storage; owners only).
+-- 0003 platform_org_list() for the Platform page (registrant e-mail, screens, storage; owners only);
+-- 0004 storage select policy for own-folder files (Storage only deletes files the user can select).
 -- =====================================================================
 
 create extension if not exists pgcrypto;
@@ -684,7 +685,38 @@ create policy media_obj_insert on storage.objects for insert to authenticated
 create policy media_obj_delete on storage.objects for delete to authenticated
   using (bucket_id = 'media'
          and public.is_member(((storage.foldername(name))[1])::uuid));
--- Public read is provided by the bucket being public (no select policy needed for public URLs).
+-- Members can select their own folder (0004): Storage only deletes objects the user can select.
+-- CASE keeps the uuid cast from running on other buckets or non-uuid folder names.
+create policy media_obj_select on storage.objects for select to authenticated
+  using (
+    case
+      when bucket_id = 'media' and (storage.foldername(name))[1] ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
+
+-- ---------------------------------------------------------------------
+-- 10. Nightly cleanup (requires pg_cron extension)
+-- ---------------------------------------------------------------------
+-- select cron.schedule('masjidview-cleanup', '30 19 * * *',  -- 03:30 Malaysia time (UTC+8)
+-- $$
+--   delete from public.slides where template_key = 'kematian' and ends_at < now() - interval '30 days';
+--   delete from public.pairing_codes where (claimed_at is null and expires_at < now() - interval '1 day')
+--                                       or claimed_at < now() - interval '30 days';
+--   delete from public.pair_attempts where attempted_at < now() - interval '1 day';
+--   delete from public.invitations where accepted_at is null and expires_at < now() - interval '30 days';
+-- $$);
+-- Note: deleting a kematian slide does not delete Storage files; kematian has no images by design.
+
+-- ---------------------------------------------------------------------
+-- 11. After running: make yourself platform owner
+-- ---------------------------------------------------------------------
+-- 1) Sign in once at /admin with your Google account.
+-- 2) Run: insert into public.platform_admins (user_id)
+--         select id from auth.users where email = 'YOUR_EMAIL';
+
+        then public.is_member(((storage.foldername(name))[1])::uuid)
+      else false
+    end
+  );
+-- Public read for everyone else is provided by the bucket being public (TVs load images by URL).
 
 -- ---------------------------------------------------------------------
 -- 10. Nightly cleanup (requires pg_cron extension)

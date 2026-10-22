@@ -233,6 +233,15 @@ async function run(orgIds: string[]) {
   const bMediaAfter = await admin.from("media").select("id").eq("id", bMedia.id);
   report((bMediaAfter.data ?? []).length === 1, "Org B's media row still exists (checked with service role)");
 
+  // Own files (migration 0004): members can list and really delete files in their own folder.
+  const bOwn = await B.db.storage.from("media").list(orgB);
+  report(!bOwn.error && (bOwn.data ?? []).some((f) => bFile.endsWith(f.name)), "B can list its own storage folder B/…", bOwn.error ? fmt(bOwn.error) : `listed ${(bOwn.data ?? []).length} file(s)`);
+  const aTmp = `${orgA}/tmp-${RUN}.webp`;
+  must("A uploads a temporary file", await A.db.storage.from("media").upload(aTmp, WEBP, { contentType: "image/webp" }));
+  const aRm = await A.db.storage.from("media").remove([aTmp]);
+  const aLeft = await admin.storage.from("media").list(orgA);
+  report(!aRm.error && (aRm.data ?? []).length === 1 && !(aLeft.data ?? []).some((f) => aTmp.endsWith(f.name)), "A can really delete its own file in A/… (checked with service role)", aRm.error ? fmt(aRm.error) : `remove reported ${(aRm.data ?? []).length}`);
+
   // 5. Kematian rule -------------------------------------------------------------
   console.log("\nKematian");
   expectFail("kematian with ends_at more than 7 days ahead is rejected",

@@ -7,7 +7,7 @@ export const metadata: Metadata = { title: "Masjid View", description: "Urus pap
 // The TV page keeps <body> black and non-scrolling; the admin app scrolls inside its own layer.
 export default function AdminLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="fixed inset-0 overflow-y-auto bg-adm-ground font-jakarta text-adm-ink antialiased">
+    <div data-admin-scroll className="fixed inset-0 overflow-y-auto bg-adm-ground font-jakarta text-adm-ink antialiased">
       <AdminProviders>{children}</AdminProviders>
     </div>
   );

@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { ROUTES, canOpen, pickCurrentOrg, routeAfterSignIn, type Membership, type OrgStatus } from "./routing";
 
 const org = (id: string, status: OrgStatus, role: Membership["role"] = "pentadbir"): Membership => ({
-  orgId: id, role, status, statusReason: null, fullName: `Masjid ${id}`, shortName: id, kind: "masjid", zone: "SGR01", logoPath: null, accentColor: "#146C4A",
+  orgId: id, role, status, statusReason: null, fullName: `Masjid ${id}`, shortName: id, kind: "masjid", zone: "SGR01", state: "Selangor", district: "Gombak", logoPath: null, accentColor: "#146C4A",
 });
 
 describe("routeAfterSignIn (PRD §4.1)", () => {

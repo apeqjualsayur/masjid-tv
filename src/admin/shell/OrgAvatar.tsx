@@ -1,6 +1,7 @@
 "use client";
 import { getSupabase } from "@/lib/supabase";
 import type { Membership } from "../routing";
+import { monogram } from "./monogram";
 
 /** Logo from storage, or the short-name monogram in the masjid's accent colour. */
 export function OrgAvatar({ org, size }: { org: Pick<Membership, "shortName" | "logoPath" | "accentColor">; size: number }) {
@@ -14,7 +15,7 @@ export function OrgAvatar({ org, size }: { org: Pick<Membership, "shortName" | "
   }
   return (
     <div aria-hidden="true" style={{ ...style, background: org.accentColor || "#146C4A" }} className="flex flex-none items-center justify-center rounded-full font-extrabold text-white">
-      {org.shortName.slice(0, 3).toUpperCase()}
+      {monogram(org.shortName)}
     </div>
   );
 }

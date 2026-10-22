@@ -30,7 +30,7 @@ const Ctx = createContext<AdminSession | null>(null);
 interface OrgJoin {
   role: MemberRole;
   organisations: {
-    id: string; full_name: string; short_name: string; kind: "masjid" | "surau"; zone: string;
+    id: string; full_name: string; short_name: string; kind: "masjid" | "surau"; zone: string; state: string; district: string;
     status: OrgStatus; status_reason: string | null; logo_path: string | null; accent_color: string;
   } | null;
 }
@@ -61,7 +61,7 @@ function SessionInner({ children, langRef }: { children: ReactNode; langRef: { c
       try {
         await sb.rpc("accept_invitations");
         const [members, admin, profile] = await Promise.all([
-          sb.from("members").select("role, organisations(id, full_name, short_name, kind, zone, status, status_reason, logo_path, accent_color)").eq("user_id", s.user.id),
+          sb.from("members").select("role, organisations(id, full_name, short_name, kind, zone, state, district, status, status_reason, logo_path, accent_color)").eq("user_id", s.user.id),
           sb.from("platform_admins").select("user_id").eq("user_id", s.user.id).maybeSingle(),
           sb.from("profiles").select("lang, display_name").eq("user_id", s.user.id).maybeSingle(),
         ]);
@@ -77,6 +77,8 @@ function SessionInner({ children, langRef }: { children: ReactNode; langRef: { c
             shortName: m.organisations!.short_name,
             kind: m.organisations!.kind,
             zone: m.organisations!.zone,
+            state: m.organisations!.state,
+            district: m.organisations!.district,
             logoPath: m.organisations!.logo_path,
             accentColor: m.organisations!.accent_color,
           }))

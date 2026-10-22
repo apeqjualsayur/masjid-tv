@@ -6,9 +6,9 @@ import { useT } from "./i18n";
 import { ROUTES } from "./routing";
 import { useAdmin } from "./session";
 import { LangToggle } from "./shell/AdminShell";
-import { LogoMark } from "./shell/icons";
+import { ICON, Icon, LogoMark } from "./shell/icons";
 
-export function SimplePage({ title, children }: { title: string; children: ReactNode }) {
+export function SimplePage({ title, children, back, aside, progress }: { title: string; children: ReactNode; back?: () => void; aside?: string; progress?: number }) {
   const a = useAdmin();
   const { t } = useT();
   const router = useRouter();
@@ -18,7 +18,22 @@ export function SimplePage({ title, children }: { title: string; children: React
         <LogoMark size={40} />
         <LangToggle />
       </div>
-      <h1 className="text-[26px] font-extrabold tracking-[-0.4px]">{title}</h1>
+      <div className="flex flex-col gap-3">
+        <div className="flex items-center gap-2">
+          {back && (
+            <button type="button" onClick={back} aria-label={t("register.back")} className="-ml-3 flex h-11 w-11 flex-none items-center justify-center rounded-full text-adm-ink hover:bg-adm-hair focus-visible:outline-2 focus-visible:outline-adm-green">
+              <Icon d={ICON.chevronLeft} size={22} />
+            </button>
+          )}
+          <h1 className="flex-1 text-[26px] font-extrabold tracking-[-0.4px]">{title}</h1>
+          {aside && <span className="text-[13px] font-semibold text-adm-muted">{aside}</span>}
+        </div>
+        {progress !== undefined && (
+          <div aria-hidden="true" className="h-1.5 rounded-full bg-[#DCE7E1]">
+            <div className="h-full rounded-full bg-adm-green transition-[width]" style={{ width: `${Math.round(progress * 100)}%` }} />
+          </div>
+        )}
+      </div>
       {children}
       <div className="mt-auto flex items-center justify-between gap-3 border-t border-adm-hair pt-4 text-[13px] text-adm-muted">
         <span className="truncate">{a.email}</span>

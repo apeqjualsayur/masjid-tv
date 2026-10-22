@@ -12,6 +12,8 @@ export interface Membership {
   shortName: string;
   kind: "masjid" | "surau";
   zone: string;
+  state: string;
+  district: string;
   logoPath: string | null;
   accentColor: string;
 }

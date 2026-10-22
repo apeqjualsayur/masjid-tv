@@ -4,6 +4,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { useT } from "../i18n";
+import { notify } from "../notify";
 import { useAdmin } from "../session";
 import { Dialog } from "../shell/Dialog";
 import { OrgAvatar } from "../shell/OrgAvatar";
@@ -66,6 +67,7 @@ export function PlatformView() {
       return false;
     }
     setNotice({ ok: true, text: t(`platform.done.${action}`, { name: org.short_name }) });
+    if (action === "approve" || action === "reject") notify("reviewed", org.id);
     await reload();
     if (a.orgs.some((o) => o.orgId === org.id)) await a.refresh();
     return true;

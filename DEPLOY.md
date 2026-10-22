@@ -179,6 +179,15 @@ npm run fetch-year -- SGR01 2027
 
 ---
 
+## E-mail notifications (Resend)
+
+The Supabase Edge Function `notify` (`supabase/functions/notify/`) e-mails the platform owner when a masjid registers, and the registrant when it is approved or rejected. The app calls it after `register_org` / `review_org`; if it is not deployed, nothing breaks (status is still shown at next sign-in).
+
+- Function secrets (Supabase → **Edge Functions** → **Secrets**): `RESEND_API_KEY` (required), `NOTIFY_FROM` (e.g. `Masjid View <notifikasi@masjidview.my>`; default `onboarding@resend.dev`), `APP_URL` (default `https://masjidview.my`).
+- Until the domain is verified in Resend, the default sender only delivers to the Resend account's own e-mail.
+- Deploy (maintainer): `npx supabase functions deploy notify --project-ref <ref> --no-verify-jwt --use-api` with `SUPABASE_ACCESS_TOKEN` set. `--no-verify-jwt` is required: the function checks the signed-in user itself, and the browser's CORS preflight carries no token.
+
+---
 ## Troubleshooting
 
 | Problem | What to do |

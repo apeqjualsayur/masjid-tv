@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useEffect, useId, useRef, useState, type ReactNode } from "react";
 import { getSupabase } from "@/lib/supabase";
 import { useT } from "../i18n";
+import { notify } from "../notify";
 import { ROUTES, routeAfterSignIn } from "../routing";
 import { useAdmin } from "../session";
 import { SimplePage } from "../SimplePage";
@@ -98,6 +99,7 @@ export function RegisterView() {
     try {
       const sb = getSupabase();
       const r = await submitRegistration(supabaseRegisterBackend(sb, a.session.user.id), { ...form, zone: form.zone }, logo, () => crypto.randomUUID());
+      notify("registered", r.orgId);
       try {
         if (r.logo === "failed") sessionStorage.setItem(LOGO_FAILED_KEY, r.orgId);
       } catch {}

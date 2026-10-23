@@ -12,7 +12,7 @@ import { Dialog } from "./Dialog";
 import { ICON, Icon, LogoMark } from "./icons";
 import { OrgAvatar } from "./OrgAvatar";
 
-interface NavItem {
+export interface NavItem {
   key: "home" | "content" | "screens" | "settings" | "members" | "platform";
   route: AdminRoute;
   icon: string;
@@ -20,17 +20,20 @@ interface NavItem {
   phone: boolean;
 }
 
-function navItems(role: Membership["role"] | null, isPlatformAdmin: boolean): NavItem[] {
-  const items: NavItem[] = [
-    { key: "home", route: ROUTES.home, icon: ICON.home, phone: true },
-    { key: "content", route: ROUTES.content, icon: ICON.content, phone: true },
-    { key: "screens", route: ROUTES.screens, icon: ICON.screens, phone: true },
-  ];
+/**
+ * Masjid pages only when the account has an active masjid (they need one and would just bounce back).
+ * A platform owner without a masjid sees Platform only, also in the phone bottom bar.
+ */
+export function navItems(role: Membership["role"] | null, isPlatformAdmin: boolean): NavItem[] {
+  const items: NavItem[] = [];
   if (role) {
+    items.push({ key: "home", route: ROUTES.home, icon: ICON.home, phone: true });
+    items.push({ key: "content", route: ROUTES.content, icon: ICON.content, phone: true });
+    items.push({ key: "screens", route: ROUTES.screens, icon: ICON.screens, phone: true });
     items.push({ key: "settings", route: ROUTES.settings, icon: ICON.settings, phone: true });
     items.push({ key: "members", route: ROUTES.members, icon: ICON.members, phone: false });
   }
-  if (isPlatformAdmin) items.push({ key: "platform", route: ROUTES.platform, icon: ICON.platform, phone: false });
+  if (isPlatformAdmin) items.push({ key: "platform", route: ROUTES.platform, icon: ICON.platform, phone: !role });
   return items;
 }
 
@@ -185,6 +188,7 @@ function PhoneHeader({ onAccount }: { onAccount: () => void }) {
 function BottomNav({ items, path }: { items: NavItem[]; path: string | null }) {
   const { t } = useT();
   const phoneItems = items.filter((n) => n.phone);
+  if (!phoneItems.length) return null;
   return (
     <nav aria-label={t("nav.main")} className="fixed inset-x-0 bottom-0 z-40 border-t border-[#DCE6E1] bg-white pb-[env(safe-area-inset-bottom)] lg:hidden">
       <div className="mx-auto grid h-[78px] max-w-[640px]" style={{ gridTemplateColumns: `repeat(${phoneItems.length}, minmax(0, 1fr))` }}>

@@ -24,6 +24,18 @@
   --color-adm-ok: #137a4b;
   --color-adm-bad: #b03a0a;
   --color-adm-danger: #a3260f;
+
+  /* Landing page, Arah 4 Lembut (_specs/20-PRD-landing.md §3) */
+  --color-lb-primary: #4fa36b;
+  --color-lb-deep: #2f7d4b;
+  --color-lb-ink: #10241b;
+  --color-lb-muted: #5a6d64;
+  --color-lb-soft: #e7f4eb;
+  --color-lb-ground: #f4f9f6;
+  --color-lb-line: #e4efe8;
+  /* the PRD's second soft and border tints: card fill and card border */
+  --color-lb-card: #f7faf8;
+  --color-lb-hair: #edf3ef;
 }
 
 html,
@@ -32,4 +44,30 @@ body {
   height: 100%;
   background: #000;
   overflow: hidden;
+}
+
+/* Outfit is loaded only on landing pages (its variable sits on the landing wrapper, not on <html>),
+   so the utility must read it where it is used: inline. */
+@theme inline {
+  --font-outfit: var(--font-outfit-landing), ui-sans-serif, system-ui, sans-serif;
+}
+
+/* Landing pages scroll like a normal document; the TV (above) stays black and fixed.
+   Applies only while a landing page is in the document. */
+html:has(body [data-landing]) {
+  height: auto;
+  overflow: visible;
+  background: #fff;
+  scroll-behavior: smooth;
+  scroll-padding-top: 84px; /* sticky header + a little air for #anchors */
+}
+html:has(body [data-landing]) body {
+  height: auto;
+  overflow: visible;
+  background: #fff;
+}
+@media (prefers-reduced-motion: reduce) {
+  html:has(body [data-landing]) {
+    scroll-behavior: auto;
+  }
 }

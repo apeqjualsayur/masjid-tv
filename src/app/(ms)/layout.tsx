@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
-import { fontVariables } from "./fonts";
-import "./globals.css";
+import { fontVariables } from "../fonts";
+import "../globals.css";
 
 export const metadata: Metadata = {
   title: "Masjid TV",

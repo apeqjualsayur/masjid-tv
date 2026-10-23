@@ -27,8 +27,8 @@ describe("admin i18n", () => {
     const files: string[] = [];
     const walk = (d: string) => readdirSync(d).forEach((n) => (statSync(join(d, n)).isDirectory() ? walk(join(d, n)) : n.endsWith(".tsx") && !n.endsWith(".test.tsx") && files.push(join(d, n))));
     walk(join(process.cwd(), "src", "admin"));
-    walk(join(process.cwd(), "src", "app", "admin"));
-    files.push(join(process.cwd(), "src", "app", "privasi", "page.tsx"));
+    walk(join(process.cwd(), "src", "app", "(ms)", "admin"));
+    files.push(join(process.cwd(), "src", "app", "(ms)", "privasi", "page.tsx"));
     const allowedText = new Set(["G", "←"]);
     const offenders: string[] = [];
     for (const f of files) {

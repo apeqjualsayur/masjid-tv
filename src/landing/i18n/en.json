@@ -1,0 +1,243 @@
+{
+  "meta": {
+    "title": "Masjid View — Prayer times and announcements on your masjid or surau TV",
+    "description": "A free prayer-time and announcement screen for masjids and suraus. Open it in any TV browser, manage it from your phone. Based on JAKIM e-Solat data."
+  },
+  "a11y": {
+    "skip": "Skip to content",
+    "home": "Masjid View, home page",
+    "mainNav": "Main",
+    "language": "Language",
+    "menu": "Menu",
+    "closeMenu": "Close menu",
+    "newTab": "(opens in a new tab)",
+    "tvMock": "TV showing Masjid View",
+    "phoneMock": "AJK panel on a phone",
+    "laptopMock": "AJK panel on a laptop",
+    "numbers": "Key numbers",
+    "tryPreview": "Preview of your masjid screen",
+    "footerNav": "Footer links"
+  },
+  "nav": {
+    "features": "Features",
+    "panel": "AJK panel",
+    "devices": "Devices",
+    "start": "Get started",
+    "faq": "FAQ",
+    "login": "Sign in",
+    "signup": "Sign up free",
+    "langMs": "BM",
+    "langEn": "EN"
+  },
+  "hero": {
+    "chip": "Free for every masjid and surau",
+    "title": "Your masjid's prayer-time screen, straight from the TV browser.",
+    "bodyBefore": "No special app, no expensive box. Open ",
+    "bodyUrl": "masjidview.my/tv",
+    "bodyAfter": " on any TV with a web browser. The AJK manages announcements from a phone or computer, and the screen updates within a minute.",
+    "signup": "Register your masjid free",
+    "demo": "See the live demo",
+    "worksOn": "Works on:",
+    "phone": {
+      "greeting": "Assalamualaikum, AJK",
+      "screen": "Main hall screen",
+      "online": "● Online",
+      "showing": "Now showing",
+      "slides": ["Kuliah Maghrib", "Infaq collection", "Gotong-royong poster"],
+      "new": "+ New announcement"
+    }
+  },
+  "numbers": {
+    "title": "One screen, everything your masjid needs to share",
+    "body": "Prayer times based on JAKIM e-Solat data, an iqamah countdown and tidy announcements, on the TV you already have.",
+    "stats": [
+      { "v": "7", "l": "Daily times for your zone" },
+      { "v": "10", "l": "Announcement templates" },
+      { "v": "3", "l": "Display themes" },
+      { "v": "RM0", "l": "Fees, forever" }
+    ]
+  },
+  "compare": {
+    "before": "Before",
+    "beforeItems": [
+      "Wall clocks running slow or out of battery",
+      "Paper notices taped up and torn",
+      "WhatsApp posters that never reach the congregation",
+      "A prayer-hall TV that hardly gets used"
+    ],
+    "after": "With Masjid View",
+    "afterItems": [
+      "Prayer times and the clock always accurate",
+      "Announcements organised on one screen",
+      "The AJK updates it from a phone in a minute",
+      "Your existing TV becomes the masjid notice board"
+    ]
+  },
+  "features": {
+    "eyebrow": "FEATURES",
+    "title": "Goodbye taped-up notices. Masjid View takes care of it.",
+    "body": "Every feature is built around the daily routine of a masjid, from the azan alert to a quiet screen during solat.",
+    "signup": "Sign up free",
+    "demo": "See the demo →",
+    "items": [
+      { "t": "Prayer times for your JAKIM zone", "d": "Based on JAKIM e-Solat data, with the Hijri date. Choose your location and the zone is set for you." },
+      { "t": "Azan, iqamah, solat", "d": "An alert before the azan, an iqamah countdown and a quiet screen during solat." },
+      { "t": "Friday khutbah mode", "d": "The screen switches automatically during the Friday khutbah and solat." },
+      { "t": "10 ready-made templates", "d": "Talks, death notices, programmes, infaq, meetings and more. Fill in the form and press Publish." },
+      { "t": "Posters at the right size", "d": "The best size is shown while you upload. Pictures are compressed automatically." },
+      { "t": "Your masjid's logo and name", "d": "Your masjid's logo and name on every screen." },
+      { "t": "Several screens", "d": "Main hall, women's section, entrance: each with its own theme and layout." },
+      { "t": "Works without internet", "d": "A whole year of prayer times is stored on the TV. It syncs again when the connection is back." }
+    ]
+  },
+  "day": {
+    "eyebrow": "A DAY ON THE MASJID SCREEN",
+    "title": "The screen knows when it is azan, when it is iqamah, and when to stay quiet",
+    "body": "Modes change automatically. Nobody needs to press a button.",
+    "items": [
+      { "tag": "NORMAL", "time": "All day", "t": "Times and announcements", "d": "Clock, Hijri date and rotating posters." },
+      { "tag": "BEFORE AZAN", "time": "5 minutes before", "t": "Early alert", "d": "The congregation knows the time is near." },
+      { "tag": "AZAN", "time": "Time begins", "t": "Full screen", "d": "The prayer name in Latin script and Arabic." },
+      { "tag": "IQAMAH", "time": "As set by the AJK", "t": "Iqamah countdown", "d": "\"Straighten and close the rows.\"" },
+      { "tag": "SOLAT", "time": "During solat", "t": "Quiet screen", "d": "Almost dark, so it does not distract." }
+    ]
+  },
+  "panel": {
+    "eyebrow": "AJK PANEL",
+    "title": "Manage it from a phone or a computer, with the same result",
+    "body": "Update an announcement on the go, or plan the week's schedule in the masjid office.",
+    "laptop": {
+      "brand": "Masjid View",
+      "nav": ["Home", "Content", "Screens", "Settings", "Members"],
+      "template": "Template: Talk",
+      "fields": [
+        { "l": "Title", "v": "Adab Menuntut Ilmu" },
+        { "l": "Speaker", "v": "Ustaz [Name]" },
+        { "l": "Time", "v": "After Maghrib" },
+        { "l": "Show until", "v": "Thursday, 23 Oct" }
+      ],
+      "publish": "Publish to screen",
+      "preview": "Live preview · Tenang",
+      "previewEyebrow": "KULIAH MAGHRIB",
+      "previewTitle": "Adab Menuntut Ilmu",
+      "showOn": "Show on: Main hall, Women's section",
+      "caption": "Computer · organise and schedule"
+    },
+    "phone": {
+      "title": "New announcement",
+      "templates": ["Talk", "Death notice", "Programme", "Infaq", "Meeting", "Imam & Bilal"],
+      "upload": "Upload poster · 1920×800",
+      "caption": "Phone · quick updates"
+    },
+    "benefits": [
+      { "t": "Sign in with Google", "d": "No password to remember. A magic link by e-mail works too." },
+      { "t": "Preview before publishing", "d": "See exactly how it looks in your screen's theme." },
+      { "t": "Schedule announcements", "d": "Start date, end date and chosen days. They end on their own." },
+      { "t": "Two administrators", "d": "Invite one more AJK member as an administrator. Both have full access." }
+    ]
+  },
+  "templates": {
+    "eyebrow": "10 READY-MADE TEMPLATES",
+    "title": "Fill in a form, press Publish. No poster design needed.",
+    "body": "Every template follows your screen's theme automatically.",
+    "items": [
+      { "n": "General announcement", "d": "Title and short text" },
+      { "n": "Talk / Lecture", "d": "Title, speaker, time" },
+      { "n": "Death notice", "d": "Funeral prayer, ends automatically" },
+      { "n": "Programme", "d": "Date, place, contact" },
+      { "n": "Collection / Infaq", "d": "Target, progress, QR" },
+      { "n": "Meeting", "d": "Official AJK notice" },
+      { "n": "Imam & Bilal", "d": "Weekly roster" },
+      { "n": "Financial statement", "d": "Collections, spending, balance" },
+      { "n": "Verse / Hadith", "d": "From authentic sources" },
+      { "n": "Festive greetings", "d": "Aidilfitri, Aidiladha and more" }
+    ]
+  },
+  "try": {
+    "eyebrow": "TRY IT NOW",
+    "title": "See what your masjid screen looks like",
+    "nameLabel": "Masjid or surau name",
+    "defaultName": "Masjid Al-Hidayah",
+    "themeLabel": "Theme",
+    "themes": { "tenang": "Tenang", "serambi": "Serambi", "alam": "Alam" },
+    "cta": "Like it? Register this masjid for free →"
+  },
+  "devices": {
+    "eyebrow": "USE THE TV YOU HAVE",
+    "title": "Got a web browser? It can be your masjid screen.",
+    "url": "masjidview.my/tv",
+    "items": [
+      { "s": "Smart TV", "t": "Android smart TV / Google TV", "d": "Download and open a web browser app, enter the address, done." },
+      { "s": "TV box", "t": "Ordinary TV + Android TV box", "d": "Plug an Android TV box into your old TV's HDMI port." },
+      { "s": "Laptop", "t": "Laptop or PC", "d": "Connect it to the TV with an HDMI cable and open the web browser full screen." },
+      { "s": "TV stick", "t": "Streaming stick with a browser", "d": "A small device that supports a modern web browser." }
+    ],
+    "pairTitle": "Set up once, runs by itself",
+    "pairBody": "The TV shows a 6-digit code. The AJK enters the code on a phone, and the screen is linked to your masjid straight away.",
+    "pairCode": "Pairing code",
+    "offlineTitle": "Keeps running without internet",
+    "offlineBody": "A year of prayer times is stored on the TV. If the WiFi drops, the screen keeps working and syncs again when the connection is back."
+  },
+  "themes": {
+    "eyebrow": "DISPLAY THEMES",
+    "title": "Three themes, colours that follow the prayer times",
+    "body": "Change the theme any time without retyping your announcements. More themes are coming.",
+    "items": [
+      { "n": "Tenang", "d": "Minimal and spacious, in soft pastel colours." },
+      { "n": "Serambi", "d": "Dark, with sky arches and a touch of gold." },
+      { "n": "Alam", "d": "A sky and landscape that change through the day." }
+    ]
+  },
+  "start": {
+    "eyebrow": "GET STARTED",
+    "title": "Ready in one afternoon",
+    "steps": [
+      { "t": "Register", "d": "Sign in with Google, enter the masjid's name and choose its location. The JAKIM zone is set for you." },
+      { "t": "Get approved", "d": "We check each registration, usually within 1–2 working days. You will get an e-mail." },
+      { "t": "Set up the TV", "d": "Open masjidview.my/tv on the TV. Enter the 6-digit code on your phone." },
+      { "t": "Publish announcements", "d": "Choose a template or upload a poster. It appears on the TV within a minute." }
+    ],
+    "needLabel": "What you need:",
+    "needs": [
+      "✓ A TV with a web browser (or an Android TV box / laptop)",
+      "✓ A WiFi connection",
+      "✓ An AJK Google account or e-mail"
+    ]
+  },
+  "faq": {
+    "title": "Frequently asked questions",
+    "items": [
+      { "q": "Is Masjid View really free?", "a": "Yes. There are no registration fees, subscriptions or hidden charges for masjids and suraus." },
+      { "q": "What kind of TV can I use?", "a": "Any TV with a modern web browser: an Android smart TV or Google TV, an ordinary TV with an Android TV box, or a laptop connected to the TV by HDMI." },
+      { "q": "Do I need to download an app?", "a": "There is no Masjid View app to install. Masjid View runs in a web browser: download and open any web browser app on the TV, then go to masjidview.my/tv." },
+      { "q": "Where do the prayer times come from?", "a": "They are based on JAKIM e-Solat data for your masjid's zone. You can check today's times while you register." },
+      { "q": "Does it need internet all the time?", "a": "No. Internet is needed to update announcements. Prayer times are stored on the TV, so the screen keeps working if the WiFi drops." },
+      { "q": "Can I change the iqamah minutes?", "a": "Yes. Administrators set the iqamah minutes for each prayer, and the length of the Friday khutbah." },
+      { "q": "How many people can manage one masjid?", "a": "Two administrators with the same access. The first administrator invites the second by e-mail. Each account can manage only one masjid. When the AJK changes, an administrator can remove and invite again, or contact us." },
+      { "q": "Can I use more than one TV?", "a": "Yes. Each screen is set up with its own code and can use a different theme and layout." },
+      { "q": "Can a small surau use it too?", "a": "Yes. Masjid View suits large masjids and small suraus alike." },
+      { "q": "How is personal data protected?", "a": "We keep only what is needed to run the display. Death notices are deleted automatically. Read the Privacy Notice for details." }
+    ]
+  },
+  "cta": {
+    "title": "Bring your masjid TV to life today.",
+    "body": "Free. Sign in with Google, enter your masjid's details, and set up the TV once you are approved.",
+    "signup": "Sign up free",
+    "demo": "See the demo"
+  },
+  "footer": {
+    "tagline": "Prayer times and announcements on screen for masjids and suraus.",
+    "product": "Product",
+    "productFeatures": "Features",
+    "productPanel": "AJK panel",
+    "productDemo": "Live demo",
+    "help": "Help",
+    "helpGuide": "TV setup guide",
+    "helpFaq": "FAQ",
+    "helpPrivacy": "Privacy Notice",
+    "contact": "Contact",
+    "whatsapp": "WhatsApp",
+    "support": "Support Masjid View",
+    "jakim": "Prayer times based on JAKIM e-Solat data."
+  }
+}

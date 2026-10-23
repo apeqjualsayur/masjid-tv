@@ -39,6 +39,8 @@
   /* stronger soft green for small icon circles (numbers band) */
   --color-lb-mint: #d4ecdc;
   /* warm "Sebelum" card (before Masjid View) */
+  /* form field border */
+  --color-lb-field: #c9d9cf;
   --color-lb-warm: #f7f5f1;
   --color-lb-warm-title: #8a5a22;
   --color-lb-warm-ink: #4a3d2e;

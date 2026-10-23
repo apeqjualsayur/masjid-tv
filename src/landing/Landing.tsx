@@ -6,6 +6,8 @@ import { Hero } from "./Hero";
 import { Numbers } from "./Numbers";
 import { Compare, Features, Steps } from "./sections";
 import { DaySection, TemplatesSection, ThemesSection } from "./showcase";
+import { DevicesSection, PanelSection } from "./illustrations";
+import { TrySection } from "./try";
 import { outfit } from "./fonts";
 import type { Lang } from "./i18n";
 
@@ -22,10 +24,10 @@ export function Landing({ lang }: { lang: Lang }) {
         <Compare lang={lang} />
         <Features lang={lang} />
         <DaySection lang={lang} />
-        <section id="panel" data-section="panel" />
+        <PanelSection lang={lang} />
         <TemplatesSection lang={lang} />
-        <section id="cuba" data-section="cuba" />
-        <section id="peranti" data-section="peranti" />
+        <TrySection lang={lang} />
+        <DevicesSection lang={lang} />
         <ThemesSection lang={lang} />
         <Steps lang={lang} />
         <section id="soalan" data-section="soalan" />

@@ -9,14 +9,16 @@ export interface TenangTokens {
   pill: string;
   card: string;
   rule: string;
+  /** Soft page glow behind a Tenang TV mockup (landing hero, design Lembut-Full). Not used on the TV. */
+  glow: string;
 }
 
 export const TOKENS: Record<PhaseKey, TenangTokens> = {
-  subuh: { bg: "#E8EAF6", fg: "#1F2440", muted: "#5F6585", accent: "#4F58AE", pill: "#FFFFFF", card: "#FFFFFF", rule: "rgba(31,36,64,.12)" },
-  zohor: { bg: "#EAF3F8", fg: "#14303D", muted: "#56707E", accent: "#23709A", pill: "#FFFFFF", card: "#FFFFFF", rule: "rgba(20,48,61,.12)" },
-  asar: { bg: "#F8EFE6", fg: "#3B2A1E", muted: "#7E6853", accent: "#A9612A", pill: "#FFFFFF", card: "#FFFFFF", rule: "rgba(59,42,30,.12)" },
-  maghrib: { bg: "#F6E9EC", fg: "#3A2230", muted: "#80616E", accent: "#9C3F5E", pill: "#FFFFFF", card: "#FFFFFF", rule: "rgba(58,34,48,.12)" },
-  isyak: { bg: "#131A2B", fg: "#E9ECF5", muted: "#8F98B3", accent: "#9DB0EE", pill: "rgba(255,255,255,.09)", card: "#1B2338", rule: "rgba(255,255,255,.10)" },
+  subuh: { bg: "#E8EAF6", fg: "#1F2440", muted: "#5F6585", accent: "#4F58AE", pill: "#FFFFFF", card: "#FFFFFF", rule: "rgba(31,36,64,.12)", glow: "#E9ECF8" },
+  zohor: { bg: "#EAF3F8", fg: "#14303D", muted: "#56707E", accent: "#23709A", pill: "#FFFFFF", card: "#FFFFFF", rule: "rgba(20,48,61,.12)", glow: "#E7F4EB" },
+  asar: { bg: "#F8EFE6", fg: "#3B2A1E", muted: "#7E6853", accent: "#A9612A", pill: "#FFFFFF", card: "#FFFFFF", rule: "rgba(59,42,30,.12)", glow: "#F7EEE4" },
+  maghrib: { bg: "#F6E9EC", fg: "#3A2230", muted: "#80616E", accent: "#9C3F5E", pill: "#FFFFFF", card: "#FFFFFF", rule: "rgba(58,34,48,.12)", glow: "#F6EAEE" },
+  isyak: { bg: "#131A2B", fg: "#E9ECF5", muted: "#8F98B3", accent: "#9DB0EE", pill: "rgba(255,255,255,.09)", card: "#1B2338", rule: "rgba(255,255,255,.10)", glow: "#E7EAF2" },
 };
 
 /** Fixed values listed in the contract (not phase colours). Dropped in lite mode. */

@@ -36,6 +36,10 @@
   /* the PRD's second soft and border tints: card fill and card border */
   --color-lb-card: #f7faf8;
   --color-lb-hair: #edf3ef;
+  /* stronger soft green for small icon circles (numbers band) */
+  --color-lb-mint: #d4ecdc;
+  /* device frames in the illustrations (TV bezel, phone, laptop) */
+  --color-lb-bezel: #121614;
 }
 
 html,

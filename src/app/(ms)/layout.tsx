@@ -6,7 +6,13 @@ export const metadata: Metadata = {
   title: "Masjid TV",
   description: "Paparan waktu solat untuk masjid dan surau",
   manifest: "/manifest.webmanifest",
-  icons: { icon: "/icon.svg" },
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/favicon.svg", type: "image/svg+xml" },
+    ],
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export const viewport: Viewport = {

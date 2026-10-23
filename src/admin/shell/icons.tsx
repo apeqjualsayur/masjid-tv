@@ -1,4 +1,5 @@
 // Line icons from designs/admin (24px grid, stroke currentColor).
+import { AppIcon } from "@/brand/AppIcon";
 export const ICON = {
   home: "M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1Z",
   content: "M12 3 2 8l10 5 10-5Z M2 13l10 5 10-5",
@@ -24,13 +25,7 @@ export function Icon({ d, size = 24, strokeWidth = 2, className }: { d: string; 
   );
 }
 
+/** The app icon (Pintu Mihrab logo); see src/brand/AppIcon.tsx. */
 export function LogoMark({ size = 34 }: { size?: number }) {
-  return (
-    <svg role="img" aria-label="Logo Masjid View" width={size} height={size} viewBox="0 0 76 76">
-      <rect width="76" height="76" rx="22" fill="#146C4A" />
-      <path d="M24 58V36a14 14 0 0 1 28 0v22Z" fill="#FFFFFF" />
-      <circle cx="38" cy="22" r="3.5" fill="#E3B04B" />
-      <rect x="32" y="44" width="12" height="14" rx="6" fill="#146C4A" />
-    </svg>
-  );
+  return <AppIcon size={size} />;
 }

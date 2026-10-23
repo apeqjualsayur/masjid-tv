@@ -4,20 +4,14 @@
 import type { ReactNode } from "react";
 import { formatGregorian, formatSeconds, formatTime } from "@/core";
 import { useNow } from "../hooks";
+import { AppIcon } from "@/brand/AppIcon";
 
 export const INK = "#12261E";
 export const MUTED = "#51655C";
 export const GREEN = "#146C4A";
 
 export function Logo({ size }: { size: number }) {
-  return (
-    <svg role="img" aria-label="Logo Masjid View" width={size} height={size} viewBox="0 0 76 76">
-      <rect width="76" height="76" rx="22" fill={GREEN} />
-      <path d="M24 58V36a14 14 0 0 1 28 0v22Z" fill="#FFFFFF" />
-      <circle cx="38" cy="22" r="3.5" fill="#E3B04B" />
-      <rect x="32" y="44" width="12" height="14" rx="6" fill={GREEN} />
-    </svg>
-  );
+  return <AppIcon size={size} />;
 }
 
 export function Frame({ children, footer, clock = true }: { children: ReactNode; footer?: ReactNode; clock?: boolean }) {

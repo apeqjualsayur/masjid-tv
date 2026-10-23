@@ -1,5 +1,5 @@
 // Tetapan rules (PRD Phase 2 §4.6, designs/admin/Settings). Pure: no React, no Supabase.
-import { withDurationDefaults, type ModeDurations } from "@/core";
+import { fridayInfo, fridayParts, localToEpoch, nextDateKey, weekdayOfDateKey, withDurationDefaults, type DayTimes, type ModeDurations } from "@/core";
 import type { LogoFile, RegisterBackend } from "../register/logic";
 
 /** The 5 accent colours of the design, with their i18n key. */
@@ -15,7 +15,8 @@ export const IQAMAH_KEYS = ["subuh", "zohor", "asar", "maghrib", "isyak"] as con
 export type IqamahKey = (typeof IQAMAH_KEYS)[number];
 export type IqamahMin = Record<IqamahKey, number>;
 export const IQAMAH = { min: 1, max: 30 } as const;
-export const KHUTBAH = { min: 10, max: 90, step: 5 } as const;
+export const KHUTBAH = { min: 10, max: 60, step: 5 } as const;
+export const JUMAAT_SOLAT = { min: 5, max: 30, step: 1 } as const;
 export const TICKER = { lines: 5, chars: 140 } as const;
 
 /** org_settings.durations: the engine's ModeDurations (incl. the Friday keys). */
@@ -42,6 +43,43 @@ export function stepIqamah(v: IqamahMin, key: IqamahKey, delta: number): IqamahM
 
 export function stepKhutbah(d: Durations, delta: number): Durations {
   return { ...d, khutbahMin: clamp(d.khutbahMin + delta * KHUTBAH.step, KHUTBAH.min, KHUTBAH.max) };
+}
+
+export function stepJumaatSolat(d: Durations, delta: number): Durations {
+  return { ...d, jumaatSolatMin: clamp(d.jumaatSolatMin + delta * JUMAAT_SOLAT.step, JUMAAT_SOLAT.min, JUMAAT_SOLAT.max) };
+}
+
+/** The keys of `next` that differ from `prev`. */
+export function changedDurations(prev: Durations, next: Durations): Partial<Durations> {
+  const out: Partial<Record<keyof Durations, unknown>> = {};
+  for (const k of Object.keys(next) as (keyof Durations)[]) if (next[k] !== prev[k]) out[k] = next[k];
+  return out as Partial<Durations>;
+}
+
+/**
+ * What to write to org_settings.durations: the row as it is in the database now, with only the
+ * changed keys replaced. Keys this app does not know (or another admin just set) are kept.
+ */
+export function mergeDurations(current: unknown, changed: Partial<Durations>): Record<string, unknown> {
+  const base = current && typeof current === "object" && !Array.isArray(current) ? (current as Record<string, unknown>) : {};
+  return { ...base, ...changed };
+}
+
+/** This week's Friday: today if today is Friday, else the next one (YYYY-MM-DD). */
+export function thisFridayKey(todayKey: string): string {
+  let k = todayKey;
+  while (weekdayOfDateKey(k) !== 5) k = nextDateKey(k);
+  return k;
+}
+
+/**
+ * The live example for that Friday, as the TV strip's three parts:
+ * ["Azan 1:05", "Khutbah 1:08 (±40 minit)", "Solat ±1:48"]. Shown even when the strip is off.
+ */
+export function fridayExample(day: DayTimes, d: Durations, clock24h: boolean): [string, string, string] | null {
+  const [y, m, dd] = day.date.split("-").map(Number);
+  const f = fridayInfo(day, { ...d, showFridayInfo: true }, localToEpoch(y, m, dd, 0, 0, 0), clock24h, true);
+  return f ? fridayParts(f) : null;
 }
 
 /** Lines to save: trimmed, empty ones dropped. Null error key when valid. */

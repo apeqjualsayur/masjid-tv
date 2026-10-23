@@ -2,19 +2,9 @@
 // Shared by all themes for the Friday strip (theme contract rule 12): the exact strip text and a
 // fade in/out wrapper. No colours here: each theme styles the strip from its own tokens.
 import { useEffect, useRef, useState, type CSSProperties, type ReactNode } from "react";
-import type { DisplayState, FridayInfo } from "@/core";
+import { FRIDAY_LABEL, fridayDetails, fridayParts, type DisplayState, type FridayInfo } from "@/core";
 
-export const FRIDAY_LABEL = "SOLAT JUMAAT";
-
-/** The three parts of the strip text; a line may only break between them. */
-export function fridayParts(f: FridayInfo): [string, string, string] {
-  return [`Azan ${f.azan}`, `Khutbah ${f.khutbahStart} (±${f.khutbahMin} minit)`, `Solat ±${f.solatStart}`];
-}
-
-/** "Azan 1:05 · Khutbah 1:08 (±40 minit) · Solat ±1:48" */
-export function fridayDetails(f: FridayInfo): string {
-  return fridayParts(f).join(" · ");
-}
+export { FRIDAY_LABEL, fridayDetails, fridayParts };
 
 /** "Dijangka tamat ±1:48" for the khutbah screen (rule 13). */
 export const khutbahEndLine = (f: FridayInfo) => `Dijangka tamat ±${f.solatStart}`;

@@ -21,6 +21,19 @@ export interface FridayInfo {
   khutbahEnd: Date;
 }
 
+/** Strip label (theme contract rule 12); TV text, always BM. */
+export const FRIDAY_LABEL = "SOLAT JUMAAT";
+
+/** The three parts of the strip text; a line may only break between them. */
+export function fridayParts(f: FridayInfo): [string, string, string] {
+  return [`Azan ${f.azan}`, `Khutbah ${f.khutbahStart} (±${f.khutbahMin} minit)`, `Solat ±${f.solatStart}`];
+}
+
+/** "Azan 1:05 · Khutbah 1:08 (±40 minit) · Solat ±1:48" */
+export function fridayDetails(f: FridayInfo): string {
+  return fridayParts(f).join(" · ");
+}
+
 const MIN = 60_000;
 const roundMin = (ms: number) => Math.round(ms / MIN) * MIN;
 

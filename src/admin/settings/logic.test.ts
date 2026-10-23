@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from "vitest";
 import type { LogoFile } from "../register/logic";
-import { SWATCHES, cleanTicker, readDurations, readIqamah, removeLogo, replaceLogo, stepIqamah, stepKhutbah, type LogoBackend } from "./logic";
+import { dayTimes } from "@/core/__fixtures__/sgr01-2026-10";
+import { SWATCHES, changedDurations, cleanTicker, fridayExample, mergeDurations, readDurations, readIqamah, removeLogo, replaceLogo, stepIqamah, stepJumaatSolat, stepKhutbah, thisFridayKey, type LogoBackend } from "./logic";
 
 describe("swatches", () => {
   it("5 accent colours that the schema accepts", () => {
@@ -21,10 +22,10 @@ describe("iqamah and khutbah", () => {
     expect(stepIqamah(v, "subuh", 1).subuh).toBe(2);
     expect(stepIqamah(v, "isyak", 1).isyak).toBe(30);
   });
-  it("khutbah steps by 5 between 10 and 90, other durations kept", () => {
+  it("khutbah steps by 5 between 10 and 60 (PRD 4.6), other durations kept", () => {
     const d = readDurations({ preAzanMin: 6, khutbahMin: 40 });
     expect(stepKhutbah(d, 1)).toEqual({ preAzanMin: 6, azanMin: 3, solatMin: 12, khutbahMin: 45, jumaatSolatMin: 12, showFridayInfo: true });
-    expect(stepKhutbah({ ...d, khutbahMin: 90 }, 1).khutbahMin).toBe(90);
+    expect(stepKhutbah({ ...d, khutbahMin: 60 }, 1).khutbahMin).toBe(60);
     expect(stepKhutbah({ ...d, khutbahMin: 10 }, -1).khutbahMin).toBe(10);
   });
 });
@@ -86,5 +87,32 @@ describe("removeLogo", () => {
     const { b, calls } = backend();
     expect(await removeLogo(b, "org", "org/old.webp")).toEqual({ oldRemoved: true });
     expect(calls).toEqual(["set_org_logo null", "delete media org/old.webp", "remove org/old.webp"]);
+  });
+});
+describe("Jumaat settings", () => {
+  const base = readDurations({ preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 40 });
+  it("khutbah 10-60 in steps of 5, Solat Jumaat 5-30", () => {
+    expect(stepKhutbah({ ...base, khutbahMin: 60 }, 1).khutbahMin).toBe(60);
+    expect(stepKhutbah({ ...base, khutbahMin: 10 }, -1).khutbahMin).toBe(10);
+    expect(stepJumaatSolat(base, 1).jumaatSolatMin).toBe(13);
+    expect(stepJumaatSolat({ ...base, jumaatSolatMin: 30 }, 1).jumaatSolatMin).toBe(30);
+    expect(stepJumaatSolat({ ...base, jumaatSolatMin: 5 }, -1).jumaatSolatMin).toBe(5);
+  });
+  it("saving merges only the changed keys into the row, keeping keys it does not know", () => {
+    const next = stepJumaatSolat(base, 1);
+    const changed = changedDurations(base, next);
+    expect(changed).toEqual({ jumaatSolatMin: 13 });
+    expect(mergeDurations({ preAzanMin: 7, khutbahMin: 45, future: "x" }, changed)).toEqual({ preAzanMin: 7, khutbahMin: 45, future: "x", jumaatSolatMin: 13 });
+    expect(mergeDurations(null, { showFridayInfo: false })).toEqual({ showFridayInfo: false });
+  });
+  it("this Friday: today when Friday, else the next one", () => {
+    expect(thisFridayKey("2026-10-23")).toBe("2026-10-23");
+    expect(thisFridayKey("2026-10-24")).toBe("2026-10-30");
+    expect(thisFridayKey("2026-10-29")).toBe("2026-10-30");
+  });
+  it("example line from that Friday's Zohor", () => {
+    const day = dayTimes(16);
+    expect(fridayExample(day, base, false)?.join(" \u00b7 ")).toBe("Azan 1:02 \u00b7 Khutbah 1:05 (\u00b140 minit) \u00b7 Solat \u00b11:45");
+    expect(fridayExample(day, { ...base, khutbahMin: 30, showFridayInfo: false }, true)?.join(" \u00b7 ")).toBe("Azan 13:02 \u00b7 Khutbah 13:05 (\u00b130 minit) \u00b7 Solat \u00b113:35");
   });
 });

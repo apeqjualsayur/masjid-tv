@@ -340,9 +340,22 @@ async function run(orgIds: string[]) {
   report((b3.data as { status?: string } | null)?.status === "ok" && v3 > v1, "after the iqamah change the version increases", `v${v1} → v${v3}`);
   const maghrib = (b3.data as { settings?: { iqamahMin?: { maghrib?: number } } } | null)?.settings?.iqamahMin?.maghrib;
   report(maghrib === 9, "bundle carries the new Maghrib iqamah (9)", `maghrib = ${maghrib}`);
+  // Friday settings (PRD §4.6): Tetapan merges the changed keys into durations, never overwriting the rest.
+  const curDur = await A.db.from("org_settings").select("durations").eq("org_id", orgA).single();
+  const before = (curDur.data?.durations ?? {}) as Record<string, unknown>;
+  const dur = await A.db.from("org_settings").update({ durations: { ...before, jumaatSolatMin: 20, showFridayInfo: false } }).eq("org_id", orgA).select("org_id");
+  report(!dur.error && (dur.data ?? []).length === 1, "A saves org A's Jumaat settings (durations merge)", fmt(dur.error ?? curDur.error));
+  const b5 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v3 });
+  const v5 = (b5.data as { version?: number } | null)?.version ?? 0;
+  report((b5.data as { status?: string } | null)?.status === "ok" && v5 > v3, "saving durations bumps bundle_version", `v${v3} → v${v5}`);
+  const bd = ((b5.data as { settings?: { durations?: Record<string, unknown> } } | null)?.settings?.durations ?? {}) as Record<string, unknown>;
+  report(bd.jumaatSolatMin === 20 && bd.showFridayInfo === false && bd.khutbahMin === before.khutbahMin && bd.preAzanMin === before.preAzanMin,
+    "bundle carries jumaatSolatMin 20 + showFridayInfo false, other keys kept", JSON.stringify(bd));
+  const bDur = await B.db.from("org_settings").update({ durations: { khutbahMin: 10 } }).eq("org_id", orgA).select("org_id");
+  report(!bDur.error && (bDur.data ?? []).length === 0, "B cannot change org A's durations (0 rows)", fmt(bDur.error));
   const rev = await A.db.from("screens").update({ revoked_at: new Date().toISOString() }).eq("id", screenA).select("id");
   report(!rev.error && (rev.data ?? []).length === 1, "A revokes the screen", fmt(rev.error));
-  const b4 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v3 });
+  const b4 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v5 });
   report((b4.data as { status?: string } | null)?.status === "revoked", "after revoke → revoked", JSON.stringify(b4.data ?? b4.error));
   const bOther = await anon.rpc("screen_bundle", { p_secret: secret(), p_since: 0 });
   report((bOther.data as { status?: string } | null)?.status === "revoked", "an unknown device secret gets nothing (revoked)", JSON.stringify(bOther.data ?? bOther.error));

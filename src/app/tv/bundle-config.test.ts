@@ -34,6 +34,17 @@ describe("bundleToScreenConfig", () => {
     expect(accentColor).toBe("#8A2A4A");
   });
 
+  it("passes the Friday settings through; bad values fall back to the defaults with a warning", () => {
+    const set = (durations: Record<string, unknown>) => bundleToScreenConfig(bundle({}, {}, { durations: { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 30, ...durations } }), SB);
+    const ok = set({ jumaatSolatMin: 20, showFridayInfo: false });
+    expect(ok.warnings).toEqual([]);
+    expect(ok.config.durations).toEqual({ preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 30, jumaatSolatMin: 20, showFridayInfo: false });
+    const bad = set({ jumaatSolatMin: "lima", showFridayInfo: "ya" });
+    expect(bad.config.durations.jumaatSolatMin).toBe(12);
+    expect(bad.config.durations.showFridayInfo).toBe(true);
+    expect(bad.warnings).toEqual(["bundle: durations.jumaatSolatMin invalid; using 12", "bundle: durations.showFridayInfo invalid; using true"]);
+  });
+
   it("no logo means no logo (never the sample logo); empty ticker stays empty", () => {
     const { config } = bundleToScreenConfig(bundle({ logoPath: null }, {}, { ticker: [] }), SB);
     expect(config.masjid.logo).toBeUndefined();

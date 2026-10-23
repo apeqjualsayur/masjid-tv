@@ -4,7 +4,8 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { waktuName } from "@/core";
+import { FRIDAY_LABEL, localDateKey, waktuName } from "@/core";
+import { createFallbackLoader, createPrayerData, idbMonthStore, refreshMonths, type DayResult } from "@/data";
 import { getSupabase } from "@/lib/supabase";
 import { useT, type Lang } from "../i18n";
 import { LIMITS } from "../register/logic";
@@ -19,7 +20,8 @@ import { useToasts } from "../shell/Toast";
 import { ZonePicker } from "../ZonePicker";
 import type { ZoneChoice } from "../ZonePicker/logic";
 import {
-  IQAMAH, IQAMAH_KEYS, KHUTBAH, SWATCHES, TICKER, cleanTicker, readDurations, readIqamah, removeLogo, replaceLogo, sameLines, stepIqamah, stepKhutbah,
+  IQAMAH, IQAMAH_KEYS, JUMAAT_SOLAT, KHUTBAH, SWATCHES, TICKER, changedDurations, cleanTicker, fridayExample, mergeDurations, readDurations, readIqamah, removeLogo,
+  replaceLogo, sameLines, stepIqamah, stepJumaatSolat, stepKhutbah, thisFridayKey,
   type Durations, type IqamahMin,
 } from "./logic";
 
@@ -122,7 +124,16 @@ export function SettingsView() {
     if (!Object.keys(patch).length || !savedSet.current) return;
     const db: Record<string, unknown> = {};
     if (patch.iqamah) db.iqamah_min = patch.iqamah;
-    if (patch.durations) db.durations = patch.durations;
+    if (patch.durations) {
+      // Merge: re-read the row and replace only the keys changed here, so other keys survive.
+      const cur = await getSupabase().from("org_settings").select("durations").eq("org_id", orgId).single();
+      if (cur.error) {
+        setSet((c) => (c ? { ...c, ...pickKeys(savedSet.current!, Object.keys(patch) as (keyof SettingsRow)[]) } : c));
+        toast("error", t("settings.error", { message: cur.error.message }));
+        return false;
+      }
+      db.durations = mergeDurations(cur.data.durations, changedDurations(savedSet.current.durations, patch.durations));
+    }
     if (patch.clock_24h !== undefined) db.clock_24h = patch.clock_24h;
     if (patch.show_arabic !== undefined) db.show_arabic = patch.show_arabic;
     if (patch.ticker) db.ticker = patch.ticker;
@@ -176,6 +187,7 @@ export function SettingsView() {
         </div>
         <div className="flex flex-col gap-4 lg:gap-5">
           <IqamahCard set={set} saveSet={saveSet} />
+          <JumaatCard set={set} saveSet={saveSet} zone={org.zone} />
           <DisplayCard set={set} saveSet={saveSet} />
           <section aria-labelledby="set-app" className={`${card} gap-3`}>
             <h2 id="set-app" className={h2}>{t("settings.app")}</h2>
@@ -476,17 +488,98 @@ function IqamahCard({ set, saveSet }: { set: SettingsRow; saveSet: (p: Partial<S
           />
         );
       })}
+    </section>
+  );
+}
+
+/** One day's prayer times for a zone, through the Phase 1 data layer (cache, bundled file, API). */
+function useZoneDay(zone: string, dateKey: string): Extract<DayResult, { status: "ok" }> | null | "loading" {
+  const [day, setDay] = useState<{ key: string; r: DayResult } | null>(null);
+  useEffect(() => {
+    let off = false;
+    (async () => {
+      const store = idbMonthStore();
+      const data = createPrayerData({ store, loadYear: createFallbackLoader() });
+      let r = await data.getDay(zone, dateKey);
+      if (r.status !== "ok") {
+        await refreshMonths(zone, Date.now(), store).catch(() => undefined);
+        r = await data.getDay(zone, dateKey);
+      }
+      if (!off) setDay({ key: `${zone}|${dateKey}`, r });
+    })();
+    return () => {
+      off = true;
+    };
+  }, [zone, dateKey]);
+  if (!day || day.key !== `${zone}|${dateKey}`) return "loading";
+  return day.r.status === "ok" ? day.r : null;
+}
+
+function JumaatCard({ set, saveSet, zone }: { set: SettingsRow; saveSet: (p: Partial<SettingsRow>, debounce?: number) => Promise<boolean | undefined>; zone: string }) {
+  const { t, lang } = useT();
+  const fridayKey = thisFridayKey(localDateKey(Date.now()));
+  const day = useZoneDay(zone, fridayKey);
+  const d = set.durations;
+  // Same line breaks as the TV strip: only between the three parts.
+  const example = day && day !== "loading" ? fridayExample(day.today, d, set.clock_24h) : null;
+  const [y, m, dd] = fridayKey.split("-").map(Number);
+  const dateText = new Date(Date.UTC(y, m - 1, dd)).toLocaleDateString(lang === "en" ? "en-MY" : "ms-MY", { day: "numeric", month: "short", timeZone: "UTC" });
+  return (
+    <section aria-labelledby="set-jumaat" className={`${card} gap-1`}>
+      <h2 id="set-jumaat" className={h2}>{t("settings.jumaat")}</h2>
+      <p className="mb-1.5 text-[12px] text-adm-muted">{t("settings.jumaatHint")}</p>
       <Stepper
         label={t("settings.khutbah")}
-        value={set.durations.khutbahMin}
-        display={t("settings.minutes", { n: set.durations.khutbahMin })}
-       
-        atMin={set.durations.khutbahMin <= KHUTBAH.min}
-        atMax={set.durations.khutbahMin >= KHUTBAH.max}
+        value={d.khutbahMin}
+        display={t("settings.minutes", { n: d.khutbahMin })}
+        atMin={d.khutbahMin <= KHUTBAH.min}
+        atMax={d.khutbahMin >= KHUTBAH.max}
         lessLabel={t("settings.less", { name: t("settings.khutbah") })}
         moreLabel={t("settings.more", { name: t("settings.khutbah") })}
-        onStep={(d) => saveSet({ durations: stepKhutbah(set.durations, d) }, 700)}
+        onStep={(s) => saveSet({ durations: stepKhutbah(d, s) }, 700)}
       />
+      <Stepper
+        label={t("settings.jumaatSolat")}
+        value={d.jumaatSolatMin}
+        display={t("settings.minutes", { n: d.jumaatSolatMin })}
+        atMin={d.jumaatSolatMin <= JUMAAT_SOLAT.min}
+        atMax={d.jumaatSolatMin >= JUMAAT_SOLAT.max}
+        lessLabel={t("settings.less", { name: t("settings.jumaatSolat") })}
+        moreLabel={t("settings.more", { name: t("settings.jumaatSolat") })}
+        onStep={(s) => saveSet({ durations: stepJumaatSolat(d, s) }, 700)}
+      />
+      <div className="flex h-14 items-center justify-between gap-3 border-t border-adm-hair">
+        <span id="set-friday-info" className="text-[15px] font-bold">{t("settings.showFriday")}</span>
+        <button
+          type="button"
+          role="switch"
+          aria-checked={d.showFridayInfo}
+          aria-labelledby="set-friday-info"
+          onClick={() => saveSet({ durations: { ...d, showFridayInfo: !d.showFridayInfo } })}
+          className={`relative h-7 w-[46px] flex-none rounded-full transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green ${d.showFridayInfo ? "bg-adm-green" : "bg-[#B9C8C0]"}`}
+        >
+          <span className={`absolute top-[3px] h-[22px] w-[22px] rounded-full bg-white shadow transition-[left] ${d.showFridayInfo ? "left-[21px]" : "left-[3px]"}`} />
+        </button>
+      </div>
+      <div data-friday-example className={`mt-1 rounded-xl px-3.5 py-3 ${d.showFridayInfo ? "bg-adm-soft" : "bg-adm-ground"}`}>
+        <p className="text-[12px] font-bold text-adm-muted">{t("settings.fridayExample", { date: dateText })}</p>
+        {day === "loading" ? (
+          <p className="mt-1 text-[14px] text-adm-muted">{t("app.loading")}</p>
+        ) : example ? (
+          <p aria-live="polite" className={`mt-1 text-[15px] font-bold leading-[1.45] ${d.showFridayInfo ? "text-adm-green" : "text-adm-muted"}`}>
+            <span className="block text-[13px] font-extrabold tracking-[0.08em]">{FRIDAY_LABEL}</span>
+            {example.map((part, i) => (
+              <span key={i}>
+                {i > 0 && " \u00b7 "}
+                <span className="whitespace-nowrap">{part}</span>
+              </span>
+            ))}
+          </p>
+        ) : (
+          <p className="mt-1 text-[14px] text-adm-muted">{t("settings.fridayNoTimes")}</p>
+        )}
+        {!d.showFridayInfo && <p className="mt-1 text-[12px] font-semibold text-adm-muted">{t("settings.fridayOff")}</p>}
+      </div>
     </section>
   );
 }

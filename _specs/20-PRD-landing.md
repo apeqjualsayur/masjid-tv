@@ -37,7 +37,7 @@ and then signs up (`/admin`) or opens the live demo (`/tv?demo=1`).
 ```ts
 export const site = {
   credit: 'Hamba Allah',               // footer: "© 2026 Masjid View · Hamba Allah"
-  contactEmail: 'afiqsyazwan@gmail.com', // footer; mailto: link
+  contactEmail: 'hubungi@masjidview.my', // footer; mailto: link (forwards to the owner)
   whatsapp: '',                          // empty = footer WhatsApp row is hidden
   supportUrl: '',                        // empty = no support/donation link anywhere
 };

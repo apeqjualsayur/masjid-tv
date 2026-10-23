@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Component, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import type { LayoutKey, ThemeId } from "@/core";
 import { getSupabase } from "@/lib/supabase";
-import { TEMPLATE_KEYS, type SlideView, type TemplateKey } from "@/templates";
+import { resolveTemplateKey, type SlideView, type TemplateKey } from "@/templates";
 import { AYAT_VERIFIED, IMAGE_FIELD_KEYS, TEMPLATES, defaultFields, getPath, setPath, shiftWeek, validateFields, type FieldErrors, type Fields, type ImageField } from "@/templates/schema";
 import { useClock } from "../home/useHomeData";
 import { usePrayerToday } from "../home/usePrayerToday";
@@ -72,18 +72,32 @@ function previewFields(key: TemplateKey, f: Fields): Fields {
   return out;
 }
 
-export function EditorView() {
+/** Shown for a ?key= that is not one of the 10 templates. */
+export function UnknownTemplate() {
+  const { t } = useT();
+  return (
+    <div className="flex flex-col gap-3">
+      <p role="alert" className="rounded-xl bg-[#FDECE8] px-4 py-3 text-[14px] text-adm-danger">{t("editor.unknownTemplate")}</p>
+      <Link href={ROUTES.picker} className="font-bold text-adm-green">{t("picker.title")}</Link>
+    </div>
+  );
+}
+
+/**
+ * The page reads ?key= / ?id= with useSearchParams (inside Suspense) and passes them in. Reading
+ * window.location here was wrong on a client-side navigation from the picker: on the first render
+ * the address bar still showed /admin/baru/, so every card opened "Unknown template".
+ */
+export function EditorView({ templateKey, slideIdParam }: { templateKey: string | null; slideIdParam: string | null }) {
   const a = useAdmin();
   const { t, lang } = useT();
   const { toast, clear: clearToasts, node: toasts } = useToasts();
   const org = a.current!;
   const now = useClock(30_000);
-  const [params] = useState(() => new URLSearchParams(typeof window === "undefined" ? "" : window.location.search));
-  const [key, setKey] = useState<TemplateKey | null>(() => {
-    const k = params.get("key");
-    return k && (TEMPLATE_KEYS as readonly string[]).includes(k) ? (k as TemplateKey) : null;
-  });
-  const [slideId, setSlideId] = useState<string | null>(params.get("id"));
+  // URL values as they were when the editor opened (later replaceState calls are the editor's own).
+  const [openedId] = useState(slideIdParam);
+  const [key, setKey] = useState<TemplateKey | null>(() => resolveTemplateKey(templateKey));
+  const [slideId, setSlideId] = useState<string | null>(openedId);
   const [status, setStatus] = useState<Status>("new");
   const [fields, setFields] = useState<Fields>(() => (key ? defaultFields(key) : {}));
   const [original, setOriginal] = useState<Fields | null>(null);
@@ -93,7 +107,7 @@ export function EditorView() {
   const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
   const [schedErrors, setSchedErrors] = useState<ScheduleErrors>({});
   const [loadError, setLoadError] = useState<string | null>(null);
-  const [loaded, setLoaded] = useState(!params.get("id"));
+  const [loaded, setLoaded] = useState(!openedId);
   const [saving, setSaving] = useState<SlideStatus | null>(null);
   const [screens, setScreens] = useState<Screen[]>([]);
   const [ctx, setCtx] = useState<PreviewContext | null>(null);
@@ -116,12 +130,12 @@ export function EditorView() {
         durations: readDurations(data?.durations),
       });
     });
-    const id = params.get("id");
+    const id = openedId;
     if (!id) return;
     sb.from("slides").select("id, type, template_key, fields, status, starts_at, ends_at, duration_s, days_of_week, priority, screen_ids").eq("id", id).eq("org_id", org.orgId).maybeSingle().then(({ data, error }) => {
       if (error) return setLoadError(error.message);
-      if (!data || data.type !== "template" || !(TEMPLATE_KEYS as readonly string[]).includes(data.template_key)) return setLoadError(t("editor.notFound"));
-      const k = data.template_key as TemplateKey;
+      const k = data?.type === "template" ? resolveTemplateKey(data.template_key) : null;
+      if (!data || !k) return setLoadError(t("editor.notFound"));
       setKey(k);
       setFields((data.fields as Fields) ?? {});
       setOriginal((data.fields as Fields) ?? {});
@@ -129,7 +143,7 @@ export function EditorView() {
       setStatus(data.status === "published" ? "published" : "draft");
       setLoaded(true);
     });
-  }, [org.orgId, org.fullName, org.shortName, org.logoPath, params, t]);
+  }, [org.orgId, org.fullName, org.shortName, org.logoPath, openedId, t]);
 
   const meta = key ? TEMPLATES[key] : null;
   const targets = useMemo<PreviewTarget[]>(() => {
@@ -254,14 +268,7 @@ export function EditorView() {
 
   if (loadError) return <p role="alert" className="rounded-xl bg-[#FDECE8] px-4 py-3 text-[14px] text-adm-danger">{t("editor.loadError", { message: loadError })}</p>;
   if (!loaded) return <p className={`${card} p-5 text-[14px] text-adm-muted`}>{t("app.loading")}</p>;
-  if (!key || !meta) {
-    return (
-      <div className="flex flex-col gap-3">
-        <p role="alert" className="rounded-xl bg-[#FDECE8] px-4 py-3 text-[14px] text-adm-danger">{t("editor.unknownTemplate")}</p>
-        <Link href={ROUTES.picker} className="font-bold text-adm-green">{t("picker.title")}</Link>
-      </div>
-    );
-  }
+  if (!key || !meta) return <UnknownTemplate />;
 
   const statusBadge = (
     <span className={`flex-none rounded-full px-2.5 py-1 text-[12px] font-extrabold ${status === "published" ? "bg-adm-soft text-adm-green-dark" : "bg-[#E3ECE7] text-[#3A4E45]"}`}>

@@ -19,6 +19,11 @@ export const TEMPLATE_KEYS: readonly TemplateKey[] = [
   "mesyuarat", "imam_bilal", "kewangan", "ayat", "ucapan",
 ];
 
+/** A ?key= value (or a slides.template_key) as one of the 10 keys, or null when it is not one. */
+export function resolveTemplateKey(k: string | null | undefined): TemplateKey | null {
+  return k && (TEMPLATE_KEYS as readonly string[]).includes(k) ? (k as TemplateKey) : null;
+}
+
 export interface PengumumanFields {
   title: string;
   body: string;

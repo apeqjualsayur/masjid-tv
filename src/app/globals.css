@@ -38,6 +38,11 @@
   --color-lb-hair: #edf3ef;
   /* stronger soft green for small icon circles (numbers band) */
   --color-lb-mint: #d4ecdc;
+  /* warm "Sebelum" card (before Masjid View) */
+  --color-lb-warm: #f7f5f1;
+  --color-lb-warm-title: #8a5a22;
+  --color-lb-warm-ink: #4a3d2e;
+  --color-lb-warm-icon: #c08a4a;
   /* device frames in the illustrations (TV bezel, phone, laptop) */
   --color-lb-bezel: #121614;
 }

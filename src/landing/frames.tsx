@@ -11,20 +11,37 @@ const STAGE_H = 1080;
 const STAND: CSSProperties = { background: "linear-gradient(180deg,#2A302D,#1A1E1C)", clipPath: "polygon(30% 0, 70% 0, 100% 100%, 0 100%)" };
 const FOOT: CSSProperties = { background: "#1A1E1C" };
 
-/** Scale of a 1920-wide stage inside an element, kept in step with its width. */
-function useStageScale<T extends HTMLElement>() {
+/** Scale of a stage `stageWidth` wide inside an element, kept in step with its width. */
+function useStageScale<T extends HTMLElement>(stageWidth = STAGE_W) {
   const ref = useRef<T>(null);
   const [scale, setScale] = useState<number | null>(null);
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
-    const update = () => setScale(el.clientWidth / STAGE_W);
+    const update = () => setScale(el.clientWidth / stageWidth);
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [stageWidth]);
   return { ref, scale };
+}
+
+/**
+ * A box with the stage's aspect ratio; children render at the stage's real pixel size and are
+ * scaled to fit (e.g. a 1728×720 template card shown as a small 12:5 thumbnail).
+ */
+export function ScaledStage({ width, height, children, className = "", style }: { width: number; height: number; children?: ReactNode; className?: string; style?: CSSProperties }) {
+  const { ref, scale } = useStageScale<HTMLDivElement>(width);
+  return (
+    <div ref={ref} aria-hidden="true" className={`relative overflow-hidden ${className}`} style={{ aspectRatio: `${width} / ${height}`, ...style }}>
+      {scale !== null && children && (
+        <div className="pointer-events-none absolute top-0 left-0 origin-top-left select-none" style={{ width, height, transform: `scale(${scale})` }}>
+          {children}
+        </div>
+      )}
+    </div>
+  );
 }
 
 export function TvFrame({
@@ -33,6 +50,7 @@ export function TvFrame({
   screenBg,
   stand = true,
   shadow = "0 40px 70px rgba(16,36,27,0.22)",
+  small = false,
   className = "",
 }: {
   label: string;
@@ -42,19 +60,16 @@ export function TvFrame({
   screenBg?: string;
   stand?: boolean;
   shadow?: string;
+  /** Small tiles (Satu hari, Tema): bezel radius 10, padding 5-6, as in the design. */
+  small?: boolean;
   className?: string;
 }) {
-  const { ref, scale } = useStageScale<HTMLDivElement>();
   return (
     <div role="img" aria-label={label} className={className}>
-      <div className="rounded-[14px] bg-lb-bezel p-[10px]" style={{ boxShadow: shadow }}>
-        <div ref={ref} aria-hidden="true" className="relative aspect-video overflow-hidden rounded-[4px]" style={{ background: screenBg }}>
-          {scale !== null && children && (
-            <div className="pointer-events-none absolute top-0 left-0 origin-top-left select-none" style={{ width: STAGE_W, height: STAGE_H, transform: `scale(${scale})` }}>
-              {children}
-            </div>
-          )}
-        </div>
+      <div className={`bg-lb-bezel ${small ? "rounded-[10px] p-[5px]" : "rounded-[14px] p-[10px]"}`} style={{ boxShadow: shadow }}>
+        <ScaledStage width={STAGE_W} height={STAGE_H} className={small ? "rounded-[3px]" : "rounded-[4px]"} style={{ background: screenBg }}>
+          {children}
+        </ScaledStage>
       </div>
       {stand && (
         <div aria-hidden="true">

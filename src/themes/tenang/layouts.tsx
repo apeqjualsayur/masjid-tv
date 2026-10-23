@@ -27,7 +27,8 @@ function pill(t: TenangTokens, w: WaktuView, lite: boolean) {
   };
 }
 
-function SlideBody({ s, slide, area }: { s: DisplayState; slide?: SlideView; area: Area }) {
+/** One slide in the card, as on the TV. Exported for the landing page's template thumbnails. */
+export function SlideBody({ s, slide, area }: { s: DisplayState; slide?: SlideView; area: Area }) {
   if (slide?.kind === "poster") return <TenangPoster s={s} imageUrl={slide.imageUrl} />;
   if (slide?.kind !== "template") return null;
   const T = tenangTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown }>;

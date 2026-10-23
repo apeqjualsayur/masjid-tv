@@ -1,9 +1,11 @@
 // Landing page (_specs/20-PRD-landing.md). One component for both languages. This step builds the
-// header, footer, hero and numbers band; the other sections exist (empty) so the #anchors work.
+// sections in PRD §4 order; the ones not built yet are empty so the #anchors already work.
 import { Footer } from "./Footer";
 import { Header } from "./Header";
 import { Hero } from "./Hero";
 import { Numbers } from "./Numbers";
+import { Compare, Features, Steps } from "./sections";
+import { DaySection, TemplatesSection, ThemesSection } from "./showcase";
 import { outfit } from "./fonts";
 import type { Lang } from "./i18n";
 
@@ -17,9 +19,17 @@ export function Landing({ lang }: { lang: Lang }) {
       <main id="kandungan" tabIndex={-1} className="outline-none">
         <Hero lang={lang} />
         <Numbers lang={lang} />
-        {SECTIONS.filter((id) => id !== "hero" && id !== "angka").map((id) => (
-          <section key={id} id={id} data-section={id} />
-        ))}
+        <Compare lang={lang} />
+        <Features lang={lang} />
+        <DaySection lang={lang} />
+        <section id="panel" data-section="panel" />
+        <TemplatesSection lang={lang} />
+        <section id="cuba" data-section="cuba" />
+        <section id="peranti" data-section="peranti" />
+        <ThemesSection lang={lang} />
+        <Steps lang={lang} />
+        <section id="soalan" data-section="soalan" />
+        <section id="daftar" data-section="daftar" />
       </main>
       <Footer lang={lang} />
     </div>

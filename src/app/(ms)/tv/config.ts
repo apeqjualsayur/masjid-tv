@@ -138,7 +138,10 @@ export function parseUrlOverrides(search: string, hostname: string): { overrides
   const warnings: string[] = [];
   const debugState = q.get("debug") === "state";
   const debug = q.get("debug") === "1" || debugState;
-  const debugAllowed = debug || LOCAL_HOSTS.includes(hostname);
+  // The live demo (?demo=1, PRD §6) takes theme/layout/sim/speed… without ?debug=1, so the landing
+  // page can link to variants. It shows only demo content, never a masjid's.
+  const demo = q.get("demo") === "1";
+  const debugAllowed = debug || demo || LOCAL_HOSTS.includes(hostname);
   const o: UrlOverrides = { debug, debugState, debugAllowed, forceFriday: false };
 
   const lite = q.get("lite");

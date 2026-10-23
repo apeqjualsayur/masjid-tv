@@ -1,0 +1,69 @@
+{
+  "screen": {
+    "masjid": { "fullName": "Masjid Demo Masjid View", "shortName": "MV", "logo": "" },
+    "zone": "WLY01",
+    "theme": "tenang",
+    "layout": "bottom",
+    "clock24h": false,
+    "showArabic": true,
+    "durations": { "preAzanMin": 5, "azanMin": 3, "solatMin": 12, "khutbahMin": 40, "jumaatSolatMin": 12, "showFridayInfo": true },
+    "iqamahMin": { "subuh": 10, "zohor": 10, "asar": 10, "maghrib": 7, "isyak": 10 },
+    "ticker": ["Paparan demo Masjid View · masjidview.my"]
+  },
+  "slides": [
+    {
+      "id": "demo-kuliah",
+      "type": "template",
+      "template_key": "kuliah",
+      "fields": {
+        "series": "Kuliah Maghrib",
+        "topic": "Adab Menuntut Ilmu",
+        "speaker": "Penceramah jemputan",
+        "date": "Setiap Khamis",
+        "time": "Selepas solat Maghrib",
+        "venue": "Dewan solat utama"
+      },
+      "sort_order": 10,
+      "status": "active"
+    },
+    {
+      "id": "demo-infaq",
+      "type": "template",
+      "template_key": "infaq",
+      "fields": {
+        "fundName": "Tabung Pembangunan Masjid",
+        "purpose": "Menaik taraf ruang solat wanita dan tandas",
+        "collected": 32400,
+        "target": 50000,
+        "updatedAt": "Minggu ini",
+        "accountName": "Contoh sahaja · bukan akaun sebenar"
+      },
+      "sort_order": 20,
+      "status": "active"
+    },
+    {
+      "id": "demo-imam-bilal",
+      "type": "template",
+      "template_key": "imam_bilal",
+      "fields": {
+        "weekRange": "Jadual minggu ini",
+        "table": [
+          { "waktu": "subuh", "imam": "Imam A", "bilal": "Bilal A" },
+          { "waktu": "zohor", "imam": "Imam B", "bilal": "Bilal B" },
+          { "waktu": "asar", "imam": "Imam B", "bilal": "Bilal C" },
+          { "waktu": "maghrib", "imam": "Imam A", "bilal": "Bilal A" },
+          { "waktu": "isyak", "imam": "Imam C", "bilal": "Bilal C" }
+        ]
+      },
+      "sort_order": 30,
+      "status": "active"
+    },
+    {
+      "id": "demo-poster",
+      "type": "poster",
+      "image_url": "/config/demo-poster.png",
+      "sort_order": 40,
+      "status": "active"
+    }
+  ]
+}

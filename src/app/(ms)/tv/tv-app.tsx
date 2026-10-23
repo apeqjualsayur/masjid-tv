@@ -33,9 +33,11 @@ import { SAMPLE_POSTER, SAMPLE_POSTER_LANDSCAPE, sampleSlide, type SlideView } f
 import { getTheme } from "@/themes/registry";
 import { ThemeView, UnavailableView } from "@/themes/ThemeView";
 import { useEffect, useRef, useState } from "react";
-import { isLocalMode, parseUrlOverrides, type ScreenConfig, type UrlOverrides } from "./config";
+import { parseUrlOverrides, type ScreenConfig, type UrlOverrides } from "./config";
 import { loadScreenConfig, type ConfigSource } from "./config-loader";
 import { DebugView, MetaFooter, type DebugMeta } from "./debug-view";
+import { loadDemo, tvMode } from "./demo";
+import { DemoBadge } from "./demo-badge";
 import { ErrorBoundary } from "./error-boundary";
 import { useAutoLite, useDailyReload, useNow } from "./hooks";
 import { Stage } from "./stage";
@@ -59,6 +61,8 @@ export interface DisplaySource {
   slides: PlaylistItem<SlideView>[];
   warnings: string[];
   bundle?: BundleMeta;
+  /** Live demo (/tv?demo=1): shows the DEMO badge. */
+  demo?: boolean;
 }
 
 interface Boot {
@@ -70,16 +74,34 @@ interface Boot {
   status: SyncStatus;
   slides: PlaylistItem<SlideView>[];
   bundle?: BundleMeta;
+  demo?: boolean;
 }
 
 export function TvRoot() {
-  const [mode, setMode] = useState<"local" | "paired" | null>(null);
-  useEffect(() => setMode(isLocalMode(window.location.search, supabaseConfigured()) ? "local" : "paired"), []);
+  const [mode, setMode] = useState<"demo" | "local" | "paired" | null>(null);
+  useEffect(() => setMode(tvMode(window.location.search, supabaseConfigured())), []);
+  const screen = mode === "demo" ? <DemoApp /> : mode === "local" ? <TvApp /> : mode === "paired" ? <PairingFlow /> : <div className="h-full bg-black" />;
   return (
     <ErrorBoundary>
-      <Stage>{mode === "local" ? <TvApp /> : mode === "paired" ? <PairingFlow /> : <div className="h-full bg-black" />}</Stage>
+      <Stage>{screen}</Stage>
     </ErrorBoundary>
   );
+}
+
+/** Live demo: public/config/demo.json, bundled prayer data, no pairing, no Supabase. */
+function DemoApp() {
+  const [source, setSource] = useState<DisplaySource | null>(null);
+  const [bootError, setBootError] = useState<unknown>(null);
+  useEffect(() => {
+    let cancelled = false;
+    loadDemo().then((s) => !cancelled && setSource(s), (e) => !cancelled && setBootError(e));
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+  if (bootError) throw bootError;
+  if (!source) return <div className="h-full bg-black" />;
+  return <DisplayHost source={source} />;
 }
 
 /** Local mode (Phase 1): public/config/screen.json + sample-slides.json. */
@@ -138,6 +160,7 @@ export function DisplayHost({ source }: { source: DisplaySource }) {
     status: sync.status,
     slides: source.slides,
     bundle: source.bundle,
+    demo: source.demo,
   };
   return <Display boot={boot} dataVersion={dataVersion} />;
 }
@@ -237,6 +260,7 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
     return (
       <>
         <UnavailableView theme={theme} u={u} />
+        {boot.demo && <DemoBadge watch={theme.id} />}
         {overlay}
       </>
     );
@@ -271,6 +295,7 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
   return (
     <>
       <ThemeView theme={theme} s={s} layout={layout} slide={pick.slide} slideKey={pick.slideKey} counter={pick.counter} />
+      {boot.demo && <DemoBadge watch={`${theme.id}|${s.phase}|${s.mode}`} />}
       {overlay}
     </>
   );

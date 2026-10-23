@@ -1,7 +1,7 @@
 // Plain landing sections (no theme renders): 4 Sebelum / Dengan, 5 Ciri-ciri, 12 Cara bermula.
 // All copy from the i18n json.
 import type { ReactNode } from "react";
-import { DEMO_HREF } from "./Footer";
+import { DEMO_HREF, PRIVACY_HREF } from "./Footer";
 import { ADMIN_HREF } from "./Header";
 import { copy, type Lang } from "./i18n";
 import { FEATURE_ICONS, LineIcon } from "./icons";
@@ -125,6 +125,82 @@ export function Steps({ lang }: { lang: Lang }) {
             <span key={n}>{n}</span>
           ))}
         </p>
+      </div>
+    </section>
+  );
+}
+/** 14 Soalan lazim: native <details> (keyboard: Tab to the question, Enter/Space toggles). First one open. */
+export function Faq({ lang }: { lang: Lang }) {
+  const k = copy(lang).faq;
+  return (
+    <section id="soalan" aria-labelledby="soalan-title" className="pb-[clamp(64px,8vw,100px)]">
+      <div className="mx-auto flex max-w-[860px] flex-col gap-7 px-5">
+        <h2 id="soalan-title" className={`${h2Class} text-center`}>
+          {k.title}
+        </h2>
+        <div className="flex flex-col gap-2.5">
+          {k.items.map((it, i) => (
+            <details key={it.q} open={i === 0} className="group rounded-2xl border border-lb-hair bg-lb-card">
+              <summary
+                className={`flex min-h-11 cursor-pointer list-none items-center justify-between gap-4 rounded-2xl px-[22px] py-[18px] text-[17px] font-semibold hover:text-lb-deep [&::-webkit-details-marker]:hidden ${focusRing}`}
+              >
+                <span>{it.q}</span>
+                <span aria-hidden="true" className="flex-none text-[22px] leading-none text-lb-primary group-open:rotate-45 motion-safe:transition-transform motion-safe:duration-200">
+                  +
+                </span>
+              </summary>
+              <p className="m-0 px-[22px] pb-[18px] text-[15px] leading-[1.65] text-lb-muted">
+                {i === k.items.length - 1 ? <PrivacyAnswer text={it.a} lang={lang} /> : it.a}
+              </p>
+            </details>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/** The last answer names the privacy notice: link that phrase to /privasi. */
+function PrivacyAnswer({ text, lang }: { text: string; lang: Lang }) {
+  const phrase = copy(lang).footer.helpPrivacy;
+  const at = text.indexOf(phrase);
+  if (at < 0) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, at)}
+      <a href={PRIVACY_HREF} className={`rounded font-semibold text-lb-deep underline underline-offset-2 ${focusRing}`}>
+        {phrase}
+      </a>
+      {text.slice(at + phrase.length)}
+    </>
+  );
+}
+
+/** 15 CTA band (#daftar). */
+export function CtaBand({ lang }: { lang: Lang }) {
+  const c = copy(lang);
+  const k = c.cta;
+  const white = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
+  return (
+    <section id="daftar" aria-labelledby="daftar-title" className="pb-[clamp(64px,8vw,100px)]">
+      <div className="mx-auto max-w-[1200px] px-5">
+        <div className="flex flex-wrap items-center justify-between gap-6 rounded-[28px] bg-gradient-to-bl from-lb-primary to-lb-deep p-[clamp(36px,5vw,60px)] text-white">
+          <div className="flex max-w-[620px] flex-col gap-2.5">
+            <h2 id="daftar-title" className="m-0 text-[clamp(28px,3.2vw,40px)] font-bold tracking-[-0.6px]">
+              {k.title}
+            </h2>
+            <p className="m-0 text-[17px] leading-[1.6] opacity-95">{k.body}</p>
+          </div>
+          <div className="flex flex-wrap gap-3">
+            <a href={ADMIN_HREF} className={`flex h-[54px] items-center rounded-[14px] bg-white px-[26px] text-[17px] font-bold text-lb-deep hover:bg-lb-ground ${white}`}>
+              {k.signup}
+            </a>
+            <a href={DEMO_HREF} target="_blank" rel="noopener" className={`flex h-[54px] items-center rounded-[14px] border-[1.5px] border-white/70 px-[22px] text-[16px] font-semibold text-white hover:bg-white/10 ${white}`}>
+              {k.demo}
+              <span className="sr-only"> {c.a11y.newTab}</span>
+            </a>
+          </div>
+        </div>
       </div>
     </section>
   );

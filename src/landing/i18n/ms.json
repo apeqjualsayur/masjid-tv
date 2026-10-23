@@ -43,7 +43,11 @@
       "screen": "Skrin dewan utama",
       "online": "● Dalam talian",
       "showing": "Sedang dipaparkan",
-      "slides": ["Kuliah Maghrib", "Kutipan Infaq", "Poster Gotong-royong"],
+      "slides": [
+        "Kuliah Maghrib",
+        "Kutipan Infaq",
+        "Poster Gotong-royong"
+      ],
       "new": "+ Pengumuman baharu"
     }
   },
@@ -51,10 +55,22 @@
     "title": "Satu skrin, semua maklumat masjid",
     "body": "Waktu solat berdasarkan data e-Solat JAKIM, kiraan iqamah dan pengumuman yang tersusun, di TV yang anda sudah ada.",
     "stats": [
-      { "v": "7", "l": "Waktu harian ikut zon" },
-      { "v": "10", "l": "Templat pengumuman" },
-      { "v": "3", "l": "Tema paparan" },
-      { "v": "RM0", "l": "Yuran, selama-lamanya" }
+      {
+        "v": "7",
+        "l": "Waktu harian ikut zon"
+      },
+      {
+        "v": "10",
+        "l": "Templat pengumuman"
+      },
+      {
+        "v": "3",
+        "l": "Tema paparan"
+      },
+      {
+        "v": "RM0",
+        "l": "Yuran, selama-lamanya"
+      }
     ]
   },
   "compare": {
@@ -80,14 +96,38 @@
     "signup": "Daftar percuma",
     "demo": "Lihat demo →",
     "items": [
-      { "t": "Waktu solat ikut zon JAKIM", "d": "Berdasarkan data e-Solat JAKIM dan tarikh Hijrah. Pilih lokasi, zon ditetapkan automatik." },
-      { "t": "Azan, iqamah, solat", "d": "Amaran sebelum azan, kiraan iqamah dan skrin senyap semasa solat." },
-      { "t": "Mod khutbah Jumaat", "d": "Skrin bertukar secara automatik semasa khutbah dan solat Jumaat." },
-      { "t": "10 templat siap", "d": "Kuliah, kematian, program, infaq, mesyuarat dan banyak lagi. Isi borang, tekan Terbit." },
-      { "t": "Poster saiz tepat", "d": "Saiz terbaik ditunjukkan semasa muat naik. Gambar dimampatkan automatik." },
-      { "t": "Logo dan nama masjid", "d": "Logo dan nama masjid anda di setiap skrin." },
-      { "t": "Beberapa skrin", "d": "Dewan utama, ruang wanita, pintu masuk: tema dan susun atur berbeza." },
-      { "t": "Tanpa internet pun jalan", "d": "Waktu setahun disimpan dalam TV. Menyegerak semula bila talian pulih." }
+      {
+        "t": "Waktu solat ikut zon JAKIM",
+        "d": "Berdasarkan data e-Solat JAKIM dan tarikh Hijrah. Pilih lokasi, zon ditetapkan automatik."
+      },
+      {
+        "t": "Azan, iqamah, solat",
+        "d": "Amaran sebelum azan, kiraan iqamah dan skrin senyap semasa solat."
+      },
+      {
+        "t": "Mod khutbah Jumaat",
+        "d": "Skrin bertukar secara automatik semasa khutbah dan solat Jumaat."
+      },
+      {
+        "t": "10 templat siap",
+        "d": "Kuliah, kematian, program, infaq, mesyuarat dan banyak lagi. Isi borang, tekan Terbit."
+      },
+      {
+        "t": "Poster saiz tepat",
+        "d": "Saiz terbaik ditunjukkan semasa muat naik. Gambar dimampatkan automatik."
+      },
+      {
+        "t": "Logo dan nama masjid",
+        "d": "Logo dan nama masjid anda di setiap skrin."
+      },
+      {
+        "t": "Beberapa skrin",
+        "d": "Dewan utama, ruang wanita, pintu masuk: tema dan susun atur berbeza."
+      },
+      {
+        "t": "Tanpa internet pun jalan",
+        "d": "Waktu setahun disimpan dalam TV. Menyegerak semula bila talian pulih."
+      }
     ]
   },
   "day": {
@@ -95,11 +135,36 @@
     "title": "Skrin tahu bila azan, bila iqamah, dan bila perlu senyap",
     "body": "Mod bertukar secara automatik. Tiada sesiapa perlu menekan butang.",
     "items": [
-      { "tag": "NORMAL", "time": "Sepanjang hari", "t": "Waktu dan pengumuman", "d": "Jam, tarikh Hijrah dan poster bergilir." },
-      { "tag": "SEBELUM AZAN", "time": "5 minit sebelum", "t": "Amaran awal", "d": "Jemaah tahu waktu hampir masuk." },
-      { "tag": "AZAN", "time": "Masuk waktu", "t": "Skrin penuh", "d": "Nama waktu dalam rumi dan Arab." },
-      { "tag": "IQAMAH", "time": "Ikut tetapan AJK", "t": "Kiraan iqamah", "d": "\"Luruskan dan rapatkan saf.\"" },
-      { "tag": "SOLAT", "time": "Semasa solat", "t": "Skrin senyap", "d": "Hampir gelap supaya tidak mengganggu." }
+      {
+        "tag": "NORMAL",
+        "time": "Sepanjang hari",
+        "t": "Waktu dan pengumuman",
+        "d": "Jam, tarikh Hijrah dan poster bergilir."
+      },
+      {
+        "tag": "SEBELUM AZAN",
+        "time": "5 minit sebelum",
+        "t": "Amaran awal",
+        "d": "Jemaah tahu waktu hampir masuk."
+      },
+      {
+        "tag": "AZAN",
+        "time": "Masuk waktu",
+        "t": "Skrin penuh",
+        "d": "Nama waktu dalam rumi dan Arab."
+      },
+      {
+        "tag": "IQAMAH",
+        "time": "Ikut tetapan AJK",
+        "t": "Kiraan iqamah",
+        "d": "\"Luruskan dan rapatkan saf.\""
+      },
+      {
+        "tag": "SOLAT",
+        "time": "Semasa solat",
+        "t": "Skrin senyap",
+        "d": "Hampir gelap supaya tidak mengganggu."
+      }
     ]
   },
   "panel": {
@@ -108,13 +173,31 @@
     "body": "Kemas kini pengumuman semasa dalam perjalanan, atau susun jadual mingguan di pejabat masjid.",
     "laptop": {
       "brand": "Masjid View",
-      "nav": ["Utama", "Kandungan", "Skrin", "Tetapan", "Ahli"],
+      "nav": [
+        "Utama",
+        "Kandungan",
+        "Skrin",
+        "Tetapan",
+        "Ahli"
+      ],
       "template": "Templat: Kuliah",
       "fields": [
-        { "l": "Tajuk", "v": "Adab Menuntut Ilmu" },
-        { "l": "Penceramah", "v": "Ustaz [Nama]" },
-        { "l": "Masa", "v": "Selepas Maghrib" },
-        { "l": "Papar sehingga", "v": "Khamis, 23 Okt" }
+        {
+          "l": "Tajuk",
+          "v": "Adab Menuntut Ilmu"
+        },
+        {
+          "l": "Penceramah",
+          "v": "Ustaz [Nama]"
+        },
+        {
+          "l": "Masa",
+          "v": "Selepas Maghrib"
+        },
+        {
+          "l": "Papar sehingga",
+          "v": "Khamis, 23 Okt"
+        }
       ],
       "publish": "Terbit ke skrin",
       "preview": "Pratonton langsung · Tenang",
@@ -125,15 +208,34 @@
     },
     "phone": {
       "title": "Pengumuman baharu",
-      "templates": ["Kuliah", "Kematian", "Program", "Infaq", "Mesyuarat", "Imam & Bilal"],
+      "templates": [
+        "Kuliah",
+        "Kematian",
+        "Program",
+        "Infaq",
+        "Mesyuarat",
+        "Imam & Bilal"
+      ],
       "upload": "Muat naik poster · 1920×800",
       "caption": "Telefon · kemas kini segera"
     },
     "benefits": [
-      { "t": "Log masuk dengan Google", "d": "Tiada kata laluan untuk diingat. E-mel pautan ajaib juga disokong." },
-      { "t": "Pratonton sebelum terbit", "d": "Lihat rupa sebenar dalam tema skrin anda." },
-      { "t": "Jadualkan pengumuman", "d": "Tarikh mula, tamat dan hari tertentu. Tamat sendiri." },
-      { "t": "Dua pentadbir", "d": "Jemput seorang lagi AJK sebagai pentadbir. Kedua-duanya mempunyai akses penuh." }
+      {
+        "t": "Log masuk dengan Google",
+        "d": "Tiada kata laluan untuk diingat. E-mel pautan ajaib juga disokong."
+      },
+      {
+        "t": "Pratonton sebelum terbit",
+        "d": "Lihat rupa sebenar dalam tema skrin anda."
+      },
+      {
+        "t": "Jadualkan pengumuman",
+        "d": "Tarikh mula, tamat dan hari tertentu. Tamat sendiri."
+      },
+      {
+        "t": "Dua pentadbir",
+        "d": "Jemput seorang lagi AJK sebagai pentadbir. Kedua-duanya mempunyai akses penuh."
+      }
     ]
   },
   "templates": {
@@ -141,16 +243,46 @@
     "title": "Isi borang, tekan Terbit. Tiada reka poster.",
     "body": "Setiap templat mengikut tema skrin anda secara automatik.",
     "items": [
-      { "n": "Pengumuman Am", "d": "Tajuk dan teks ringkas" },
-      { "n": "Kuliah / Ceramah", "d": "Tajuk, penceramah, masa" },
-      { "n": "Kematian", "d": "Solat jenazah, tamat automatik" },
-      { "n": "Program", "d": "Tarikh, tempat, hubungi" },
-      { "n": "Kutipan / Infaq", "d": "Sasaran, kemajuan, QR" },
-      { "n": "Mesyuarat", "d": "Notis rasmi AJK" },
-      { "n": "Imam & Bilal", "d": "Jadual mingguan" },
-      { "n": "Penyata Kewangan", "d": "Kutipan, belanja, baki" },
-      { "n": "Ayat / Hadith", "d": "Daripada sumber sahih" },
-      { "n": "Ucapan Perayaan", "d": "Aidilfitri, Aidiladha dan lain-lain" }
+      {
+        "n": "Pengumuman Am",
+        "d": "Tajuk dan teks ringkas"
+      },
+      {
+        "n": "Kuliah / Ceramah",
+        "d": "Tajuk, penceramah, masa"
+      },
+      {
+        "n": "Kematian",
+        "d": "Solat jenazah, tamat automatik"
+      },
+      {
+        "n": "Program",
+        "d": "Tarikh, tempat, hubungi"
+      },
+      {
+        "n": "Kutipan / Infaq",
+        "d": "Sasaran, kemajuan, QR"
+      },
+      {
+        "n": "Mesyuarat",
+        "d": "Notis rasmi AJK"
+      },
+      {
+        "n": "Imam & Bilal",
+        "d": "Jadual mingguan"
+      },
+      {
+        "n": "Penyata Kewangan",
+        "d": "Kutipan, belanja, baki"
+      },
+      {
+        "n": "Ayat / Hadith",
+        "d": "Daripada sumber sahih"
+      },
+      {
+        "n": "Ucapan Perayaan",
+        "d": "Aidilfitri, Aidiladha dan lain-lain"
+      }
     ]
   },
   "try": {
@@ -159,7 +291,11 @@
     "nameLabel": "Nama masjid atau surau",
     "defaultName": "Masjid Al-Hidayah",
     "themeLabel": "Tema",
-    "themes": { "tenang": "Tenang", "serambi": "Serambi", "alam": "Alam" },
+    "themes": {
+      "tenang": "Tenang",
+      "serambi": "Serambi",
+      "alam": "Alam"
+    },
     "cta": "Suka? Daftar masjid ini secara percuma →"
   },
   "devices": {
@@ -167,10 +303,26 @@
     "title": "Ada pelayar web? Ia boleh jadi skrin masjid.",
     "url": "masjidview.my/tv",
     "items": [
-      { "s": "Smart TV", "t": "TV pintar Android / Google TV", "d": "Muat turun dan buka aplikasi pelayar web, masukkan alamat, siap." },
-      { "s": "Kotak TV", "t": "TV biasa + kotak Android TV", "d": "Cucuk kotak Android TV ke port HDMI TV lama anda." },
-      { "s": "Laptop", "t": "Komputer riba atau PC", "d": "Sambung ke TV dengan kabel HDMI, buka pelayar web dalam skrin penuh." },
-      { "s": "Stik TV", "t": "Stik streaming dengan pelayar", "d": "Peranti kecil yang menyokong pelayar web moden." }
+      {
+        "s": "Smart TV",
+        "t": "TV pintar Android / Google TV",
+        "d": "Muat turun dan buka aplikasi pelayar web, masukkan alamat, siap."
+      },
+      {
+        "s": "Kotak TV",
+        "t": "TV biasa + kotak Android TV",
+        "d": "Cucuk kotak Android TV ke port HDMI TV lama anda."
+      },
+      {
+        "s": "Laptop",
+        "t": "Komputer riba atau PC",
+        "d": "Sambung ke TV dengan kabel HDMI, buka pelayar web dalam skrin penuh."
+      },
+      {
+        "s": "Stik TV",
+        "t": "Stik streaming dengan pelayar",
+        "d": "Peranti kecil yang menyokong pelayar web moden."
+      }
     ],
     "pairTitle": "Pasang sekali, jalan sendiri",
     "pairBody": "TV memaparkan kod 6 digit. AJK masukkan kod di telefon, dan skrin terus dipautkan kepada masjid anda.",
@@ -183,19 +335,40 @@
     "title": "Tiga tema, warna ikut waktu solat",
     "body": "Tukar tema bila-bila masa tanpa menaip semula pengumuman. Lebih banyak tema akan datang.",
     "items": [
-      { "n": "Tenang", "d": "Minimal dan lapang, warna pastel yang lembut." },
-      { "n": "Serambi", "d": "Gelap dengan gerbang langit dan sentuhan emas." },
-      { "n": "Alam", "d": "Langit dan landskap yang berubah sepanjang hari." }
+      {
+        "n": "Tenang",
+        "d": "Minimal dan lapang, warna pastel yang lembut."
+      },
+      {
+        "n": "Serambi",
+        "d": "Gelap dengan gerbang langit dan sentuhan emas."
+      },
+      {
+        "n": "Alam",
+        "d": "Langit dan landskap yang berubah sepanjang hari."
+      }
     ]
   },
   "start": {
     "eyebrow": "CARA BERMULA",
     "title": "Siap dalam satu petang",
     "steps": [
-      { "t": "Daftar", "d": "Log masuk dengan Google, isi nama masjid dan pilih lokasi. Zon JAKIM ditetapkan automatik." },
-      { "t": "Diluluskan", "d": "Kami semak pendaftaran, biasanya dalam 1–2 hari bekerja. Anda akan menerima e-mel." },
-      { "t": "Pasang TV", "d": "Buka masjidview.my/tv pada TV. Masukkan kod 6 digit di telefon anda." },
-      { "t": "Terbit pengumuman", "d": "Pilih templat atau muat naik poster. Ia muncul di TV dalam masa seminit." }
+      {
+        "t": "Daftar",
+        "d": "Log masuk dengan Google, isi nama masjid dan pilih lokasi. Zon JAKIM ditetapkan automatik."
+      },
+      {
+        "t": "Diluluskan",
+        "d": "Kami semak pendaftaran, biasanya dalam 1–2 hari bekerja. Anda akan menerima e-mel."
+      },
+      {
+        "t": "Pasang TV",
+        "d": "Buka masjidview.my/tv pada TV. Masukkan kod 6 digit di telefon anda."
+      },
+      {
+        "t": "Terbit pengumuman",
+        "d": "Pilih templat atau muat naik poster. Ia muncul di TV dalam masa seminit."
+      }
     ],
     "needLabel": "Apa yang diperlukan:",
     "needs": [
@@ -207,16 +380,46 @@
   "faq": {
     "title": "Soalan lazim",
     "items": [
-      { "q": "Adakah Masjid View benar-benar percuma?", "a": "Ya. Tiada yuran pendaftaran, langganan atau caj tersembunyi untuk masjid dan surau." },
-      { "q": "TV jenis apa yang boleh digunakan?", "a": "Mana-mana TV yang ada pelayar web moden: TV pintar Android atau Google TV, TV biasa dengan kotak Android TV, atau komputer riba yang disambungkan ke TV melalui HDMI." },
-      { "q": "Perlukah saya muat turun aplikasi?", "a": "Tiada aplikasi Masjid View untuk dipasang. Masjid View berjalan dalam pelayar web: muat turun dan buka mana-mana aplikasi pelayar web pada TV, kemudian buka masjidview.my/tv." },
-      { "q": "Dari mana waktu solat diambil?", "a": "Berdasarkan data e-Solat JAKIM mengikut zon masjid anda. Anda boleh semak waktu hari ini semasa mendaftar." },
-      { "q": "Perlukah internet sepanjang masa?", "a": "Tidak. Internet diperlukan untuk mengemas kini pengumuman. Waktu solat disimpan dalam TV supaya skrin terus berfungsi jika WiFi terputus." },
-      { "q": "Boleh ubah minit iqamah?", "a": "Boleh. Pentadbir menetapkan minit iqamah bagi setiap waktu, serta tempoh khutbah Jumaat." },
-      { "q": "Berapa orang boleh mengurus satu masjid?", "a": "Dua orang pentadbir dengan akses yang sama. Pentadbir pertama menjemput yang kedua melalui e-mel. Setiap akaun hanya boleh mengurus satu masjid. Apabila AJK bertukar, pentadbir boleh membuang dan menjemput semula, atau hubungi kami." },
-      { "q": "Boleh guna lebih daripada satu TV?", "a": "Boleh. Setiap skrin dipasang dengan kod tersendiri dan boleh menggunakan tema serta susun atur berbeza." },
-      { "q": "Surau kecil pun boleh guna?", "a": "Boleh. Masjid View sesuai untuk masjid besar dan surau kecil." },
-      { "q": "Bagaimana data peribadi dilindungi?", "a": "Kami hanya menyimpan maklumat yang perlu untuk menguruskan paparan. Pengumuman kematian dipadam secara automatik. Baca Notis Privasi untuk butiran." }
+      {
+        "q": "Adakah Masjid View benar-benar percuma?",
+        "a": "Ya. Tiada yuran pendaftaran, langganan atau caj tersembunyi untuk masjid dan surau."
+      },
+      {
+        "q": "TV jenis apa yang boleh digunakan?",
+        "a": "Mana-mana TV yang ada pelayar web moden: TV pintar Android atau Google TV, TV biasa dengan kotak Android TV, atau komputer riba yang disambungkan ke TV melalui HDMI."
+      },
+      {
+        "q": "Perlukah saya muat turun aplikasi?",
+        "a": "Tiada aplikasi Masjid View untuk dipasang. Masjid View berjalan dalam pelayar web: muat turun dan buka mana-mana aplikasi pelayar web pada TV, kemudian buka masjidview.my/tv."
+      },
+      {
+        "q": "Dari mana waktu solat diambil?",
+        "a": "Berdasarkan data e-Solat JAKIM mengikut zon masjid anda. Anda boleh semak waktu hari ini semasa mendaftar."
+      },
+      {
+        "q": "Perlukah internet sepanjang masa?",
+        "a": "Tidak. Internet diperlukan untuk mengemas kini pengumuman. Waktu solat disimpan dalam TV supaya skrin terus berfungsi jika WiFi terputus."
+      },
+      {
+        "q": "Boleh ubah minit iqamah?",
+        "a": "Boleh. Pentadbir menetapkan minit iqamah bagi setiap waktu, serta tempoh khutbah Jumaat."
+      },
+      {
+        "q": "Berapa orang boleh mengurus satu masjid?",
+        "a": "Dua orang pentadbir dengan akses yang sama. Pentadbir pertama menjemput yang kedua melalui e-mel. Setiap akaun hanya boleh mengurus satu masjid. Apabila AJK bertukar, pentadbir boleh membuang dan menjemput semula, atau hubungi kami."
+      },
+      {
+        "q": "Boleh guna lebih daripada satu TV?",
+        "a": "Boleh. Setiap skrin dipasang dengan kod tersendiri dan boleh menggunakan tema serta susun atur berbeza."
+      },
+      {
+        "q": "Surau kecil pun boleh guna?",
+        "a": "Boleh. Masjid View sesuai untuk masjid besar dan surau kecil."
+      },
+      {
+        "q": "Bagaimana data peribadi dilindungi?",
+        "a": "Kami hanya menyimpan maklumat yang perlu untuk menguruskan paparan. Pengumuman kematian dipadam secara automatik. Baca Notis Privasi untuk butiran."
+      }
     ]
   },
   "cta": {
@@ -239,5 +442,106 @@
     "whatsapp": "WhatsApp",
     "support": "Sokong Masjid View",
     "jakim": "Waktu solat berdasarkan data e-Solat JAKIM."
+  },
+  "panduan": {
+    "meta": {
+      "title": "Panduan pemasangan TV — Masjid View",
+      "description": "Cara memasang skrin Masjid View pada TV pintar Android, kotak Android TV atau komputer riba, dan memasangkannya dengan kod 6 digit."
+    },
+    "eyebrow": "PANDUAN",
+    "title": "Panduan pemasangan TV",
+    "intro": "Pasang skrin Masjid View dalam kira-kira 30 minit. Pilih cara yang sesuai dengan TV anda, kemudian pasangkan skrin dengan kod 6 digit dari panel AJK.",
+    "before": "Sebelum mula: sambungkan TV ke WiFi masjid yang hidup sepanjang hari (bukan hotspot telefon), dan pastikan tarikh, masa dan zon waktu Kuala Lumpur (GMT+8) betul.",
+    "toc": "Dalam panduan ini",
+    "imgMissing": "Gambar akan ditambah kemudian.",
+    "sections": [
+      {
+        "id": "android",
+        "title": "TV pintar Android / Google TV",
+        "steps": [
+          "Pada TV, buka Google Play. Cari dan pasang aplikasi pelayar web (browser).",
+          "Buka pelayar itu dan taip alamat https://masjidview.my/tv",
+          "Jika pelayar ada tetapan halaman mula (start page atau home page), tetapkan kepada alamat yang sama.",
+          "Jika pelayar boleh dibuka sendiri apabila TV dihidupkan (start on boot atau mod kiosk), hidupkan tetapan itu supaya skrin terus muncul selepas bekalan elektrik pulih.",
+          "Dalam Tetapan TV, matikan penjimat skrin (screen saver) dan mod tidur supaya skrin sentiasa menyala."
+        ],
+        "img": {
+          "file": "android-browser.png",
+          "alt": "Pelayar web pada TV Android sedang membuka masjidview.my/tv"
+        }
+      },
+      {
+        "id": "kotak",
+        "title": "TV biasa + kotak Android TV",
+        "steps": [
+          "Cucuk kotak Android TV ke port HDMI pada TV dan sambungkan kotak ke WiFi.",
+          "Pilih input HDMI yang betul dengan alat kawalan TV.",
+          "Pada kotak itu, ikut langkah yang sama seperti TV pintar Android di atas.",
+          "Semak Tetapan kotak (Paparan atau Kuasa) supaya kotak tidak masuk mod tidur."
+        ],
+        "img": {
+          "file": "android-box.png",
+          "alt": "Kotak Android TV disambungkan ke port HDMI di belakang TV"
+        }
+      },
+      {
+        "id": "laptop",
+        "title": "Komputer riba melalui HDMI",
+        "steps": [
+          "Sambungkan komputer riba ke TV dengan kabel HDMI dan pilih input HDMI pada TV.",
+          "Buka pelayar web dan pergi ke https://masjidview.my/tv",
+          "Tekan F11 (atau pilih Skrin penuh dalam menu pelayar) supaya skrin memenuhi TV.",
+          "Dalam Tetapan Kuasa, tetapkan komputer supaya tidak tidur dan skrin tidak padam.",
+          "Biarkan pengecas sentiasa disambungkan."
+        ],
+        "img": {
+          "file": "laptop-hdmi.png",
+          "alt": "Komputer riba disambung ke TV dengan kabel HDMI, memaparkan skrin penuh"
+        }
+      },
+      {
+        "id": "pasang",
+        "title": "Pasangkan skrin dengan kod 6 digit",
+        "steps": [
+          "Selepas masjidview.my/tv dibuka, TV memaparkan kod 6 digit dan kod QR.",
+          "Di telefon, log masuk ke masjidview.my/admin dan buka Skrin, kemudian Tambah skrin.",
+          "Masukkan kod (atau imbas kod QR) dan beri nama skrin, contohnya Dewan utama.",
+          "Dalam beberapa saat, TV memaparkan waktu solat dan pengumuman masjid anda.",
+          "Kod tamat tempoh selepas 10 minit. TV akan memaparkan kod baharu dengan sendirinya."
+        ],
+        "img": {
+          "file": "pairing-code.png",
+          "alt": "Skrin TV memaparkan kod pemasangan 6 digit dan kod QR"
+        }
+      }
+    ],
+    "trouble": {
+      "id": "masalah",
+      "title": "Jika ada masalah",
+      "items": [
+        {
+          "q": "WiFi terputus",
+          "a": "Waktu solat terus dipaparkan kerana disimpan dalam TV. Pengumuman baharu akan muncul semula apabila talian pulih."
+        },
+        {
+          "q": "Waktu atau jam tidak tepat",
+          "a": "Pastikan zon waktu peranti ialah Kuala Lumpur (GMT+8) dan tarikhnya betul. Skrin membetulkan perbezaan kecil sendiri, tetapi zon waktu yang salah mengelirukannya."
+        },
+        {
+          "q": "Skrin padam atau masuk mod tidur",
+          "a": "Matikan penjimat skrin, mod tidur dan tetapan tutup sendiri (auto power off) dalam Tetapan TV, kotak atau komputer."
+        },
+        {
+          "q": "Kod pemasangan tidak diterima",
+          "a": "Kod tamat tempoh selepas 10 minit. Muat semula halaman di TV untuk mendapat kod baharu, kemudian cuba lagi."
+        },
+        {
+          "q": "TV kembali memaparkan kod pemasangan",
+          "a": "Skrin itu telah dibuang dalam panel AJK. Pasangkan semula dengan kod baharu."
+        }
+      ]
+    },
+    "help": "Masih tidak berjaya? E-mel kami di",
+    "back": "← Kembali ke halaman utama"
   }
 }

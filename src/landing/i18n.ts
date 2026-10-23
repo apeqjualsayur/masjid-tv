@@ -18,3 +18,8 @@ export function t(lang: Lang, key: string): string {
 
 /** Page addresses per language (static export, trailing slashes). */
 export const homeHref = (lang: Lang) => (lang === "en" ? "/en/" : "/");
+
+export type Page = "home" | "panduan";
+export const pageHref = (lang: Lang, page: Page) => homeHref(lang) + (page === "panduan" ? "panduan/" : "");
+/** A home-page section anchor from any page: "#ciri" on the home page, "/en/#ciri" elsewhere. */
+export const sectionHref = (lang: Lang, page: Page, id: string) => (page === "home" ? `#${id}` : `${homeHref(lang)}#${id}`);

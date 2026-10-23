@@ -12,7 +12,8 @@
     "fetch-year": "tsx scripts/fetch-year.ts",
     "sample-slides": "tsx scripts/make-sample-slides.ts",
     "e2e": "node scripts/e2e.mjs",
-    "rls-check": "node --env-file-if-exists=.env.local --import tsx scripts/rls-check.ts"
+    "rls-check": "node --env-file-if-exists=.env.local --import tsx scripts/rls-check.ts",
+    "og": "tsx scripts/og.ts"
   },
   "dependencies": {
     "@dnd-kit/core": "6.3.1",
@@ -30,6 +31,7 @@
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
     "fake-indexeddb": "^6.2.6",
+    "playwright-core": "^1.49.1",
     "postcss": "^8.5.30",
     "tailwindcss": "^4.3.3",
     "tsx": "^4.23.15",

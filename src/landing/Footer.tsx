@@ -1,7 +1,7 @@
 // Landing footer (PRD §4 row 16): white lockup, tagline, Produk / Bantuan / Hubungi, credit line.
 // Contact rows come from site.ts; an empty value hides its row (no placeholders).
 import type { ReactNode } from "react";
-import { copy, type Lang } from "./i18n";
+import { copy, sectionHref, type Lang, type Page } from "./i18n";
 import { site } from "./site";
 
 export const DEMO_HREF = "/tv/?demo=1";
@@ -19,7 +19,7 @@ function Column({ title, children }: { title: string; children: ReactNode }) {
   );
 }
 
-export function Footer({ lang }: { lang: Lang }) {
+export function Footer({ lang, page = "home" }: { lang: Lang; page?: Page }) {
   const c = copy(lang);
   const f = c.footer;
   const year = new Date().getFullYear();
@@ -32,8 +32,8 @@ export function Footer({ lang }: { lang: Lang }) {
           <p className="leading-[1.6]">{f.tagline}</p>
         </div>
         <Column title={f.product}>
-          <li><a className={link} href="#ciri">{f.productFeatures}</a></li>
-          <li><a className={link} href="#panel">{f.productPanel}</a></li>
+          <li><a className={link} href={sectionHref(lang, page, "ciri")}>{f.productFeatures}</a></li>
+          <li><a className={link} href={sectionHref(lang, page, "panel")}>{f.productPanel}</a></li>
           <li>
             <a className={link} href={DEMO_HREF} target="_blank" rel="noopener">
               {f.productDemo}
@@ -43,7 +43,7 @@ export function Footer({ lang }: { lang: Lang }) {
         </Column>
         <Column title={f.help}>
           <li><a className={link} href={guideHref(lang)}>{f.helpGuide}</a></li>
-          <li><a className={link} href="#soalan">{f.helpFaq}</a></li>
+          <li><a className={link} href={sectionHref(lang, page, "soalan")}>{f.helpFaq}</a></li>
           <li><a className={link} href={PRIVACY_HREF}>{f.helpPrivacy}</a></li>
           {site.supportUrl && (
             <li><a className={link} href={site.supportUrl} rel="noopener">{f.support}</a></li>

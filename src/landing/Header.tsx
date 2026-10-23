@@ -2,7 +2,7 @@
 // Landing header (PRD §4 row 1, design Lembut-Full): sticky; lockup, section anchors, BM/EN, Log masuk,
 // Daftar percuma. Below 900 px: lockup + Daftar + a menu button opening a sheet (focus trap, Esc).
 import { useCallback, useEffect, useRef, useState } from "react";
-import { copy, homeHref, type Lang } from "./i18n";
+import { copy, homeHref, pageHref, sectionHref, type Lang, type Page } from "./i18n";
 
 export const ADMIN_HREF = "/admin/";
 
@@ -27,15 +27,15 @@ function useHash(): string {
   return hash;
 }
 
-/** BM | EN segmented links. The other language keeps the current #anchor. */
-export function LangSwitch({ lang, className = "" }: { lang: Lang; className?: string }) {
+/** BM | EN segmented links to the same page; the other language keeps the current #anchor. */
+export function LangSwitch({ lang, page = "home", className = "" }: { lang: Lang; page?: Page; className?: string }) {
   const c = copy(lang);
   const hash = useHash();
   const item = (l: Lang, label: string) => {
     const on = l === lang;
     return (
       <a
-        href={`${homeHref(l)}${hash}`}
+        href={`${pageHref(l, page)}${hash}`}
         hrefLang={l}
         lang={l}
         aria-current={on ? "page" : undefined}
@@ -55,7 +55,7 @@ export function LangSwitch({ lang, className = "" }: { lang: Lang; className?: s
 
 const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lb-deep";
 
-export function Header({ lang }: { lang: Lang }) {
+export function Header({ lang, page = "home" }: { lang: Lang; page?: Page }) {
   const c = copy(lang);
   const [open, setOpen] = useState(false);
   const button = useRef<HTMLButtonElement>(null);
@@ -119,13 +119,13 @@ export function Header({ lang }: { lang: Lang }) {
           </a>
           <nav aria-label={c.a11y.mainNav} className="mx-auto hidden gap-7 text-[15px] font-medium min-[900px]:flex">
             {NAV.map((n) => (
-              <a key={n.id} href={`#${n.id}`} className={`rounded text-lb-muted hover:text-lb-ink ${focusRing}`}>
+              <a key={n.id} href={sectionHref(lang, page, n.id)} className={`rounded text-lb-muted hover:text-lb-ink ${focusRing}`}>
                 {c.nav[n.key]}
               </a>
             ))}
           </nav>
           <div className="ml-auto flex items-center gap-2 min-[400px]:gap-3">
-            <LangSwitch lang={lang} className="hidden min-[900px]:flex" />
+            <LangSwitch lang={lang} page={page} className="hidden min-[900px]:flex" />
             <a href={ADMIN_HREF} className={`hidden rounded text-[15px] font-semibold min-[900px]:block ${focusRing}`}>
               {c.nav.login}
             </a>
@@ -170,13 +170,13 @@ export function Header({ lang }: { lang: Lang }) {
             </div>
             <nav aria-label={c.a11y.mainNav} className="mt-2 flex flex-col">
               {NAV.map((n) => (
-                <a key={n.id} href={`#${n.id}`} onClick={close} className={`flex h-12 items-center border-b border-lb-hair text-[17px] font-semibold ${focusRing}`}>
+                <a key={n.id} href={sectionHref(lang, page, n.id)} onClick={close} className={`flex h-12 items-center border-b border-lb-hair text-[17px] font-semibold ${focusRing}`}>
                   {c.nav[n.key]}
                 </a>
               ))}
             </nav>
             <div className="mt-4 flex items-center justify-between gap-3">
-              <LangSwitch lang={lang} className="flex" />
+              <LangSwitch lang={lang} page={page} className="flex" />
               <a href={ADMIN_HREF} className={`flex h-11 items-center rounded px-2 text-[16px] font-semibold ${focusRing}`}>
                 {c.nav.login}
               </a>

@@ -3,6 +3,7 @@
 // azan and khutbah reuse that arch; solat is near-black with a tiny clock.
 import { formatCountdown, formatMmSs, type DisplayState } from "@/core";
 import type { CSSProperties, ReactNode } from "react";
+import { ProgressLine, khutbahEndLine } from "../shared/friday";
 import type { UnavailableState } from "../types";
 import { Amiri, Caps, GoldRule, Kufi, Logo, Page, numStyle } from "./parts";
 import { C, F, SKY, SOLAT_BG, SOLAT_FG, archRadius } from "./tokens";
@@ -174,6 +175,8 @@ export function Khutbah({ s }: { s: DisplayState }) {
           <div style={{ fontSize: 28, color: C.muted, marginTop: 10 }}>Senyapkan telefon bimbit</div>
           <GoldRule margin="40px 0 20px" />
           <div style={{ ...numStyle, fontSize: 200, fontWeight: 600, lineHeight: 0.9, color: "rgba(255,255,255,0.85)" }}>{s.clock}</div>
+          {s.friday && <div style={{ fontSize: 36, fontWeight: 600, color: C.gold, marginTop: 26 }}>{khutbahEndLine(s.friday)}</div>}
+          <ProgressLine color={C.gold} track="rgba(227,176,75,0.2)" progress={s.modeProgress ?? 0} lite={s.lite} width={480} style={{ marginTop: 30 }} />
         </div>
       </BigArch>
     </Page>

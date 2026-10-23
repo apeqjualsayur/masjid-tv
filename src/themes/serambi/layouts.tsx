@@ -18,6 +18,7 @@ import {
   type Area,
 } from "./parts";
 import { CrossFade } from "../shared/crossfade";
+import { FridayStrip } from "./friday";
 import { SerambiPoster } from "./poster";
 import { serambiTemplates } from "./templates";
 import { ARCH_OVERLAY, ARCH_OVERLAY_SMALL, C, SKY, archRadius } from "./tokens";
@@ -93,7 +94,7 @@ function Counter({ counter }: { counter?: LayoutProps["counter"] }) {
 
 function SlideArea({ s, slide, slideKey, counter, area, style }: LayoutProps & { area: Area; style: CSSProperties }) {
   return (
-    <div style={{ position: "absolute", overflow: "hidden", background: C.bg, ...style }}>
+    <div data-poster-area style={{ position: "absolute", overflow: "hidden", background: C.bg, ...style }}>
       <CrossFade id={slideKey ?? "slide"} lite={s.lite}>
         <SlideLayer s={s} slide={slide} area={area} />
       </CrossFade>
@@ -134,11 +135,14 @@ export function FullLayout({ s }: LayoutProps) {
         </div>
       </div>
 
+      <FridayStrip s={s} style={{ position: "absolute", top: 394, right: 72, height: 46 }} />
+
       <div style={{ position: "absolute", left: 72, right: 72, bottom: 64, height: 620, display: "flex", alignItems: "flex-end", gap: 20 }}>
         {s.waktu.map((w) => {
           const cur = w.state === "current";
+          const h = s.friday ? 60 : 0;
           return (
-            <ArchWindow key={w.key} w={w} width={236} height={cur ? 620 : 560} overlay={ARCH_OVERLAY} look={archLook(w, 70, s.lite)}>
+            <ArchWindow key={w.key} w={w} width={236} height={(cur ? 620 : 560) - h} overlay={ARCH_OVERLAY} look={archLook(w, 70, s.lite)}>
               {(cur || w.state === "next") && (
                 <div style={{ position: "absolute", top: 132, left: 0, right: 0, display: "flex", justifyContent: "center" }}>
                   <Chip current={cur}>{cur ? "SEKARANG" : "SETERUSNYA"}</Chip>
@@ -166,7 +170,8 @@ export function BottomLayout({ s, slide, slideKey, counter }: LayoutProps) {
     <Page>
       <SlideArea s={s} slide={slide} slideKey={slideKey} counter={counter} area="wide" style={{ top: 0, left: 0, right: 0, height: 730 }} />
 
-      <div style={{ position: "absolute", left: 64, right: 64, bottom: 36, height: 310, display: "grid", gridTemplateColumns: "360px minmax(0, 1fr)", gap: 40, alignItems: "end" }}>
+      <FridayStrip s={s} style={{ position: "absolute", left: 64, top: 742, height: 44 }} />
+      <div style={{ position: "absolute", left: 64, right: 64, bottom: s.friday ? 16 : 36, height: 310, display: "grid", gridTemplateColumns: "360px minmax(0, 1fr)", gap: 40, alignItems: "end" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 8, paddingBottom: 6, minWidth: 0 }}>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <Logo masjid={s.masjid} size={40} />
@@ -184,7 +189,7 @@ export function BottomLayout({ s, slide, slideKey, counter }: LayoutProps) {
           {s.waktu.map((w) => {
             const cur = w.state === "current";
             return (
-              <ArchWindow key={w.key} w={w} width={BOTTOM_ARCH_W} height={cur ? 300 : 250} bottomRadius={14} overlay={ARCH_OVERLAY_SMALL} look={archLook(w, 50, s.lite)}>
+              <ArchWindow key={w.key} w={w} width={BOTTOM_ARCH_W} height={s.friday ? (cur ? 262 : 222) : cur ? 300 : 250} bottomRadius={14} overlay={ARCH_OVERLAY_SMALL} look={archLook(w, 50, s.lite)}>
                 <div style={{ position: "absolute", left: 0, right: 0, bottom: 0, padding: "0 10px 20px", display: "flex", flexDirection: "column", alignItems: "center", gap: 2 }}>
                   {cur && (
                     <div style={{ marginBottom: 8 }}>
@@ -252,7 +257,7 @@ export function SideLayout({ s, slide, slideKey, counter }: LayoutProps) {
                   display: "flex",
                   alignItems: "center",
                   gap: 18,
-                  height: 78,
+                  height: s.friday ? 60 : 78,
                   boxSizing: "border-box",
                   padding: "0 20px 0 14px",
                   borderRadius: 18,
@@ -268,11 +273,12 @@ export function SideLayout({ s, slide, slideKey, counter }: LayoutProps) {
                     SEKARANG
                   </Chip>
                 )}
-                <div style={{ marginLeft: "auto", ...numStyle, fontSize: 62, fontWeight: 600, color: cur ? C.gold : C.white }}>{w.time}</div>
+                <div style={{ marginLeft: "auto", ...numStyle, fontSize: s.friday ? 56 : 62, fontWeight: 600, color: cur ? C.gold : C.white }}>{w.time}</div>
               </div>
             );
           })}
         </div>
+        <FridayStrip s={s} variant="card" />
       </div>
     </Page>
   );

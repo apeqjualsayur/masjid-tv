@@ -1,4 +1,5 @@
 import type { ThemeDefinition } from "../types";
+import { FridayStrip } from "./friday";
 import { BottomLayout, FullLayout, SideLayout } from "./layouts";
 import { AlamPoster } from "./poster";
 import { Azan, Iqamah, Khutbah, PreAzanBanner, Solat, Unavailable } from "./screens";
@@ -12,4 +13,5 @@ export const alam: ThemeDefinition = {
   screens: { preAzanBanner: PreAzanBanner, azan: Azan, iqamah: Iqamah, solat: Solat, khutbah: Khutbah, unavailable: Unavailable },
   templates: alamTemplates,
   posterFrame: AlamPoster,
+  fridayInfo: FridayStrip,
 };

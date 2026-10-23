@@ -6,3 +6,6 @@ next-env.d.ts
 .env*.local
 e2e-output/
 supabase/.temp/
+
+# local QA screenshots
+designs/qa/

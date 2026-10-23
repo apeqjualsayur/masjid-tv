@@ -5,6 +5,7 @@ import type { CSSProperties, FC } from "react";
 import type { LayoutProps, SlideView } from "../types";
 import { CrossFade } from "../shared/crossfade";
 import { AreaContext, Arabic, Dot, Logo, Page, tickerItem, tokensOf, type Area } from "./parts";
+import { FridayStrip } from "./friday";
 import { TenangPoster } from "./poster";
 import { tenangTemplates } from "./templates";
 import { SHADOW_CARD, SHADOW_PILL, type TenangTokens } from "./tokens";
@@ -51,7 +52,7 @@ function Counter({ t, counter }: { t: TenangTokens; counter?: LayoutProps["count
 
 function Card({ t, s, slide, slideKey, counter, area, style }: LayoutProps & { t: TenangTokens; area: Area; style: CSSProperties }) {
   return (
-    <div style={{ position: "absolute", borderRadius: 40, background: t.card, color: t.fg, boxShadow: s.lite ? "none" : SHADOW_CARD, overflow: "hidden", ...style }}>
+    <div data-poster-area style={{ position: "absolute", borderRadius: 40, background: t.card, color: t.fg, boxShadow: s.lite ? "none" : SHADOW_CARD, overflow: "hidden", ...style }}>
       <CrossFade id={slideKey ?? "slide"} lite={s.lite}>
         <SlideBody s={s} slide={slide} area={area} />
       </CrossFade>
@@ -90,6 +91,7 @@ export function FullLayout({ s }: LayoutProps) {
           )}
           <div style={{ fontSize: 30, fontWeight: 500, color: t.muted }}>{countdownLine(s)}</div>
         </div>
+        <FridayStrip s={s} variant="card" style={{ maxWidth: 780 }} />
       </div>
 
       <div style={{ position: "absolute", top: 0, bottom: 0, right: 112, width: 760, display: "flex", flexDirection: "column", justifyContent: "center" }}>
@@ -150,7 +152,8 @@ export function BottomLayout({ s, slide, slideKey, counter }: LayoutProps) {
     <Page t={t}>
       <Card t={t} s={s} slide={slide} slideKey={slideKey} counter={counter} area="wide" style={{ top: 56, left: 96, right: 96, height: 670 }} />
 
-      <div style={{ position: "absolute", left: 96, right: 96, bottom: 56, height: 250, display: "grid", gridTemplateColumns: "360px minmax(0, 1fr)", gap: 40, alignItems: "center" }}>
+      <FridayStrip s={s} variant="pill" style={{ position: "absolute", left: 96, top: 736, height: 44 }} />
+      <div style={{ position: "absolute", left: 96, right: 96, bottom: s.friday ? 40 : 56, height: 250, display: "grid", gridTemplateColumns: "360px minmax(0, 1fr)", gap: 40, alignItems: "center" }}>
         <div style={{ display: "flex", flexDirection: "column", gap: 4, minWidth: 0, lineHeight: 1.15 }}>
           <div style={{ fontSize: 22, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis", marginBottom: 4 }}>{s.masjid.fullName}</div>
           <div style={{ fontSize: 132, fontWeight: 300, letterSpacing: -6, lineHeight: 0.9, marginBottom: 6, ...num }}>{s.clock}</div>
@@ -201,13 +204,14 @@ export function SideLayout({ s, slide, slideKey, counter }: LayoutProps) {
           {s.waktu.map((w) => {
             const p = pill(t, w, s.lite);
             return (
-              <div key={w.key} style={{ display: "flex", alignItems: "center", height: 82, padding: "0 30px", borderRadius: 999, background: p.background, boxShadow: p.boxShadow }}>
+              <div key={w.key} style={{ display: "flex", alignItems: "center", height: s.friday ? 66 : 82, padding: "0 30px", borderRadius: 999, background: p.background, boxShadow: p.boxShadow }}>
                 <div style={{ fontSize: 32, fontWeight: p.nameWeight }}>{w.label}</div>
-                <div style={{ marginLeft: "auto", fontSize: 54, fontWeight: p.timeWeight, letterSpacing: -2, color: p.timeColor, ...num }}>{w.time}</div>
+                <div style={{ marginLeft: "auto", fontSize: s.friday ? 50 : 54, fontWeight: p.timeWeight, letterSpacing: -2, color: p.timeColor, ...num }}>{w.time}</div>
               </div>
             );
           })}
         </div>
+        <FridayStrip s={s} variant="card" style={{ marginTop: 16 }} />
       </div>
     </Page>
   );

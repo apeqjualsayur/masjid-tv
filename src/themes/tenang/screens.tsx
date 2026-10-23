@@ -2,6 +2,7 @@
 // Tenang mode screens. iqamah follows designs/F-Iqamah; the others use the same tokens and type scale.
 import { formatCountdown, formatMmSs, type DisplayState } from "@/core";
 import type { ReactNode } from "react";
+import { ProgressLine, khutbahEndLine } from "../shared/friday";
 import type { UnavailableState } from "../types";
 import { Arabic, Dot, Page, tokensOf } from "./parts";
 import { SHADOW_PILL, SOLAT_BG, SOLAT_FG, TOKENS, type TenangTokens } from "./tokens";
@@ -126,7 +127,9 @@ export function Khutbah({ s }: { s: DisplayState }) {
         <Label t={t}>Solat Jumaat</Label>
         <div style={{ fontSize: 96, fontWeight: 500, letterSpacing: -3, marginTop: 28 }}>Khutbah sedang disampaikan</div>
         <div style={{ fontSize: 32, fontWeight: 500, color: t.muted, marginTop: 20 }}>Senyapkan telefon bimbit</div>
-        <div style={{ fontSize: 160, fontWeight: 300, letterSpacing: -6, lineHeight: 1, marginTop: 80, color: t.muted, ...num }}>{s.clock}</div>
+        <div style={{ fontSize: 160, fontWeight: 300, letterSpacing: -6, lineHeight: 1, marginTop: 70, color: t.muted, ...num }}>{s.clock}</div>
+        {s.friday && <div style={{ fontSize: 40, fontWeight: 600, color: t.accent, marginTop: 28 }}>{khutbahEndLine(s.friday)}</div>}
+        <ProgressLine color={t.accent} track={t.rule} progress={s.modeProgress ?? 0} lite={s.lite} style={{ marginTop: 40 }} />
       </Center>
     </Page>
   );

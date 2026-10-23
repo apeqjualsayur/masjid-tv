@@ -50,4 +50,6 @@ export interface ThemeDefinition {
   /** all 10 */
   templates: TemplateComponents;
   posterFrame: FC<{ s: DisplayState; imageUrl: string }>;
+  /** Friday strip (contract rule 12), one-line pill; renders nothing when s.friday is unset. */
+  fridayInfo: FC<{ s: DisplayState }>;
 }

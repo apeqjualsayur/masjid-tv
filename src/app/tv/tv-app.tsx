@@ -163,6 +163,21 @@ function pickSlide(layout: LayoutKey, preview: UrlOverrides["slide"], slides: Pl
   return { layout, slide: now.item.payload, slideKey: now.item.id, counter: { position: now.position, total: now.total } };
 }
 
+/** With ?debug=1 the F key toggles a forced Friday (same as &day=fri), for quick checks. */
+function useFridayKey(debug: boolean, initial: boolean): boolean {
+  const [on, setOn] = useState(initial);
+  useEffect(() => {
+    if (!debug) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.repeat || e.ctrlKey || e.metaKey || e.altKey || e.key.toLowerCase() !== "f") return;
+      setOn((v) => !v);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [debug]);
+  return on;
+}
+
 function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
   const { config, overrides } = boot;
   const at = useNow(overrides.speed ?? 1);
@@ -182,6 +197,7 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
   const online = useOnline();
   const lite = overrides.lite ?? autoLite;
   const forced = useRef<ForcedModeInput | null>(null);
+  const forceFriday = useFridayKey(overrides.debug, overrides.forceFriday);
 
   const { theme, warning: themeWarning } = getTheme(overrides.theme ?? config.theme);
   const configuredLayout = overrides.layout ?? config.layout;
@@ -210,6 +226,7 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
       ...(themeWarning ? [themeWarning] : []),
       ...(layout !== configuredLayout ? [`no slides to show; ${configuredLayout} layout shown as full`] : []),
       ...boot.warnings,
+      ...(forceFriday ? ["Jumaat dipaksa (day=fri / kekunci F)"] : []),
     ],
   };
   const overlay = overrides.debug && !overrides.debugState ? <DebugOverlay meta={meta} /> : null;
@@ -229,7 +246,7 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
   // current/next (everything passed, next = tomorrow's Subuh), so it is safe to keep showing.
   if (overrides.mode && !forced.current) {
     const sched = computeSchedule(
-      { today: day.today, tomorrowImsak: day.tomorrowImsak ?? NaN, tomorrowSubuh: day.tomorrowSubuh ?? NaN, forceFriday: overrides.forceFriday || undefined },
+      { today: day.today, tomorrowImsak: day.tomorrowImsak ?? NaN, tomorrowSubuh: day.tomorrowSubuh ?? NaN, forceFriday: forceFriday || undefined },
       at,
     );
     forced.current = { mode: overrides.mode, target: upcomingPrayer(sched), sinceMs: at };
@@ -240,7 +257,7 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
     today: day.today,
     tomorrowImsak: day.tomorrowImsak,
     tomorrowSubuh: day.tomorrowSubuh,
-    forceFriday: overrides.forceFriday || undefined,
+    forceFriday: forceFriday || undefined,
     clock24h: config.clock24h,
     showArabic: config.showArabic,
     ticker: config.ticker,

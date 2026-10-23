@@ -1,4 +1,5 @@
 import type { ThemeDefinition } from "../types";
+import { FridayStrip } from "./friday";
 import { BottomLayout, FullLayout, SideLayout } from "./layouts";
 import { SerambiPoster } from "./poster";
 import { Azan, Iqamah, Khutbah, PreAzanBanner, Solat, Unavailable } from "./screens";
@@ -12,4 +13,5 @@ export const serambi: ThemeDefinition = {
   screens: { preAzanBanner: PreAzanBanner, azan: Azan, iqamah: Iqamah, solat: Solat, khutbah: Khutbah, unavailable: Unavailable },
   templates: serambiTemplates,
   posterFrame: SerambiPoster,
+  fridayInfo: FridayStrip,
 };

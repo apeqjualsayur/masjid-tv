@@ -3,6 +3,7 @@
 // azan uses the landscape, khutbah and unavailable the iqamah background.
 import { formatCountdown, formatMmSs, type DisplayState } from "@/core";
 import type { ReactNode } from "react";
+import { ProgressLine, khutbahEndLine } from "../shared/friday";
 import type { UnavailableState } from "../types";
 import { Landscape } from "./landscape";
 import { Arabic, Icon, Logo, Page, Star8, num } from "./parts";
@@ -173,6 +174,8 @@ export function Khutbah({ s }: { s: DisplayState }) {
           <div style={{ fontSize: 32, fontWeight: 800, letterSpacing: "0.32em", color: A.yellow }}>SOLAT JUMAAT</div>
           <div style={{ fontSize: 96, fontWeight: 800, letterSpacing: -3, lineHeight: 1.05 }}>Khutbah sedang disampaikan</div>
           <div style={{ fontSize: 170, fontWeight: 700, letterSpacing: -6, lineHeight: 1, opacity: 0.85, marginTop: 30, ...num }}>{s.clock}</div>
+          {s.friday && <div style={{ fontSize: 40, fontWeight: 700, color: A.yellow }}>{khutbahEndLine(s.friday)}</div>}
+          <ProgressLine color={A.yellow} track="rgba(255,255,255,0.18)" progress={s.modeProgress ?? 0} lite={s.lite} style={{ marginTop: 8 }} />
         </div>
         <div style={{ display: "flex", gap: 20 }}>
           <Pill icon={ICON_SILENT}>Senyapkan telefon bimbit</Pill>

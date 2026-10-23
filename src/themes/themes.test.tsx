@@ -132,3 +132,38 @@ describe("tenang templates", () => {
     }
   });
 });
+describe("Friday strip and khutbah screen (contract rules 12, 13)", () => {
+  // 17 Oct 2026 is a Saturday in the fixture; forceFriday makes it a Friday (Zohor 1:01).
+  const fri = (when: string, durations: Partial<typeof CONFIG.durations> = {}) =>
+    state(when, { forceFriday: true, modeConfig: { ...CONFIG, durations: { ...CONFIG.durations, ...durations } } });
+  const strip = "Azan 1:01 · Khutbah 1:04 (±40 minit) · Solat ±1:44";
+  const text = (h: string) => h.replace(/<[^>]+>/g, "");
+
+  for (const id of availableThemes()) {
+    const t = getTheme(id).theme;
+    const render = (s: ReturnType<typeof state>, layout: "full" | "bottom" | "side") =>
+      renderToStaticMarkup(<ThemeView theme={t} s={s} layout={layout} slide={sampleSlide("pengumuman")} />);
+    for (const layout of ["full", "bottom", "side"] as const) {
+      it(`${id} ${layout}: strip on Friday morning, none on other days or when switched off`, () => {
+        const h = render(fri("2026-10-17T10:00:00"), layout);
+        expect(h).toContain("data-friday-strip");
+        expect(text(h)).toContain("SOLAT JUMAAT");
+        expect(text(h)).toContain(strip);
+        expect(render(state("2026-10-17T10:00:00"), layout)).not.toContain("data-friday-strip");
+        expect(render(fri("2026-10-17T10:00:00", { showFridayInfo: false }), layout)).not.toContain("data-friday-strip");
+      });
+    }
+    it(`${id}: khutbah screen has the end time and a progress line, no ticking seconds`, () => {
+      const s = fri("2026-10-17T13:20:00");
+      const h = render(s, "full");
+      expect(h).toMatch(/Khutbah sedang(\s|<br\/>)disampaikan/);
+      expect(text(h)).toContain("Dijangka tamat ±1:44");
+      expect(h).toContain("data-khutbah-progress");
+      expect(h).toContain("width:40%");
+      expect(text(h)).not.toContain(`${s.clock}${s.seconds}`);
+    });
+    it(`${id}: fridayInfo is the theme's strip`, () => {
+      expect(text(renderToStaticMarkup(<t.fridayInfo s={fri("2026-10-17T10:00:00")} />))).toContain(strip);
+    });
+  }
+});

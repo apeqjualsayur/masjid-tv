@@ -6,6 +6,7 @@ import type { LayoutProps, SlideView } from "../types";
 import { Landscape } from "./landscape";
 import { AreaContext, Arabic, Logo, Page, StateChip, Star8, WaktuIcon, cardLook, countdownLine, num, type Area } from "./parts";
 import { CrossFade } from "../shared/crossfade";
+import { FridayStrip } from "./friday";
 import { AlamPoster } from "./poster";
 import { alamTemplates } from "./templates";
 import { A, glass } from "./tokens";
@@ -58,7 +59,7 @@ function Counter({ s, counter }: { s: DisplayState; counter?: LayoutProps["count
 
 function SlideCard({ s, slide, slideKey, counter, area, style }: LayoutProps & { area: Area; style: CSSProperties }) {
   return (
-    <div style={{ position: "absolute", overflow: "hidden", background: A.card, boxShadow: s.lite ? "none" : "0 24px 60px rgba(0,0,0,0.25)", ...style }}>
+    <div data-poster-area style={{ position: "absolute", overflow: "hidden", background: A.card, boxShadow: s.lite ? "none" : "0 24px 60px rgba(0,0,0,0.25)", ...style }}>
       <CrossFade id={slideKey ?? "slide"} lite={s.lite}>
         <SlideLayer s={s} slide={slide} area={area} />
       </CrossFade>
@@ -118,6 +119,7 @@ export function FullLayout({ s }: LayoutProps) {
             )}
             <div style={{ padding: "12px 26px", borderRadius: 999, border: "1px solid rgba(255,255,255,0.28)", fontSize: 28, fontWeight: 600, ...glass(s.lite, A.glass, 16) }}>{countdownLine(s)}</div>
           </div>
+          <FridayStrip s={s} style={{ height: 50 }} />
         </div>
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(7, minmax(0, 1fr))", gap: 18 }}>
@@ -187,6 +189,7 @@ export function BottomLayout({ s, slide, slideKey, counter }: LayoutProps) {
           ))}
         </div>
       </div>
+      <FridayStrip s={s} style={{ position: "absolute", left: 446, top: 782, height: 44 }} />
     </Page>
   );
 }
@@ -223,7 +226,7 @@ export function SideLayout({ s, slide, slideKey, counter }: LayoutProps) {
           <div style={{ fontSize: 20, fontWeight: 500, opacity: 0.85 }}>{s.hijri}</div>
         </div>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10 }}>
-          <div style={{ fontSize: 138, fontWeight: 700, letterSpacing: -5, lineHeight: 0.92, ...num }}>{s.clock}</div>
+          <div style={{ fontSize: s.friday ? 104 : 138, fontWeight: 700, letterSpacing: -5, lineHeight: 0.92, ...num }}>{s.clock}</div>
           <div style={{ fontSize: 42, fontWeight: 600, opacity: 0.75, ...num }}>{s.seconds}</div>
         </div>
         <div style={{ display: "flex" }}>
@@ -231,16 +234,17 @@ export function SideLayout({ s, slide, slideKey, counter }: LayoutProps) {
             {countdownLine(s)}
           </div>
         </div>
-        <div style={{ display: "flex", flexDirection: "column", gap: 8, marginTop: "auto" }}>
+        <div style={{ display: "flex", flexDirection: "column", gap: s.friday ? 6 : 8, marginTop: "auto" }}>
           {s.waktu.map((w) => (
-            <div key={w.key} data-card={w.key} style={{ display: "flex", alignItems: "center", gap: 14, padding: "8px 18px", ...cardLook(w, s.lite, "subtle", 18) }}>
+            <div key={w.key} data-card={w.key} style={{ display: "flex", alignItems: "center", gap: 14, padding: s.friday ? "2px 18px" : "8px 18px", ...cardLook(w, s.lite, "subtle", 18) }}>
               <WaktuIcon k={w.key} size={28} />
               <div style={{ fontSize: 24, fontWeight: 700, flex: 1 }}>{w.label}</div>
               {s.showArabic && <Arabic style={{ fontSize: 20, opacity: 0.8 }}>{w.arabic}</Arabic>}
-              <div style={{ fontSize: 54, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1, minWidth: 130, textAlign: "right", ...num }}>{w.time}</div>
+              <div style={{ fontSize: s.friday ? 44 : 54, fontWeight: 800, letterSpacing: -1.5, lineHeight: 1, minWidth: 130, textAlign: "right", ...num }}>{w.time}</div>
             </div>
           ))}
         </div>
+        <FridayStrip s={s} variant="card" style={{ padding: "12px 20px", lineHeight: 1.25 }} />
       </div>
     </Page>
   );

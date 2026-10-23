@@ -724,6 +724,12 @@
     "title": "Notis Privasi",
     "draft": "Notis privasi penuh akan diterbitkan sebelum perintis. Data yang disimpan: nama, e-mel dan telefon AJK, serta kandungan pengumuman (termasuk nama si mati)."
   },
+  "error": {
+    "title": "Maaf, ada masalah",
+    "body": "Halaman ini tidak dapat dipaparkan. Kerja anda yang telah disimpan selamat. Cuba lagi, atau kembali ke halaman utama.",
+    "retry": "Cuba lagi",
+    "home": "Ke halaman utama"
+  },
   "dialog": {
     "close": "Tutup"
   }

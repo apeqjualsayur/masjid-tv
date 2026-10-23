@@ -724,6 +724,12 @@
     "title": "Privacy Notice",
     "draft": "The full privacy notice will be published before the pilot. Data held: AJK names, emails and phone numbers, and announcement content (including names of the deceased)."
   },
+  "error": {
+    "title": "Sorry, something went wrong",
+    "body": "This page could not be shown. Work you already saved is safe. Try again, or go back to the start page.",
+    "retry": "Try again",
+    "home": "Go to start page"
+  },
   "dialog": {
     "close": "Close"
   }

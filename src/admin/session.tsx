@@ -5,6 +5,7 @@ import type { Session } from "@supabase/supabase-js";
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { getSupabase, supabaseConfigured } from "@/lib/supabase";
 import { LangProvider, readSavedLang, useT, type Lang } from "./i18n";
+import { logError } from "./log";
 import { pickCurrentOrg, type MemberRole, type Membership, type OrgStatus } from "./routing";
 
 const ORG_KEY = "mv:org";
@@ -96,6 +97,7 @@ function SessionInner({ children, langRef }: { children: ReactNode; langRef: { c
         setCurrentId(pickCurrentOrg(list, saved)?.orgId ?? null);
         setStatus("ready");
       } catch (e) {
+        logError({ where: "session.load" }, e);
         setError((e as { message?: string }).message ?? String(e));
         setStatus("error");
       }
@@ -157,6 +159,17 @@ function SessionInner({ children, langRef }: { children: ReactNode; langRef: { c
 /** Language + session for every admin page. */
 export function AdminProviders({ children }: { children: ReactNode }) {
   const langRef = useRef<(l: Lang) => void>(() => {});
+  // Errors the error boundary cannot catch (async code, event handlers): logged with context.
+  useEffect(() => {
+    const onError = (e: ErrorEvent) => logError({ where: "window.error", source: e.filename ? e.filename.split("/").pop() : undefined, line: e.lineno }, e.error ?? e.message);
+    const onRejection = (e: PromiseRejectionEvent) => logError({ where: "unhandledrejection" }, e.reason);
+    window.addEventListener("error", onError);
+    window.addEventListener("unhandledrejection", onRejection);
+    return () => {
+      window.removeEventListener("error", onError);
+      window.removeEventListener("unhandledrejection", onRejection);
+    };
+  }, []);
   const onChange = useCallback((l: Lang) => langRef.current(l), []);
   return (
     <LangProvider onChange={onChange}>

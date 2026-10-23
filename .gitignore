@@ -9,3 +9,6 @@ supabase/.temp/
 
 # local QA screenshots
 designs/qa/
+
+# landing QA screenshots
+designs/landing/qa/

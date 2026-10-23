@@ -16,7 +16,7 @@ export function heroSlide(at: number): SlideView {
     fields: {
       series: "Kuliah Maghrib",
       topic: "Adab Menuntut Ilmu",
-      speaker: "Ustaz [Nama Penceramah]",
+      speaker: "Penceramah jemputan",
       date: formatGregorian(at).replace(/ \d{4}$/, ""),
       time: "Selepas solat Maghrib",
       venue: "Dewan solat utama",

@@ -29,6 +29,8 @@
   --color-lb-primary: #4fa36b;
   --color-lb-deep: #2f7d4b;
   --color-lb-ink: #10241b;
+  /* logo green: green text on the pale-green card (contrast >= 4.5:1) and hover of dark-green buttons */
+  --color-lb-brand: #146c4a;
   --color-lb-muted: #5a6d64;
   --color-lb-soft: #e7f4eb;
   --color-lb-ground: #f4f9f6;

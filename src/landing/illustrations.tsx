@@ -17,7 +17,7 @@ function Laptop({ lang }: { lang: Lang }) {
       <div className="box-border flex w-[19%] flex-col gap-[1.2cqw] border-r border-lb-line bg-lb-ground px-[1.4cqw] py-[2cqw] text-[1.4cqw]">
         <div className="text-[1.6cqw] font-bold">{l.brand}</div>
         {l.nav.map((n, i) => (
-          <div key={n} className={`rounded-[0.8cqw] px-[1cqw] py-[0.8cqw] font-semibold ${i === 1 ? "bg-lb-soft text-lb-deep" : "text-lb-muted"}`}>
+          <div key={n} className={`rounded-[0.8cqw] px-[1cqw] py-[0.8cqw] font-semibold ${i === 1 ? "bg-lb-soft text-lb-brand" : "text-lb-muted"}`}>
             {n}
           </div>
         ))}
@@ -31,13 +31,13 @@ function Laptop({ lang }: { lang: Lang }) {
               <div className="rounded-[0.8cqw] border border-lb-line px-[1cqw] py-[0.9cqw]">{f.v}</div>
             </div>
           ))}
-          <div className="mt-auto rounded-[0.8cqw] bg-lb-primary p-[1cqw] text-center font-bold text-white">{l.publish}</div>
+          <div className="mt-auto rounded-[0.8cqw] bg-lb-deep p-[1cqw] text-center font-bold text-white">{l.publish}</div>
         </div>
         <div className="flex flex-col gap-[1cqw]">
           <div className="text-[1.3cqw] font-bold text-lb-muted">{l.preview}</div>
           <div className="box-border aspect-video rounded-[1cqw] border-[0.5cqw] border-lb-bezel p-[1.4cqw]" style={{ background: TENANG.zohor.bg }}>
             <div className="box-border h-full rounded-[0.8cqw] bg-white p-[1.4cqw]">
-              <div className="text-[1cqw] font-extrabold text-lb-primary">{l.previewEyebrow}</div>
+              <div className="text-[1cqw] font-extrabold text-lb-deep">{l.previewEyebrow}</div>
               <div className="text-[2.2cqw] font-extrabold" style={{ color: TENANG.zohor.fg }}>
                 {l.previewTitle}
               </div>
@@ -72,7 +72,7 @@ function Phone({ lang }: { lang: Lang }) {
 export function PanelSection({ lang }: { lang: Lang }) {
   const k = copy(lang).panel;
   return (
-    <section id="panel" aria-labelledby="panel-title" className={sectionPad}>
+    <section id="panel" aria-labelledby="panel-title" className={`overflow-x-clip ${sectionPad}`}>
       <div className="mx-auto flex max-w-[1200px] flex-col gap-10 px-5">
         <SectionHead id="panel-title" eyebrow={k.eyebrow} title={k.title} body={k.body} />
         <div className="flex flex-wrap items-end justify-center gap-8">

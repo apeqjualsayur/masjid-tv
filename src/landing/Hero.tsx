@@ -20,7 +20,7 @@ function HeroPhone({ lang }: { lang: Lang }) {
   return (
     <PhoneFrame label={copy(lang).a11y.phoneMock} className="absolute right-[-10px] bottom-0 hidden shadow-[0_24px_50px_rgba(16,36,27,0.3)] min-[900px]:block">
       <div className="text-[10px] font-bold">{p.greeting}</div>
-      <div className="rounded-xl bg-lb-primary p-[9px] text-white">
+      <div className="rounded-xl bg-lb-deep p-[9px] text-white">
         <div className="text-[8px] opacity-85">{p.screen}</div>
         <div className="text-[12px] font-bold">{p.online}</div>
       </div>

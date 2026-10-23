@@ -4,7 +4,8 @@
 // (a Thursday, so no Friday rules), from the bundled year file.
 import type { CSSProperties, FC } from "react";
 import type { DisplayState, ThemeId } from "@/core";
-import { sampleSlide, TEMPLATE_KEYS } from "@/templates";
+import { TEMPLATE_KEYS, type SlideView } from "@/templates";
+import { ABSTRACT_THUMBS, LANDING_SAMPLES } from "./template-samples";
 import { tokensOf } from "@/themes/tenang/parts";
 import { SlideBody } from "@/themes/tenang/layouts";
 import { FONT } from "@/themes/tenang/tokens";
@@ -54,7 +55,7 @@ export function DaySection({ lang }: { lang: Lang }) {
                 <InView placeholder={placeholder(label)}>
                   <DayTv offset={DAY_OFFSETS[i]} label={label} />
                 </InView>
-                <p className="m-0 text-[13px] font-bold text-lb-primary">{it.time}</p>
+                <p className="m-0 text-[13px] font-bold text-lb-deep">{it.time}</p>
                 <h3 className="m-0 text-[17px] font-bold">{it.t}</h3>
                 <p className="m-0 text-[14px] leading-[1.55] text-lb-muted">{it.d}</p>
               </li>
@@ -74,11 +75,24 @@ function TemplateThumb({ index }: { index: number }) {
   const snap = useSnapshot("tenang", SHOWCASE_DATE, (zohor) => zohor + 40 * MIN);
   if (!snap) return null;
   const t = tokensOf(snap.s);
-  const Body = SlideBody as FC<{ s: DisplayState; slide: ReturnType<typeof sampleSlide>; area: "wide" }>;
+  const Body = SlideBody as FC<{ s: DisplayState; slide: SlideView; area: "wide" }>;
+  const key = TEMPLATE_KEYS[index];
+  const slide = { kind: "template", template: key, fields: LANDING_SAMPLES[key] } as SlideView;
   const style: CSSProperties = { width: CARD_W, height: CARD_H, fontFamily: FONT, color: t.fg, background: t.card };
   return (
     <div style={style}>
-      <Body s={snap.s} slide={sampleSlide(TEMPLATE_KEYS[index])} area="wide" />
+      <Body s={snap.s} slide={slide} area="wide" />
+    </div>
+  );
+}
+
+/** The design's abstract 12:5 thumbnail: three bars in the template's tint. */
+function AbstractThumb({ bg, fg }: { bg: string; fg: string }) {
+  return (
+    <div aria-hidden="true" className="box-border flex aspect-[12/5] flex-col justify-center gap-[5px] border-b border-lb-hair p-3" style={{ background: bg }}>
+      <div className="h-[5px] w-[40%] rounded-[3px] opacity-60" style={{ background: fg }} />
+      <div className="h-[10px] w-[75%] rounded" style={{ background: fg }} />
+      <div className="h-[5px] w-[55%] rounded-[3px] opacity-40" style={{ background: fg }} />
     </div>
   );
 }
@@ -100,11 +114,15 @@ export function TemplatesSection({ lang }: { lang: Lang }) {
         <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-3.5">
           {k.items.map((it, i) => (
             <li key={it.n} className="overflow-hidden rounded-2xl border border-lb-line bg-white">
-              <ScaledStage width={CARD_W} height={CARD_H} style={{ background: TENANG.zohor.card }} className="border-b border-lb-hair">
-                <InView margin="400px">
-                  <TemplateThumb index={i} />
-                </InView>
-              </ScaledStage>
+              {ABSTRACT_THUMBS[TEMPLATE_KEYS[i]] ? (
+                <AbstractThumb {...ABSTRACT_THUMBS[TEMPLATE_KEYS[i]]!} />
+              ) : (
+                <ScaledStage width={CARD_W} height={CARD_H} style={{ background: TENANG.zohor.card }} className="border-b border-lb-hair">
+                  <InView margin="400px">
+                    <TemplateThumb index={i} />
+                  </InView>
+                </ScaledStage>
+              )}
               <div className="flex flex-col gap-[3px] px-3.5 py-3">
                 <h3 className="m-0 text-[15px] font-bold">{it.n}</h3>
                 <p className="m-0 text-[13px] text-lb-muted">{it.d}</p>

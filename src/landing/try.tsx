@@ -65,7 +65,7 @@ export function TrySection({ lang }: { lang: Lang }) {
                   type="button"
                   aria-pressed={on}
                   onClick={() => setTheme(id)}
-                  className={`h-11 rounded-full border px-[18px] text-[15px] font-semibold ${on ? "border-lb-primary bg-lb-primary text-white" : "border-lb-field bg-white text-lb-ink hover:border-lb-primary"} ${focusRing}`}
+                  className={`h-11 rounded-full border px-[18px] text-[15px] font-semibold ${on ? "border-lb-deep bg-lb-deep text-white" : "border-lb-field bg-white text-lb-ink hover:border-lb-primary"} ${focusRing}`}
                 >
                   {k.themes[id]}
                 </button>

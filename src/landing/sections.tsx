@@ -11,7 +11,7 @@ export const sectionPad = "py-[clamp(64px,8vw,100px)]";
 export const h2Class = "m-0 text-[clamp(28px,3.2vw,38px)] font-bold tracking-[-0.6px]";
 
 export function Eyebrow({ children }: { children: ReactNode }) {
-  return <p className="m-0 text-[14px] font-bold tracking-[0.14em] text-lb-primary">{children}</p>;
+  return <p className="m-0 text-[14px] font-bold tracking-[0.14em] text-lb-deep">{children}</p>;
 }
 
 /** Centred eyebrow + heading + optional line, used by most sections. */
@@ -47,7 +47,7 @@ export function Compare({ lang }: { lang: Lang }) {
           </ul>
         </div>
         <div className="flex flex-col gap-3.5 rounded-[22px] bg-lb-soft p-7">
-          <h2 className="m-0 text-[15px] font-bold text-lb-deep">{k.after}</h2>
+          <h2 className="m-0 text-[15px] font-bold text-lb-brand">{k.after}</h2>
           <ul className="flex flex-col gap-3.5">
             {k.afterItems.map((a) => (
               <li key={a} className="flex gap-3 text-[16px] leading-[1.5]">
@@ -75,7 +75,7 @@ export function Features({ lang }: { lang: Lang }) {
           </h2>
           <p className="m-0 text-[17px] leading-[1.6] text-lb-muted">{f.body}</p>
           <div className="flex flex-wrap gap-3">
-            <a href={ADMIN_HREF} className={`flex h-[46px] items-center rounded-[10px] bg-lb-primary px-5 text-[15px] font-semibold text-white hover:bg-lb-deep ${focusRing}`}>
+            <a href={ADMIN_HREF} className={`flex h-[46px] items-center rounded-[10px] bg-lb-deep px-5 text-[15px] font-semibold text-white hover:bg-lb-brand ${focusRing}`}>
               {f.signup}
             </a>
             <a href={DEMO_HREF} target="_blank" rel="noopener" className={`flex h-[46px] items-center rounded-[10px] px-3 text-[15px] font-semibold hover:text-lb-deep ${focusRing}`}>
@@ -111,7 +111,7 @@ export function Steps({ lang }: { lang: Lang }) {
         <ol className="grid grid-cols-[repeat(auto-fit,minmax(min(230px,100%),1fr))] gap-4">
           {k.steps.map((s, i) => (
             <li key={s.t} className="flex flex-col gap-3 rounded-[20px] border border-lb-line bg-white p-6">
-              <span aria-hidden="true" className="flex h-10 w-10 items-center justify-center rounded-full bg-lb-primary text-[16px] font-bold text-white">
+              <span aria-hidden="true" className="flex h-10 w-10 items-center justify-center rounded-full bg-lb-deep text-[16px] font-bold text-white">
                 {i + 1}
               </span>
               <h3 className="m-0 text-[18px] font-bold">{s.t}</h3>

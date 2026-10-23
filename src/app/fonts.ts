@@ -1,5 +1,9 @@
 // All theme fonts, self-hosted by next/font at build time (no runtime request to Google),
 // so the display keeps working offline. Themes refer to these via the CSS variables below.
+// Not preloaded (except Plus Jakarta Sans, the admin font): these are in the root layout of every
+// page, and preloading ~550 KB of theme fonts slowed the landing page, which shows the themes only
+// below the fold. The browser still fetches each font as soon as a page uses it, and the TV's
+// service worker precaches every font file, so a paired TV reads them from its cache.
 import {
   Amiri,
   Barlow,
@@ -24,6 +28,7 @@ export const notoNaskhArabic = Noto_Naskh_Arabic({
   weight: ["400", "500", "600"],
   variable: "--font-noto-naskh-arabic",
   display: "block",
+  preload: false,
 });
 
 // serambi
@@ -32,6 +37,7 @@ export const barlow = Barlow({
   weight: ["400", "500", "600", "700"],
   variable: "--font-barlow",
   display: "block",
+  preload: false,
 });
 
 export const barlowCondensed = Barlow_Condensed({
@@ -39,6 +45,7 @@ export const barlowCondensed = Barlow_Condensed({
   weight: ["500", "600", "700"],
   variable: "--font-barlow-condensed",
   display: "block",
+  preload: false,
 });
 
 export const reemKufi = Reem_Kufi({
@@ -46,6 +53,7 @@ export const reemKufi = Reem_Kufi({
   weight: ["500", "600"],
   variable: "--font-reem-kufi",
   display: "block",
+  preload: false,
 });
 
 export const amiri = Amiri({
@@ -53,6 +61,7 @@ export const amiri = Amiri({
   weight: ["400", "700"],
   variable: "--font-amiri",
   display: "block",
+  preload: false,
 });
 
 // tenang
@@ -61,6 +70,7 @@ export const manrope = Manrope({
   weight: ["300", "400", "500", "600", "700", "800"],
   variable: "--font-manrope",
   display: "block",
+  preload: false,
 });
 
 export const fontVariables = [

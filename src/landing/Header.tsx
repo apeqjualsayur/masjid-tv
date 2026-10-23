@@ -129,7 +129,7 @@ export function Header({ lang, page = "home" }: { lang: Lang; page?: Page }) {
             <a href={ADMIN_HREF} className={`hidden rounded text-[15px] font-semibold min-[900px]:block ${focusRing}`}>
               {c.nav.login}
             </a>
-            <a href={ADMIN_HREF} className={`flex h-[42px] items-center rounded-full bg-lb-primary px-4 text-[15px] min-[400px]:px-5 font-semibold whitespace-nowrap text-white hover:bg-lb-deep ${focusRing}`}>
+            <a href={ADMIN_HREF} className={`flex h-[42px] items-center rounded-full bg-lb-deep px-4 text-[15px] min-[400px]:px-5 font-semibold whitespace-nowrap text-white hover:bg-lb-brand ${focusRing}`}>
               {c.nav.signup}
             </a>
             <button
@@ -181,7 +181,7 @@ export function Header({ lang, page = "home" }: { lang: Lang; page?: Page }) {
                 {c.nav.login}
               </a>
             </div>
-            <a href={ADMIN_HREF} className={`mt-3 flex h-12 items-center justify-center rounded-full bg-lb-primary text-[16px] font-semibold text-white ${focusRing}`}>
+            <a href={ADMIN_HREF} className={`mt-3 flex h-12 items-center justify-center rounded-full bg-lb-deep text-[16px] font-semibold text-white ${focusRing}`}>
               {c.nav.signup}
             </a>
           </div>

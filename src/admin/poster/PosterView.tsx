@@ -71,13 +71,19 @@ function PosterPreview({ pic, layout, theme, label }: { pic: Picture; layout: Po
 
 const fitTone = { full: "bg-adm-soft text-adm-green-dark", blur: "bg-[#FFF1D6] text-[#7A4700]", small: "bg-[#FDE7E2] text-[#7A1F0B]" } as const;
 
-export function PosterView() {
+/**
+ * The page reads ?id= with useSearchParams (inside Suspense) and passes it in. Reading
+ * window.location here was wrong on a client-side navigation from Kandungan (a <Link>): on the first
+ * render the address bar still showed /admin/kandungan/, so the poster opened as a new one.
+ */
+export function PosterView({ editIdParam }: { editIdParam: string | null }) {
   const a = useAdmin();
   const { t, locale } = useT();
   const { toast, node: toasts } = useToasts();
   const orgId = a.current!.orgId;
   const [screens, setScreens] = useState<ScreenLite[] | null>(null);
-  const [editId] = useState(() => (typeof window === "undefined" ? null : new URLSearchParams(window.location.search).get("id")));
+  // ?id= as it was when the page opened.
+  const [editId] = useState(editIdParam);
   const [existing, setExisting] = useState<Existing | null>(null);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [pic, setPic] = useState<Picture | null>(null);

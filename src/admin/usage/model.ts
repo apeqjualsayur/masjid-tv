@@ -1,0 +1,303 @@
+// Usage model for Platform › Penggunaan (_specs/30-PRD-usage.md §2, §3, §6).
+// Port of model() in designs/admin/D-Usage.html. Pure: no React, no fetch, no clock (times come from
+// report.generated_at and cycle.today), no display strings (metric keys and action codes only; the UI
+// translates them). A copy runs in the usage-digest Edge Function: supabase/functions/_shared/usage-model.ts,
+// made by `npm run sync:usage-model`. Import only types from ./types so the copy works in Deno.
+import type { ComputeSize, SupabasePlan, UsageReport, UsageSettings } from "./types";
+
+export const GB = 1e9;
+const DAY_MS = 86_400_000;
+const HOUR_MS = 3_600_000;
+/** Size of an empty Masjid View database, used to scale DB size per masjid in the scale table. */
+export const DB_BASE_BYTES = 30e6;
+/** Calibration factors apply for this many days after measured_on (PRD §2). */
+export const CALIBRATION_DAYS = 45;
+export const SCALE_STEPS = [50, 100, 250, 500, 1000];
+
+export type MetricKey = "egress" | "cached" | "db" | "storage" | "rps" | "email_day" | "email_month" | "mau";
+export type Level = "ok" | "warn" | "crit";
+export type Unit = "bytes" | "rps" | "count";
+
+export interface UsageMetric {
+  key: MetricKey;
+  /** Used so far (flows: cycle to date; stock and peaks: now). */
+  used: number;
+  /** Projected at the end of the billing cycle. */
+  proj: number;
+  limit: number;
+  unit: Unit;
+  usedPct: number;
+  projPct: number;
+  level: Level;
+  /** Database and storage: grow with approved masjids, not with this cycle's traffic. */
+  stock: boolean;
+  /** "exact" = read from the database or Resend; "estimate" = counted by Masjid View. */
+  source: "exact" | "estimate";
+  /** Calibration factor applied (egress, cached), or null when not calibrated. */
+  factor: number | null;
+  perMasjid: number;
+  /** Masjid count at which the limit is reached, or null when there is no usage yet. */
+  runsOutAt: number | null;
+  /** "now" = already reached; "date" = runsOutDate; "beyond" = more than 2 years away; null = unknown. */
+  runsOutWhen: "now" | "date" | "beyond" | null;
+  /** 'YYYY-MM-DD' when runsOutWhen is "date". */
+  runsOutDate: string | null;
+}
+
+export type ActionCode = `fix:${MetricKey}` | "backup" | "calibrate" | "email_sync" | "snapshot" | "prices" | "none";
+
+export interface UsageAction {
+  code: ActionCode;
+  level: Level | "info";
+  usedPct?: number;
+  projPct?: number;
+  /** backup: approved masjids. */
+  orgs?: number;
+  /** calibrate, prices: days since; null = never. */
+  days?: number | null;
+  /** email_sync, snapshot: hours since; null = never. */
+  hours?: number | null;
+}
+
+export interface ScaleRow {
+  /** Active masjids. */
+  n: number;
+  tvs: number;
+  egressBytes: number;
+  cachedBytes: number;
+  storageBytes: number;
+  dbBytes: number;
+  rps: number;
+  plan: SupabasePlan;
+  compute: ComputeSize;
+  resendPlan: "free" | "pro";
+  usd: number;
+  rm: number;
+  /** The first row: today's active count. */
+  now: boolean;
+}
+
+export interface UsageModel {
+  metrics: UsageMetric[];
+  actions: UsageAction[];
+  scale: ScaleRow[];
+  /** Average active masjids per 7-day bucket, oldest first, last bucket ends today (≤ 12). */
+  weekly: number[];
+  /** Least-squares growth of weekly active masjids per week. */
+  perWeek: number;
+  nowUsd: number;
+  nowRm: number;
+  needPro: boolean;
+  recommendedCompute: ComputeSize;
+  /** Monthly RM on Pro with the recommended compute at this cycle's projected usage. */
+  proRm: number;
+  worst: UsageMetric;
+  /** Flow metric that runs out first as masjids grow, or null. */
+  first: UsageMetric | null;
+  activeNow: number;
+  orgsActive: number;
+  rpsNow: number;
+  rpsPeak: number;
+  /** Days of snapshot history; fewer than 2 = still collecting (PRD §7 empty state). */
+  daysOfData: number;
+  collecting: boolean;
+}
+
+// ---------------------------------------------------------------------------- helpers
+
+/** Least-squares slope per step; 0 for fewer than 2 points. */
+export function linSlope(ys: number[]): number {
+  const n = ys.length;
+  if (n < 2) return 0;
+  const mx = (n - 1) / 2;
+  const my = ys.reduce((a, b) => a + b, 0) / n;
+  let num = 0;
+  let den = 0;
+  ys.forEach((y, i) => {
+    num += (i - mx) * (y - my);
+    den += (i - mx) ** 2;
+  });
+  return den ? num / den : 0;
+}
+
+/** Average of `key` per 7-day bucket, oldest first; the last bucket ends with the last row. */
+export function weekly<T>(rows: T[], pick: (row: T) => number): number[] {
+  const out: number[] = [];
+  for (let end = rows.length; end > 0; end -= 7) {
+    const w = rows.slice(Math.max(0, end - 7), end);
+    out.unshift(w.reduce((a, r) => a + pick(r), 0) / w.length);
+  }
+  return out;
+}
+
+/** PRD §3: crit = used ≥ crit % or projected ≥ 100 %; warn = used or projected ≥ warn %. */
+export function level(usedPct: number, projPct: number, s: Pick<UsageSettings, "alert_warn_pct" | "alert_crit_pct">): Level {
+  if (usedPct >= s.alert_crit_pct || projPct >= 100) return "crit";
+  if (usedPct >= s.alert_warn_pct || projPct >= s.alert_warn_pct) return "warn";
+  return "ok";
+}
+
+const rank = (l: Level | "info") => (l === "crit" ? 3 : l === "warn" ? 2 : l === "info" ? 1 : 0);
+const pct = (v: number, limit: number) => (limit > 0 ? (v / limit) * 100 : 0);
+const days = (laterYmd: string, earlierYmd: string) => (Date.parse(`${laterYmd.slice(0, 10)}T00:00:00Z`) - Date.parse(`${earlierYmd.slice(0, 10)}T00:00:00Z`)) / DAY_MS;
+const hours = (laterIso: string, earlierIso: string) => (Date.parse(laterIso) - Date.parse(earlierIso)) / HOUR_MS;
+export function addDays(ymd: string, n: number): string {
+  return new Date(Date.parse(`${ymd.slice(0, 10)}T00:00:00Z`) + n * DAY_MS).toISOString().slice(0, 10);
+}
+
+export interface CostInput {
+  egress: number;
+  cached: number;
+  storage: number;
+  db: number;
+}
+
+/** Monthly US$ (PRD §6): Free = 0; Pro = base + compute above the credit + overage above Pro quotas; + Resend Pro. */
+export function costUsd(s: UsageSettings, plan: SupabasePlan, compute: ComputeSize, resendPro: boolean, b: CostInput): number {
+  let u = 0;
+  if (plan === "pro") {
+    const P = s.prices;
+    const PL = s.limits.pro;
+    u += P.supabase_pro_usd + Math.max(0, P.compute[compute].usd - P.compute_credit_usd);
+    u += (Math.max(0, b.egress - PL.egress_bytes) / GB) * P.egress_usd_per_gb;
+    u += (Math.max(0, b.cached - PL.cached_egress_bytes) / GB) * P.cached_egress_usd_per_gb;
+    u += (Math.max(0, b.storage - PL.storage_bytes) / GB) * P.storage_usd_per_gb;
+    u += (Math.max(0, b.db - PL.db_bytes) / GB) * P.db_usd_per_gb;
+  }
+  if (resendPro) u += s.prices.resend_pro_usd;
+  return u;
+}
+
+/** RM per month = US$ × fx + domain ÷ 12. */
+export const toRm = (s: UsageSettings, usd: number) => usd * s.fx_rm_per_usd + s.domain_rm_per_year / 12;
+
+/** Smallest paid compute whose guide req/s ≥ 1.5 × peak (PRD §3); "large" if none. */
+export function pickCompute(s: UsageSettings, rps: number): ComputeSize {
+  const hit = (Object.entries(s.prices.compute) as [ComputeSize, { rps: number }][]).find(([k, v]) => k !== "nano" && v.rps >= rps * 1.5);
+  return hit?.[0] ?? "large";
+}
+
+// ---------------------------------------------------------------------------- model
+
+export function model(r: UsageReport): UsageModel {
+  const s = r.settings;
+  const c = r.cycle;
+  const ctd = r.cycle_to_date;
+  const L = s.limits[s.plan];
+  const RL = s.resend_plan === "pro" ? s.limits.resend_pro : s.limits.resend_free;
+  const elapsed = Math.max(c.days_elapsed, 0.04);
+  const frac = c.days_total / elapsed;
+  const remain = Math.max(0, c.days_total - elapsed);
+
+  const cal = r.calibration;
+  const calOk = !!cal && days(c.today, cal.measured_on) <= CALIBRATION_DAYS;
+  const fE = calOk && cal!.factor_egress ? cal!.factor_egress : null;
+  const fC = calOk && cal!.factor_cached ? cal!.factor_cached : null;
+
+  const h = r.history;
+  const last28 = h.slice(-28);
+  const slope = (pick: (d: (typeof h)[number]) => number) => Math.max(0, linSlope(last28.map(pick)));
+  const activeNow = Math.max(1, ctd.orgs_seen);
+  const orgsActive = r.live.orgs.active;
+  const approved = Math.max(1, orgsActive);
+  const rpsLimit = s.plan === "free" ? L.rps : s.prices.compute[s.compute].rps;
+
+  const metrics: UsageMetric[] = [];
+  const add = (key: MetricKey, used: number, proj: number, limit: number, unit: Unit, per: number | null,
+    source: "exact" | "estimate", factor: number | null = null, stock = false) => {
+    const usedPct = pct(used, limit);
+    const projPct = pct(proj, limit);
+    const perMasjid = per ?? proj / activeNow;
+    metrics.push({
+      key, used, proj, limit, unit, usedPct, projPct, level: level(usedPct, projPct, s), stock, source, factor, perMasjid,
+      runsOutAt: perMasjid > 0 ? Math.floor(limit / perMasjid) : null, runsOutWhen: null, runsOutDate: null,
+    });
+  };
+
+  const eg = ctd.egress_est_bytes * (fE ?? 1);
+  const ce = ctd.cached_est_bytes * (fC ?? 1);
+  add("egress", eg, eg * frac, L.egress_bytes, "bytes", null, "estimate", fE);
+  add("cached", ce, ce * frac, L.cached_egress_bytes, "bytes", null, "estimate", fC);
+  add("db", r.live.db_bytes, r.live.db_bytes + slope((d) => d.db_bytes) * remain, L.db_bytes, "bytes", r.live.db_bytes / approved, "exact", null, true);
+  add("storage", r.live.storage_bytes, r.live.storage_bytes + slope((d) => d.storage_bytes) * remain, L.storage_bytes, "bytes", r.live.storage_bytes / approved, "exact", null, true);
+  const rpsNow = r.live.screens_online / s.poll_seconds;
+  const rpsPeak = ctd.peak_screens_day / s.poll_seconds;
+  add("rps", rpsPeak, rpsPeak, rpsLimit, "rps", rpsPeak / activeNow, "estimate");
+  if (RL.emails_day) add("email_day", ctd.emails_peak_day, ctd.emails_peak_day, RL.emails_day, "count", ctd.emails_peak_day / activeNow, "exact");
+  add("email_month", ctd.emails_sent, ctd.emails_sent * frac, RL.emails_month, "count", null, "exact");
+  add("mau", r.live.mau_30d, r.live.mau_30d, L.mau, "count", r.live.mau_30d / approved, "exact");
+
+  // Growth: active masjids per week, last 12 weeks.
+  const wk = weekly(h, (d) => d.orgs_seen).slice(-12);
+  const perWeek = linSlope(wk);
+  for (const m of metrics) {
+    if (m.runsOutAt == null) continue;
+    if (m.runsOutAt <= activeNow) {
+      m.runsOutWhen = "now";
+      continue;
+    }
+    if (perWeek <= 0) continue;
+    const weeks = (m.runsOutAt - activeNow) / perWeek;
+    if (weeks > 104) m.runsOutWhen = "beyond";
+    else {
+      m.runsOutWhen = "date";
+      m.runsOutDate = addDays(c.today, Math.round(weeks * 7));
+    }
+  }
+
+  // Cost and recommendation (PRD §3, §6).
+  const supa = metrics.filter((m) => m.key === "egress" || m.key === "cached" || m.key === "db" || m.key === "storage" || m.key === "rps");
+  const needPro = s.plan === "free" && (supa.some((m) => m.projPct >= 100) || orgsActive >= s.backup_upgrade_at);
+  const projected = { egress: eg * frac, cached: ce * frac, storage: r.live.storage_bytes, db: r.live.db_bytes };
+  const nowUsd = costUsd(s, s.plan, s.compute, s.resend_plan === "pro", projected);
+  const recommendedCompute = pickCompute(s, rpsPeak);
+  const proRm = toRm(s, costUsd(s, "pro", recommendedCompute, s.resend_plan === "pro", projected));
+
+  // Scale table: this cycle's real per-masjid rates × N.
+  const FL = s.limits.free;
+  const RF = s.limits.resend_free;
+  const scale: ScaleRow[] = [activeNow, ...SCALE_STEPS.filter((v) => v > activeNow)].map((n) => {
+    const k = n / activeNow;
+    const egressBytes = eg * frac * k;
+    const cachedBytes = ce * frac * k;
+    const storageBytes = (r.live.storage_bytes / approved) * n;
+    const dbBytes = DB_BASE_BYTES + (Math.max(0, r.live.db_bytes - DB_BASE_BYTES) / approved) * n;
+    const rps = rpsPeak * k;
+    const emDay = ctd.emails_peak_day * k;
+    const emMonth = ctd.emails_sent * frac * k;
+    const pro = egressBytes > FL.egress_bytes || cachedBytes > FL.cached_egress_bytes || storageBytes > FL.storage_bytes
+      || dbBytes > FL.db_bytes || rps > FL.rps || n >= s.backup_upgrade_at;
+    const compute: ComputeSize = pro ? pickCompute(s, rps) : "nano";
+    const resendPro = (RF.emails_day != null && emDay > RF.emails_day) || emMonth > RF.emails_month;
+    const usd = costUsd(s, pro ? "pro" : "free", compute, resendPro, { egress: egressBytes, cached: cachedBytes, storage: storageBytes, db: dbBytes });
+    return {
+      n, tvs: Math.round(ctd.screens_seen * k), egressBytes, cachedBytes, storageBytes, dbBytes, rps,
+      plan: pro ? "pro" : "free", compute, resendPlan: resendPro ? "pro" : "free", usd, rm: toRm(s, usd), now: n === activeNow,
+    };
+  });
+
+  // Actions (PRD §7), ordered crit → warn → info.
+  const actions: UsageAction[] = metrics
+    .filter((m) => m.level !== "ok")
+    .sort((a, b) => b.projPct - a.projPct)
+    .map((m) => ({ code: `fix:${m.key}` as ActionCode, level: m.level, usedPct: m.usedPct, projPct: m.projPct }));
+  if (s.plan === "free" && orgsActive >= s.backup_upgrade_at) actions.push({ code: "backup", level: "warn", orgs: orgsActive });
+  const calDays = cal ? days(c.today, cal.measured_on) : null;
+  if (calDays == null || calDays > 30) actions.push({ code: "calibrate", level: "info", days: calDays });
+  const syncHours = ctd.emails_synced_at ? hours(r.generated_at, ctd.emails_synced_at) : null;
+  if (syncHours == null || syncHours > 26) actions.push({ code: "email_sync", level: "warn", hours: syncHours });
+  const snapHours = r.snapshot_at ? hours(r.generated_at, r.snapshot_at) : null;
+  if (snapHours == null || snapHours > 2) actions.push({ code: "snapshot", level: "warn", hours: snapHours });
+  const priceDays = days(c.today, s.prices_checked_on);
+  if (priceDays > 180) actions.push({ code: "prices", level: "info", days: priceDays });
+  actions.sort((a, b) => rank(b.level) - rank(a.level)); // stable: keeps the order above within a level
+  if (!actions.length) actions.push({ code: "none", level: "ok" });
+
+  const worst = metrics.reduce((a, m) => (rank(m.level) > rank(a.level) ? m : a), metrics[0]);
+  const first = metrics.filter((m) => m.runsOutAt != null && !m.stock).sort((a, b) => a.runsOutAt! - b.runsOutAt!)[0] ?? null;
+
+  return {
+    metrics, actions, scale, weekly: wk, perWeek, nowUsd, nowRm: toRm(s, nowUsd), needPro, recommendedCompute, proRm,
+    worst, first, activeNow, orgsActive, rpsNow, rpsPeak, daysOfData: h.length, collecting: h.length < 2,
+  };
+}

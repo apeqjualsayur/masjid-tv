@@ -27,6 +27,21 @@ export interface PlatformOrg {
 export type PlatformTab = "pending" | "active" | "suspended";
 export const TABS: PlatformTab[] = ["pending", "active", "suspended"];
 
+/** All tabs of /admin/platform: the three org lists plus Penggunaan (usage, PRD usage §7). */
+export type ViewTab = PlatformTab | "usage";
+export const VIEW_TABS: ViewTab[] = [...TABS, "usage"];
+/** ?tab= value per tab. */
+export const TAB_QUERY: Record<ViewTab, string> = { pending: "pending", active: "active", suspended: "suspended", usage: "penggunaan" };
+
+/** The tab named by ?tab= (BM or English names accepted); Menunggu when missing or unknown. */
+export function tabFromQuery(value: string | null | undefined): ViewTab {
+  const v = (value ?? "").trim().toLowerCase();
+  if (v === "penggunaan" || v === "usage") return "usage";
+  if (v === "active" || v === "aktif") return "active";
+  if (v === "suspended" || v === "digantung") return "suspended";
+  return "pending";
+}
+
 /** Rejected registrations sit with the suspended ones: both can be reactivated. */
 export function tabOf(status: OrgStatus): PlatformTab {
   return status === "pending" ? "pending" : status === "active" ? "active" : "suspended";

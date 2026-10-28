@@ -236,7 +236,8 @@
     "tab": {
       "pending": "Menunggu",
       "active": "Aktif",
-      "suspended": "Digantung"
+      "suspended": "Digantung",
+      "usage": "Penggunaan"
     },
     "tabCount": "{label} ({n})",
     "tabs": "Status masjid",
@@ -732,5 +733,215 @@
   },
   "dialog": {
     "close": "Tutup"
+  },
+  "usage": {
+    "tab": "Penggunaan",
+    "updated": "Dikemas kini {time}",
+    "refresh": "Muat semula",
+    "loading": "Memuatkan penggunaan…",
+    "loadError": "Penggunaan tidak dapat dimuatkan: {message}",
+    "needsMigration": "Fungsi platform_usage belum dipasang dalam pangkalan data (migrasi 0008).",
+    "retry": "Cuba lagi",
+    "level": {
+      "ok": "Selamat",
+      "warn": "Perhatian",
+      "crit": "Tindakan",
+      "info": "Info",
+      "collecting": "Mengumpul data"
+    },
+    "summary": {
+      "label": "Ringkasan",
+      "plan": "Supabase {plan} · {status}",
+      "status": {
+        "ok": "Semua dalam had",
+        "warn": "Perlu perhatian",
+        "crit": "Tindakan diperlukan"
+      },
+      "rm": "RM{rm}",
+      "perMonth": "/ bulan kini",
+      "recommendPro": "Disyorkan: Pro ≈ RM{rm} / bulan",
+      "keepPlan": "Kekal di pelan semasa",
+      "cycle": "Kitaran {start} – {end} · hari {day} / {total}",
+      "cycleBar": "Hari {day} daripada {total} dalam kitaran bil",
+      "active": "Masjid aktif",
+      "approved": "/ {n} diluluskan",
+      "activeLine": "TV dalam talian 24 jam lalu · {pending} menunggu kelulusan",
+      "screens": "Skrin dalam talian",
+      "screensOf": "/ {n}",
+      "screensOff": "{n} di luar talian > 3 min",
+      "first": "Had pertama dicapai",
+      "firstValue": "~{n}",
+      "masjid": "masjid",
+      "firstNone": "Belum dapat dikira",
+      "firstLine": "{name} · sekitar {when}"
+    },
+    "limits": {
+      "titleFree": "Had pelan Free",
+      "titlePro": "Had pelan Pro",
+      "hint": "Kitaran bil semasa. Bar penuh = digunakan setakat ini; jalur = unjuran hingga akhir kitaran.",
+      "legendUsed": "Digunakan",
+      "legendProj": "Unjuran",
+      "legendWarn": "Amaran {pct}%"
+    },
+    "metric": {
+      "egress": "Egress",
+      "cached": "Egress cache (poster)",
+      "db": "Pangkalan data",
+      "storage": "Storan fail",
+      "rps": "Beban pelayan",
+      "email_day": "Emel sehari (puncak)",
+      "email_month": "Emel sebulan",
+      "mau": "Pengguna aktif (30 hari)"
+    },
+    "meter": {
+      "value": "/ {limit} · {pct}%",
+      "aria": "{name}: {used}% digunakan, unjuran {proj}%",
+      "ariaCollecting": "{name}: {used}% digunakan, masih mengumpul data",
+      "projected": "Unjuran akhir kitaran",
+      "projectedValue": "{value} · {pct}%",
+      "runsOutAt": "Habis pada",
+      "runsOutAtValue": "~{n} masjid",
+      "runsOutWhen": "Anggaran tarikh",
+      "now": "sekarang",
+      "beyond": "> 2 tahun",
+      "none": "—",
+      "collecting": "Mengumpul data (hari {day} / 2)"
+    },
+    "source": {
+      "db": "Tepat · pg_database_size",
+      "storage": "Tepat · {n} fail",
+      "calibrated": "Anggaran ×{f} (diselaraskan)",
+      "uncalibrated": "Anggaran (belum diselaraskan)",
+      "rps": "Kini {rps} permintaan/s · compute {compute}",
+      "emailDay": "Tepat · hari ini {n}",
+      "emailMonth": "Tepat · dikira dari Resend",
+      "mau": "Tepat · akaun AJK yang log masuk"
+    },
+    "actions": {
+      "title": "Tindakan disyorkan",
+      "hint": "Disusun ikut keutamaan. Dikira semula setiap kali halaman dimuat semula.",
+      "numbers": "{title} ({used}%, unjuran {proj}%)",
+      "fix": {
+        "egress": {
+          "t": "Egress TV menghampiri had",
+          "d": "Ubah selang semakan TV kepada 120 s antara Isyak dan Subuh, atau naik taraf ke Supabase Pro (US${usd}, {quota})."
+        },
+        "cached": {
+          "t": "Muat turun poster menghampiri had",
+          "d": "Pindahkan poster ke Cloudflare R2 (tiada caj egress), atau naik taraf ke Supabase Pro ({quota})."
+        },
+        "db": {
+          "t": "Pangkalan data menghampiri {limit}",
+          "d": "Semak jadual usage_screen_daily dipangkas (120 hari) dan kandungan lama dipadam, atau naik taraf ke Supabase Pro ({quota})."
+        },
+        "storage": {
+          "t": "Storan fail menghampiri {limit}",
+          "d": "Padam poster yang tamat lebih 30 hari, atau naik taraf ke Supabase Pro ({quota})."
+        },
+        "rps": {
+          "t": "Beban pelayan tinggi",
+          "d": "Naik taraf saiz compute di Supabase → Settings → Compute, kemudian kemas kini \"Saiz compute\" di bawah."
+        },
+        "email_day": {
+          "t": "Emel sehari menghampiri {limit}",
+          "d": "Galakkan AJK log masuk dengan Google (tiada emel), atau naik taraf ke Resend Pro (US${usd})."
+        },
+        "email_month": {
+          "t": "Emel sebulan menghampiri {limit}",
+          "d": "Naik taraf ke Resend Pro (US${usd})."
+        },
+        "mau": {
+          "t": "Pengguna aktif menghampiri had",
+          "d": "Naik taraf ke Supabase Pro."
+        }
+      },
+      "backup": {
+        "t": "{n} masjid bergantung pada sistem tanpa sandaran harian",
+        "d": "Pelan Free tiada sandaran automatik. Naik taraf ke Supabase Pro untuk sandaran harian 7 hari."
+      },
+      "calibrate": {
+        "t": "Selaraskan anggaran egress",
+        "d": "Angka sebenar terakhir lebih 30 hari lalu. Salin dari Supabase → Usage ke borang di bawah.",
+        "never": "Belum pernah diselaraskan. Salin angka dari Supabase → Usage ke borang di bawah."
+      },
+      "email_sync": {
+        "t": "Kiraan emel tidak dikemas kini",
+        "d": "Fungsi usage-digest tidak berjalan lebih 50 jam. Semak Supabase → Edge Functions → usage-digest → Logs."
+      },
+      "snapshot": {
+        "t": "Snapshot penggunaan terhenti",
+        "d": "Tugas cron masjidview-usage-snapshot tidak berjalan lebih 2 jam. Semak Supabase → Integrations → Cron."
+      },
+      "prices": {
+        "t": "Semak harga dan had",
+        "d": "Harga disemak lebih 6 bulan lalu. Bandingkan dengan supabase.com/pricing dan resend.com/pricing."
+      },
+      "none": {
+        "t": "Tiada tindakan diperlukan",
+        "d": "Semua had di bawah {pct}% dan unjuran kekal dalam had hingga akhir kitaran."
+      }
+    },
+    "growth": {
+      "title": "Pertumbuhan",
+      "hint": "Masjid aktif (sekurang-kurangnya satu TV dalam talian) setiap minggu, dengan unjuran 12 minggu.",
+      "aria": "Carta pertumbuhan masjid aktif: {now} kini, purata {perWeek} seminggu",
+      "ago": "{n} minggu lalu",
+      "now": "kini",
+      "ahead": "+12 minggu",
+      "note": "Purata +{perWeek} masjid aktif seminggu. Jika berterusan: ~{n} masjid dalam 12 minggu.",
+      "flat": "Belum cukup pertumbuhan untuk unjuran.",
+      "notEnough": "Belum cukup data. Carta muncul selepas dua minggu."
+    },
+    "scale": {
+      "title": "Kos bulanan jika berkembang",
+      "hint": "Berdasarkan kadar sebenar setiap masjid dalam kitaran ini (bukan andaian). Termasuk domain.",
+      "col": {
+        "masjid": "Masjid",
+        "tv": "TV",
+        "egress": "Egress / bulan",
+        "storage": "Storan",
+        "supabase": "Supabase (disyorkan)",
+        "resend": "Resend (disyorkan)",
+        "rm": "RM / bulan"
+      },
+      "now": "{n} (kini)",
+      "free": "Free",
+      "pro": "Pro",
+      "proCompute": "Pro + {compute}"
+    },
+    "calibrate": {
+      "title": "Selaraskan dengan angka sebenar",
+      "hint": "Egress tidak boleh dibaca terus dari Supabase, jadi Masjid View menganggarkannya. Masukkan angka sebenar sebulan sekali supaya anggaran tepat.",
+      "last": "Terakhir: {date} · egress {eg} GB, cached {ce} GB · faktor ×{fe} / ×{fc}",
+      "never": "Belum pernah diselaraskan. Anggaran mungkin tersasar ±50%.",
+      "date": "Tarikh dilihat",
+      "egress": "Egress (GB)",
+      "cached": "Cached egress (GB)",
+      "save": "Simpan",
+      "how": "Cara dapatkan:",
+      "step1": "supabase.com → organisasi anda → Usage",
+      "step2": "Pilih projek masjidview-prod, kitaran bil semasa",
+      "step3": "Salin jumlah Egress dan Cached Egress",
+      "saved": "Disimpan. Faktor egress kini ×{f}.",
+      "savedPlain": "Disimpan.",
+      "badDate": "Tarikh tidak boleh selepas hari ini.",
+      "badValue": "Masukkan nilai antara 0 dan 100,000 GB.",
+      "error": "Tidak dapat disimpan: {message}"
+    },
+    "plan": {
+      "title": "Pelan dan kadar",
+      "hint": "Ubah apabila anda naik taraf, supaya had dan kos di atas betul.",
+      "supabase": "Pelan Supabase",
+      "compute": "Saiz compute",
+      "resend": "Pelan Resend",
+      "cycleDay": "Hari mula kitaran bil",
+      "fx": "RM bagi US$1",
+      "domain": "Domain RM / tahun",
+      "save": "Simpan",
+      "saved": "Pelan dan kadar disimpan.",
+      "bad": "Semak nilai: hari 1–28, kadar 3–6, domain 0 atau lebih.",
+      "error": "Tidak dapat disimpan: {message}",
+      "checked": "Harga dan had disemak {date}. Had dan harga disimpan dalam jadual usage_settings."
+    }
   }
 }

@@ -236,7 +236,8 @@
     "tab": {
       "pending": "Pending",
       "active": "Active",
-      "suspended": "Suspended"
+      "suspended": "Suspended",
+      "usage": "Usage"
     },
     "tabCount": "{label} ({n})",
     "tabs": "Masjid status",
@@ -732,5 +733,215 @@
   },
   "dialog": {
     "close": "Close"
+  },
+  "usage": {
+    "tab": "Usage",
+    "updated": "Updated {time}",
+    "refresh": "Refresh",
+    "loading": "Loading usage…",
+    "loadError": "Usage could not be loaded: {message}",
+    "needsMigration": "The platform_usage function is not installed in the database yet (migration 0008).",
+    "retry": "Try again",
+    "level": {
+      "ok": "Safe",
+      "warn": "Attention",
+      "crit": "Action",
+      "info": "Info",
+      "collecting": "Collecting data"
+    },
+    "summary": {
+      "label": "Summary",
+      "plan": "Supabase {plan} · {status}",
+      "status": {
+        "ok": "All within limits",
+        "warn": "Needs attention",
+        "crit": "Action needed"
+      },
+      "rm": "RM{rm}",
+      "perMonth": "/ month now",
+      "recommendPro": "Recommended: Pro ≈ RM{rm} / month",
+      "keepPlan": "Stay on the current plan",
+      "cycle": "Cycle {start} – {end} · day {day} / {total}",
+      "cycleBar": "Day {day} of {total} in the billing cycle",
+      "active": "Active masjids",
+      "approved": "/ {n} approved",
+      "activeLine": "TV online in the last 24 hours · {pending} awaiting approval",
+      "screens": "Screens online",
+      "screensOf": "/ {n}",
+      "screensOff": "{n} offline > 3 min",
+      "first": "First limit reached at",
+      "firstValue": "~{n}",
+      "masjid": "masjids",
+      "firstNone": "Not enough data yet",
+      "firstLine": "{name} · around {when}"
+    },
+    "limits": {
+      "titleFree": "Free plan limits",
+      "titlePro": "Pro plan limits",
+      "hint": "Current billing cycle. Solid bar = used so far; stripes = projected to the end of the cycle.",
+      "legendUsed": "Used",
+      "legendProj": "Projected",
+      "legendWarn": "Warning {pct}%"
+    },
+    "metric": {
+      "egress": "Egress",
+      "cached": "Cached egress (posters)",
+      "db": "Database",
+      "storage": "File storage",
+      "rps": "Server load",
+      "email_day": "Emails per day (peak)",
+      "email_month": "Emails per month",
+      "mau": "Active users (30 days)"
+    },
+    "meter": {
+      "value": "/ {limit} · {pct}%",
+      "aria": "{name}: {used}% used, projected {proj}%",
+      "ariaCollecting": "{name}: {used}% used, still collecting data",
+      "projected": "Projected at cycle end",
+      "projectedValue": "{value} · {pct}%",
+      "runsOutAt": "Runs out at",
+      "runsOutAtValue": "~{n} masjids",
+      "runsOutWhen": "Estimated date",
+      "now": "now",
+      "beyond": "> 2 years",
+      "none": "—",
+      "collecting": "Collecting data (day {day} / 2)"
+    },
+    "source": {
+      "db": "Exact · pg_database_size",
+      "storage": "Exact · {n} files",
+      "calibrated": "Estimate ×{f} (calibrated)",
+      "uncalibrated": "Estimate (not calibrated)",
+      "rps": "Now {rps} requests/s · compute {compute}",
+      "emailDay": "Exact · today {n}",
+      "emailMonth": "Exact · counted from Resend",
+      "mau": "Exact · AJK accounts that signed in"
+    },
+    "actions": {
+      "title": "Recommended actions",
+      "hint": "In order of priority. Recalculated every time the page refreshes.",
+      "numbers": "{title} ({used}%, projected {proj}%)",
+      "fix": {
+        "egress": {
+          "t": "TV egress is nearing the limit",
+          "d": "Change the TV check interval to 120 s between Isyak and Subuh, or upgrade to Supabase Pro (US${usd}, {quota})."
+        },
+        "cached": {
+          "t": "Poster downloads are nearing the limit",
+          "d": "Move posters to Cloudflare R2 (no egress fees), or upgrade to Supabase Pro ({quota})."
+        },
+        "db": {
+          "t": "Database is nearing {limit}",
+          "d": "Check that usage_screen_daily is trimmed (120 days) and old content is deleted, or upgrade to Supabase Pro ({quota})."
+        },
+        "storage": {
+          "t": "File storage is nearing {limit}",
+          "d": "Delete posters that ended more than 30 days ago, or upgrade to Supabase Pro ({quota})."
+        },
+        "rps": {
+          "t": "Server load is high",
+          "d": "Upgrade the compute size in Supabase → Settings → Compute, then update \"Compute size\" below."
+        },
+        "email_day": {
+          "t": "Daily emails are nearing {limit}",
+          "d": "Encourage AJK to sign in with Google (no email), or upgrade to Resend Pro (US${usd})."
+        },
+        "email_month": {
+          "t": "Monthly emails are nearing {limit}",
+          "d": "Upgrade to Resend Pro (US${usd})."
+        },
+        "mau": {
+          "t": "Active users are nearing the limit",
+          "d": "Upgrade to Supabase Pro."
+        }
+      },
+      "backup": {
+        "t": "{n} masjids rely on a system without daily backups",
+        "d": "The Free plan has no automatic backups. Upgrade to Supabase Pro for 7 days of daily backups."
+      },
+      "calibrate": {
+        "t": "Calibrate the egress estimate",
+        "d": "The last real figures are more than 30 days old. Copy them from Supabase → Usage into the form below.",
+        "never": "Never calibrated. Copy the figures from Supabase → Usage into the form below."
+      },
+      "email_sync": {
+        "t": "Email count is out of date",
+        "d": "The usage-digest function has not run for more than 50 hours. Check Supabase → Edge Functions → usage-digest → Logs."
+      },
+      "snapshot": {
+        "t": "Usage snapshot has stopped",
+        "d": "The masjidview-usage-snapshot cron job has not run for more than 2 hours. Check Supabase → Integrations → Cron."
+      },
+      "prices": {
+        "t": "Check prices and limits",
+        "d": "Prices were checked more than 6 months ago. Compare with supabase.com/pricing and resend.com/pricing."
+      },
+      "none": {
+        "t": "No action needed",
+        "d": "Every limit is below {pct}% and projections stay within limits until the end of the cycle."
+      }
+    },
+    "growth": {
+      "title": "Growth",
+      "hint": "Active masjids (at least one TV online) per week, with a 12-week projection.",
+      "aria": "Chart of active masjids: {now} now, average {perWeek} per week",
+      "ago": "{n} weeks ago",
+      "now": "now",
+      "ahead": "+12 weeks",
+      "note": "Average +{perWeek} active masjids per week. If this continues: ~{n} masjids in 12 weeks.",
+      "flat": "Not enough growth for a projection yet.",
+      "notEnough": "Not enough data yet. The chart appears after two weeks."
+    },
+    "scale": {
+      "title": "Monthly cost as you grow",
+      "hint": "Based on each masjid's real usage this cycle (not assumptions). Includes the domain.",
+      "col": {
+        "masjid": "Masjids",
+        "tv": "TVs",
+        "egress": "Egress / month",
+        "storage": "Storage",
+        "supabase": "Supabase (recommended)",
+        "resend": "Resend (recommended)",
+        "rm": "RM / month"
+      },
+      "now": "{n} (now)",
+      "free": "Free",
+      "pro": "Pro",
+      "proCompute": "Pro + {compute}"
+    },
+    "calibrate": {
+      "title": "Calibrate with the real figures",
+      "hint": "Egress cannot be read from Supabase directly, so Masjid View estimates it. Enter the real figures once a month to keep the estimate accurate.",
+      "last": "Last: {date} · egress {eg} GB, cached {ce} GB · factor ×{fe} / ×{fc}",
+      "never": "Never calibrated. The estimate may be off by ±50%.",
+      "date": "Date seen",
+      "egress": "Egress (GB)",
+      "cached": "Cached egress (GB)",
+      "save": "Save",
+      "how": "Where to find them:",
+      "step1": "supabase.com → your organisation → Usage",
+      "step2": "Choose project masjidview-prod, current billing cycle",
+      "step3": "Copy the Egress and Cached Egress totals",
+      "saved": "Saved. The egress factor is now ×{f}.",
+      "savedPlain": "Saved.",
+      "badDate": "The date cannot be after today.",
+      "badValue": "Enter a value between 0 and 100,000 GB.",
+      "error": "Could not save: {message}"
+    },
+    "plan": {
+      "title": "Plans and rates",
+      "hint": "Change these when you upgrade, so the limits and costs above are right.",
+      "supabase": "Supabase plan",
+      "compute": "Compute size",
+      "resend": "Resend plan",
+      "cycleDay": "Billing cycle start day",
+      "fx": "RM per US$1",
+      "domain": "Domain RM / year",
+      "save": "Save",
+      "saved": "Plans and rates saved.",
+      "bad": "Check the values: day 1–28, rate 3–6, domain 0 or more.",
+      "error": "Could not save: {message}",
+      "checked": "Prices and limits checked on {date}. Limits and prices are stored in the usage_settings table."
+    }
   }
 }

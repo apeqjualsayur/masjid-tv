@@ -1,5 +1,25 @@
 import { describe, expect, it } from "vitest";
-import { actionsFor, countByTab, filterOrgs, formatBytes, reasonError, tabOf, totals, type PlatformOrg } from "./logic";
+import { TAB_QUERY, VIEW_TABS, actionsFor, countByTab, filterOrgs, formatBytes, reasonError, tabFromQuery, tabOf, totals, type PlatformOrg } from "./logic";
+
+describe("?tab= on /admin/platform", () => {
+  it("?tab=penggunaan opens Penggunaan; the org tabs keep working", () => {
+    expect(tabFromQuery("penggunaan")).toBe("usage");
+    expect(tabFromQuery("usage")).toBe("usage");
+    expect(tabFromQuery("active")).toBe("active");
+    expect(tabFromQuery("Aktif")).toBe("active");
+    expect(tabFromQuery("digantung")).toBe("suspended");
+  });
+
+  it("missing or unknown = Menunggu", () => {
+    expect(tabFromQuery(null)).toBe("pending");
+    expect(tabFromQuery("")).toBe("pending");
+    expect(tabFromQuery("nonsense")).toBe("pending");
+  });
+
+  it("every tab's query value leads back to it", () => {
+    for (const t of VIEW_TABS) expect(tabFromQuery(TAB_QUERY[t])).toBe(t);
+  });
+});
 
 let n = 0;
 function org(over: Partial<PlatformOrg>): PlatformOrg {

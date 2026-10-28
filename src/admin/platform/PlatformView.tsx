@@ -9,7 +9,8 @@ import { useAdmin } from "../session";
 import { Dialog } from "../shell/Dialog";
 import { OrgAvatar } from "../shell/OrgAvatar";
 import { useIsDesktop } from "../shell/useIsDesktop";
-import { REASON_MAX, TABS, actionsFor, countByTab, filterOrgs, formatBytes, needsReason, reasonError, totals, type PlatformOrg, type PlatformTab, type ReviewAction } from "./logic";
+import { UsageView } from "../usage/UsageView";
+import { REASON_MAX, TAB_QUERY, VIEW_TABS, actionsFor, countByTab, filterOrgs, formatBytes, needsReason, reasonError, tabFromQuery, totals, type PlatformOrg, type PlatformTab, type ReviewAction, type ViewTab } from "./logic";
 
 const card = "rounded-[18px] bg-adm-card shadow-[0_1px_3px_rgba(18,38,30,0.08)]";
 const badge: Record<PlatformOrg["status"], string> = {
@@ -41,12 +42,21 @@ function usePlatformOrgs() {
   return { orgs, error, loading, reload: load };
 }
 
-export function PlatformView() {
+/** `tabParam` = ?tab= (pending | active | suspended | penggunaan); Penggunaan = PRD usage §7. */
+export function PlatformView({ tabParam }: { tabParam: string | null }) {
   const a = useAdmin();
   const { t, locale } = useT();
   const desktop = useIsDesktop();
   const { orgs, error, loading, reload } = usePlatformOrgs();
-  const [tab, setTab] = useState<PlatformTab>("pending");
+  const [view, setView] = useState<ViewTab>(() => tabFromQuery(tabParam));
+  useEffect(() => setView(tabFromQuery(tabParam)), [tabParam]);
+  const usage = view === "usage";
+  const tab: PlatformTab = usage ? "pending" : view;
+  const choose = (k: ViewTab) => {
+    setView(k);
+    // Keep the tab in the URL so it can be bookmarked; the usage-digest email links ?tab=penggunaan.
+    window.history.replaceState(null, "", `?tab=${TAB_QUERY[k]}`);
+  };
   const [query, setQuery] = useState("");
   const [busy, setBusy] = useState<string | null>(null);
   const [notice, setNotice] = useState<{ ok: boolean; text: string } | null>(null);
@@ -109,33 +119,37 @@ export function PlatformView() {
         <span className="rounded-full bg-adm-ink px-2.5 py-1.5 text-[12px] font-extrabold text-adm-gold-soft lg:hidden">{t("platform.owner")}</span>
       </div>
 
-      <dl className="grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-3">
-        {stats.map((s) => (
-          <div key={s.key} className={`flex flex-col-reverse gap-1 rounded-[14px] p-3 lg:p-4 ${s.tone === "warn" ? "bg-[#FFF4DF]" : "bg-white shadow-[0_1px_3px_rgba(18,38,30,0.08)]"}`}>
-            <dt className={`text-[12px] ${s.tone === "warn" ? "text-[#6B4A12]" : "text-adm-muted"}`}>{t(`platform.stat.${s.key}`)}</dt>
-            <dd className={`text-[22px] font-extrabold ${s.tone === "warn" ? "text-[#8A5300]" : ""}`}>{orgs ? s.value : "–"}</dd>
-          </div>
-        ))}
-      </dl>
+      {!usage && (
+        <dl className="grid grid-cols-2 gap-2 lg:grid-cols-4 lg:gap-3">
+          {stats.map((s) => (
+            <div key={s.key} className={`flex flex-col-reverse gap-1 rounded-[14px] p-3 lg:p-4 ${s.tone === "warn" ? "bg-[#FFF4DF]" : "bg-white shadow-[0_1px_3px_rgba(18,38,30,0.08)]"}`}>
+              <dt className={`text-[12px] ${s.tone === "warn" ? "text-[#6B4A12]" : "text-adm-muted"}`}>{t(`platform.stat.${s.key}`)}</dt>
+              <dd className={`text-[22px] font-extrabold ${s.tone === "warn" ? "text-[#8A5300]" : ""}`}>{orgs ? s.value : "–"}</dd>
+            </div>
+          ))}
+        </dl>
+      )}
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-        <div role="tablist" aria-label={t("platform.tabs")} className="grid grid-cols-3 rounded-[14px] bg-[#E3ECE7] p-1 lg:w-[460px]">
-          {TABS.map((k) => {
-            const on = tab === k;
+        <div role="tablist" aria-label={t("platform.tabs")} className="grid grid-cols-2 gap-1 rounded-[14px] bg-[#E3ECE7] p-1 min-[480px]:grid-cols-4 min-[480px]:gap-0 lg:w-[620px]">
+          {VIEW_TABS.map((k) => {
+            const on = view === k;
             return (
               <button
                 key={k}
                 type="button"
                 role="tab"
                 aria-selected={on}
-                onClick={() => setTab(k)}
-                className={`h-10 rounded-[11px] text-[14px] font-bold focus-visible:outline-2 focus-visible:outline-adm-green ${on ? "bg-white text-adm-ink shadow-[0_1px_3px_rgba(18,38,30,0.12)]" : "text-adm-muted"}`}
+                onClick={() => choose(k)}
+                className={`h-11 rounded-[11px] px-1 text-[14px] font-bold focus-visible:outline-2 focus-visible:outline-adm-green ${on ? "bg-white text-adm-ink shadow-[0_1px_3px_rgba(18,38,30,0.12)]" : "text-adm-muted"}`}
               >
-                {t("platform.tabCount", { label: t(`platform.tab.${k}`), n: counts[k] })}
+                {k === "usage" ? t("platform.tab.usage") : t("platform.tabCount", { label: t(`platform.tab.${k}`), n: counts[k] })}
               </button>
             );
           })}
         </div>
+        {!usage && (
+        <>
         <input
           type="search"
           value={query}
@@ -147,8 +161,14 @@ export function PlatformView() {
         <button type="button" onClick={reload} disabled={loading} className="hidden h-11 rounded-xl px-3 text-[14px] font-bold text-adm-green hover:bg-adm-soft disabled:opacity-60 lg:ml-auto lg:block">
           {t("platform.refresh")}
         </button>
+        </>
+        )}
       </div>
 
+      {usage ? (
+        <UsageView />
+      ) : (
+      <>
       {notice && (
         <p role={notice.ok ? "status" : "alert"} className={`rounded-xl px-3.5 py-3 text-[14px] ${notice.ok ? "bg-adm-soft text-adm-green-dark" : "bg-[#FDECE8] text-adm-danger"}`}>
           {notice.text}
@@ -272,6 +292,8 @@ export function PlatformView() {
       )}
 
       <p className="text-[12px] leading-[1.5] text-adm-muted">{t("platform.tip")}</p>
+      </>
+      )}
 
       {asking && <ReasonDialog key={`${asking.org.id}-${asking.action}`} org={asking.org} action={asking.action} onClose={() => setAsking(null)} onSubmit={(r) => review(asking.org, asking.action, r)} />}
     </div>

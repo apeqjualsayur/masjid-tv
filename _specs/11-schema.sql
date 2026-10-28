@@ -5,6 +5,9 @@
 -- on a wrong code), 0003 platform_org_list(), 0004 storage select policy (so deletes work),
 -- 0005 reorder_slides(). Account rules = 0006_account_rules.sql (= 13-account-rules-migration.sql).
 -- Note: the Friday fields in org_settings.durations come from 14-friday-migration.sql.
+-- Usage monitoring = 0008_usage.sql (= 32-usage-migration.sql): usage_* tables and functions,
+-- platform_usage(), and a screen_bundle() that also calls usage_note_ping(). Run it after this file;
+-- §7 below keeps the pre-0008 screen_bundle so this file still works on its own.
 -- source of truth for supabase/migrations/0001_init.sql
 -- Run once on a fresh project (SQL editor or `supabase db push`).
 -- =====================================================================

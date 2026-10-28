@@ -115,6 +115,8 @@ async function cleanup(orgIds: string[]) {
     // Order matters: slides reference media (on delete restrict); members must go with their org.
     await admin.from("slides").delete().in("org_id", ids);
     await admin.from("media").delete().in("org_id", ids);
+    // Usage telemetry has no foreign keys (migration 0008); harmless if the table does not exist yet.
+    await admin.from("usage_screen_daily").delete().in("org_id", ids);
     const del = await admin.from("organisations").delete().in("id", ids);
     if (del.error) console.log(`  could not delete test orgs: ${fmt(del.error)}`);
   }
@@ -333,6 +335,7 @@ async function run(orgIds: string[]) {
   report(slidesInBundle >= 1, "bundle contains org A's published slide", `${slidesInBundle} slide(s)`);
   const b2 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v1 });
   report((b2.data as { status?: string } | null)?.status === "unchanged", "second call with that version → unchanged", JSON.stringify(b2.data ?? b2.error));
+  await usageChecks(A, P, screenA);
   const iq = await A.db.from("org_settings").update({ iqamah_min: { subuh: 10, zohor: 10, asar: 10, maghrib: 9, isyak: 10 } }).eq("org_id", orgA).select("org_id");
   report(!iq.error && (iq.data ?? []).length === 1, "A updates org A's iqamah minutes", fmt(iq.error));
   const b3 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v1 });
@@ -386,6 +389,39 @@ async function run(orgIds: string[]) {
   const aOrgs = await A.db.from("members").select("org_id").eq("user_id", A.id);
   report((cOrgs.data ?? []).some((m) => m.org_id === orgA) && (aOrgs.data ?? []).length === 0, "after the replace: C sees org A, A sees no masjid", `C: ${(cOrgs.data ?? []).length}, A: ${(aOrgs.data ?? []).length}`);
   expectFail("P adds an email that already manages a masjid (B) -> user_has_org", await P.db.rpc("transfer_org", { p_org: orgA, p_email: B.email }), "user_has_org");
+}
+
+// Usage monitoring (migration 0008, _specs/30-PRD-usage.md §10.1). Runs after the screen above
+// has made one full and one unchanged screen_bundle call.
+async function usageChecks(A: TestUser, P: TestUser, screenA: string) {
+  console.log("\nUsage monitoring (migration 0008)");
+  const own = await P.db.rpc("platform_usage");
+  if (own.error?.code === "PGRST202") {
+    report(false, "migration 0008 (usage) is applied", "platform_usage not found — apply supabase/migrations/0008_usage.sql first");
+    return;
+  }
+  const keys = Object.keys((own.data as Record<string, unknown> | null) ?? {});
+  const want = ["cycle", "live", "cycle_to_date", "settings"];
+  report(!own.error && want.every((k) => keys.includes(k)), "P (platform owner) platform_usage → JSON with cycle, live, cycle_to_date, settings",
+    own.error ? fmt(own.error) : `keys: ${keys.join(", ")}`);
+  expectFail("A (not a platform owner) platform_usage → not_allowed", await A.db.rpc("platform_usage"), "not_allowed");
+
+  const denied = "42501"; // permission denied for function
+  expectFail("anon cannot execute platform_usage", await anon.rpc("platform_usage"), denied);
+  expectFail("anon cannot execute usage_report", await anon.rpc("usage_report"), denied);
+  expectFail("anon cannot execute usage_note_ping",
+    await anon.rpc("usage_note_ping", { p_screen: screenA, p_org: screenA, p_full: true, p_body_bytes: 1 }), denied);
+  expectFail("anon cannot execute usage_set_emails", await anon.rpc("usage_set_emails", { p_day: "2000-01-01", p_sent: 1 }), denied);
+  expectFail("anon cannot execute usage_mark_alert", await anon.rpc("usage_mark_alert", { p_metric: "rls-check", p_level: "warn" }), denied);
+
+  const row = await admin.from("usage_screen_daily").select("pings").eq("screen_id", screenA);
+  const pings = (row.data ?? []).reduce((n, r) => n + Number(r.pings), 0);
+  report(!row.error && pings >= 1, "screen_bundle counts the TV in usage_screen_daily (pings ≥ 1, checked with service role)",
+    row.error ? fmt(row.error) : `${(row.data ?? []).length} row(s), pings = ${pings}`);
+
+  const tomorrow = new Date(Date.now() + (8 + 24) * 3_600_000).toISOString().slice(0, 10); // Malaysian date + 1
+  expectFail("usage_calibrate with tomorrow's date → bad_date",
+    await P.db.rpc("usage_calibrate", { p_measured_on: tomorrow, p_egress_gb: 1 }), "bad_date");
 }
 
 async function main() {

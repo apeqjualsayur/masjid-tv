@@ -1,0 +1,417 @@
+<!doctype html><html lang="ms"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Masjid View Penggunaan</title>
+</head><body>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap">
+<style>
+/* Layout: admin shell (248 px sidebar ≥1024 px) → Platform page → "Penggunaan" tab. Admin visual system from PRD Phase 2 §5. */
+:root{
+  --green:#146C4A; --green-2:#0F5A3D; --green-soft:#E3EFE8; --green-faint:#F1F7F3;
+  --gold:#E3B04B; --gold-soft:#FBF1DC; --gold-ink:#8A6414;
+  --ink:#12261E; --muted:#51655C; --line:#C9D8D0; --line-2:#E1EAE5; --ground:#F4F7F5; --card:#FFFFFF;
+  --ok:#1E8A5F; --ok-soft:#E3EFE8; --warn:#A8670F; --warn-soft:#FBEFD9; --crit:#B42318; --crit-soft:#FBE3E0; --info:#3E5C8A; --info-soft:#E3EAF4;
+  --f:"Plus Jakarta Sans",ui-sans-serif,system-ui,sans-serif; --mono:"JetBrains Mono",ui-monospace,monospace;
+  color-scheme:light;
+}
+*{box-sizing:border-box}
+body{background:var(--ground);color:var(--ink);font-family:var(--f);font-size:14px;line-height:1.45;margin:0}
+.app{display:grid;grid-template-columns:248px minmax(0,1fr);min-height:100vh}
+aside{background:var(--card);border-right:1px solid var(--line-2);padding:22px 16px;display:flex;flex-direction:column;gap:20px;position:sticky;top:0;height:100vh}
+.brand{display:flex;align-items:center;gap:8px;font-weight:800;font-size:17px;letter-spacing:-.02em}
+.brand svg{width:22px;height:28px}
+.brand span{font-weight:500;color:var(--green)}
+nav{display:grid;gap:2px}
+nav a{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:10px;color:var(--muted);text-decoration:none;font-weight:600;font-size:14px}
+nav a.on{background:var(--green-soft);color:var(--green)}
+nav a i{width:18px;height:18px;border-radius:5px;border:2px solid currentColor;opacity:.7}
+.me{margin-top:auto;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line-2);padding-top:14px}
+.me b{display:block;color:var(--ink)}
+main{padding-block:26px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));min-width:0}
+.wrap{max-width:1140px;margin:0 auto;display:grid;gap:18px}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;flex-wrap:wrap}
+h1{font-size:26px;font-weight:800;letter-spacing:-.02em;margin:0}
+.sub{color:var(--muted);margin:2px 0 0}
+.tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);overflow-x:auto}
+.tabs a{padding:10px 14px;font-weight:600;color:var(--muted);text-decoration:none;border-bottom:2.5px solid transparent;white-space:nowrap}
+.tabs a.on{color:var(--green);border-color:var(--green)}
+.tabs .n{font-family:var(--mono);font-size:11px;background:var(--line-2);border-radius:99px;padding:1px 7px;margin-left:6px}
+.btn{font:inherit;font-weight:600;font-size:13.5px;min-height:40px;padding:8px 14px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn.pri{background:var(--green);border-color:var(--green);color:#fff}
+.btn:focus-visible,input:focus-visible,select:focus-visible,a:focus-visible{outline:2.5px solid var(--gold);outline-offset:2px}
+.card{background:var(--card);border:1px solid var(--line-2);border-radius:16px;padding:18px;display:grid;gap:14px;min-width:0}
+.card h2{font-size:16px;font-weight:700;margin:0}
+.card .hint{color:var(--muted);font-size:12.5px;margin:0}
+.eyebrow{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.num{font-variant-numeric:tabular-nums}
+.mono{font-family:var(--mono);font-size:12px}
+
+/* verdict */
+.verdict{display:grid;grid-template-columns:minmax(0,1.3fr) repeat(3,minmax(0,1fr));gap:0;padding:0;overflow:hidden}
+.verdict>div{padding:18px;border-left:1px solid var(--line-2);display:grid;gap:4px;align-content:start}
+.verdict>div:first-child{border-left:0;background:var(--green);color:#fff}
+.verdict>div:first-child .eyebrow{color:#CFE6DA}
+.verdict .big{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.verdict .big small{font-size:13px;font-weight:500;color:var(--muted)}
+.verdict>div:first-child .big small{color:#CFE6DA}
+.verdict .line{font-size:12.5px;color:var(--muted)}
+.verdict>div:first-child .line{color:#CFE6DA}
+.cyc{height:6px;border-radius:99px;background:rgba(255,255,255,.2);overflow:hidden;margin-top:6px}
+.cyc i{display:block;height:100%;background:var(--gold)}
+@media (max-width:900px){.verdict{grid-template-columns:1fr 1fr}.verdict>div:nth-child(3){border-left:0}.verdict>div:nth-child(n+3){border-top:1px solid var(--line-2)}}
+@media (max-width:520px){.verdict{grid-template-columns:1fr}.verdict>div{border-left:0;border-top:1px solid var(--line-2)}}
+
+/* meters */
+.meters{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,250px),1fr));gap:12px}
+.meter{border:1px solid var(--line-2);border-radius:12px;padding:14px;display:grid;gap:8px;align-content:start;position:relative}
+.meter::before{content:"";position:absolute;left:0;top:12px;bottom:12px;width:3px;border-radius:0 3px 3px 0;background:var(--ok)}
+.meter.warn::before{background:var(--warn)} .meter.crit::before{background:var(--crit)}
+.meter .hd{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.meter .nm{font-weight:700;font-size:13.5px}
+.pill{font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:99px;background:var(--ok-soft);color:var(--ok);white-space:nowrap}
+.pill.warn{background:var(--warn-soft);color:var(--warn)} .pill.crit{background:var(--crit-soft);color:var(--crit)} .pill.info{background:var(--info-soft);color:var(--info)} .pill.grey{background:var(--line-2);color:var(--muted)}
+.meter .val{font-size:20px;font-weight:800;letter-spacing:-.01em}
+.meter .val small{font-size:12.5px;font-weight:500;color:var(--muted)}
+.bar{height:10px;border-radius:99px;background:var(--line-2);position:relative;overflow:hidden}
+.bar .used{position:absolute;inset:0 auto 0 0;background:var(--ok);border-radius:99px}
+.bar .proj{position:absolute;inset:0 auto 0 0;background:repeating-linear-gradient(45deg,rgba(30,138,95,.28) 0 4px,rgba(30,138,95,.12) 4px 8px);border-radius:99px}
+.meter.warn .bar .used{background:var(--warn)} .meter.warn .bar .proj{background:repeating-linear-gradient(45deg,rgba(168,103,15,.3) 0 4px,rgba(168,103,15,.12) 4px 8px)}
+.meter.crit .bar .used{background:var(--crit)} .meter.crit .bar .proj{background:repeating-linear-gradient(45deg,rgba(180,35,24,.3) 0 4px,rgba(180,35,24,.12) 4px 8px)}
+.bar .tick{position:absolute;top:-2px;bottom:-2px;width:2px;background:var(--ink);opacity:.35}
+.meter dl{display:grid;grid-template-columns:auto 1fr;gap:3px 10px;margin:0;font-size:12.5px}
+.meter dt{color:var(--muted)} .meter dd{margin:0;text-align:right;font-weight:600}
+.meter .src{font-size:11.5px;color:var(--muted)}
+.legend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--muted)}
+.legend i{display:inline-block;width:18px;height:8px;border-radius:99px;margin-right:6px;vertical-align:middle;background:var(--ok)}
+.legend i.p{background:repeating-linear-gradient(45deg,rgba(30,138,95,.35) 0 4px,rgba(30,138,95,.12) 4px 8px)}
+
+/* two-col */
+.two{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:18px;align-items:start}
+@media (max-width:1100px){.two{grid-template-columns:minmax(0,1fr)}}
+.acts{display:grid;gap:10px;margin:0;padding:0;list-style:none}
+.acts li{display:grid;grid-template-columns:auto 1fr;gap:10px;padding:12px;border-radius:12px;background:var(--ground)}
+.acts li .dot{width:10px;height:10px;border-radius:50%;margin-top:5px;background:var(--info)}
+.acts li.crit .dot{background:var(--crit)} .acts li.warn .dot{background:var(--warn)}
+.acts b{display:block;font-size:13.5px}
+.acts p{margin:2px 0 0;font-size:12.5px;color:var(--muted)}
+.acts a{color:var(--green);font-weight:600;font-size:12.5px}
+svg text{font-family:var(--f);font-size:11px;fill:var(--muted)}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th,td{padding:9px 8px;border-bottom:1px solid var(--line-2);text-align:left;white-space:nowrap}
+th{font-size:11px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:700}
+td.n,th.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.now td{background:var(--green-faint);font-weight:700}
+form.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:10px;align-items:end}
+label{display:grid;gap:4px;font-size:12.5px;font-weight:600;color:var(--muted)}
+input,select{font:inherit;font-size:14px;color:var(--ink);min-height:40px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);width:100%}
+.note{font-size:12.5px;color:var(--muted);background:var(--ground);border-radius:10px;padding:10px 12px}
+.note ol{margin:4px 0 0;padding-left:18px}
+.toast{font-size:12.5px;color:var(--green);font-weight:600;min-height:18px}
+.sample{display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;background:var(--gold-soft);color:var(--gold-ink);padding:3px 9px;border-radius:99px}
+@media (max-width:1023px){.app{grid-template-columns:minmax(0,1fr)}aside{display:none}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+
+<div class="app">
+  <aside aria-label="Navigasi">
+    <div class="brand"><svg viewBox="14 2 72 94" aria-hidden="true"><path fill="#146C4A" fill-rule="evenodd" d="M18 92 V48 C18 30 34 18 50 6 C66 18 82 30 82 48 V92 Z M32 92 V53 C32 41 41 33 50 25 C59 33 68 41 68 53 V92 Z"/><circle cx="50" cy="60" r="8" fill="#E3B04B"/></svg>Masjid <span>View</span></div>
+    <nav>
+      <a href="#"><i></i>Utama</a><a href="#"><i></i>Kandungan</a><a href="#"><i></i>Skrin</a>
+      <a href="#"><i></i>Tetapan</a><a href="#"><i></i>Ahli</a><a href="#" class="on"><i></i>Platform</a>
+    </nav>
+    <div class="me"><b>Afiq Syazwan</b>Pemilik platform · BM / EN</div>
+  </aside>
+
+  <main>
+    <div class="wrap">
+      <div class="top">
+        <div>
+          <h1>Platform</h1>
+          <p class="sub">Kelulusan masjid dan penggunaan sistem. <span class="sample">CONTOH DATA</span></p>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="mono" id="updated" style="align-self:center;color:var(--muted)"></span>
+          <button class="btn" type="button" id="refresh">Muat semula</button>
+        </div>
+      </div>
+      <div class="tabs" role="tablist">
+        <a href="#">Menunggu<span class="n">2</span></a><a href="#">Aktif<span class="n">42</span></a><a href="#">Digantung<span class="n">0</span></a><a href="#" class="on" aria-current="page">Penggunaan</a>
+      </div>
+
+      <section class="card verdict" aria-label="Ringkasan" id="verdict"></section>
+
+      <section class="card">
+        <div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:flex-end">
+          <div><h2 id="limTitle">Had pelan percuma</h2><p class="hint">Kitaran bil semasa. Bar penuh = digunakan setakat ini; jalur = unjuran hingga akhir kitaran.</p></div>
+          <div class="legend"><span><i></i>Digunakan</span><span><i class="p"></i>Unjuran</span><span><i style="width:2px;height:12px;border-radius:0;background:var(--ink);opacity:.35"></i>Amaran 70%</span></div>
+        </div>
+        <div class="meters" id="meters"></div>
+      </section>
+
+      <div class="two">
+        <section class="card">
+          <div><h2>Tindakan disyorkan</h2><p class="hint">Disusun ikut keutamaan. Dikira semula setiap kali halaman dibuka.</p></div>
+          <ul class="acts" id="acts"></ul>
+        </section>
+        <section class="card">
+          <div><h2>Pertumbuhan</h2><p class="hint">Masjid aktif (sekurang-kurangnya satu TV dalam talian) setiap minggu, dengan unjuran 12 minggu.</p></div>
+          <svg id="growth" viewBox="0 0 520 230" role="img" aria-label="Carta pertumbuhan masjid aktif"></svg>
+          <p class="hint" id="growthNote"></p>
+        </section>
+      </div>
+
+      <section class="card">
+        <div><h2>Kos bulanan jika berkembang</h2><p class="hint">Berdasarkan kadar sebenar setiap masjid dalam kitaran ini (bukan andaian). Termasuk domain.</p></div>
+        <div class="scroll"><table>
+          <thead><tr><th class="n">Masjid</th><th class="n">TV</th><th class="n">Egress / bulan</th><th class="n">Storan</th><th>Supabase (disyorkan)</th><th>Resend (disyorkan)</th><th class="n">RM / bulan</th></tr></thead>
+          <tbody id="scale"></tbody>
+        </table></div>
+      </section>
+
+      <div class="two">
+        <section class="card">
+          <div><h2>Selaraskan dengan angka sebenar</h2><p class="hint">Egress tidak boleh dibaca terus dari Supabase, jadi Masjid View menganggarkannya. Masukkan angka sebenar sebulan sekali supaya anggaran tepat.</p></div>
+          <div class="note" id="calNote"></div>
+          <form class="grid" id="calForm">
+            <label for="calDate">Tarikh dilihat<input type="date" id="calDate" required></label>
+            <label for="calEg">Egress (GB)<input type="number" id="calEg" step="0.01" min="0" inputmode="decimal" required></label>
+            <label for="calCe">Cached egress (GB)<input type="number" id="calCe" step="0.01" min="0" inputmode="decimal"></label>
+            <button class="btn pri" type="submit">Simpan</button>
+          </form>
+          <div class="note">Cara dapatkan:<ol><li>supabase.com → organisasi anda → <b>Usage</b></li><li>Pilih projek <b>masjidview-prod</b>, kitaran bil semasa</li><li>Salin jumlah <b>Egress</b> dan <b>Cached Egress</b></li></ol></div>
+          <div class="toast" id="calToast" role="status"></div>
+        </section>
+        <section class="card">
+          <div><h2>Pelan dan kadar</h2><p class="hint">Ubah apabila anda naik taraf, supaya had dan kos di atas betul.</p></div>
+          <form class="grid" id="setForm">
+            <label for="sPlan">Pelan Supabase<select id="sPlan"><option value="free">Free</option><option value="pro">Pro</option></select></label>
+            <label for="sCompute">Saiz compute<select id="sCompute"><option>nano</option><option>micro</option><option>small</option><option>medium</option><option>large</option></select></label>
+            <label for="sResend">Pelan Resend<select id="sResend"><option value="free">Free</option><option value="pro">Pro</option></select></label>
+            <label for="sCycle">Hari mula kitaran bil<input type="number" id="sCycle" min="1" max="28"></label>
+            <label for="sFx">RM bagi US$1<input type="number" id="sFx" step="0.01" min="3" max="6"></label>
+            <label for="sDom">Domain RM / tahun<input type="number" id="sDom" step="1" min="0"></label>
+            <button class="btn pri" type="submit">Simpan</button>
+          </form>
+          <p class="hint" id="priceNote"></p>
+          <div class="toast" id="setToast" role="status"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+/* ---------------- SAMPLE: shape of platform_usage() ---------------- */
+const REPORT = (() => {
+  const today = new Date('2026-10-28T10:00:00+08:00');
+  const hist = [];
+  for (let i = 83; i >= 0; i--) {
+    const d = new Date(today); d.setDate(d.getDate() - i);
+    const wk = (83 - i) / 7;
+    const orgs = Math.max(0, Math.round(4 + wk * 3.1 + Math.sin(i) * 0.8));
+    const screens = Math.round(orgs * 1.45);
+    hist.push({ day: d.toISOString().slice(0, 10), orgs_seen: orgs, screens_seen: screens, orgs_active: orgs + 2,
+      screens_total: screens + 3, pings: screens * 1300, full_bundles: screens * 2, bundle_bytes: screens * 1300 * 487 + screens * 2 * 5200,
+      db_bytes: 30e6 + (83 - i) * 1.4e5 * (1 + wk / 10), storage_bytes: 60e6 + (83 - i) * 2.7e6, storage_objects: 200 + (83 - i) * 9,
+      mau_30d: Math.round(orgs * 1.4), emails: Math.round(4 + wk * 1.2 + (i % 7 === 1 ? 14 : 0)) });
+  }
+  return {
+    generated_at: today.toISOString(),
+    snapshot_at: '2026-10-28T09:05:00+08:00',
+    settings: { cycle_day: 1, plan: 'free', compute: 'nano', resend_plan: 'free', poll_seconds: 60, http_overhead_bytes: 450,
+      fx_rm_per_usd: 4.2, domain_rm_per_year: 130, backup_upgrade_at: 25, alert_warn_pct: 70, alert_crit_pct: 90,
+      limits: { free: { db_bytes: 5e8, storage_bytes: 1e9, egress_bytes: 5e9, cached_egress_bytes: 5e9, mau: 50000, rps: 3 },
+                pro: { db_bytes: 8e9, storage_bytes: 1e11, egress_bytes: 2.5e11, cached_egress_bytes: 2.5e11, mau: 100000, rps: 10 },
+                resend_free: { emails_month: 3000, emails_day: 100 }, resend_pro: { emails_month: 50000, emails_day: null } },
+      prices: { supabase_pro_usd: 25, compute_credit_usd: 10, egress_usd_per_gb: 0.09, cached_egress_usd_per_gb: 0.03, storage_usd_per_gb: 0.021, db_usd_per_gb: 0.125, resend_pro_usd: 20,
+        compute: { nano: { usd: 0, rps: 3 }, micro: { usd: 10, rps: 10 }, small: { usd: 15, rps: 30 }, medium: { usd: 60, rps: 80 }, large: { usd: 110, rps: 200 } } },
+      prices_checked_on: '2026-10-23' },
+    cycle: { start: '2026-10-01', end: '2026-11-01', today: '2026-10-28', days_elapsed: 27.42, days_total: 31 },
+    live: { db_bytes: 41.6e6, storage_bytes: 286e6, storage_objects: 951, mau_30d: 58, screens_total: 64, screens_online: 57,
+      orgs: { pending: 2, active: 42, suspended: 0, rejected: 1 }, orgs_seen_24h: 39 },
+    cycle_to_date: { pings: 1.98e6, full_bundles: 1430, screens_seen: 61, orgs_seen: 41, peak_screens_day: 58,
+      bundle_bytes: 0.972e9, admin_est_bytes: 0.12e9, egress_est_bytes: 1.092e9, cached_est_bytes: 0.41e9,
+      emails_sent: 612, emails_peak_day: 74, emails_today: 9, emails_synced_at: '2026-10-28T08:00:00+08:00' },
+    calibration: { measured_on: '2026-10-20', cycle_start: '2026-10-01', egress_gb: 0.98, cached_egress_gb: 0.31, factor_egress: 1.18, factor_cached: 0.94 },
+    history: hist, alerts_sent: []
+  };
+})();
+
+/* ---------------- MODEL (port to src/admin/usage/model.ts, pure + Vitest) ---------------- */
+const GB = 1e9;
+function linSlope(ys) { // least-squares slope per step
+  const n = ys.length; if (n < 2) return 0;
+  const mx = (n - 1) / 2, my = ys.reduce((a, b) => a + b, 0) / n;
+  let num = 0, den = 0; ys.forEach((y, i) => { num += (i - mx) * (y - my); den += (i - mx) ** 2; });
+  return den ? num / den : 0;
+}
+function weekly(hist, key) { // average per 7-day bucket, oldest first, last bucket ends today
+  const out = []; for (let end = hist.length; end > 0; end -= 7) { const w = hist.slice(Math.max(0, end - 7), end); out.unshift(w.reduce((a, r) => a + r[key], 0) / w.length); } return out;
+}
+function level(usedPct, projPct, s) {
+  if (usedPct >= s.alert_crit_pct || projPct >= 100) return 'crit';
+  if (usedPct >= s.alert_warn_pct || projPct >= s.alert_warn_pct) return 'warn';
+  return 'ok';
+}
+function model(r) {
+  const s = r.settings, c = r.cycle, L = s.limits[s.plan], RL = s.limits['resend_' + s.resend_plan];
+  const frac = c.days_total / c.days_elapsed, remain = c.days_total - c.days_elapsed;
+  const calOk = r.calibration && (new Date(c.today) - new Date(r.calibration.measured_on)) / 864e5 <= 45;
+  const fE = calOk && r.calibration.factor_egress ? r.calibration.factor_egress : 1;
+  const fC = calOk && r.calibration.factor_cached ? r.calibration.factor_cached : 1;
+  const h = r.history, last28 = h.slice(-28);
+  const slope = k => Math.max(0, linSlope(last28.map(x => x[k])));
+  const activeNow = Math.max(1, r.cycle_to_date.orgs_seen);
+  const orgsActive = r.live.orgs.active;
+  const tier = s.prices.compute[s.compute];
+  const rpsLimit = s.plan === 'free' ? L.rps : tier.rps;
+  const M = [];
+  const add = (key, name, used, proj, limit, unit, per, src, stock) => {
+    const usedPct = used / limit * 100, projPct = proj / limit * 100;
+    const perMasjid = per ?? proj / activeNow;
+    const runsOutAt = perMasjid > 0 ? Math.floor(limit / perMasjid) : null;
+    M.push({ key, name, used, proj, limit, unit, usedPct, projPct, level: level(usedPct, projPct, s), runsOutAt, src, stock });
+  };
+  const eg = r.cycle_to_date.egress_est_bytes * fE, ce = r.cycle_to_date.cached_est_bytes * fC;
+  add('egress', 'Egress', eg, eg * frac, L.egress_bytes, 'b', null, calOk ? `Anggaran ×${fE.toFixed(2)} (diselaraskan)` : 'Anggaran (belum diselaraskan)');
+  add('cached', 'Egress cache (poster)', ce, ce * frac, L.cached_egress_bytes, 'b', null, calOk ? `Anggaran ×${fC.toFixed(2)} (diselaraskan)` : 'Anggaran (belum diselaraskan)');
+  add('db', 'Pangkalan data', r.live.db_bytes, r.live.db_bytes + slope('db_bytes') * remain, L.db_bytes, 'b', r.live.db_bytes / Math.max(1, orgsActive), 'Tepat · pg_database_size', true);
+  add('storage', 'Storan fail', r.live.storage_bytes, r.live.storage_bytes + slope('storage_bytes') * remain, L.storage_bytes, 'b', r.live.storage_bytes / Math.max(1, orgsActive), `Tepat · ${r.live.storage_objects.toLocaleString('ms-MY')} fail`, true);
+  const rpsNow = r.live.screens_online / s.poll_seconds, rpsPeak = r.cycle_to_date.peak_screens_day / s.poll_seconds;
+  add('rps', 'Beban pelayan', rpsPeak, rpsPeak, rpsLimit, 'rps', rpsPeak / activeNow, `Kini ${rpsNow.toFixed(2)} permintaan/s · compute ${s.compute}`);
+  if (RL.emails_day) add('email_day', 'Emel sehari (puncak)', r.cycle_to_date.emails_peak_day, r.cycle_to_date.emails_peak_day, RL.emails_day, 'n', r.cycle_to_date.emails_peak_day / activeNow, `Hari ini ${r.cycle_to_date.emails_today}`);
+  add('email_month', 'Emel sebulan', r.cycle_to_date.emails_sent, r.cycle_to_date.emails_sent * frac, RL.emails_month, 'n', null, 'Dikira dari Resend');
+  add('mau', 'Pengguna aktif (30 hari)', r.live.mau_30d, r.live.mau_30d, L.mau, 'n', r.live.mau_30d / Math.max(1, orgsActive), 'Akaun AJK yang log masuk');
+
+  // growth (active masjids per week)
+  const wk = weekly(h, 'orgs_seen').slice(-12);
+  const perWeek = linSlope(wk);
+  M.forEach(m => {
+    if (m.runsOutAt == null || perWeek <= 0 || m.runsOutAt <= activeNow) { m.runsOutDate = m.runsOutAt != null && m.runsOutAt <= activeNow ? 'sekarang' : null; return; }
+    const weeks = (m.runsOutAt - activeNow) / perWeek;
+    const d = new Date(c.today); d.setDate(d.getDate() + Math.round(weeks * 7));
+    m.runsOutDate = weeks > 104 ? '> 2 tahun' : d.toLocaleDateString('ms-MY', { month: 'short', year: 'numeric' });
+  });
+
+  // cost
+  const supaM = M.filter(m => ['egress', 'cached', 'db', 'storage', 'rps'].includes(m.key));
+  const needPro = s.plan === 'free' && (supaM.some(m => m.projPct >= 100) || orgsActive >= s.backup_upgrade_at);
+  const costUsd = (plan, compute, resendPro, eg, ce, st, db) => {
+    let u = 0;
+    if (plan === 'pro') {
+      const P = s.prices, PL = s.limits.pro;
+      u += P.supabase_pro_usd + Math.max(0, P.compute[compute].usd - P.compute_credit_usd);
+      u += Math.max(0, eg - PL.egress_bytes) / GB * P.egress_usd_per_gb + Math.max(0, ce - PL.cached_egress_bytes) / GB * P.cached_egress_usd_per_gb;
+      u += Math.max(0, st - PL.storage_bytes) / GB * P.storage_usd_per_gb + Math.max(0, db - PL.db_bytes) / GB * P.db_usd_per_gb;
+    }
+    if (resendPro) u += s.prices.resend_pro_usd;
+    return u;
+  };
+  const rm = u => u * s.fx_rm_per_usd + s.domain_rm_per_year / 12;
+  const nowUsd = costUsd(s.plan, s.compute, s.resend_plan === 'pro', eg * frac, ce * frac, r.live.storage_bytes, r.live.db_bytes);
+  const pickCompute = rps => Object.entries(s.prices.compute).find(([k, v]) => k !== 'nano' && v.rps >= rps * 1.5)?.[0] ?? 'large';
+
+  const scale = [activeNow, 50, 100, 250, 500, 1000].filter((v, i, a) => i === 0 || v > activeNow).map(n => {
+    const k = n / activeNow;
+    const e = eg * frac * k, cc = ce * frac * k, st = r.live.storage_bytes / Math.max(1, orgsActive) * n, db = 30e6 + (r.live.db_bytes - 30e6) / Math.max(1, orgsActive) * n;
+    const rps = rpsPeak * k, emDay = r.cycle_to_date.emails_peak_day * k, emM = r.cycle_to_date.emails_sent * frac * k;
+    const FL = s.limits.free;
+    const pro = e > FL.egress_bytes || cc > FL.cached_egress_bytes || st > FL.storage_bytes || db > FL.db_bytes || rps > FL.rps || n >= s.backup_upgrade_at;
+    const comp = pro ? (rps * 1.5 <= s.prices.compute.micro.rps ? 'micro' : pickCompute(rps)) : 'nano';
+    const resPro = emDay > s.limits.resend_free.emails_day || emM > s.limits.resend_free.emails_month;
+    const u = costUsd(pro ? 'pro' : 'free', comp, resPro, e, cc, st, db);
+    return { n, tvs: Math.round(r.cycle_to_date.screens_seen * k), e, st: st + 0, supa: pro ? 'Pro' + (comp !== 'micro' ? ' + ' + comp : '') : 'Free', resend: resPro ? 'Pro' : 'Free', rm: rm(u), now: n === activeNow };
+  });
+
+  // actions
+  const A = [];
+  const fix = {
+    egress: ['Egress TV menghampiri had', 'Ubah selang semakan TV kepada 120 s antara Isyak dan Subuh, atau naik taraf ke Supabase Pro (US$25, 250 GB).'],
+    cached: ['Muat turun poster menghampiri had', 'Pindahkan poster ke Cloudflare R2 (tiada caj egress) atau naik taraf ke Pro.'],
+    db: ['Pangkalan data menghampiri 500 MB', 'Semak jadual usage_screen_daily dipangkas (120 hari) dan kandungan lama dipadam, atau naik taraf ke Pro (8 GB).'],
+    storage: ['Storan fail menghampiri 1 GB', 'Padam poster yang tamat lebih 30 hari secara automatik, atau naik taraf ke Pro (100 GB).'],
+    rps: ['Beban pelayan tinggi', 'Naik taraf saiz compute di Supabase → Settings → Compute, kemudian kemas kini "Saiz compute" di bawah.'],
+    email_day: ['Emel sehari menghampiri 100', 'Galakkan AJK log masuk dengan Google (tiada emel), atau naik taraf Resend Pro (US$20).'],
+    email_month: ['Emel sebulan menghampiri 3,000', 'Naik taraf Resend Pro (US$20, 50,000 emel).'],
+    mau: ['Pengguna aktif menghampiri had', 'Naik taraf ke Supabase Pro.']
+  };
+  M.filter(m => m.level !== 'ok').sort((a, b) => b.projPct - a.projPct).forEach(m => A.push({ lvl: m.level, t: fix[m.key][0] + ` (${Math.round(m.usedPct)}%, unjuran ${Math.round(m.projPct)}%)`, d: fix[m.key][1] }));
+  if (s.plan === 'free' && orgsActive >= s.backup_upgrade_at) A.push({ lvl: 'warn', t: `${orgsActive} masjid bergantung pada sistem tanpa sandaran harian`, d: 'Pelan Free tiada sandaran automatik. Naik taraf ke Supabase Pro untuk sandaran harian 7 hari.', link: 'supabase.com/dashboard/org/_/billing' });
+  if (!r.calibration || (new Date(c.today) - new Date(r.calibration.measured_on)) / 864e5 > 30) A.push({ lvl: 'info', t: 'Selaraskan anggaran egress', d: 'Angka sebenar terakhir lebih 30 hari lalu. Salin dari Supabase → Usage ke borang di bawah.' });
+  if (!r.cycle_to_date.emails_synced_at || (new Date(r.generated_at) - new Date(r.cycle_to_date.emails_synced_at)) / 36e5 > 26) A.push({ lvl: 'warn', t: 'Kiraan emel tidak dikemas kini', d: 'Fungsi usage-digest tidak berjalan lebih 26 jam. Semak Supabase → Edge Functions → usage-digest → Logs.' });
+  if (!r.snapshot_at || (new Date(r.generated_at) - new Date(r.snapshot_at)) / 36e5 > 2) A.push({ lvl: 'warn', t: 'Snapshot penggunaan terhenti', d: 'Tugas cron masjidview-usage-snapshot tidak berjalan lebih 2 jam. Semak Supabase → Integrations → Cron.' });
+  if ((new Date(c.today) - new Date(s.prices_checked_on)) / 864e5 > 180) A.push({ lvl: 'info', t: 'Semak harga dan had', d: 'Harga disemak lebih 6 bulan lalu. Bandingkan dengan supabase.com/pricing dan resend.com/pricing.' });
+  if (!A.length) A.push({ lvl: 'ok', t: 'Tiada tindakan diperlukan', d: 'Semua had di bawah 70% dan unjuran kekal dalam had hingga akhir kitaran.' });
+
+  const worst = M.reduce((a, m) => (m.level === 'crit' ? 2 : m.level === 'warn' ? 1 : 0) > (a.level === 'crit' ? 2 : a.level === 'warn' ? 1 : 0) ? m : a, M[0]);
+  const first = M.filter(m => m.runsOutAt != null && !m.stock).sort((a, b) => a.runsOutAt - b.runsOutAt)[0];
+  return { M, A, scale, wk, perWeek, nowUsd, nowRm: rm(nowUsd), needPro, worst, first, activeNow, orgsActive, rpsNow };
+}
+
+/* ---------------- RENDER ---------------- */
+const $ = id => document.getElementById(id);
+const fmtB = b => b >= 1e9 ? (b / 1e9).toFixed(b >= 1e10 ? 0 : 2) + ' GB' : (b / 1e6).toFixed(b >= 1e8 ? 0 : 1) + ' MB';
+const fmtV = (v, u) => u === 'b' ? fmtB(v) : u === 'rps' ? v.toFixed(2) + ' /s' : Math.round(v).toLocaleString('ms-MY');
+const LV = { ok: 'Selamat', warn: 'Perhatian', crit: 'Tindakan', info: 'Info' };
+
+function render(r) {
+  const m = model(r), s = r.settings, c = r.cycle;
+  $('limTitle').textContent = s.plan === 'free' ? 'Had pelan Free' : 'Had pelan Pro';
+  $('updated').textContent = 'Dikemas kini ' + new Date(r.generated_at).toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+  const dayN = Math.ceil(c.days_elapsed), pct = c.days_elapsed / c.days_total * 100;
+  const st = m.worst.level === 'ok' ? 'Semua dalam had' : m.worst.level === 'warn' ? 'Perlu perhatian' : 'Tindakan diperlukan';
+  $('verdict').innerHTML = `
+    <div><span class="eyebrow">Supabase ${s.plan === 'free' ? 'Free' : 'Pro'} · ${st}</span>
+      <div class="big num">RM${m.nowRm.toFixed(2)} <small>/ bulan kini</small></div>
+      <div class="line">${m.needPro ? `Disyorkan: Pro ≈ RM${(s.prices.supabase_pro_usd * s.fx_rm_per_usd + s.domain_rm_per_year / 12).toFixed(0)} / bulan` : 'Kekal di pelan semasa'}</div>
+      <div class="line">Kitaran ${new Date(c.start).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short' })} – ${new Date(new Date(c.end) - 864e5).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short' })} · hari ${dayN} / ${c.days_total}</div>
+      <div class="cyc"><i style="width:${pct}%"></i></div></div>
+    <div><span class="eyebrow">Masjid aktif</span><div class="big num">${r.live.orgs_seen_24h} <small>/ ${r.live.orgs.active} diluluskan</small></div><div class="line">TV dalam talian 24 jam lalu · ${r.live.orgs.pending} menunggu kelulusan</div></div>
+    <div><span class="eyebrow">Skrin dalam talian</span><div class="big num">${r.live.screens_online} <small>/ ${r.live.screens_total}</small></div><div class="line">${r.live.screens_total - r.live.screens_online} di luar talian &gt; 3 min</div></div>
+    <div><span class="eyebrow">Had pertama dicapai</span><div class="big num">${m.first ? '~' + m.first.runsOutAt.toLocaleString('ms-MY') : '—'} <small>masjid</small></div><div class="line">${m.first ? m.first.name + (m.first.runsOutDate ? ' · sekitar ' + m.first.runsOutDate : '') : ''}</div></div>`;
+
+  $('meters').innerHTML = m.M.map(x => {
+    const u = Math.min(100, x.usedPct), p = Math.min(100, x.projPct);
+    return `<article class="meter ${x.level}">
+      <div class="hd"><span class="nm">${x.name}</span><span class="pill ${x.level}">${LV[x.level]}</span></div>
+      <div class="val num">${fmtV(x.used, x.unit)} <small>/ ${fmtV(x.limit, x.unit)} · ${x.usedPct < 1 ? x.usedPct.toFixed(1) : Math.round(x.usedPct)}%</small></div>
+      <div class="bar" role="img" aria-label="${Math.round(x.usedPct)}% digunakan, unjuran ${Math.round(x.projPct)}%"><span class="proj" style="width:${p}%"></span><span class="used" style="width:${u}%"></span><span class="tick" style="left:${s.alert_warn_pct}%"></span></div>
+      <dl class="num"><dt>Unjuran akhir kitaran</dt><dd>${fmtV(x.proj, x.unit)} · ${Math.round(x.projPct)}%</dd>
+      <dt>Habis pada</dt><dd>${x.runsOutAt == null ? '—' : '~' + x.runsOutAt.toLocaleString('ms-MY') + ' masjid'}</dd>
+      <dt>Anggaran tarikh</dt><dd>${x.runsOutDate ?? '—'}</dd></dl>
+      <div class="src">${x.src}</div></article>`;
+  }).join('');
+
+  $('acts').innerHTML = m.A.map(a => `<li class="${a.lvl}"><span class="dot"></span><div><b>${a.t}</b><p>${a.d}</p></div></li>`).join('');
+
+  // growth chart
+  const W = 520, H = 230, L = 34, R = 10, T = 14, B = 28, wk = m.wk, fut = 12;
+  const fc = Array.from({ length: fut }, (_, i) => wk[wk.length - 1] + m.perWeek * (i + 1));
+  const max = Math.ceil(Math.max(...wk, ...fc, 10) / 10) * 10;
+  const x = i => L + (W - L - R) * i / (wk.length + fut - 1), y = v => T + (H - T - B) * (1 - v / max);
+  let g = '';
+  for (let k = 0; k <= 4; k++) { const v = max * k / 4; g += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="#E1EAE5"/><text x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${v}</text>`; }
+  const pts = wk.map((v, i) => `${x(i)},${y(v)}`).join(' ');
+  g += `<polygon points="${x(0)},${y(0)} ${pts} ${x(wk.length - 1)},${y(0)}" fill="#146C4A" fill-opacity=".1"/>`;
+  g += `<polyline points="${pts}" fill="none" stroke="#146C4A" stroke-width="2.5" stroke-linejoin="round"/>`;
+  g += `<polyline points="${x(wk.length - 1)},${y(wk[wk.length - 1])} ${fc.map((v, i) => `${x(wk.length + i)},${y(v)}`).join(' ')}" fill="none" stroke="#146C4A" stroke-width="2" stroke-dasharray="5 4"/>`;
+  g += `<circle cx="${x(wk.length - 1)}" cy="${y(wk[wk.length - 1])}" r="4.5" fill="#146C4A" stroke="#fff" stroke-width="2"/>`;
+  g += `<text x="${x(wk.length - 1)}" y="${y(wk[wk.length - 1]) - 10}" text-anchor="middle" style="fill:#12261E;font-weight:700">${Math.round(wk[wk.length - 1])}</text>`;
+  g += `<line x1="${x(wk.length - 1)}" x2="${x(wk.length - 1)}" y1="${T}" y2="${H - B}" stroke="#C9D8D0" stroke-dasharray="2 3"/>`;
+  g += `<text x="${x(0)}" y="${H - 8}">12 minggu lalu</text><text x="${x(wk.length - 1)}" y="${H - 8}" text-anchor="middle">kini</text><text x="${W - R}" y="${H - 8}" text-anchor="end">+12 minggu</text>`;
+  $('growth').innerHTML = g;
+  $('growthNote').textContent = m.perWeek > 0 ? `Purata +${m.perWeek.toFixed(1)} masjid aktif seminggu. Jika berterusan: ~${Math.round(fc[fut - 1])} masjid dalam 12 minggu.` : 'Belum cukup data untuk unjuran.';
+
+  $('scale').innerHTML = m.scale.map(z => `<tr class="${z.now ? 'now' : ''}"><td class="n">${z.n.toLocaleString('ms-MY')}${z.now ? ' (kini)' : ''}</td><td class="n">${z.tvs.toLocaleString('ms-MY')}</td><td class="n">${fmtB(z.e)}</td><td class="n">${fmtB(z.st)}</td><td>${z.supa}</td><td>${z.resend}</td><td class="n">${z.rm.toFixed(0)}</td></tr>`).join('');
+
+  const cal = r.calibration;
+  $('calNote').innerHTML = cal ? `Terakhir: <b>${new Date(cal.measured_on).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long' })}</b> · egress ${cal.egress_gb} GB, cached ${cal.cached_egress_gb ?? '—'} GB · faktor ×${cal.factor_egress} / ×${cal.factor_cached ?? '—'}` : 'Belum pernah diselaraskan. Anggaran mungkin tersasar ±50%.';
+  $('calDate').value = c.today;
+  $('sPlan').value = s.plan; $('sCompute').value = s.compute; $('sResend').value = s.resend_plan; $('sCycle').value = s.cycle_day; $('sFx').value = s.fx_rm_per_usd; $('sDom').value = s.domain_rm_per_year;
+  $('priceNote').textContent = `Harga dan had disemak ${new Date(s.prices_checked_on).toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' })}. Had dan harga disimpan dalam jadual usage_settings.`;
+}
+render(REPORT);
+$('refresh').addEventListener('click', () => { REPORT.generated_at = new Date().toISOString(); render(REPORT); });
+$('calForm').addEventListener('submit', e => { e.preventDefault(); $('calToast').textContent = 'Disimpan. (Contoh: dalam aplikasi ini memanggil usage_calibrate.)'; });
+$('setForm').addEventListener('submit', e => { e.preventDefault(); const s = REPORT.settings; s.plan = $('sPlan').value; s.compute = $('sCompute').value; s.resend_plan = $('sResend').value; s.cycle_day = +$('sCycle').value; s.fx_rm_per_usd = +$('sFx').value; s.domain_rm_per_year = +$('sDom').value; render(REPORT); $('setToast').textContent = 'Disimpan.'; });
+</script>
+</body></html>

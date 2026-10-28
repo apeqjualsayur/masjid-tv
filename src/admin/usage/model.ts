@@ -13,6 +13,8 @@ export const DB_BASE_BYTES = 30e6;
 /** Calibration factors apply for this many days after measured_on (PRD §2). */
 export const CALIBRATION_DAYS = 45;
 export const SCALE_STEPS = [50, 100, 250, 500, 1000];
+/** usage-digest counts emails every 2 days; warn when the last count is older than this (PRD §7). */
+export const EMAIL_SYNC_MAX_HOURS = 50;
 
 export type MetricKey = "egress" | "cached" | "db" | "storage" | "rps" | "email_day" | "email_month" | "mau";
 export type Level = "ok" | "warn" | "crit";
@@ -285,7 +287,7 @@ export function model(r: UsageReport): UsageModel {
   const calDays = cal ? days(c.today, cal.measured_on) : null;
   if (calDays == null || calDays > 30) actions.push({ code: "calibrate", level: "info", days: calDays });
   const syncHours = ctd.emails_synced_at ? hours(r.generated_at, ctd.emails_synced_at) : null;
-  if (syncHours == null || syncHours > 26) actions.push({ code: "email_sync", level: "warn", hours: syncHours });
+  if (syncHours == null || syncHours > EMAIL_SYNC_MAX_HOURS) actions.push({ code: "email_sync", level: "warn", hours: syncHours });
   const snapHours = r.snapshot_at ? hours(r.generated_at, r.snapshot_at) : null;
   if (snapHours == null || snapHours > 2) actions.push({ code: "snapshot", level: "warn", hours: snapHours });
   const priceDays = days(c.today, s.prices_checked_on);

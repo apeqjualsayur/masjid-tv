@@ -1,7 +1,7 @@
 // Usage model (_specs/30-PRD-usage.md §2, §3, §6; acceptance §10 item 7).
 import { describe, expect, it } from "vitest";
 import fixture from "../../../tests/fixtures/usage-report.json";
-import { CALIBRATION_DAYS, DB_BASE_BYTES, GB, addDays, costUsd, level, linSlope, model, pickCompute, toRm, weekly } from "./model";
+import { CALIBRATION_DAYS, DB_BASE_BYTES, EMAIL_SYNC_MAX_HOURS, GB, addDays, costUsd, level, linSlope, model, pickCompute, toRm, weekly } from "./model";
 import type { UsageDay, UsageReport } from "./types";
 
 const base = fixture as UsageReport;
@@ -337,12 +337,12 @@ describe("actions (PRD §7)", () => {
     expect(codes(report((x) => { quiet(x); x.calibration!.measured_on = addDays(x.cycle.today, -30); }))).toEqual(["none"]);
   });
 
-  it("email_sync: never, or more than 26 hours ago", () => {
+  it(`email_sync: never, or more than ${EMAIL_SYNC_MAX_HOURS} hours ago (job runs every 2 days)`, () => {
     const at = (iso: string | null) => report((x) => { quiet(x); x.cycle_to_date.emails_synced_at = iso; });
     expect(model(at(null)).actions).toEqual([{ code: "email_sync", level: "warn", hours: null }]);
-    expect(model(at("2026-10-26T23:00:00Z")).actions).toEqual([{ code: "email_sync", level: "warn", hours: 27 }]); // generated 02:00Z
-    expect(codes(at("2026-10-27T00:00:00Z"))).toEqual(["none"]); // exactly 26 h
-    expect(codes(at("2026-10-27T01:00:00Z"))).toEqual(["none"]); // 25 h
+    expect(model(at("2026-10-25T23:00:00Z")).actions).toEqual([{ code: "email_sync", level: "warn", hours: 51 }]); // generated 02:00Z
+    expect(codes(at("2026-10-26T00:00:00Z"))).toEqual(["none"]); // exactly 50 h
+    expect(codes(at("2026-10-26T04:00:00Z"))).toEqual(["none"]); // 46 h: normal between runs
   });
 
   it("snapshot: never, or more than 2 hours ago", () => {

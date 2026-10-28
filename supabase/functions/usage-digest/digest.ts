@@ -10,11 +10,15 @@ export const myDate = (ms: number) => new Date(ms + MYT_MS).toISOString().slice(
 /** Instant of 00:00 Malaysian time on a 'YYYY-MM-DD'. */
 export const myMidnight = (ymd: string) => Date.parse(`${ymd}T00:00:00Z`) - MYT_MS;
 
-/** Malaysian today and yesterday, and the instant counting starts from (00:00 yesterday). */
-export function countWindow(nowMs: number): { today: string; yesterday: string; fromMs: number } {
-  const today = myDate(nowMs);
-  const yesterday = myDate(myMidnight(today) - DAY_MS);
-  return { today, yesterday, fromMs: myMidnight(yesterday) };
+/**
+ * The job runs every 2 days, so it recounts the last COUNT_DAYS Malaysian days (oldest first) to cover
+ * the gap since the previous run. fromMs = 00:00 of the oldest day. usage_set_emails keeps the larger count.
+ */
+export const COUNT_DAYS = 3;
+export function countWindow(nowMs: number): { days: string[]; fromMs: number } {
+  const today = myMidnight(myDate(nowMs));
+  const days = Array.from({ length: COUNT_DAYS }, (_, i) => myDate(today - (COUNT_DAYS - 1 - i) * DAY_MS));
+  return { days, fromMs: myMidnight(days[0]) };
 }
 
 /** Resend's created_at looks like "2026-10-28 02:13:55.977+00"; also accepts ISO. NaN when unreadable. */

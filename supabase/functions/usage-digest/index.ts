@@ -1,6 +1,6 @@
-// Supabase Edge Function `usage-digest` (Deno), _specs/30-PRD-usage.md §8. Called every 6 hours by
+// Supabase Edge Function `usage-digest` (Deno), _specs/30-PRD-usage.md §8. Called every 2 days by
 // pg_cron + pg_net (secrets in Vault), or by hand with curl:
-//   1. counts Resend emails for yesterday and today (Malaysian days) → usage_set_emails
+//   1. counts Resend emails for the last 3 Malaysian days → usage_set_emails
 //   2. usage_report() → shared usage model → usage_mark_alert(metric, level) for each warn/crit item
 //      (true only the first time per billing cycle), plus 'snapshot' when it is older than 2 hours
 //   3. new items → ONE email to OWNER_EMAIL
@@ -24,8 +24,8 @@ const MAX_PAGES = 50;
 const json = (status: number, body: unknown) => new Response(JSON.stringify(body), { status, headers: { "Content-Type": "application/json" } });
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-/** Emails sent yesterday and today (Malaysian days), or null when Resend could not be read. */
-async function countEmails(nowMs: number): Promise<{ today: string; yesterday: string; counts: Record<string, number> } | null> {
+/** Emails sent per Malaysian day over the count window, or null when Resend could not be read. */
+async function countEmails(nowMs: number): Promise<{ days: string[]; counts: Record<string, number> } | null> {
   if (!RESEND_API_KEY) {
     console.error("resend list: RESEND_API_KEY not set");
     return null;
@@ -48,7 +48,7 @@ async function countEmails(nowMs: number): Promise<{ today: string; yesterday: s
     }
     after = addPage(counts, (await res.json()) as ResendListPage, w.fromMs);
   }
-  return { today: w.today, yesterday: w.yesterday, counts };
+  return { days: w.days, counts };
 }
 
 Deno.serve(async (req) => {
@@ -61,7 +61,7 @@ Deno.serve(async (req) => {
   const em = await countEmails(Date.now());
   if (em) {
     emailsCounted = 0;
-    for (const day of [em.yesterday, em.today]) {
+    for (const day of em.days) {
       const n = em.counts[day] ?? 0;
       emailsCounted += n;
       const { error } = await db.rpc("usage_set_emails", { p_day: day, p_sent: n });

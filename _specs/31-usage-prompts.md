@@ -86,7 +86,7 @@ Run npm run sync:usage-model, npm test and npm run build; paste the summary line
 Create supabase/functions/usage-digest/index.ts per _specs/30-PRD-usage.md §8.
 - Reject unless header x-cron-secret equals Deno.env.get('CRON_SECRET') → 401 with no detail.
 - Use SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from the Edge runtime, and the Resend key secret name found in U0.
-- Email count: GET https://api.resend.com/emails?limit=100, follow has_more/after, wait 600 ms between pages, stop once created_at is before 00:00 yesterday (Asia/Kuala_Lumpur). Group by Malaysian date; rpc usage_set_emails for yesterday and today. If Resend fails, log only the HTTP status and continue.
+- Email count: GET https://api.resend.com/emails?limit=100, follow has_more/after, wait 600 ms between pages, stop once created_at is before 00:00 two days ago (Asia/Kuala_Lumpur). Group by Malaysian date; rpc usage_set_emails for each of the last 3 days (the job runs every 2 days). If Resend fails, log only the HTTP status and continue.
 - Alerts: rpc usage_report → model from ../_shared/usage-model.ts → for every metric at warn or crit, rpc usage_mark_alert(metric, level); keep those that return true. Add a 'snapshot' item if snapshot_at is older than 2 hours (also through usage_mark_alert).
 - If any items: send ONE email via Resend (same sender as the existing notify function) to Deno.env.get('OWNER_EMAIL'). Subject: "Masjid View: <worst metric> <used %> (<Perhatian|Tindakan>)". Body in BM: one line per item (used, projected, action), then https://masjidview.my/admin/platform?tab=penggunaan. Plain text + simple HTML.
 - Respond with JSON {emails_counted, alerts_sent}. Never log keys or email addresses.
@@ -94,7 +94,7 @@ Then give me non-coder steps for masjidview-dev:
 1. supabase secrets set CRON_SECRET=… OWNER_EMAIL=…  (with --project-ref for dev)
 2. supabase functions deploy usage-digest --no-verify-jwt
 3. One curl command to call it with the x-cron-secret header.
-4. SQL for the dev SQL editor: vault.create_secret for 'project_url' and 'cron_secret', and cron.schedule('masjidview-usage-digest', '7 */6 * * *', …) using net.http_post with the URL and header read from vault.decrypted_secrets. Show me the SQL; I will run it.
+4. SQL for the dev SQL editor: vault.create_secret for 'project_url' and 'cron_secret', and cron.schedule('masjidview-usage-digest', '7 0 */2 * *', …) using net.http_post with the URL and header read from vault.decrypted_secrets. Show me the SQL; I will run it.
 ```
 **Check (dev):**
 1. The curl call returns `{"emails_counted": …, "alerts_sent": 0}`; `select * from usage_email_daily;` has today.
@@ -148,7 +148,7 @@ Prepare the production rollout of usage monitoring. Do not run anything against 
 - Every paired TV still shows content and `screens.last_seen_at` is within the last 2 minutes.
 - `select count(*) from usage_screen_daily where day = public.usage_today();` ≈ number of online TVs.
 - The tab at `https://masjidview.my/admin/platform?tab=penggunaan` loads; the first calibration is saved.
-- Next morning: `select * from usage_email_daily order by day desc limit 2;` has rows, and the "Kiraan emel" action is not shown.
+- After the first scheduled run (08:07 Malaysian time on an odd day of the month): `select * from usage_email_daily order by day desc limit 3;` has rows, and the "Kiraan emel" action is not shown.
 
 **Monthly routine (5 minutes):** Supabase → Usage → copy Egress and Cached Egress into the Selaraskan form. When you upgrade any plan, update "Pelan dan kadar" the same day.
 

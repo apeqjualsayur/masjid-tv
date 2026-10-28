@@ -18,10 +18,10 @@ describe("Malaysian days", () => {
     expect(myDate(Date.parse("2026-10-27T16:00:00Z"))).toBe("2026-10-28");
   });
 
-  it("counting starts at 00:00 yesterday, Malaysian time", () => {
+  it("counts the last 3 Malaysian days (runs every 2 days), from 00:00 of the oldest", () => {
     const w = countWindow(Date.parse("2026-10-28T01:30:00Z")); // 09:30 MYT
-    expect(w).toEqual({ today: "2026-10-28", yesterday: "2026-10-27", fromMs: Date.parse("2026-10-26T16:00:00Z") });
-    expect(countWindow(Date.parse("2026-11-01T00:10:00Z")).yesterday).toBe("2026-10-31");
+    expect(w).toEqual({ days: ["2026-10-26", "2026-10-27", "2026-10-28"], fromMs: Date.parse("2026-10-25T16:00:00Z") });
+    expect(countWindow(Date.parse("2026-11-01T00:10:00Z")).days).toEqual(["2026-10-30", "2026-10-31", "2026-11-01"]);
   });
 
   it("reads Resend's timestamp format and ISO", () => {

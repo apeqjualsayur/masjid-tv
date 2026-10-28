@@ -55,7 +55,7 @@ Overall verdict = worst metric. **Recommended plan**: Supabase Pro if any Supaba
 ```
 TV ──screen_bundle (every 60 s)──▶ usage_note_ping() ──▶ usage_screen_daily (1 row / screen / day)
 pg_cron hourly ──▶ usage_snapshot() ──▶ usage_daily (1 row / day, kept forever)
-pg_cron every 6 h ──pg_net──▶ Edge Function usage-digest
+pg_cron every 2 days ──pg_net──▶ Edge Function usage-digest
         ├─ Resend GET /emails ──▶ usage_set_emails(day, n) ──▶ usage_email_daily
         └─ usage_report() → levels → usage_mark_alert() → Resend email to owner (first time only)
 Owner /admin/platform?tab=penggunaan ──▶ platform_usage()  (JSON)  ──▶ model.ts ──▶ UI
@@ -105,13 +105,13 @@ Match `designs/admin/D-Usage.html` (computer 1440 px; phone 390 px stacks to one
 
 Header shows "Dikemas kini HH:MM" and **Muat semula** (re-calls the RPC). Auto-refresh every 5 minutes while the tab is visible. Empty state (< 2 days of data): meters still show exact metrics; flows show "Mengumpul data (hari 1 / 2)"; growth chart shows "Belum cukup data".
 
-Actions rules (ordered: crit, warn, info): one per non-ok metric with its fix; backups (Free and approved ≥ threshold); calibration missing or > 30 days old; email sync older than 26 h; snapshot older than 2 h; prices checked > 180 days ago; else "Tiada tindakan diperlukan".
+Actions rules (ordered: crit, warn, info): one per non-ok metric with its fix; backups (Free and approved ≥ threshold); calibration missing or > 30 days old; email sync older than 50 h (the job runs every 2 days); snapshot older than 2 h; prices checked > 180 days ago; else "Tiada tindakan diperlukan".
 
 All text via `ms.json` / `en.json`. Charts are inline SVG (no chart library). Numbers use `font-variant-numeric: tabular-nums`.
 
 ## 8. Alert email (Edge Function `usage-digest`)
 
-Runs every 6 hours (pg_cron + pg_net, secrets in Vault). Steps: count Resend emails for yesterday and today (Malaysian days) → `usage_set_emails`; get `usage_report()`; compute levels with the shared model; for each metric at warn/crit where `usage_mark_alert(metric, level)` returns true, include it; also include "snapshot stale > 2 h". If anything is included, send one email to `OWNER_EMAIL`:
+Runs every 2 days at 08:07 Malaysian time (`7 0 */2 * *` UTC; owner's choice 2026-10-28: registrations are not daily, so faster alerts are not needed; pg_cron + pg_net, secrets in Vault). An alert can therefore arrive up to 2 days after a limit is crossed. Steps: count Resend emails for the last 3 Malaysian days (covers the gap since the previous run; `usage_set_emails` keeps the larger count) → `usage_set_emails`; get `usage_report()`; compute levels with the shared model; for each metric at warn/crit where `usage_mark_alert(metric, level)` returns true, include it; also include "snapshot stale > 2 h". If anything is included, send one email to `OWNER_EMAIL`:
 Subject `Masjid View: Egress 74% (Perhatian)` (worst item first). Body: each item with used, projected and the action line, plus a link to `https://masjidview.my/admin/platform?tab=penggunaan`.
 Auth: header `x-cron-secret` must equal secret `CRON_SECRET`; deployed with `--no-verify-jwt`. Never logs keys.
 

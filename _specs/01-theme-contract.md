@@ -1,8 +1,10 @@
-# Theme Contract (v0.2 — adds Friday info)
+# Theme Contract (v0.3 — adds 4 themes, the `poster` layout and iqamah time)
 
 Every theme is a self-contained folder `src/themes/<id>/` that implements the interface below. The engine (time, modes, data, playlist) never contains theme styling; themes never contain prayer logic.
 
-Visual references: `designs/` (`A-*` = Alam, `D-*` = Serambi, `F-*` = Tenang). The `.dc.html` files are design-tool source (they do not run standalone): read the markup, inline styles and the data in each file's script block; values below are copied from them.
+Visual references: `_specs/designs/` (`A-*` = Alam, `D-*` = Serambi, `F-*` = Tenang, `G-*` = Falak, `I-*` = Garis Masa, `J-*` = Kerawang, `K-*` = Seterusnya). The `.dc.html` files are design-tool source (they do not run standalone): read the markup, inline styles and the data in each file's script block; values below are copied from them. **G/I/J/K mockups are 1280×720: every value below is already ×1.5 and raised to the §2 minimums (`40-PRD-themes-round2.md` D4).**
+
+v0.3 changes (2026-10-29): `LayoutKey` `poster`, `WaktuView.iqamah`, `posterArea` incl. `poster`, `screens.unavailable` (already in code), templates `area` prop, rules 14–19, sections 6–9 (Falak, Garis Masa, Kerawang, Seterusnya).
 
 ---
 
@@ -11,7 +13,7 @@ Visual references: `designs/` (`A-*` = Alam, `D-*` = Serambi, `F-*` = Tenang). T
 ```ts
 export type PhaseKey = 'subuh' | 'zohor' | 'asar' | 'maghrib' | 'isyak';
 export type WaktuKey = 'imsak' | 'subuh' | 'syuruk' | 'zohor' | 'asar' | 'maghrib' | 'isyak';
-export type LayoutKey = 'full' | 'bottom' | 'side';
+export type LayoutKey = 'full' | 'bottom' | 'side' | 'poster';   // poster = announcement-only screen (rules 14–17)
 
 export interface WaktuView {
   key: WaktuKey;
@@ -20,6 +22,7 @@ export interface WaktuView {
   time: string;         // "1:05" (already formatted)
   state: 'past' | 'current' | 'next' | 'upcoming';
   isMarker: boolean;    // imsak, syuruk
+  iqamah?: string;      // "1:15": azan + iqamahMin[key], formatted like `time`. Undefined for imsak, syuruk and Friday zohor.
 }
 
 export interface DisplayState {
@@ -55,19 +58,21 @@ export interface FridayInfo {
 }
 
 export interface ThemeDefinition {
-  id: 'alam' | 'serambi' | 'tenang';
-  name: string;                 // shown in admin: "Alam", "Serambi", "Tenang"
+  id: 'alam' | 'serambi' | 'tenang' | 'falak' | 'garis' | 'kerawang' | 'seterusnya';
+  name: string;                 // shown in admin: "Alam", "Serambi", "Tenang", "Falak", "Garis Masa", "Kerawang", "Seterusnya"
   fonts: string[];              // font families to self-host
-  layouts: Record<LayoutKey, React.FC<{ s: DisplayState; slide?: SlideView }>>;
+  layouts: Record<LayoutKey, React.FC<{ s: DisplayState; slide?: SlideView; slideKey?: string; counter?: { position: number; total: number } }>>;
+  posterArea: Record<'bottom' | 'side' | 'poster', { x: number; y: number; w: number; h: number }>; // rule 10
   screens: {
     preAzanBanner: React.FC<{ s: DisplayState }>;
     azan: React.FC<{ s: DisplayState }>;
     iqamah: React.FC<{ s: DisplayState }>;
     solat: React.FC<{ s: DisplayState }>;
     khutbah: React.FC<{ s: DisplayState }>;   // must show "Dijangka tamat ±{s.friday.solatStart}" + thin progress line (s.modeProgress)
+    unavailable: React.FC<{ u: UnavailableState }>; // "Data waktu tidak tersedia" (in code since v0.1)
   };
   fridayInfo: React.FC<{ s: DisplayState }>;   // the Friday strip (rule 12); render nothing if !s.friday
-  templates: Record<TemplateKey, React.FC<{ s: DisplayState; fields: any }>>; // all 10
+  templates: Record<TemplateKey, React.FC<{ s: DisplayState; fields: any; area: 'bottom' | 'side' | 'poster' }>>; // all 10; `area` (rule 18)
   posterFrame: React.FC<{ s: DisplayState; imageUrl: string }>;
 }
 ```
@@ -83,8 +88,8 @@ export interface ThemeDefinition {
 7. Kematian template: no accent colours, no decoration, regardless of theme.
 8. Arabic text uses `lang="ar" dir="rtl"`.
 9. Labels in BM. Status words: **SEKARANG**, **SETERUSNYA**.
-10. **Poster/announcement area has a fixed aspect ratio in every theme** (so the admin app's recommended poster sizes fit all themes): **`bottom` layout = 12:5** (e.g. 1824×760 or 1920×800 inside the stage); **`side` layout = 5:4** (e.g. 1260×1008 or 1350×1080). The area may sit inside a card with padding, but the poster box itself must be exactly this ratio. Expose it as `posterArea: Record<'bottom'|'side', {x,y,w,h}>` on the `ThemeDefinition`. The mockups in `designs/` vary slightly — the ratio rule wins. (Added in Phase 2; see `10-PRD-phase2.md` §6.)
-11. Announcement templates must render correctly inside the poster area at both ratios and in the admin live preview (scaled stage).
+10. **Poster/announcement area has a fixed aspect ratio in every theme** (so the admin app's recommended poster sizes fit all themes): **`bottom` layout = 12:5** (e.g. 1824×760 or 1920×800 inside the stage); **`side` layout = 5:4** (e.g. 1260×1008 or 1350×1080); **`poster` layout = 16:9, the full stage 0,0,1920,1080**. The area may sit inside a card with padding, but the poster box itself must be exactly this ratio. Expose it as `posterArea: Record<'bottom'|'side'|'poster', {x,y,w,h}>` on the `ThemeDefinition`. The mockups in `designs/` vary slightly — the ratio rule wins. One poster size fits every theme: the round-2 themes use bottom **48,24,1824,760** with the prayer bar below it (owner decision 2026-10-29; the G/I/J/K-Bottom split layouts are not used). (Added in Phase 2; see `10-PRD-phase2.md` §6.)
+11. Announcement templates must render correctly inside the poster area at all three ratios and in the admin live preview (scaled stage). See rule 18.
 12. **Friday strip** (`fridayInfo`), shown by every layout when `s.friday` is set and mode is `normal` or `pre_azan`:
     - Text: **SOLAT JUMAAT** label, then `Azan {azan} · Khutbah {khutbahStart} (±{khutbahMin} minit) · Solat ±{solatStart}`. Text ≥ 30 px; label weight ≥ 700.
     - `full`: a pill directly under the date/countdown block, never covering the prayer list.
@@ -93,6 +98,14 @@ export interface ThemeDefinition {
     - Colours from the phase tokens (accent fill at low opacity + accent text); Serambi uses gold. No animation except a fade in/out.
     - The Jumaat row in the prayer list keeps its normal look; the strip is extra information, not a replacement.
 13. Khutbah screen: title "Khutbah sedang disampaikan", clock, "Dijangka tamat ±{s.friday.solatStart}", thin progress line from `s.modeProgress`; calm, no countdown digits ticking every second.
+14. **`poster` layout** renders the current slide edge-to-edge in the 1920×1080 stage (16:9). The only chrome is a small **brand chip** (logo + short name, text ≥ 18 px, bottom-left, 48 px safe margin, theme colours, 70 % opacity). No frame, border or decoration around the slide beyond what the theme's `posterFrame` / template already draws.
+15. **`poster` layout never shows** a clock, seconds, date (Gregorian or Hijri), prayer names or times, countdown, ticker, Friday strip, slide counter, or any mode screen: prayer modes never replace the slides (PRD round 2 D2; the engine sets `mode: 'normal'` for poster screens). It still receives `s.phase`, only to tint theme colours (D3).
+16. Poster images in `poster` layout: `contain` + blurred copy as fill (no blur in `lite`), 16:9 area.
+17. **Empty state** (no slide to show): a calm card with logo, full masjid name and "Tiada pengumuman buat masa ini". No prayer data. Never blank, never an error text.
+18. Every template renders correctly in **all three** areas (12:5, 5:4, 16:9) and in the admin live preview. Layout adapts to `area`; text never clips; minimum sizes unchanged.
+19. **Unknown theme or layout** (e.g. an older TV app receiving a newer id) falls back to `tenang` / `full`: never a crash or a blank screen (PRD round 2 D7).
+
+Round-2 themes follow rules 2, 3, 6, 7, 8, 12 and 13 exactly as written above; there is no exception for any of them. Their Arabic text (e.g. the `ayat` template) uses **Noto Naskh Arabic** 400–600 (already self-hosted).
 
 ---
 
@@ -193,13 +206,128 @@ export interface ThemeDefinition {
 
 ---
 
-## 6. Template coverage in references
+## Round-2 themes: common Bottom layout
 
-| Template | Reference to adapt for all 3 themes |
+In all four themes below, **Bottom** = poster area **1824×760 at 48,24** (rule 10) with a ~**296 px prayer bar** under it holding the theme's clock element and the 7 waktu (time ≥ 44, current = different fill + weight). The Friday strip is a pill on the bar's top edge; the poster keeps its size. The `*-Bottom` mockups are references for colours and the template card only; their split layouts are replaced (owner decision 2026-10-29).
+
+---
+
+## 6. Theme: `falak` (Konsep G, "Falak")
+
+**Concept:** analogue dial; digital time in a small window under the pivot; rim arc = progress since the current waktu.
+
+**Fonts:** Fraunces 500–600 (masjid name, prayer names, footers) · Manrope 300 / 500 / 700
+
+**Per-phase tokens** (dial face is automatic by phase, PRD D6)
+
+| phase | bg | face | plate | ink | hand | sec |
+|---|---|---|---|---|---|---|
+| subuh | #26305E | dark | #12161C | #EFE7D3 | #F3EBD8 | #E3B25A |
+| zohor | #14566A | light | #F7F1E3 | #23252B | #1D1F24 | #B3541E |
+| asar | #6A4E2A | light | #F7F1E3 | #23252B | #1D1F24 | #B3541E |
+| maghrib | #7A2F3A | dark | #12161C | #EFE7D3 | #F3EBD8 | #E3B25A |
+| isyak | #0E1428 | dark | #12161C | #EFE7D3 | #F3EBD8 | #E3B25A |
+
+**Fixed tokens**
+- Text #F7F1E3; gold #E9BD63 (progress arc, waktu dots, dial labels); dial rim rgba(255,255,255,0.16)
+- Current row pill #F7F1E3 with ink #1B1D22; row rule rgba(247,241,227,0.16); bar / side column rgba(0,0,0,0.26)
+- Template card #F7F1E3 / #1B1D22, card line #D9D1BD, muted #3A3D45; Iqamah label on the light face #8A4A12
+
+**Rules**
+- The dial shows only waktu within the next 12 hours (avoids the Syuruk/Maghrib collision on a 12-h face). Current dot r = 11 (SVG units), others r = 7.
+- Hands step once a second; no CSS transitions on hands in `lite`.
+- Imsak/Syuruk rows opacity 0.74. **Current:** pill fill + name 600 / time 700 (rule 2). **Next:** the "X dalam …" line.
+- Iqamah: the dial with a draining rim, countdown inside the dial.
+
+**Sizes (Full):** dial 936 (1 SVG unit ≈ 2.03 px); dial time 49/500; dial labels 35/700; masjid name 42/600; "● WAKTU" 22.5/700; remaining 90/300; row name 39/500; row time **54**/500.
+**Side:** column 600; dial 300; row name 33, time **54**. **Iqamah:** dial 780; countdown 146/300; footer 51.
+**References:** `G-Full` (canvas Main), `G-Bottom` (Pengumuman card), `G-Side` (Kewangan card), `G-Iqamah`.
+
+---
+
+## 7. Theme: `garis` (Konsep I, "Garis Masa")
+
+**Concept:** the day as one proportional bar from Imsak to Isyak + 72 min; segment width (or height in Side) = real duration.
+
+**Fonts:** Fraunces 500–600 · Manrope 200 (clock, countdown) / 500 / 700
+
+**Per-phase tokens:** bg subuh #141A33 · zohor #0F2230 · asar #241C10 · maghrib #2A1419 · isyak #0A0F1F. Accent = colour of the current segment.
+
+| segment | imsak | subuh | syuruk (to zohor, neutral) | zohor | asar | maghrib | isyak |
+|---|---|---|---|---|---|---|---|
+| colour | #7A84AE | #B8A9F0 | #2D3A4A (ink #A9B6C4) | #8CCBF2 | #EDC27F | #F09A8C | #8FA5F0 |
+
+**Fixed tokens**
+- Text #F4F1EA; segment ink #10151F; now-line and now-chip #FFFFFF (chip ink #10151F); label rule rgba(255,255,255,0.3)
+- Side column rgba(255,255,255,0.05); template card #F4F1EA / #10151F, card line #DCD6C8
+
+**Rules**
+- Segments: past **0.42** · current 1 + glow `0 0 42px <colour>` (none in `lite`) · upcoming 0.72. Gap 4.5 px, min width 6 px.
+- Labels under the bar at each segment start; if two are closer than 140 px, stagger the second vertically. **Side:** push labels apart to ≥ 64 px with a thin leader line to the true point.
+- Between Isyak + 72 min and the next Imsak the now-marker clamps to the right end.
+- The neutral segment is labelled "Syuruk"; Imsak is a small note; Friday: "Jumaat". Current label time 700 (rule 2).
+- Iqamah: **10 equal blocks, each = 10 % of `iqamahMin`** for that waktu, draining left to right; no block numbers (the countdown shows the time).
+
+**Sizes (Full):** clock 375/200; "Baki …" 45; bar 1680×96 (radius 15); segment label 30/700; now-chip 36/700; label name 25.5, time **54**.
+**Bottom bar:** clock 120/200; timeline ~1300×72; label time 44. **Side:** clock 150/200; bar 39×630; label time **54**. **Iqamah:** countdown 435/200; blocks 66 tall, gap 12.
+**References:** `I-Full`, `I-Bottom`, `I-Side`, `I-Iqamah`.
+
+---
+
+## 8. Theme: `kerawang` (Konsep J, "Kerawang")
+
+**Concept:** carved Malay timber arch panels; the current panel is gold-lit. Patterns are SVG `<pattern>`s drawn once, never per frame. *Motifs are simplified and need review by someone who knows Malay carving before launch.*
+
+**Fonts:** Fraunces 500–600 · Manrope 200 (iqamah countdown) / 300 / 500 / 700
+
+**Per-phase tokens:** bg subuh #3F3552 · zohor #5E3D24 · asar #6C4626 · maghrib #5C2B27 · isyak #241A28, with grain `repeating-linear-gradient(90deg, rgba(0,0,0,.06) 0 3px, transparent 3px 12px)`.
+
+**Fixed tokens**
+- Text #F6EBD4; gold #F2C45A; timber #2E1B0F
+- Unlit plaque #3A2414, border #8A6428, carving #4E3120; "awan" border motif #D4A94E in 39 px bands top and bottom (tile 90×39); carving tile 72
+- Template card #F6EBD4 / #2E1B0F with a 9 px #D4A94E frame and inset rings #F6EBD4 / #8A6428; muted #4A3322, line #C9B58A
+
+**Rules**
+- **Current:** gold border + gold plaque (ink #2E1B0F) + glow `0 0 105px 9px rgba(242,196,90,.55)` (none in `lite`) + time 700. Imsak/Syuruk 0.82.
+- Arch radius in explicit px (Full 129 top / 21 bottom), never 999px.
+- **Kematian:** no pattern, no gold: plain #2E1B0F panel.
+
+**Sizes (Full):** header 177 tall (name 51/600, clock 138/300, next line 30); panel border 6; plaque 225 tall, name 39/600, time 69/500.
+**Bottom bar:** short arch panels, plaque time 48. **Side:** column 600; clock 114/300; carving strip 105; name 34.5, time **54**; poster 1185×948 (5:4). **Iqamah:** arch 660×912 (radius 330, gold border 9) filling with light from the bottom as time passes; countdown 315/200; footer 57.
+**References:** `J-Full`, `J-Bottom`, `J-Side`, `J-Iqamah`.
+
+---
+
+## 9. Theme: `seterusnya` (Konsep K, "Seterusnya")
+
+**Concept:** the next waktu is the hero, with its azan and iqamah times (PRD D5) and a countdown ring.
+
+**Fonts:** Manrope 300 / 500 / 700 / 800 (no other family)
+
+**Per-phase tokens:** bg subuh #3A2F7A · zohor #0E6C8A · asar #9A5B10 · maghrib #A8323F · isyak #101B4A.
+
+**Fixed tokens**
+- Text #FFFFFF; waktu cell rgba(255,255,255,0.12)
+- **Next** cell #FFFFFF with ink = phase bg; **current** cell rgba(255,255,255,0.24) + 3 px #FFFFFF border + name 800 (rule 2)
+- Ring track rgba(255,255,255,0.2), arc #FFFFFF; template card #FFFFFF / #14202B, line #DCE3EA, muted #3D4A56
+
+**Rules**
+- Hero = `s.next` (never a marker); iqamah = `WaktuView.iqamah`. Friday Zohor (Jumaat): azan + khutbah start (`s.friday.khutbahStart`), no iqamah.
+- The ring updates every second in Full and once a minute in Bottom; Side shows text only.
+
+**Sizes (Full):** "SETERUSNYA" 30/700; hero name 198/800; azan 138/700; iqamah 138/300; ring 510 (stroke 27), remaining 93/700; strip 168 tall, cell time **54**/500.
+**Bottom bar:** compact hero (name 66/800, azan + iqamah 54, ring 200); cells time 48. **Side:** column 660; hero 96/800; azan + iqamah columns **54**. **Iqamah:** countdown 495/800; bar 1140×12.
+**References:** `K-Full`, `K-Bottom`, `K-Side`, `K-Iqamah`.
+
+---
+
+## 10. Template coverage in references
+
+| Template | Reference to adapt for all 7 themes |
 |---|---|
-| kuliah | A-Bottom |
+| kuliah | A-Bottom; also G/I/J/K-Bottom ("Pengumuman am" card) |
 | program | D-Bottom |
 | ayat | D-Side |
 | pengumuman | F-Bottom |
-| kewangan | F-Side |
+| kewangan | F-Side; also G/I/J/K-Side |
 | kematian, infaq, imam_bilal, mesyuarat, ucapan | No reference in launch themes yet: design within each theme's tokens following §2 rules (sober Kematian) |

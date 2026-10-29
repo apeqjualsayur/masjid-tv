@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Garis Masa Iqamah</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Manrope:wght@200;300;500;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1280px; height: 720px; box-sizing: border-box; padding: 40px 80px 36px; display: flex; flex-direction: column; justify-content: space-between; background: {{g.bg}}; color: #F4F1EA; font-family: 'Manrope', sans-serif">
+  <div style="display: flex; justify-content: space-between; align-items: center">
+    <div style="display: flex; align-items: center; gap: 14px">
+      <svg width="30" height="36" viewBox="0 0 40 48" aria-hidden="true"><path d="M6 46V20a14 14 0 0 1 28 0v26" fill="none" stroke="#F4F1EA" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="24" r="5" fill="{{g.acc}}"/></svg>
+      <div style="font-family: 'Fraunces', serif; font-weight: 600; font-size: 26px">Masjid Al-Hidayah</div>
+    </div>
+    <div style="font-size: 18px; opacity: 0.8">Khamis · 29 Oktober 2026</div>
+  </div>
+  <div style="display: flex; flex-direction: column; align-items: center; gap: 0">
+    <div style="font-size: 22px; font-weight: 700; letter-spacing: 0.22em; color: {{g.acc}}">IQAMAH {{curUp}}</div>
+    <div style="font-size: 290px; font-weight: 200; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums">{{mmss}}</div>
+  </div>
+  <div style="display: flex; flex-direction: column; gap: 10px">
+    <div style="display: flex; gap: 8px; width: 1120px">
+      <sc-for list="{{blocks}}" as="b" hint-placeholder-count="10">
+        <div style="flex: 1; display: flex; flex-direction: column; gap: 6px; align-items: center">
+          <div style="width: 100%; height: 44px; border-radius: 9px; background: rgba(255,255,255,0.14); overflow: hidden">
+            <div style="width: {{b.w}}; height: 44px; background: {{g.acc}}"></div>
+          </div>
+          <div style="font-size: 15px; opacity: 0.75; font-variant-numeric: tabular-nums">{{b.n}}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: baseline">
+      <div style="font-family: 'Fraunces', serif; font-weight: 500; font-size: 34px">Luruskan dan rapatkan saf</div>
+      <div style="font-size: 15px; opacity: 0.75">minit berbaki</div>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"phase":{"editor":"enum","default":"Zohor","options":["Subuh","Zohor","Asar","Maghrib","Isyak"]},"progress":{"editor":"range","default":40,"min":0,"max":100,"step":1},"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = this.props;
+    const ph = ['Subuh','Zohor','Asar','Maghrib','Isyak'].includes(P.phase) ? P.phase : 'Zohor';
+    const name = {Subuh:'SUBUH',Zohor:'ZOHOR',Asar:'ASAR',Maghrib:'MAGHRIB',Isyak:'ISYAK'}[ph];
+    const BG = {Subuh:'#141A33',Zohor:'#0F2230',Asar:'#241C10',Maghrib:'#2A1419',Isyak:'#0A0F1F'}[ph];
+    const ACC = {Subuh:'#B8A9F0',Zohor:'#8CCBF2',Asar:'#EDC27F',Maghrib:'#F09A8C',Isyak:'#8FA5F0'}[ph];
+    const p = Math.min(100, Math.max(0, Number(P.progress ?? 40)))/100;
+    const rem = Math.round((1-p)*600);
+    const mmss = String(Math.floor(rem/60)).padStart(2,'0')+':'+String(rem%60).padStart(2,'0');
+    const remMin = rem/60;
+    const blocks = [0,1,2,3,4,5,6,7,8,9].map(i => ({ n:i+1, w:(Math.min(1, Math.max(0, remMin-i))*100).toFixed(1)+'%' }));
+    return { g:{ bg:BG, acc:ACC }, curUp:name, mmss, blocks };
+  }
+}
+</script>
+</body>
+</html>

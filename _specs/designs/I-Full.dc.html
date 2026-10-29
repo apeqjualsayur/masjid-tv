@@ -1,0 +1,81 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Garis Masa Penuh</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Manrope:wght@200;300;500;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1280px; height: 720px; box-sizing: border-box; padding: 40px 80px 36px; display: flex; flex-direction: column; background: {{g.bg}}; color: #F4F1EA; font-family: 'Manrope', sans-serif">
+  <div style="display: flex; justify-content: space-between; align-items: center">
+    <div style="display: flex; align-items: center; gap: 14px">
+      <svg width="30" height="36" viewBox="0 0 40 48" aria-hidden="true"><path d="M6 46V20a14 14 0 0 1 28 0v26" fill="none" stroke="#F4F1EA" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="24" r="5" fill="{{g.acc}}"/></svg>
+      <div style="font-family: 'Fraunces', serif; font-weight: 600; font-size: 28px">Masjid Al-Hidayah</div>
+    </div>
+    <div style="font-size: 18px; opacity: 0.8">Khamis · 29 Oktober 2026</div>
+  </div>
+  <div style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px">
+    <div style="font-size: 18px; font-weight: 700; letter-spacing: 0.2em; color: {{g.acc}}">● WAKTU {{curUp}}</div>
+    <div style="font-size: 250px; font-weight: 200; line-height: 0.95; letter-spacing: -0.03em; font-variant-numeric: tabular-nums">{{now}}</div>
+    <div style="font-size: 30px; font-weight: 500">Baki {{remain}} ke {{nextName}}</div>
+  </div>
+  <div style="display: flex; flex-direction: column">
+    <div style="position: relative; height: 46px">
+      <div style="position: absolute; left: {{g.nowX}}px; top: 0; transform: translateX(-50%); padding: 6px 14px; border-radius: 12px; background: #FFFFFF; color: #10151F; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums">{{now}}</div>
+    </div>
+    <div style="position: relative; width: 1120px; height: 64px">
+      <sc-for list="{{segs}}" as="s" hint-placeholder-count="7">
+        <div style="position: absolute; left: {{s.left}}px; top: 0; width: {{s.w}}px; height: 64px; box-sizing: border-box; border-radius: 10px; background: {{s.color}}; opacity: {{s.op}}; box-shadow: {{s.glow}}; display: flex; align-items: center; justify-content: center; color: {{s.ink}}; font-size: 20px; font-weight: 700; overflow: hidden; white-space: nowrap">{{s.label}}</div>
+      </sc-for>
+      <div style="position: absolute; left: {{g.nowX}}px; top: -8px; width: 4px; height: 80px; margin-left: -2px; border-radius: 2px; background: #FFFFFF"></div>
+    </div>
+    <div style="position: relative; width: 1120px; height: 74px; margin-top: 10px">
+      <sc-for list="{{marks}}" as="m" hint-placeholder-count="6">
+        <div style="position: absolute; left: {{m.left}}px; top: 0; padding-left: 8px; border-left: 2px solid rgba(255,255,255,0.3); display: flex; flex-direction: column; color: {{m.fg}}">
+          <div style="font-size: 17px; font-weight: 500; opacity: 0.85">{{m.name}}</div>
+          <div style="font-size: 32px; font-weight: 500; line-height: 1.1; font-variant-numeric: tabular-nums">{{m.time}}</div>
+        </div>
+      </sc-for>
+    </div>
+    <div style="font-size: 14px; opacity: 0.7; margin-top: 2px">Imsak 5:39 · garis ini menunjukkan tempoh sebenar setiap waktu</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"phase":{"editor":"enum","default":"Zohor","options":["Subuh","Zohor","Asar","Maghrib","Isyak"]},"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = this.props;
+    const ph = ['Subuh','Zohor','Asar','Maghrib','Isyak'].includes(P.phase) ? P.phase : 'Zohor';
+    const N = {Subuh:[6,12],Zohor:[13,42],Asar:[16,55],Maghrib:[19,30],Isyak:[21,10]}[ph];
+    const C = {Subuh:1,Zohor:3,Asar:4,Maghrib:5,Isyak:6}[ph];
+    const X = {Subuh:2,Zohor:4,Asar:5,Maghrib:6,Isyak:1}[ph];
+    const T = [['Imsak',5,39],['Subuh',5,49],['Syuruk',7,8],['Zohor',13,12],['Asar',16,28],['Maghrib',19,16],['Isyak',20,27]];
+    const f = (h,m) => (h%12||12)+':'+String(m).padStart(2,'0');
+    const nowM = N[0]*60+N[1];
+    let nx = T[X][1]*60+T[X][2]; if (nx<=nowM) nx+=1440;
+    const left = nx-nowM;
+    const BG = {Subuh:'#141A33',Zohor:'#0F2230',Asar:'#241C10',Maghrib:'#2A1419',Isyak:'#0A0F1F'}[ph];
+    const S = [['Imsak',339,349,'#7A84AE'],['Subuh',349,428,'#B8A9F0'],['Syuruk – Zohor',428,792,'#2D3A4A'],['Zohor',792,988,'#8CCBF2'],['Asar',988,1156,'#EDC27F'],['Maghrib',1156,1227,'#F09A8C'],['Isyak',1227,1299,'#8FA5F0']];
+    const W = 1120, sc = W/960;
+    const acc = S[C][3];
+    const segs = S.map((s,i) => ({
+      left:((s[1]-339)*sc).toFixed(1), w:Math.max(4,(s[2]-s[1])*sc-3).toFixed(1), color:s[3],
+      label:(i===0)?'':s[0], op: i<C?0.4:(i===C?1:0.72), ink:i===2?'#A9B6C4':'#10151F',
+      glow: i===C ? '0 0 28px '+s[3] : 'none'
+    }));
+    const marks = [1,2,3,4,5,6].map(i => ({ left:((T[i][1]*60+T[i][2]-339)*sc).toFixed(1), name:T[i][0], time:f(T[i][1],T[i][2]), fg:i===C?acc:'#F4F1EA' }));
+    return {
+      g: { bg:BG, acc, nowX:((nowM-339)*sc).toFixed(1) },
+      segs, marks, now:f(N[0],N[1]), curUp:T[C][0].toUpperCase(), nextName:T[X][0],
+      remain: Math.floor(left/60)+'j '+(left%60)+'m'
+    };
+  }
+}
+</script>
+</body>
+</html>

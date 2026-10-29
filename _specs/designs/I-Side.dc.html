@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="ms">
+<head>
+<meta charset="utf-8">
+<title>Garis Masa Bar Sisi</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:wght@500;600&family=Manrope:wght@200;300;500;700&display=swap" rel="stylesheet">
+<style>body{margin:0}</style>
+</helmet>
+<div style="width: 1280px; height: 720px; display: flex; background: {{g.bg}}; color: #F4F1EA; font-family: 'Manrope', sans-serif">
+  <div style="flex: 1; min-width: 0; box-sizing: border-box; padding: 40px; display: flex">
+    <div style="flex: 1; background: #F4F1EA; color: #10151F; border-radius: 28px; padding: 44px 52px; display: flex; flex-direction: column; gap: 20px">
+      <div style="align-self: flex-start; font-size: 14px; font-weight: 700; letter-spacing: 0.16em; padding: 8px 16px; border-radius: 999px; background: #10151F; color: #F4F1EA">PENYATA KEWANGAN</div>
+      <div style="font-family: 'Fraunces', serif; font-weight: 600; font-size: 52px; line-height: 1.05">Kutipan dan perbelanjaan minggu ini</div>
+      <div style="display: flex; gap: 16px">
+        <div style="flex: 1; padding: 20px 24px; border-radius: 18px; border: 2px solid #DCD6C8">
+          <div style="font-size: 16px; font-weight: 700; letter-spacing: 0.1em; color: #4B4E57">KUTIPAN</div>
+          <div style="font-size: 36px; font-weight: 500; font-variant-numeric: tabular-nums; margin-top: 4px">RM 4,250.00</div>
+        </div>
+        <div style="flex: 1; padding: 20px 24px; border-radius: 18px; border: 2px solid #DCD6C8">
+          <div style="font-size: 16px; font-weight: 700; letter-spacing: 0.1em; color: #4B4E57">PERBELANJAAN</div>
+          <div style="font-size: 36px; font-weight: 500; font-variant-numeric: tabular-nums; margin-top: 4px">RM 1,180.00</div>
+        </div>
+        <div style="flex: 1; padding: 20px 24px; border-radius: 18px; background: #10151F; color: #F4F1EA">
+          <div style="font-size: 16px; font-weight: 700; letter-spacing: 0.1em; color: {{g.acc}}">BAKI SEMASA</div>
+          <div style="font-size: 36px; font-weight: 700; font-variant-numeric: tabular-nums; margin-top: 4px">RM 3,070.00</div>
+        </div>
+      </div>
+      <div style="display: flex; flex-direction: column; font-size: 24px; color: #2E3037">
+        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #DCD6C8"><div>Bil utiliti</div><div style="font-variant-numeric: tabular-nums">540.00</div></div>
+        <div style="display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid #DCD6C8"><div>Pembersihan</div><div style="font-variant-numeric: tabular-nums">420.00</div></div>
+        <div style="display: flex; justify-content: space-between; padding: 12px 0"><div>Alat tulis dan lain-lain</div><div style="font-variant-numeric: tabular-nums">220.00</div></div>
+      </div>
+      <div style="margin-top: auto; font-size: 13px; letter-spacing: 0.12em; opacity: 0.6">CONTOH DATA · CONTOH TEMPLAT</div>
+    </div>
+  </div>
+  <div style="width: 400px; flex: none; box-sizing: border-box; padding: 26px 30px 20px; background: rgba(255,255,255,0.05); display: flex; flex-direction: column; gap: 8px">
+    <div style="display: flex; align-items: center; gap: 12px">
+      <svg width="26" height="32" viewBox="0 0 40 48" aria-hidden="true"><path d="M6 46V20a14 14 0 0 1 28 0v26" fill="none" stroke="#F4F1EA" stroke-width="4" stroke-linecap="round"/><circle cx="20" cy="24" r="5" fill="{{g.acc}}"/></svg>
+      <div style="display: flex; flex-direction: column">
+        <div style="font-family: 'Fraunces', serif; font-weight: 600; font-size: 21px; line-height: 1.1">Masjid Al-Hidayah</div>
+        <div style="font-size: 13px; opacity: 0.8">Khamis · 29 Oktober 2026</div>
+      </div>
+    </div>
+    <div style="display: flex; flex-direction: column; padding-top: 6px">
+      <div style="font-size: 13px; font-weight: 700; letter-spacing: 0.18em; color: {{g.acc}}">● WAKTU {{curUp}}</div>
+      <div style="font-size: 100px; font-weight: 200; line-height: 1; letter-spacing: -0.03em; font-variant-numeric: tabular-nums">{{now}}</div>
+      <div style="font-size: 18px; font-weight: 500">Baki {{remain}} ke {{nextName}}</div>
+    </div>
+    <div style="position: relative; height: 420px; margin-top: 18px">
+      <sc-for list="{{segs}}" as="s" hint-placeholder-count="7">
+        <div style="position: absolute; left: 0; top: {{s.top}}px; width: 26px; height: {{s.h}}px; border-radius: 8px; background: {{s.color}}; opacity: {{s.op}}; box-shadow: {{s.glow}}"></div>
+      </sc-for>
+      <sc-for list="{{marks}}" as="m" hint-placeholder-count="6">
+        <div style="position: absolute; left: 44px; top: {{m.top}}px; display: flex; align-items: baseline; gap: 10px; color: {{m.fg}}; white-space: nowrap">
+          <div style="font-size: 17px; font-weight: 500; opacity: 0.88; width: 78px">{{m.name}}</div>
+          <div style="font-size: 24px; font-weight: 500; font-variant-numeric: tabular-nums">{{m.time}}</div>
+        </div>
+      </sc-for>
+      <div style="position: absolute; left: -6px; top: {{g.nowY}}px; width: 292px; height: 3px; margin-top: -1px; border-radius: 2px; background: #FFFFFF"></div>
+      <div style="position: absolute; right: 0; top: {{g.nowY}}px; transform: translateY(-50%); padding: 3px 10px; border-radius: 9px; background: #FFFFFF; color: #10151F; font-size: 18px; font-weight: 700; font-variant-numeric: tabular-nums">{{now}}</div>
+    </div>
+    <div style="font-size: 13px; opacity: 0.7">Imsak 5:39 · tinggi setiap blok = tempoh sebenar</div>
+  </div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"phase":{"editor":"enum","default":"Zohor","options":["Subuh","Zohor","Asar","Maghrib","Isyak"]},"$preview":{"width":1280,"height":720}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = this.props;
+    const ph = ['Subuh','Zohor','Asar','Maghrib','Isyak'].includes(P.phase) ? P.phase : 'Zohor';
+    const N = {Subuh:[6,12],Zohor:[13,42],Asar:[16,55],Maghrib:[19,30],Isyak:[21,10]}[ph];
+    const C = {Subuh:1,Zohor:3,Asar:4,Maghrib:5,Isyak:6}[ph];
+    const X = {Subuh:2,Zohor:4,Asar:5,Maghrib:6,Isyak:1}[ph];
+    const T = [['Imsak',5,39],['Subuh',5,49],['Syuruk',7,8],['Zohor',13,12],['Asar',16,28],['Maghrib',19,16],['Isyak',20,27]];
+    const f = (h,m) => (h%12||12)+':'+String(m).padStart(2,'0');
+    const nowM = N[0]*60+N[1];
+    let nx = T[X][1]*60+T[X][2]; if (nx<=nowM) nx+=1440;
+    const left = nx-nowM;
+    const BG = {Subuh:'#141A33',Zohor:'#0F2230',Asar:'#241C10',Maghrib:'#2A1419',Isyak:'#0A0F1F'}[ph];
+    const S = [['Imsak',339,349,'#7A84AE'],['Subuh',349,428,'#B8A9F0'],['Syuruk – Zohor',428,792,'#2D3A4A'],['Zohor',792,988,'#8CCBF2'],['Asar',988,1156,'#EDC27F'],['Maghrib',1156,1227,'#F09A8C'],['Isyak',1227,1299,'#8FA5F0']];
+    const H = 420, sc = H/960;
+    const acc = S[C][3];
+    const segs = S.map((s,i) => ({
+      top:((s[1]-339)*sc).toFixed(1), h:Math.max(4,(s[2]-s[1])*sc-3).toFixed(1), color:s[3],
+      op: i<C?0.4:(i===C?1:0.72), glow: i===C ? '0 0 22px '+s[3] : 'none'
+    }));
+    const marks = [1,2,3,4,5,6].map(i => ({ top:Math.max(0,((T[i][1]*60+T[i][2]-339)*sc-13)).toFixed(1), name:T[i][0], time:f(T[i][1],T[i][2]), fg:i===C?acc:'#F4F1EA' }));
+    return {
+      g: { bg:BG, acc, nowY:((nowM-339)*sc).toFixed(1) },
+      segs, marks, now:f(N[0],N[1]), curUp:T[C][0].toUpperCase(), nextName:T[X][0],
+      remain: Math.floor(left/60)+'j '+(left%60)+'m'
+    };
+  }
+}
+</script>
+</body>
+</html>

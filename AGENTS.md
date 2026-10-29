@@ -7,9 +7,9 @@ Project rules for the coding agent (Antigravity / Gemini, Claude Code, Cursor, C
 - Phase 1 = TV display (no backend). Phase 2 = admin app + Supabase backend + TV sync.
 
 ## Source of truth
-- **Always read `_specs/` before changing behaviour.** `00-PRD.md` (display), `01-theme-contract.md` (theme interface + tokens), `10-PRD-phase2.md` (admin + backend), `11-schema.sql` (database), `02-*-prompts.md` / `12-phase2-prompts.md` (build order).
+- **Always read `_specs/` before changing behaviour.** `00-PRD.md` (display), `01-theme-contract.md` (theme interface + tokens), `10-PRD-phase2.md` (admin + backend), `11-schema.sql` (database), `40-PRD-themes-round2.md` (4 new themes + announcement-only screen), `02-*-prompts.md` / `12-phase2-prompts.md` / `41-themes-round2-prompts.md` (build order).
 - If code and spec disagree, the spec wins. If the spec is unclear or contradicts itself, STOP and ask — do not guess.
-- `designs/*.dc.html` (TV) and `designs/admin/*.dc.html` (admin) are design-tool source. They do NOT run in a browser. Read markup, inline styles and the script data block. If `designs/ref/*.png` or `designs/admin/ref/*.png` exist, they are screenshots for visual comparison.
+- `_specs/designs/*.dc.html` (TV: `A-*` alam, `D-*` serambi, `F-*` tenang, `G-*` falak, `I-*` garis, `J-*` kerawang, `K-*` seterusnya; G–K are 1280×720 mockups, scale ×1.5) and `_specs/designs/admin/*.dc.html` (admin) are design-tool source. They do NOT run in a browser. Read markup, inline styles and the script data block. If `designs/ref/*.png` or `designs/admin/ref/*.png` exist, they are screenshots for visual comparison.
 
 ## Stack
 - Next.js (App Router) + TypeScript (strict) + Tailwind, `output: 'export'` (static; no API routes, no server actions, no middleware).
@@ -34,7 +34,8 @@ Project rules for the coding agent (Antigravity / Gemini, Claude Code, Cursor, C
 - Friday Zohor = "Jumaat"; azan → khutbah (no iqamah).
 - Times 12h without AM/PM by default ("1:05").
 - Stage is a fixed 1920×1080 px box scaled by the engine. Smallest text ≥ 18 px; times ≥ 54 px (≥ 44 px in bottom bar).
-- Poster area ratios: bottom layout 12:5, side layout 5:4, in every theme.
+- Poster area ratios: bottom layout 12:5, side layout 5:4, poster layout 16:9 (full stage), in every theme.
+- `poster` layout (Pengumuman sahaja): slides only; no clock, date, prayer times, ticker, Friday strip or mode screens (contract rules 14–17).
 - `lite` mode: no `backdrop-filter`, blur, glow or large shadow. Layout identical.
 - Kematian template: no accent colour, no decoration.
 - Arabic text: `lang="ar" dir="rtl"`.
@@ -59,7 +60,7 @@ Project rules for the coding agent (Antigravity / Gemini, Claude Code, Cursor, C
 7. No new npm dependencies without saying why in the plan.
 
 ## Debug URL params (only with `?debug=1` or on localhost)
-`sim=2026-10-17T13:04:30` · `speed=10` · `theme=alam|serambi|tenang` · `layout=full|bottom|side` · `mode=azan|iqamah|solat|khutbah` · `day=fri` · `lite=1` · `local=1` (use screen.json instead of Supabase)
+`sim=2026-10-17T13:04:30` · `speed=10` · `theme=alam|serambi|tenang|falak|garis|kerawang|seterusnya` · `layout=full|bottom|side|poster` (unknown values fall back to tenang / full) · `mode=azan|iqamah|solat|khutbah` · `day=fri` · `lite=1` · `local=1` (use screen.json instead of Supabase)
 
 <!-- BEGIN:nextjs-agent-rules -->
 

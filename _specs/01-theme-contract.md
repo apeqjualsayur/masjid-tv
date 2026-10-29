@@ -105,6 +105,7 @@ export interface ThemeDefinition {
 17. **Empty state** (no slide to show): a calm card with logo, full masjid name and "Tiada pengumuman buat masa ini". No prayer data. Never blank, never an error text.
 18. Every template renders correctly in **all three** areas (12:5, 5:4, 16:9) and in the admin live preview. Layout adapts to `area`; text never clips; minimum sizes unchanged.
 19. **Unknown theme or layout** (e.g. an older TV app receiving a newer id) falls back to `tenang` / `full`: never a crash or a blank screen (PRD round 2 D7).
+20. **Ticker in every theme** (owner decision 2026-10-29): the `full` layout shows `s.ticker` whenever it has text, at least 26 px, labelled "PENGUMUMAN" or in a band of its own. Scrolling or one item at a time (`shared/ticker.ts`: every 12 s); `lite` = one item at a time, no animation. Make room for it (shrink the list or clock), never cover prayer times. Never in the `poster` layout (rule 15).
 
 Round-2 themes follow rules 2, 3, 6, 7, 8, 12 and 13 exactly as written above; there is no exception for any of them. Their Arabic text (e.g. the `ayat` template) uses **Noto Naskh Arabic** 400–600 (already self-hosted).
 

@@ -19,6 +19,7 @@ import {
   type Area,
 } from "./parts";
 import { CrossFade } from "../shared/crossfade";
+import { TICKER_LABEL, tickerNow } from "../shared/ticker";
 import { FridayStrip } from "./friday";
 import { SerambiPoster } from "./poster";
 import { serambiTemplates } from "./templates";
@@ -104,6 +105,8 @@ function SlideArea({ s, slide, slideKey, counter, area, style }: LayoutProps & {
   );
 }
 export function FullLayout({ s }: LayoutProps) {
+  const ticker = tickerNow(s);
+  const lift = ticker ? 48 : 0; // room for the ticker under the gold line (rule 20)
   return (
     <Page>
       <Ambient s={s} />
@@ -138,10 +141,10 @@ export function FullLayout({ s }: LayoutProps) {
 
       <FridayStrip s={s} style={{ position: "absolute", top: 394, right: 72, height: 46 }} />
 
-      <div style={{ position: "absolute", left: 72, right: 72, bottom: 64, height: 620, display: "flex", alignItems: "flex-end", gap: 20 }}>
+      <div style={{ position: "absolute", left: 72, right: 72, bottom: 64 + lift, height: 620 - lift, display: "flex", alignItems: "flex-end", gap: 20 }}>
         {s.waktu.map((w) => {
           const cur = w.state === "current";
-          const h = s.friday ? 60 : 0;
+          const h = (s.friday ? 60 : 0) + lift;
           return (
             <ArchWindow key={w.key} w={w} width={236} height={(cur ? 620 : 560) - h} overlay={ARCH_OVERLAY} look={archLook(w, 70, s.lite)}>
               {(cur || w.state === "next") && (
@@ -158,7 +161,15 @@ export function FullLayout({ s }: LayoutProps) {
           );
         })}
       </div>
-      <div style={{ position: "absolute", left: 72, right: 72, bottom: 44, height: 2, background: C.goldLine }} />
+      <div style={{ position: "absolute", left: 72, right: 72, bottom: 44 + lift, height: 2, background: C.goldLine }} />
+      {ticker && (
+        <div data-ticker style={{ position: "absolute", left: 72, right: 72, bottom: 24, height: 48, display: "flex", alignItems: "center", gap: 24 }}>
+          <Caps size={20} spacing={0.2} weight={700}>
+            {TICKER_LABEL}
+          </Caps>
+          <div style={{ flex: 1, minWidth: 0, fontSize: 28, fontWeight: 500, color: C.soft, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{ticker}</div>
+        </div>
+      )}
     </Page>
   );
 }

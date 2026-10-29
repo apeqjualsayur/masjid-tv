@@ -5,6 +5,7 @@ import type { DisplayState } from "@/core";
 import type { CSSProperties, FC } from "react";
 import { CrossFade } from "../shared/crossfade";
 import { CHIP_MARGIN, EMPTY_TEXT, FitBox, templateAreaOf } from "../shared/poster";
+import { TICKER_LABEL, tickerNow } from "../shared/ticker";
 import type { LayoutProps, SlideView, TemplateArea } from "../types";
 import { FridayStrip } from "./friday";
 import { AreaContext, Dial, Logo, Page, Status, nextLine, num, rowLook, serif, tokensOf, type Area } from "./parts";
@@ -70,13 +71,25 @@ function Header({ s, nameSize, dateSize, logo }: { s: DisplayState; nameSize: nu
 
 // ------------------------------------------------------------------ full
 
+/** Ticker band across the bottom (rule 20): one announcement at a time, every 12 s. */
+function Ticker({ text }: { text: string }) {
+  return (
+    <div data-ticker style={{ position: "absolute", left: 0, right: 0, bottom: 0, height: 72, boxSizing: "border-box", padding: "0 72px", background: F.panel, display: "flex", alignItems: "center", gap: 24 }}>
+      <Status size={20}>{TICKER_LABEL}</Status>
+      <div style={{ flex: 1, minWidth: 0, fontSize: 28, fontWeight: 500, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{text}</div>
+    </div>
+  );
+}
+
 export function FullLayout({ s }: LayoutProps) {
   const t = tokensOf(s);
-  const tight = Boolean(s.friday);
+  const ticker = tickerNow(s);
+  const tight = Boolean(s.friday) || Boolean(ticker);
+  const dial = ticker ? 880 : 936;
   return (
-    <Page t={t} style={{ boxSizing: "border-box", padding: 72, display: "flex", gap: 60 }}>
-      <div style={{ width: 936, height: 936, flex: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
-        <Dial s={s} size={936} labels />
+    <Page t={t} style={{ boxSizing: "border-box", padding: ticker ? "54px 72px 100px" : 72, display: "flex", gap: 60 }}>
+      <div style={{ width: 936, height: dial, flex: "none", display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <Dial s={s} size={dial} labels />
       </div>
       <div style={{ flex: 1, minWidth: 0, display: "flex", flexDirection: "column", gap: tight ? 22 : 33 }}>
         <Header s={s} nameSize={42} dateSize={22} logo={60} />
@@ -109,6 +122,7 @@ export function FullLayout({ s }: LayoutProps) {
           })}
         </div>
       </div>
+      {ticker && <Ticker text={ticker} />}
     </Page>
   );
 }

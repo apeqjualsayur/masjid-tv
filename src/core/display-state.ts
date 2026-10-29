@@ -15,6 +15,8 @@ export interface WaktuView {
   arabic: string;
   /** "1:05" (already formatted); "–" if unknown (tomorrow's Imsak not published) */
   time: string;
+  /** The same moment as epoch ms (NaN if unknown), for drawing only (e.g. the Falak dial via core/dial). */
+  at: number;
   state: WaktuState;
   /** imsak, syuruk */
   isMarker: boolean;
@@ -115,6 +117,7 @@ export function buildDisplayState(i: DisplayInputs): DisplayState {
     label: w.label,
     arabic: w.arabic,
     time: Number.isFinite(w.time) ? formatTime(w.time, i.clock24h) : "–",
+    at: w.time,
     state: w.state,
     isMarker: w.isMarker,
     iqamah: iqamah(w),

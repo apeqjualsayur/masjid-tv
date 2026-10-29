@@ -8,3 +8,4 @@ export * from "./display-state";
 export * from "./playlist";
 export * from "./friday";
 export * from "./sync-interval";
+export * from "./dial";

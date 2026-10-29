@@ -23,6 +23,7 @@ export interface WaktuView {
   state: 'past' | 'current' | 'next' | 'upcoming';
   isMarker: boolean;    // imsak, syuruk
   iqamah?: string;      // "1:15": azan + iqamahMin[key], formatted like `time`. Undefined for imsak, syuruk and Friday zohor.
+  at: number;           // the same moment as epoch ms (NaN if unknown), for drawing only: angles/positions via src/core/dial.ts (Falak). Never for prayer logic in a theme.
 }
 
 export interface DisplayState {

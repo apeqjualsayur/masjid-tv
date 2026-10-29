@@ -8,6 +8,7 @@ import {
   Amiri,
   Barlow,
   Barlow_Condensed,
+  Fraunces,
   Manrope,
   Noto_Naskh_Arabic,
   Plus_Jakarta_Sans,
@@ -73,6 +74,15 @@ export const manrope = Manrope({
   preload: false,
 });
 
+// falak, garis, kerawang (round 2): headings and prayer names
+export const fraunces = Fraunces({
+  subsets: ["latin"],
+  weight: ["500", "600"],
+  variable: "--font-fraunces",
+  display: "block",
+  preload: false,
+});
+
 export const fontVariables = [
   plusJakartaSans,
   notoNaskhArabic,
@@ -81,6 +91,7 @@ export const fontVariables = [
   reemKufi,
   amiri,
   manrope,
+  fraunces,
 ]
   .map((f) => f.variable)
   .join(" ");

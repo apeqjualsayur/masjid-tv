@@ -15,7 +15,8 @@
     "rls-check": "node --env-file-if-exists=.env.local --import tsx scripts/rls-check.ts",
     "og": "tsx scripts/og.ts",
     "sync:usage-model": "tsx scripts/sync-usage-model.ts",
-    "qa:poster": "node scripts/qa-poster.mjs"
+    "qa:poster": "node scripts/qa-poster.mjs",
+    "qa:theme": "node scripts/qa-theme.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "6.3.1",

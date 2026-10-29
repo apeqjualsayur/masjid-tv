@@ -53,7 +53,7 @@ describe("bundleToScreenConfig", () => {
 
   it("bad values fall back to safe defaults with warnings", () => {
     const { config, accentColor, warnings } = bundleToScreenConfig(bundle({ accentColor: "red" }, { theme: "neon", layout: "diagonal" }, { iqamahMin: { subuh: -4 } }), SB);
-    expect(config.theme).toBe("alam");
+    expect(config.theme).toBe("tenang"); // PRD round 2 D7 (was the screen.json default, alam)
     expect(config.layout).toBe("full");
     expect(config.iqamahMin.subuh).toBe(10);
     expect(accentColor).toBeNull();

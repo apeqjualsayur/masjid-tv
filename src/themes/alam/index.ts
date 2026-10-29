@@ -9,7 +9,8 @@ export const alam: ThemeDefinition = {
   id: "alam",
   name: "Alam",
   fonts: ["Plus Jakarta Sans", "Noto Naskh Arabic"],
-  layouts: { full: FullLayout, bottom: BottomLayout, side: SideLayout },
+  // poster: placeholder (shows slides) until the announcement-only layout is built (round 2, T3).
+  layouts: { full: FullLayout, bottom: BottomLayout, side: SideLayout, poster: BottomLayout },
   screens: { preAzanBanner: PreAzanBanner, azan: Azan, iqamah: Iqamah, solat: Solat, khutbah: Khutbah, unavailable: Unavailable },
   templates: alamTemplates,
   posterFrame: AlamPoster,

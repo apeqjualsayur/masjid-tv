@@ -1,5 +1,5 @@
 // Screen config (public/config/screen.json, PRD section 9.4) and URL overrides (PRD section 10).
-import { parseLocalDateTime, type IqamahMinutes, type LayoutKey, type ModeDurations, type ModeKey, type ThemeId } from "@/core";
+import { FALLBACK_LAYOUT, FALLBACK_THEME_ID, LAYOUT_KEYS, THEME_IDS, parseLocalDateTime, type IqamahMinutes, type LayoutKey, type ModeDurations, type ModeKey, type ThemeId } from "@/core";
 import { findZone } from "@/data";
 import { TEMPLATE_KEYS, type TemplateKey } from "@/templates";
 
@@ -28,8 +28,9 @@ export const DEFAULT_SCREEN_CONFIG: ScreenConfig = {
   ticker: ["[Teks pengumuman]"],
 };
 
-export const THEMES: readonly ThemeId[] = ["alam", "serambi", "tenang"];
-export const LAYOUTS: readonly LayoutKey[] = ["full", "bottom", "side"];
+// Every theme and layout, incl. round 2 (falak, garis, kerawang, seterusnya; poster): config + debug params.
+export const THEMES: readonly ThemeId[] = THEME_IDS;
+export const LAYOUTS: readonly LayoutKey[] = LAYOUT_KEYS;
 const MODES: readonly ModeKey[] = ["normal", "pre_azan", "azan", "iqamah", "solat", "khutbah"];
 
 const isObj = (v: unknown): v is Record<string, unknown> => !!v && typeof v === "object" && !Array.isArray(v);
@@ -155,9 +156,16 @@ export function parseUrlOverrides(search: string, hostname: string): { overrides
   }
 
   const theme = q.get("theme");
-  if (theme !== null) oneOf(THEMES, theme) ? (o.theme = theme) : warnings.push(`theme=${theme} unknown`);
+  // Unknown values fall back like an unknown bundle value would (PRD round 2 D7).
+  if (theme !== null) {
+    if (oneOf(THEMES, theme)) o.theme = theme;
+    else (o.theme = FALLBACK_THEME_ID), warnings.push(`theme=${theme} unknown; using ${FALLBACK_THEME_ID}`);
+  }
   const layout = q.get("layout");
-  if (layout !== null) oneOf(LAYOUTS, layout) ? (o.layout = layout) : warnings.push(`layout=${layout} unknown`);
+  if (layout !== null) {
+    if (oneOf(LAYOUTS, layout)) o.layout = layout;
+    else (o.layout = FALLBACK_LAYOUT), warnings.push(`layout=${layout} unknown; using ${FALLBACK_LAYOUT}`);
+  }
   const mode = q.get("mode");
   if (mode !== null) oneOf(MODES, mode) ? (o.mode = mode) : warnings.push(`mode=${mode} unknown`);
 

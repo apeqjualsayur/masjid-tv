@@ -29,8 +29,8 @@ const html = (s: ReturnType<typeof state>, layout: "full" | "bottom" | "side" = 
   renderToStaticMarkup(<ThemeView theme={theme} s={s} layout={layout} slide={slide} />);
 
 describe("registry", () => {
-  it("all three launch themes are built; an unknown id falls back with a warning", () => {
-    expect(availableThemes().sort()).toEqual(["alam", "serambi", "tenang"]);
+  it("all seven themes are registered (round 2 ids are placeholders for now); an unknown id falls back with a warning", () => {
+    expect(availableThemes().sort()).toEqual(["alam", "falak", "garis", "kerawang", "serambi", "seterusnya", "tenang"]);
     expect(getTheme("tenang")).toEqual({ theme });
     expect(getTheme("alam").theme.id).toBe("alam");
     const unknown = getTheme("pink" as ThemeId);

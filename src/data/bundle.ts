@@ -2,7 +2,7 @@
 // 'ok' → validate, store in IndexedDB, apply; 'unchanged' → nothing; 'revoked' → wipe;
 // 'suspended' → calm screen. Boot starts from the stored bundle, so a network error never blanks
 // the screen. Pure parts are exported for tests; I/O is injected.
-import type { PlaylistItem } from "@/core";
+import { FALLBACK_LAYOUT, FALLBACK_THEME_ID, isLayoutKey, isThemeId, type LayoutKey, type PlaylistItem, type ThemeId } from "@/core";
 import type { SlideView } from "@/templates";
 import { IMAGE_FIELD_KEYS } from "@/templates/schema";
 import { parseSlides, type RawSlide } from "./slides";
@@ -10,9 +10,16 @@ import { parseSlides, type RawSlide } from "./slides";
 export interface BundleScreen {
   id: string;
   name: string;
-  theme: string;
-  layout: string;
+  theme: ThemeId;
+  layout: LayoutKey;
+  /** Values from the server this app did not know and replaced (for the debug warnings). */
+  replaced?: { theme?: string; layout?: string };
 }
+
+/** Unknown theme (e.g. an id newer than this app) → tenang; never crash or blank (PRD round 2 D7). */
+export const bundleTheme = (v: unknown): ThemeId => (isThemeId(v) ? v : FALLBACK_THEME_ID);
+/** Unknown layout → full (D7). */
+export const bundleLayout = (v: unknown): LayoutKey => (isLayoutKey(v) ? v : FALLBACK_LAYOUT);
 export interface BundleOrg {
   fullName: string;
   shortName: string;
@@ -79,7 +86,20 @@ export function parseBundleAnswer(raw: unknown): BundleAnswer {
     kind: "ok",
     bundle: {
       version,
-      screen: { id: s(screen.id)!, name: s(screen.name)!, theme: s(screen.theme) ?? "", layout: s(screen.layout) ?? "" },
+      screen: {
+        id: s(screen.id)!,
+        name: s(screen.name)!,
+        theme: bundleTheme(screen.theme),
+        layout: bundleLayout(screen.layout),
+        ...(isThemeId(screen.theme) && isLayoutKey(screen.layout)
+          ? {}
+          : {
+              replaced: {
+                ...(isThemeId(screen.theme) ? {} : { theme: String(screen.theme ?? "") }),
+                ...(isLayoutKey(screen.layout) ? {} : { layout: String(screen.layout ?? "") }),
+              },
+            }),
+      },
       org: {
         fullName: s(org.fullName)!,
         shortName: s(org.shortName)!,

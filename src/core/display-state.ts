@@ -4,7 +4,8 @@ import { formatGregorian, formatHijri, formatSeconds, formatTime } from "./forma
 import { fridayInfo, type FridayInfo } from "./friday";
 import { computeMode, forcedMode, type ModeConfig } from "./modes";
 import { computeSchedule, type ScheduleState, type WaktuEntry } from "./schedule";
-import type { DayTimes, ModeKey, PhaseKey, PrayerKey, WaktuKey, WaktuState } from "./types";
+import type { DayTimes, LayoutKey, ModeKey, PhaseKey, PrayerKey, WaktuKey, WaktuState } from "./types";
+import { isPrayer } from "./waktu";
 
 export interface WaktuView {
   key: WaktuKey;
@@ -17,6 +18,11 @@ export interface WaktuView {
   state: WaktuState;
   /** imsak, syuruk */
   isMarker: boolean;
+  /**
+   * Iqamah time, "1:15": azan + the masjid's iqamahMin for this waktu, formatted like `time`
+   * (PRD round 2 D5). Undefined for imsak, syuruk, Friday Zohor (khutbah instead) and unknown times.
+   */
+  iqamah?: string;
 }
 
 export interface DisplayState {
@@ -75,6 +81,8 @@ export interface DisplayInputs {
   modeConfig: ModeConfig;
   /** Debug mode= override. */
   forced?: ForcedModeInput;
+  /** The screen's layout. `poster` never switches to a prayer mode (PRD round 2 D2); phase is still computed (D3). */
+  layout?: LayoutKey;
 }
 
 /** The prayer a forced mode should be about: the next prayer (never a marker). */
@@ -97,6 +105,11 @@ export function buildDisplayState(i: DisplayInputs): DisplayState {
     { today: i.today, tomorrowImsak: i.tomorrowImsak ?? NaN, tomorrowSubuh: i.tomorrowSubuh ?? NaN, forceFriday: i.forceFriday },
     i.at,
   );
+  const iqamah = (w: WaktuEntry): string | undefined => {
+    if (!isPrayer(w.key) || !Number.isFinite(w.time) || (sched.isFriday && w.key === "zohor")) return undefined;
+    const min = i.modeConfig.iqamahMin[w.key];
+    return Number.isFinite(min) ? formatTime(w.time + min * 60_000, i.clock24h) : undefined;
+  };
   const view = (w: WaktuEntry): WaktuView => ({
     key: w.key,
     label: w.label,
@@ -104,11 +117,15 @@ export function buildDisplayState(i: DisplayInputs): DisplayState {
     time: Number.isFinite(w.time) ? formatTime(w.time, i.clock24h) : "–",
     state: w.state,
     isMarker: w.isMarker,
+    iqamah: iqamah(w),
   });
   const waktu = sched.waktu.map(view);
-  const m = i.forced
-    ? forcedMode(i.forced.mode, i.forced.target, i.forced.sinceMs, i.modeConfig, i.at, sched.isFriday)
-    : computeMode(i.today.times, sched.isFriday, i.modeConfig, i.at);
+  const m =
+    i.layout === "poster"
+      ? { mode: "normal" as const, target: undefined, remainingSec: undefined, progress: undefined }
+      : i.forced
+        ? forcedMode(i.forced.mode, i.forced.target, i.forced.sinceMs, i.modeConfig, i.at, sched.isFriday)
+        : computeMode(i.today.times, sched.isFriday, i.modeConfig, i.at);
 
   return {
     now: new Date(i.at),

@@ -30,7 +30,7 @@ import {
   type SyncStatus,
 } from "@/data";
 import { SAMPLE_POSTER, SAMPLE_POSTER_LANDSCAPE, sampleSlide, type SlideView } from "@/templates";
-import { getTheme } from "@/themes/registry";
+import { useTheme } from "@/themes";
 import { ThemeView, UnavailableView } from "@/themes/ThemeView";
 import { useEffect, useRef, useState } from "react";
 import { parseUrlOverrides, type ScreenConfig, type UrlOverrides } from "./config";
@@ -177,6 +177,7 @@ interface SlidePick {
 /**
  * What goes in the poster area: the ?slide= preview, else the playlist slide for this moment.
  * With no eligible slide the bottom/side layouts fall back to full rather than show an empty card.
+ * A `poster` screen never falls back to prayer times: it keeps its own (empty-state) layout (rule 17).
  */
 function pickSlide(layout: LayoutKey, preview: UrlOverrides["slide"], slides: PlaylistItem<SlideView>[], at: number): SlidePick {
   if (layout === "full") return { layout };
@@ -184,7 +185,7 @@ function pickSlide(layout: LayoutKey, preview: UrlOverrides["slide"], slides: Pl
   if (preview === "poster-landscape") return { layout, slide: SAMPLE_POSTER_LANDSCAPE, slideKey: "preview-poster-landscape" };
   if (preview) return { layout, slide: sampleSlide(preview), slideKey: `preview-${preview}` };
   const now = playlistAt(slides, at);
-  if (!now) return { layout: "full" };
+  if (!now) return { layout: layout === "poster" ? "poster" : "full" };
   return { layout, slide: now.item.payload, slideKey: now.item.id, counter: { position: now.position, total: now.total } };
 }
 
@@ -224,7 +225,7 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
   const forced = useRef<ForcedModeInput | null>(null);
   const forceFriday = useFridayKey(overrides.debug, overrides.forceFriday);
 
-  const { theme, warning: themeWarning } = getTheme(overrides.theme ?? config.theme);
+  const { theme, warning: themeWarning } = useTheme(overrides.theme ?? config.theme);
   const configuredLayout = overrides.layout ?? config.layout;
   const pick = pickSlide(configuredLayout, overrides.slide, boot.slides, at);
   const layout = pick.layout;
@@ -291,6 +292,8 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
     masjid,
     modeConfig: { durations: config.durations, iqamahMin: config.iqamahMin },
     forced: forced.current ?? undefined,
+    // The screen's own layout: a poster screen never shows prayer modes, even with ?mode= (D2).
+    layout: configuredLayout,
   });
 
   if (overrides.debugState) return <DebugView s={s} meta={meta} />;

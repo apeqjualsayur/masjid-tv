@@ -70,9 +70,9 @@ describe("parseUrlOverrides (PRD section 10)", () => {
     expect(parseUrlOverrides("", "masjid.example").overrides.lite).toBeUndefined();
   });
 
-  it("invalid values are reported, not applied", () => {
+  it("invalid values are reported, not applied (an unknown theme falls back to tenang, PRD round 2 D7)", () => {
     const { overrides, warnings } = parseUrlOverrides("?debug=1&sim=yesterday&speed=-2&theme=x&mode=dance&day=mon", "h");
-    expect(overrides).toEqual({ debug: true, debugState: false, debugAllowed: true, forceFriday: false });
+    expect(overrides).toEqual({ debug: true, debugState: false, debugAllowed: true, forceFriday: false, theme: "tenang" });
     expect(warnings).toHaveLength(5);
   });
 });

@@ -1,4 +1,4 @@
-// TV content sync (PRD Phase 2 §7): every 60 s screen_bundle(secret, lastVersion, appVersion).
+// TV content sync (PRD Phase 2 §7): every 60 s (120 s at night, PRD usage §7) screen_bundle(secret, lastVersion, appVersion).
 // 'ok' → validate, store in IndexedDB, apply; 'unchanged' → nothing; 'revoked' → wipe;
 // 'suspended' → calm screen. Boot starts from the stored bundle, so a network error never blanks
 // the screen. Pure parts are exported for tests; I/O is injected.
@@ -248,6 +248,8 @@ export interface BundleState {
   /** Last answer from the server (any status), epoch ms. */
   lastSync: number | null;
   error: string | null;
+  /** Wait before the next sync (60 s by day, 120 s at night), shown in the debug overlay. */
+  intervalMs?: number;
 }
 
 export interface BundleSyncDeps {
@@ -256,7 +258,8 @@ export interface BundleSyncDeps {
   store: BundleStore;
   onState: (s: BundleState) => void;
   now?: () => number;
-  intervalMs?: number;
+  /** Fixed ms, or asked before every wait (bundleIntervalAt: 120 s at night). Errors or nonsense → 60 s. */
+  intervalMs?: number | (() => number | Promise<number>);
   setTimer?: (fn: () => void, ms: number) => unknown;
   clearTimer?: (t: unknown) => void;
 }
@@ -267,7 +270,14 @@ export function startBundleSync(d: BundleSyncDeps): { ready: Promise<void>; sync
   const now = d.now ?? Date.now;
   const setTimer = d.setTimer ?? ((fn, ms) => setTimeout(fn, ms));
   const clearTimer = d.clearTimer ?? ((t) => clearTimeout(t as ReturnType<typeof setTimeout>));
-  const interval = d.intervalMs ?? BUNDLE_INTERVAL_MS;
+  const nextInterval = async (): Promise<number> => {
+    try {
+      const v = typeof d.intervalMs === "function" ? await d.intervalMs() : (d.intervalMs ?? BUNDLE_INTERVAL_MS);
+      return Number.isFinite(v) && v > 0 ? v : BUNDLE_INTERVAL_MS;
+    } catch {
+      return BUNDLE_INTERVAL_MS;
+    }
+  };
   let state: BundleState = { bundle: null, from: null, status: "starting", suspended: false, lastSync: null, error: null };
   let stopped = false;
   let timer: unknown = null;
@@ -277,12 +287,16 @@ export function startBundleSync(d: BundleSyncDeps): { ready: Promise<void>; sync
     state = { ...state, ...patch };
     if (!stopped) d.onState(state);
   };
-  const schedule = () => {
-    if (stopped || state.status === "revoked") return;
+  const finished = () => stopped || state.status === "revoked";
+  const schedule = async () => {
+    if (finished()) return;
+    const ms = await nextInterval();
+    if (finished()) return; // stopped or revoked while asking
+    if (ms !== state.intervalMs) emit({ intervalMs: ms });
     timer = setTimer(() => {
       timer = null;
       void tick().then(schedule);
-    }, interval);
+    }, ms);
   };
 
   async function tick() {
@@ -324,7 +338,7 @@ export function startBundleSync(d: BundleSyncDeps): { ready: Promise<void>; sync
     if (stopped) return;
     if (cached) emit({ bundle: cached.bundle, from: "cache", status: "starting", suspended: cached.suspended });
     await tick();
-    schedule();
+    await schedule();
   })();
 
   return {

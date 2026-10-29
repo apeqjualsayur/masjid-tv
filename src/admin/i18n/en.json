@@ -824,7 +824,7 @@
       "fix": {
         "egress": {
           "t": "TV egress is nearing the limit",
-          "d": "Change the TV check interval to 120 s between Isyak and Subuh, or upgrade to Supabase Pro (US${usd}, {quota})."
+          "d": "TVs already check only every 120 s at night. Next: move posters to Cloudflare R2, or upgrade to Supabase Pro (US${usd}, {quota})."
         },
         "cached": {
           "t": "Poster downloads are nearing the limit",

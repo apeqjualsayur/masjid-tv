@@ -88,7 +88,7 @@ export const METRIC_NAME: Record<AlertMetric, string> = {
 };
 
 const ACTION: Record<AlertMetric, string> = {
-  egress: "Ubah selang semakan TV kepada 120 s antara Isyak dan Subuh, atau naik taraf ke Supabase Pro.",
+  egress: "TV sudah menyemak setiap 120 s pada waktu malam. Seterusnya: pindahkan poster ke Cloudflare R2, atau naik taraf ke Supabase Pro.",
   cached: "Pindahkan poster ke Cloudflare R2 (tiada caj egress), atau naik taraf ke Supabase Pro.",
   db: "Semak jadual usage_screen_daily dipangkas (120 hari) dan kandungan lama dipadam, atau naik taraf ke Supabase Pro.",
   storage: "Padam poster yang tamat lebih 30 hari, atau naik taraf ke Supabase Pro.",

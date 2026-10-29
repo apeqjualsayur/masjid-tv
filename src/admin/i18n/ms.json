@@ -824,7 +824,7 @@
       "fix": {
         "egress": {
           "t": "Egress TV menghampiri had",
-          "d": "Ubah selang semakan TV kepada 120 s antara Isyak dan Subuh, atau naik taraf ke Supabase Pro (US${usd}, {quota})."
+          "d": "TV sudah menyemak setiap 120 s pada waktu malam. Seterusnya: pindahkan poster ke Cloudflare R2, atau naik taraf ke Supabase Pro (US${usd}, {quota})."
         },
         "cached": {
           "t": "Muat turun poster menghampiri had",

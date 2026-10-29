@@ -1,8 +1,9 @@
 "use client";
 // Paired TV: content bundle sync (src/data/bundle.ts) → the Phase 1 display (PRD Phase 2 §7).
 // Boots from the stored bundle at once; network errors never blank the screen.
-import { useEffect, useMemo, useState } from "react";
-import { bundleSlides, idbBundleStore, referencedMedia, startBundleSync, type BundleState } from "@/data";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { nowMs } from "@/core";
+import { bundleIntervalAt, bundleSlides, createFallbackLoader, createPrayerData, idbBundleStore, idbMonthStore, referencedMedia, startBundleSync, type BundleState } from "@/data";
 import { getTvSupabase } from "@/lib/supabase";
 import { bundleToScreenConfig } from "../bundle-config";
 import { APP_VERSION } from "../status";
@@ -18,16 +19,25 @@ export function postMediaSync(urls: string[]) {
 export function BundleDisplay({ secret, onRevoked }: { secret: string; onRevoked: () => void }) {
   const [st, setSt] = useState<BundleState | null>(null);
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? "";
+  /** The masjid's zone from the latest bundle, for the night-time sync interval. */
+  const zone = useRef<string | null>(null);
 
   useEffect(() => {
     const sb = getTvSupabase();
+    // Prayer times read like the display does (IndexedDB → bundled file): works offline.
+    const prayer = createPrayerData({ store: idbMonthStore(), loadYear: createFallbackLoader() });
     const sync = startBundleSync({
       call: async (since) => {
         const { data, error } = await sb.rpc("screen_bundle", { p_secret: secret, p_since: since, p_app_version: APP_VERSION });
         return { data, error: error ? { message: error.message } : null };
       },
       store: idbBundleStore(),
-      onState: setSt,
+      onState: (s) => {
+        zone.current = s.bundle?.org.zone ?? zone.current;
+        setSt(s);
+      },
+      // 60 s by day, 120 s from Isyak + 30 min to Subuh − 30 min. nowMs() follows ?sim= on debug TVs.
+      intervalMs: () => bundleIntervalAt(prayer, zone.current, nowMs()),
     });
     return () => sync.stop();
   }, [secret]);
@@ -61,7 +71,7 @@ export function BundleDisplay({ secret, onRevoked }: { secret: string; onRevoked
     configSource: st.from === "live" ? "bundle" : "bundle (simpanan)",
     slides: mapped.slides,
     warnings: mapped.warnings,
-    bundle: { version: bundle.version, lastSync: st.lastSync, status: st.status, screenName: bundle.screen.name, from: st.from },
+    bundle: { version: bundle.version, lastSync: st.lastSync, status: st.status, screenName: bundle.screen.name, from: st.from, intervalMs: st.intervalMs ?? null },
   };
   return <DisplayHost source={source} />;
 }

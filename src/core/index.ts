@@ -7,3 +7,4 @@ export * from "./modes";
 export * from "./display-state";
 export * from "./playlist";
 export * from "./friday";
+export * from "./sync-interval";

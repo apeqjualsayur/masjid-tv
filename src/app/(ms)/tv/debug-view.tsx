@@ -18,7 +18,7 @@ export interface DebugMeta {
   swVersion: string | null;
   online: boolean;
   /** Paired TVs: content bundle sync (PRD Phase 2 §7). */
-  bundle?: { version: number | null; lastSync: number | null; status: string; screenName: string | null; from: string | null };
+  bundle?: { version: number | null; lastSync: number | null; status: string; screenName: string | null; from: string | null; intervalMs?: number | null };
   warnings: string[];
 }
 
@@ -136,7 +136,7 @@ export function MetaFooter({ meta }: { meta: DebugMeta }) {
       {row("Sim", "sim", meta.sim ?? "tiada")}
       {meta.bundle && row("Skrin", "screen", meta.bundle.screenName ?? "–")}
       {meta.bundle && row("Bundle", "bundle", `v${meta.bundle.version ?? "–"} · ${meta.bundle.status}${meta.bundle.from === "cache" ? " · simpanan" : ""}`)}
-      {meta.bundle && row("Bundle sync", "bundle-sync", ago(meta.bundle.lastSync))}
+      {meta.bundle && row("Bundle sync", "bundle-sync", `${ago(meta.bundle.lastSync)}${meta.bundle.intervalMs ? ` · setiap ${Math.round(meta.bundle.intervalMs / 1000)} s` : ""}`)}
       {meta.warnings.length > 0 && <div className="col-span-3 text-orange-300">⚠ {meta.warnings.join(" · ")}</div>}
     </footer>
   );

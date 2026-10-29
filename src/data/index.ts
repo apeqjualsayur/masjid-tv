@@ -8,3 +8,4 @@ export * from "./prayer-data";
 export * from "./zones";
 export * from "./slides";
 export * from "./bundle";
+export * from "./night-sync";

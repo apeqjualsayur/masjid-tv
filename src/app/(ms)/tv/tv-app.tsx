@@ -52,6 +52,8 @@ export interface BundleMeta {
   status: string;
   screenName: string | null;
   from: string | null;
+  /** Wait before the next bundle sync (60 s / 120 s at night). */
+  intervalMs?: number | null;
 }
 
 /** What the display shows: screen.json + sample slides (local mode) or the synced bundle (paired). */

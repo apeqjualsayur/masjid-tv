@@ -28,9 +28,20 @@ export interface UnavailableState {
   lite: boolean;
 }
 
+/** Where a template is drawn: bottom = 12:5, side = 5:4, poster = 16:9 full stage (contract rules 10, 18). */
+export type TemplateArea = "bottom" | "side" | "poster";
+
 export type TemplateComponents = {
-  [K in TemplateKey]: FC<{ s: DisplayState; fields: TemplateFields[K] }>;
+  [K in TemplateKey]: FC<{ s: DisplayState; fields: TemplateFields[K]; area: TemplateArea }>;
 };
+
+/** A poster box inside the 1920×1080 stage. */
+export interface PosterRect {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
 
 export interface ThemeDefinition {
   id: ThemeId;
@@ -39,6 +50,8 @@ export interface ThemeDefinition {
   /** font families used (self-hosted in src/app/fonts.ts) */
   fonts: string[];
   layouts: Record<LayoutKey, FC<LayoutProps>>;
+  /** Poster/announcement box per layout (contract rule 10); poster = the full stage. */
+  posterArea: Record<TemplateArea, PosterRect>;
   screens: {
     preAzanBanner: FC<{ s: DisplayState }>;
     azan: FC<{ s: DisplayState }>;

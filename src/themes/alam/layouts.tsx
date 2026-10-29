@@ -2,10 +2,11 @@
 // Alam layouts: full (designs/A-Full), bottom (A-Bottom), side (A-Side), all over the landscape.
 import type { DisplayState } from "@/core";
 import type { CSSProperties, FC } from "react";
-import type { LayoutProps, SlideView } from "../types";
+import type { LayoutProps, SlideView, TemplateArea } from "../types";
 import { Landscape } from "./landscape";
 import { AreaContext, Arabic, Logo, Page, StateChip, Star8, WaktuIcon, cardLook, countdownLine, num, type Area } from "./parts";
 import { CrossFade } from "../shared/crossfade";
+import { CHIP_MARGIN, EMPTY_TEXT, FitBox, templateAreaOf } from "../shared/poster";
 import { FridayStrip } from "./friday";
 import { AlamPoster } from "./poster";
 import { alamTemplates } from "./templates";
@@ -21,12 +22,12 @@ function SlideLayer({ s, slide, area }: { s: DisplayState; slide?: SlideView; ar
     );
   }
   const sober = slide?.kind === "template" && slide.template === "kematian";
-  const T = slide?.kind === "template" ? (alamTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown }>) : null;
+  const T = slide?.kind === "template" ? (alamTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>) : null;
   return (
     <div style={{ position: "absolute", inset: 0, background: A.card, color: A.cardFg }}>
       {!sober && <Star8 size={560} color={A.green} opacity={0.08} circle style={{ top: -140, right: -140 }} />}
       <div style={{ position: "relative", height: "100%", boxSizing: "border-box", padding: "72px 80px" }}>
-        <AreaContext.Provider value={area}>{T && slide?.kind === "template" ? <T s={s} fields={slide.fields} /> : null}</AreaContext.Provider>
+        <AreaContext.Provider value={area}>{T && slide?.kind === "template" ? <T s={s} fields={slide.fields} area={templateAreaOf(area)} /> : null}</AreaContext.Provider>
       </div>
     </div>
   );
@@ -246,6 +247,81 @@ export function SideLayout({ s, slide, slideKey, counter }: LayoutProps) {
         </div>
         <FridayStrip s={s} variant="card" style={{ padding: "12px 20px", lineHeight: 1.25 }} />
       </div>
+    </Page>
+  );
+}
+// ------------------------------------------------------------------ poster (announcement-only)
+
+/** Content box of the side (5:4) card: 1280×1008 minus its 72/80 px padding. Scaled up to fill 16:9. */
+const POSTER_CONTENT = { w: 1120, h: 864 };
+
+function PosterSlide({ s, slide }: { s: DisplayState; slide: SlideView }) {
+  if (slide.kind === "poster") {
+    return (
+      <div style={{ position: "absolute", inset: 0, background: "#0C1A16" }}>
+        <AlamPoster s={s} imageUrl={slide.imageUrl} />
+      </div>
+    );
+  }
+  const T = alamTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>;
+  // Light card edge-to-edge; no star decoration around the slide (rule 14).
+  return (
+    <div style={{ position: "absolute", inset: 0, background: A.card, color: A.cardFg }}>
+      <FitBox w={POSTER_CONTENT.w} h={POSTER_CONTENT.h}>
+        <AreaContext.Provider value="tall">
+          <T s={s} fields={slide.fields} area="poster" />
+        </AreaContext.Provider>
+      </FitBox>
+    </div>
+  );
+}
+
+/** Logo + short name, bottom-left, 70 % opacity (rule 14). Solid glass colour: no blur. Kematian: name only (rule 7). */
+function BrandChip({ s, sober }: { s: DisplayState; sober: boolean }) {
+  return (
+    <div
+      data-brand-chip
+      style={{ position: "absolute", left: CHIP_MARGIN, bottom: CHIP_MARGIN, display: "flex", alignItems: "center", gap: 12, padding: sober ? "12px 22px" : "8px 22px 8px 8px", borderRadius: 999, background: A.glassLite, color: A.white, opacity: 0.7, fontSize: 22, fontWeight: 700 }}
+    >
+      {!sober && <Logo masjid={s.masjid} size={40} lite />}
+      {s.masjid.shortName}
+    </div>
+  );
+}
+
+/** Rule 17: the phase landscape with one calm card; no prayer data. */
+function PosterEmpty({ s }: { s: DisplayState }) {
+  return (
+    <>
+      <Landscape phase={s.phase} lite={s.lite} />
+      <div data-empty style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+        <div style={{ width: 1100, boxSizing: "border-box", padding: "96px 110px", borderRadius: 32, background: A.card, color: A.cardFg, boxShadow: s.lite ? "none" : "0 24px 60px rgba(0,0,0,0.25)", display: "flex", flexDirection: "column", alignItems: "center", gap: 28, textAlign: "center" }}>
+          <Logo masjid={s.masjid} size={140} lite={s.lite} />
+          <div style={{ fontSize: 56, fontWeight: 800, lineHeight: 1.15 }}>{s.masjid.fullName}</div>
+          <div style={{ fontSize: 32, fontWeight: 500, color: A.cardMuted }}>{EMPTY_TEXT}</div>
+        </div>
+      </div>
+    </>
+  );
+}
+
+/** Announcement-only screen (contract rules 14–17): the slide edge-to-edge, nothing about prayer times. */
+export function PosterLayout({ s, slide, slideKey }: LayoutProps) {
+  if (!slide) {
+    return (
+      <Page>
+        <PosterEmpty s={s} />
+      </Page>
+    );
+  }
+  return (
+    <Page>
+      <div data-poster-area style={{ position: "absolute", inset: 0, overflow: "hidden", background: A.card }}>
+        <CrossFade id={slideKey ?? "slide"} lite={s.lite}>
+          <PosterSlide s={s} slide={slide} />
+        </CrossFade>
+      </div>
+      <BrandChip s={s} sober={slide.kind === "template" && slide.template === "kematian"} />
     </Page>
   );
 }

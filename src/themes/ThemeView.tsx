@@ -4,6 +4,12 @@ import type { DisplayState, LayoutKey } from "@/core";
 import type { LayoutProps, SlideView, ThemeDefinition, UnavailableState } from "./types";
 
 export function ThemeView({ theme, s, layout, slide, slideKey, counter }: { theme: ThemeDefinition; s: DisplayState; layout: LayoutKey; slide?: SlideView; slideKey?: string; counter?: LayoutProps["counter"] }) {
+  // Announcement-only screen: only the poster layout, never a mode screen, banner or counter (rules 14–15).
+  // The engine already keeps mode "normal" for poster screens; this guard keeps it true for any caller.
+  if (layout === "poster") {
+    const Poster = theme.layouts.poster;
+    return <Poster s={s} slide={slide} slideKey={slideKey} />;
+  }
   const sc = theme.screens;
   switch (s.mode) {
     case "azan":

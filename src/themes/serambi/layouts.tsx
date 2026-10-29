@@ -2,7 +2,8 @@
 // Serambi layouts: full (designs/D-Full), bottom (D-Bottom), side (D-Side).
 import type { DisplayState } from "@/core";
 import type { CSSProperties, FC } from "react";
-import type { LayoutProps, SlideView } from "../types";
+import type { LayoutProps, SlideView, TemplateArea } from "../types";
+import { CHIP_MARGIN, EMPTY_TEXT, FitBox, templateAreaOf } from "../shared/poster";
 import {
   AreaContext,
   ArchWindow,
@@ -34,16 +35,16 @@ function Ambient({ s }: { s: DisplayState }) {
   );
 }
 
-function TemplateBody({ s, slide }: { s: DisplayState; slide: Extract<SlideView, { kind: "template" }> }) {
-  const T = serambiTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown }>;
-  return <T s={s} fields={slide.fields} />;
+function TemplateBody({ s, slide, area }: { s: DisplayState; slide: Extract<SlideView, { kind: "template" }>; area: TemplateArea }) {
+  const T = serambiTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>;
+  return <T s={s} fields={slide.fields} area={area} />;
 }
 
 /** One slide's full layer. Wide: emerald panel. Tall: big gold arch frame. Kematian: plain and sober in both. */
 function SlideLayer({ s, slide, area }: { s: DisplayState; slide?: SlideView; area: Area }) {
   if (slide?.kind === "poster") return <SerambiPoster s={s} imageUrl={slide.imageUrl} />;
   const sober = slide?.kind === "template" && slide.template === "kematian";
-  const body = slide?.kind === "template" ? <TemplateBody s={s} slide={slide} /> : null;
+  const body = slide?.kind === "template" ? <TemplateBody s={s} slide={slide} area={templateAreaOf(area)} /> : null;
   if (area === "wide") {
     return (
       <div style={{ position: "absolute", inset: 0, boxSizing: "border-box", padding: "64px 110px", background: sober ? C.sidebar : C.emerald }}>
@@ -280,6 +281,72 @@ export function SideLayout({ s, slide, slideKey, counter }: LayoutProps) {
         </div>
         <FridayStrip s={s} variant="card" />
       </div>
+    </Page>
+  );
+}
+// ------------------------------------------------------------------ poster (announcement-only)
+
+/** Content box inside the side (5:4) arch: 920×960 minus its 200/90/80 px padding. Scaled up to fill 16:9. */
+const POSTER_CONTENT = { w: 740, h: 680 };
+
+function PosterSlide({ s, slide }: { s: DisplayState; slide: SlideView }) {
+  if (slide.kind === "poster") return <SerambiPoster s={s} imageUrl={slide.imageUrl} />;
+  const sober = slide.template === "kematian";
+  // Emerald panel edge-to-edge; no arch frame around the slide (rule 14). Kematian: plain dark.
+  return (
+    <div style={{ position: "absolute", inset: 0, background: sober ? C.sidebar : C.emerald }}>
+      <FitBox w={POSTER_CONTENT.w} h={POSTER_CONTENT.h}>
+        <AreaContext.Provider value="tall">
+          <TemplateBody s={s} slide={slide} area="poster" />
+        </AreaContext.Provider>
+      </FitBox>
+    </div>
+  );
+}
+
+/** Logo + short name, bottom-left, 70 % opacity (rule 14). Kematian: name only, no gold (rule 7). */
+function BrandChip({ s, sober }: { s: DisplayState; sober: boolean }) {
+  return (
+    <div
+      data-brand-chip
+      style={{ position: "absolute", left: CHIP_MARGIN, bottom: CHIP_MARGIN, display: "flex", alignItems: "center", gap: 12, padding: sober ? "12px 22px" : "8px 22px 8px 8px", borderRadius: 999, background: C.chipDark, border: `1px solid ${sober ? C.divider : C.goldLine}`, color: sober ? C.muted : C.gold, opacity: 0.7, fontSize: 22, fontWeight: 600 }}
+    >
+      {!sober && <Logo masjid={s.masjid} size={40} />}
+      {s.masjid.shortName}
+    </div>
+  );
+}
+
+/** Rule 17: one calm panel with a gold hairline; no prayer data. */
+function PosterEmpty({ s }: { s: DisplayState }) {
+  return (
+    <div data-empty style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center", background: s.lite ? C.bg : `radial-gradient(ellipse 60% 70% at 50% 55%, ${C.emerald2} 0%, ${C.bg} 75%)` }}>
+      <div style={{ width: 1100, boxSizing: "border-box", padding: "96px 110px", borderRadius: 28, background: C.sidebar, border: `1px solid ${C.goldLine}`, display: "flex", flexDirection: "column", alignItems: "center", gap: 28, textAlign: "center" }}>
+        <Logo masjid={s.masjid} size={140} />
+        <div style={{ fontSize: 56, fontWeight: 600, lineHeight: 1.15, color: C.white }}>{s.masjid.fullName}</div>
+        <div style={{ fontSize: 32, fontWeight: 500, color: C.muted }}>{EMPTY_TEXT}</div>
+      </div>
+    </div>
+  );
+}
+
+/** Announcement-only screen (contract rules 14–17): the slide edge-to-edge, nothing about prayer times. */
+export function PosterLayout({ s, slide, slideKey }: LayoutProps) {
+  if (!slide) {
+    return (
+      <Page>
+        <PosterEmpty s={s} />
+      </Page>
+    );
+  }
+  return (
+    <Page>
+      <div data-poster-area style={{ position: "absolute", inset: 0, overflow: "hidden", background: C.bg }}>
+        <CrossFade id={slideKey ?? "slide"} lite={s.lite}>
+          <PosterSlide s={s} slide={slide} />
+        </CrossFade>
+      </div>
+      <BrandChip s={s} sober={slide.kind === "template" && slide.template === "kematian"} />
     </Page>
   );
 }

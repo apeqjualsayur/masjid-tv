@@ -2,8 +2,9 @@
 // Tenang layouts: full (designs/F-Full), bottom (F-Bottom), side (F-Side).
 import type { DisplayState, WaktuView } from "@/core";
 import type { CSSProperties, FC } from "react";
-import type { LayoutProps, SlideView } from "../types";
+import type { LayoutProps, SlideView, TemplateArea } from "../types";
 import { CrossFade } from "../shared/crossfade";
+import { CHIP_MARGIN, EMPTY_TEXT, FitBox, templateAreaOf } from "../shared/poster";
 import { AreaContext, Arabic, Dot, Logo, Page, tickerItem, tokensOf, type Area } from "./parts";
 import { FridayStrip } from "./friday";
 import { TenangPoster } from "./poster";
@@ -31,11 +32,11 @@ function pill(t: TenangTokens, w: WaktuView, lite: boolean) {
 export function SlideBody({ s, slide, area }: { s: DisplayState; slide?: SlideView; area: Area }) {
   if (slide?.kind === "poster") return <TenangPoster s={s} imageUrl={slide.imageUrl} />;
   if (slide?.kind !== "template") return null;
-  const T = tenangTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown }>;
+  const T = tenangTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>;
   return (
     <div style={{ height: "100%", boxSizing: "border-box", background: tokensOf(s).card, padding: area === "wide" ? "88px 110px" : "80px 90px" }}>
       <AreaContext.Provider value={area}>
-        <T s={s} fields={slide.fields} />
+        <T s={s} fields={slide.fields} area={templateAreaOf(area)} />
       </AreaContext.Provider>
     </div>
   );
@@ -214,6 +215,70 @@ export function SideLayout({ s, slide, slideKey, counter }: LayoutProps) {
         </div>
         <FridayStrip s={s} variant="card" style={{ marginTop: 16 }} />
       </div>
+    </Page>
+  );
+}
+// ------------------------------------------------------------------ poster (announcement-only)
+
+/** Content box of the side (5:4) card: 1200×968 minus its 80/90 px padding. Scaled up to fill 16:9. */
+const POSTER_CONTENT = { w: 1020, h: 808 };
+
+function PosterSlide({ s, slide }: { s: DisplayState; slide: SlideView }) {
+  if (slide.kind === "poster") return <TenangPoster s={s} imageUrl={slide.imageUrl} />;
+  const T = tenangTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>;
+  return (
+    <FitBox w={POSTER_CONTENT.w} h={POSTER_CONTENT.h}>
+      <AreaContext.Provider value="tall">
+        <T s={s} fields={slide.fields} area="poster" />
+      </AreaContext.Provider>
+    </FitBox>
+  );
+}
+
+/** Logo + short name, bottom-left, 70 % opacity (rule 14). Kematian: name only, no accent (rule 7). */
+function BrandChip({ s, t, sober }: { s: DisplayState; t: TenangTokens; sober: boolean }) {
+  return (
+    <div
+      data-brand-chip
+      style={{ position: "absolute", left: CHIP_MARGIN, bottom: CHIP_MARGIN, display: "flex", alignItems: "center", gap: 12, padding: sober ? "12px 22px" : "8px 22px 8px 8px", borderRadius: 999, background: t.bg, color: sober ? t.muted : t.fg, opacity: 0.7, fontSize: 22, fontWeight: 600 }}
+    >
+      {!sober && <Logo masjid={s.masjid} size={40} color={t.accent} />}
+      {s.masjid.shortName}
+    </div>
+  );
+}
+
+/** Rule 17: calm card, no prayer data. */
+function PosterEmpty({ s, t }: { s: DisplayState; t: TenangTokens }) {
+  return (
+    <div data-empty style={{ position: "absolute", inset: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
+      <div style={{ width: 1100, boxSizing: "border-box", padding: "96px 110px", borderRadius: 40, background: t.card, boxShadow: s.lite ? "none" : SHADOW_CARD, display: "flex", flexDirection: "column", alignItems: "center", gap: 28, textAlign: "center" }}>
+        <Logo masjid={s.masjid} size={140} color={t.accent} />
+        <div style={{ fontSize: 56, fontWeight: 700, letterSpacing: -1, lineHeight: 1.15 }}>{s.masjid.fullName}</div>
+        <div style={{ fontSize: 32, fontWeight: 500, color: t.muted }}>{EMPTY_TEXT}</div>
+      </div>
+    </div>
+  );
+}
+
+/** Announcement-only screen (contract rules 14–17): the slide edge-to-edge, nothing about prayer times. */
+export function PosterLayout({ s, slide, slideKey }: LayoutProps) {
+  const t = tokensOf(s);
+  if (!slide) {
+    return (
+      <Page t={t}>
+        <PosterEmpty s={s} t={t} />
+      </Page>
+    );
+  }
+  return (
+    <Page t={t}>
+      <div data-poster-area style={{ position: "absolute", inset: 0, background: t.card, color: t.fg, overflow: "hidden" }}>
+        <CrossFade id={slideKey ?? "slide"} lite={s.lite}>
+          <PosterSlide s={s} slide={slide} />
+        </CrossFade>
+      </div>
+      <BrandChip s={s} t={t} sober={slide.kind === "template" && slide.template === "kematian"} />
     </Page>
   );
 }

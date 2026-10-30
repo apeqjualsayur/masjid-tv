@@ -326,6 +326,8 @@ async function run(orgIds: string[]) {
   expectFail(`after 10 wrong codes the 11th pair_claim is refused (too_many_attempts) [extra, PRD §10] — failed attempts recorded: ${recorded.count ?? "?"}`,
     await P.db.rpc("pair_claim", { p_code: "199999", p_org: pReg, p_name: "x" }), "too_many_attempts");
 
+  await round2Checks(A, orgA);
+
   // 8. screen_bundle --------------------------------------------------------------
   console.log("\nScreen bundle (TV sync)");
   const b1 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: 0 });
@@ -389,6 +391,60 @@ async function run(orgIds: string[]) {
   const aOrgs = await A.db.from("members").select("org_id").eq("user_id", A.id);
   report((cOrgs.data ?? []).some((m) => m.org_id === orgA) && (aOrgs.data ?? []).length === 0, "after the replace: C sees org A, A sees no masjid", `C: ${(cOrgs.data ?? []).length}, A: ${(aOrgs.data ?? []).length}`);
   expectFail("P adds an email that already manages a masjid (B) -> user_has_org", await P.db.rpc("transfer_org", { p_org: orgA, p_email: B.email }), "user_has_org");
+}
+
+// Themes round 2 (migration 0009, _specs/40-PRD-themes-round2.md §7): the new theme ids and the
+// `poster` layout, and slide targeting between a full screen and a poster screen of one masjid.
+// Every screen paired here belongs to org A, so cleanup (org delete + pairing codes) removes it.
+type Bundle = { status?: string; screen?: { theme?: string; layout?: string }; slides?: { id?: string }[] } | null;
+async function round2Checks(A: TestUser, orgA: string) {
+  console.log("\nThemes round 2 (migration 0009)");
+  /** Pairs a new TV into org A; returns its secret and screen id (null when pair_claim failed). */
+  const pairTv = async (theme: string, layout: string) => {
+    const tv = secret();
+    const start = must(`pair_start (${theme}/${layout})`, await anon.rpc("pair_start", { p_secret: tv })) as { code: string };
+    const res = await A.db.rpc("pair_claim", { p_code: start.code, p_org: orgA, p_name: `TV ${theme} ${layout}`, p_theme: theme, p_layout: layout });
+    return { tv, res, screen: (res.data as string | null) ?? null };
+  };
+  const bundle = async (tv: string) => (await anon.rpc("screen_bundle", { p_secret: tv, p_since: 0 })).data as Bundle;
+
+  let fullTv = "";
+  for (const theme of ["falak", "garis", "kerawang", "seterusnya"]) {
+    const { tv, res, screen } = await pairTv(theme, "full");
+    if (res.error?.code === "22P02") {
+      report(false, `pair_claim accepts theme ${theme}`, "invalid enum value — apply supabase/migrations/0009_themes_round2.sql first");
+      return;
+    }
+    report(!res.error && !!screen, `pair_claim accepts theme ${theme}`, fmt(res.error));
+    const b = await bundle(tv);
+    report(b?.screen?.theme === theme && b?.screen?.layout === "full", `screen_bundle returns theme "${theme}"`, JSON.stringify(b?.screen ?? b));
+    if (theme === "falak") fullTv = tv;
+  }
+
+  const poster = await pairTv("tenang", "poster");
+  report(!poster.res.error && !!poster.screen, "pair_claim accepts layout poster", fmt(poster.res.error));
+  const pb = await bundle(poster.tv);
+  report(pb?.screen?.layout === "poster", 'screen_bundle returns layout "poster"', JSON.stringify(pb?.screen ?? pb));
+
+  // Rejected by the enum before pair_claim runs, so no pairing attempt is used up.
+  const bad = await pairTv("banana", "full");
+  expectFail("pair_claim rejects an unknown theme (banana)", bad.res, "22P02");
+  const badLayout = await pairTv("tenang", "carousel");
+  expectFail("pair_claim rejects an unknown layout (carousel)", badLayout.res, "22P02");
+
+  if (!poster.screen || !fullTv) return;
+  const target = await A.db
+    .from("slides")
+    .insert({ org_id: orgA, type: "template", template_key: "kuliah", fields: kuliahFields, status: "published", screen_ids: [poster.screen] })
+    .select("id")
+    .single();
+  expectOk("A creates a slide targeted only to the poster screen", target);
+  const id = (target.data as { id: string } | null)?.id;
+  if (!id) return;
+  const onFull = (await bundle(fullTv))?.slides ?? [];
+  report(!onFull.some((sl) => sl.id === id), "the targeted slide is NOT in the full screen's bundle", `${onFull.length} slide(s) in the full screen's bundle`);
+  const onPoster = (await bundle(poster.tv))?.slides ?? [];
+  report(onPoster.some((sl) => sl.id === id), "the targeted slide IS in the poster screen's bundle", `${onPoster.length} slide(s) in the poster screen's bundle`);
 }
 
 // Usage monitoring (migration 0008, _specs/30-PRD-usage.md §10.1). Runs after the screen above

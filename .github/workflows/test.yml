@@ -21,8 +21,9 @@ jobs:
         run: npm run lint
       - name: Unit tests
         run: npm test
-      - name: Production build (same command as Cloudflare Pages)
-        run: npm run build
+      - name: "Production build (same command as Cloudflare Pages, one retry: next/font downloads from Google Fonts sometimes fail on the runner)"
+        run: |
+          npm run build || { echo "::warning::Build failed (often a Google Fonts download from the runner); retrying once in 30 s"; sleep 30; npm run build; }
       - name: Build contains the service worker
         run: test -f out/sw.js && test -f out/tv/index.html && test -f out/data/SGR01-2026.json
 
@@ -40,7 +41,9 @@ jobs:
           node-version-file: .node-version
           cache: npm
       - run: npm ci
-      - run: npm run build
+      - name: "Build (one retry, as above)"
+        run: |
+          npm run build || { echo "::warning::Build failed (often a Google Fonts download from the runner); retrying once in 30 s"; sleep 30; npm run build; }
       - name: Browser checks
         run: npm run e2e
         env:

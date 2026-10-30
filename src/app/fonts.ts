@@ -65,10 +65,10 @@ export const amiri = Amiri({
   preload: false,
 });
 
-// tenang
+// tenang; round 2: falak, garis, kerawang, seterusnya (200 = Garis clock, Kerawang iqamah countdown)
 export const manrope = Manrope({
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["200", "300", "400", "500", "600", "700", "800"],
   variable: "--font-manrope",
   display: "block",
   preload: false,

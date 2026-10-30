@@ -10,7 +10,7 @@ import { seterusnya } from "./seterusnya";
 import { tenang } from "./tenang";
 import type { ThemeDefinition } from "./types";
 
-/** All themes (PRD section 8 + round 2). seterusnya is a placeholder until built. */
+/** All themes (PRD section 8 + round 2). */
 const THEMES: Partial<Record<ThemeId, ThemeDefinition>> = { alam, serambi, tenang, falak, garis, kerawang, seterusnya };
 
 export const FALLBACK_THEME: ThemeId = FALLBACK_THEME_ID;

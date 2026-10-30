@@ -27,7 +27,7 @@ If code and spec disagree, the spec wins — or update the spec first, deliberat
 | `src/data/` | API client (waktusolat.app), IndexedDB cache, bundled fallback, zones list; `bundle.ts`: Phase 2 TV content sync (screen_bundle every 60 s, stored bundle in IndexedDB) |
 | `src/themes/` | `types.ts` (ThemeDefinition), `index.ts` (TV: lazy per-theme loading, `useTheme`), `registry.ts` (synchronous, for the admin preview and tests), `ThemeView.tsx` (picks layout vs full-screen mode). Theme render tests in `themes.test.tsx` |
 | `src/themes/{alam,serambi,tenang,falak,garis,kerawang,seterusnya}/` | One self-contained folder per theme implementing `ThemeDefinition` |
-| `src/config/` | Build-time feature switches (`features.ts`: `THEMES_ROUND2_VISIBLE`, on only with `NEXT_PUBLIC_THEMES_ROUND2=1`; production builds leave it off) |
+| `src/config/` | Build-time feature switches (`features.ts`: `THEMES_ROUND2_VISIBLE`, on in production since 2026-10-30) |
 | `src/templates/` | Announcement template types + sample data (no styling); `schema.ts`: field metadata + validation the admin editor builds its form from; `ayat-sources.json`: the only allowed ayat/hadith (TO BE VERIFIED BY AN USTAZ) |
 | `src/app/tv/` | The display page: config + URL overrides → `DisplayState` → selected theme on a 1920×1080 stage. `pairing/`: Phase 2 pairing screen (device secret, pair_start/pair_status, QR). Without `?local=1` (and with Supabase configured) /tv shows pairing |
 | `scripts/` | Build-time scripts (e.g. `fetch-year.ts` for fallback data) |

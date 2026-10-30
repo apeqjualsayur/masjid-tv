@@ -2,6 +2,7 @@
 // says "free" (RM0).
 import { copy, type Lang } from "./i18n";
 import { LineIcon, STAT_ICONS } from "./icons";
+import { landingThemes } from "./themes-list";
 
 export function Numbers({ lang }: { lang: Lang }) {
   const c = copy(lang);
@@ -21,7 +22,7 @@ export function Numbers({ lang }: { lang: Lang }) {
               <span className="flex h-[30px] w-[30px] items-center justify-center rounded-full bg-lb-mint text-lb-deep">
                 <LineIcon d={STAT_ICONS[i]} size={15} strokeWidth={2.2} />
               </span>
-              <span className="text-[40px] font-semibold tracking-[-1px] text-lb-deep">{s.v}</span>
+              <span className="text-[40px] font-semibold tracking-[-1px] text-lb-deep">{s.id === "themes" ? landingThemes().length : s.v}</span>
               <span className="text-[14px] font-semibold">{s.l}</span>
             </li>
           ))}

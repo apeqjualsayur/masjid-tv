@@ -1,10 +1,13 @@
-// Plain landing sections (no theme renders): 4 Sebelum / Dengan, 5 Ciri-ciri, 12 Cara bermula.
+// Plain landing sections: 4 Sebelum / Dengan, 5 Ciri-ciri (its "Dua TV, dua tugas" card holds two
+// real theme renders, ./dual), 12 Cara bermula.
 // All copy from the i18n json.
 import type { ReactNode } from "react";
 import { DEMO_HREF, PRIVACY_HREF } from "./Footer";
 import { ADMIN_HREF } from "./Header";
 import { copy, type Lang } from "./i18n";
+import { DualScreens } from "./dual";
 import { FEATURE_ICONS, LineIcon } from "./icons";
+import { showDualScreens } from "./themes-list";
 
 export const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lb-deep";
 export const sectionPad = "py-[clamp(64px,8vw,100px)]";
@@ -96,6 +99,20 @@ export function Features({ lang }: { lang: Lang }) {
               </div>
             </li>
           ))}
+          {showDualScreens() && (
+            <li className="col-span-full flex flex-col gap-4 rounded-[18px] border border-lb-hair bg-lb-card p-[22px]">
+              <div className="flex gap-3.5">
+                <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-lb-soft text-lb-deep">
+                  <LineIcon d={FEATURE_ICONS[6]} />
+                </span>
+                <div className="flex flex-col gap-1.5">
+                  <h3 className="m-0 text-[17px] font-bold">{f.dual.t}</h3>
+                  <p className="m-0 text-[14px] leading-[1.6] text-lb-muted">{f.dual.d}</p>
+                </div>
+              </div>
+              <DualScreens prayer={f.dual.prayer} poster={f.dual.poster} />
+            </li>
+          )}
         </ul>
       </div>
     </section>

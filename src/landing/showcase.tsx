@@ -15,16 +15,21 @@ import { ScaledStage, TvFrame } from "./frames";
 import { copy, type Lang } from "./i18n";
 import { InView, useSnapshot } from "./lazy";
 import { SectionHead, h2Class, Eyebrow, sectionPad } from "./sections";
+import { landingThemes } from "./themes-list";
 
 export const SHOWCASE_DATE = "2026-10-22";
 const MIN = 60_000;
 /** Minutes from Zohor (13:01 that day) at which the engine is in each mode. Azan 3 min, iqamah 10. */
 export const DAY_OFFSETS = [40, -2, 1, 8, 16] as const; // normal, pre_azan, azan, iqamah, solat
-/** Fixed times for the Tema section (PRD). */
+/** Fixed times for the Tema section (PRD §4 row 11): each theme in a phase that shows it well. */
 export const THEME_TIMES: { id: ThemeId; hour: number; minute: number }[] = [
   { id: "tenang", hour: 13, minute: 20 },
   { id: "serambi", hour: 19, minute: 15 },
   { id: "alam", hour: 19, minute: 6 },
+  { id: "falak", hour: 6, minute: 20 },
+  { id: "garis", hour: 14, minute: 40 },
+  { id: "kerawang", hour: 17, minute: 20 },
+  { id: "seterusnya", hour: 21, minute: 10 },
 ];
 const atLocal = (hour: number, minute: number) => Date.UTC(2026, 9, 22, hour - 8, minute);
 
@@ -148,13 +153,16 @@ function ThemeTv({ id, hour, minute, label }: { id: ThemeId; hour: number; minut
 
 export function ThemesSection({ lang }: { lang: Lang }) {
   const k = copy(lang).themes;
+  const ids = landingThemes();
+  const all = ids.length > 3;
+  const items = k.items.filter((it) => ids.includes(it.id as ThemeId));
   return (
     <section id="tema" aria-labelledby="tema-title" className={sectionPad}>
       <div className="mx-auto flex max-w-[1200px] flex-col gap-8 px-5">
-        <SectionHead id="tema-title" eyebrow={k.eyebrow} title={k.title} body={k.body} />
+        <SectionHead id="tema-title" eyebrow={k.eyebrow} title={all ? k.titleAll : k.title} body={all ? k.bodyAll : k.body} />
         <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(280px,100%),1fr))] gap-[22px]">
-          {k.items.map((it, i) => {
-            const tt = THEME_TIMES[i];
+          {items.map((it) => {
+            const tt = THEME_TIMES.find((x) => x.id === it.id)!;
             const label = `${it.n}: ${it.d}`;
             return (
               <li key={it.n} className="flex flex-col gap-2.5">

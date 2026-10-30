@@ -51,15 +51,15 @@ IDs are anchor targets for the nav.
 |---|---|---|---|
 | 1 | Header (sticky) | Lockup · Ciri-ciri `#ciri` · Panel AJK `#panel` · Peranti `#peranti` · Cara bermula `#cara` · Soalan lazim `#soalan` · BM/EN · Log masuk · **Daftar percuma** | < 900 px: lockup + Daftar + menu button opening a sheet with the links and BM/EN |
 | 2 | Hero | App icon, chip "Percuma untuk semua masjid dan surau", H1, paragraph, **Daftar masjid percuma** + Lihat demo langsung, "Berfungsi pada" device chips. Right: TV (stand + bezel) showing the **Tenang theme, bottom layout, Kuliah slide**, with a phone admin mockup overlapping | TV colours follow the **current prayer time in Kuala Lumpur** (WLY01) using the Phase 1 engine and bundled data; background glow follows too. Phone mockup hidden < 900 px |
-| 3 | Numbers band | 7 waktu harian · 10 templat · 3 tema · RM0 yuran | This band + the hero chip are the only places "free" is said — no separate section |
+| 3 | Numbers band | 7 waktu harian · 10 templat · 3 tema (7 tema once round 2 is switched on, `THEMES_ROUND2_VISIBLE`) · RM0 yuran | This band + the hero chip are the only places "free" is said — no separate section |
 | 4 | Sebelum / Dengan Masjid View | 4 + 4 lines | |
-| 5 | Ciri-ciri `#ciri` | Heading block left, 8 feature cards right | 1 column on phone |
+| 5 | Ciri-ciri `#ciri` | Heading block left, 8 feature cards right; with round 2 a full-width 9th card "Dua TV, dua tugas" with two real renders (Tenang full + Tenang poster layout) | 1 column on phone |
 | 6 | Satu hari di skrin masjid | 5 small TVs: normal, sebelum azan, azan, iqamah, solat | Use the real theme mode renders (Tenang) if feasible; otherwise coded tiles as in design |
 | 7 | Panel AJK `#panel` | Laptop (editor + live preview) and phone (template picker + poster size "1920×800") + 4 benefit cards, incl. "Dua pentadbir" (two equal admins per masjid — PRD Phase 2 §3) | Coded illustration |
 | 8 | 10 templat | Grid of 10 template cards (12:5 thumbnails) | Thumbnails may be real template renders at small scale |
-| 9 | Cuba sekarang `#cuba` | Name input + Tenang/Serambi/Alam buttons; TV preview updates live with the typed name and monogram | Uses real theme components; nothing is saved or sent |
+| 9 | Cuba sekarang `#cuba` | Name input + one button per theme (3, or 7 with round 2; wrap on phone, `aria-pressed`); TV preview updates live with the typed name and monogram | Uses real theme components; nothing is saved or sent |
 | 10 | Guna TV sedia ada `#peranti` | URL pill `masjidview.my/tv`, 4 device cards, strip: pairing code + works offline | Device list must not name TV brands that have not been tested |
-| 11 | Tema | 3 small TVs (Tenang, Serambi, Alam) + names + one line each | Real theme renders, full layout |
+| 11 | Tema | Small TVs (Tenang, Serambi, Alam; + Falak, Garis Masa, Kerawang, Seterusnya with round 2) + names + one line each | Real theme renders, full layout, mounted when in view, fixed times: Tenang 1:20 pm, Serambi 7:15 pm, Alam 7:06 pm, Falak 6:20 am, Garis Masa 2:40 pm, Kerawang 5:20 pm, Seterusnya 9:10 pm |
 | 12 | Cara bermula `#cara` | 4 steps + "Apa yang diperlukan" line | |
 | 13 | ~~Kenapa percuma?~~ | **Removed.** "Free" is already covered by the hero chip (§4 row 2) and the numbers band (§4 row 3); no dedicated section. | |
 | 14 | Soalan lazim `#soalan` | 10 Q&A as `<details>` (first open) | Also output as FAQPage JSON-LD |
@@ -103,7 +103,7 @@ Short static page, same header/footer. Sections: (1) Android / Google TV with Fu
 ## 10. Acceptance criteria
 1. `/` matches `Lembut-Full.dc.html` at 1440 and 390 (side-by-side screenshots), with the Pintu Mihrab lockup in header and footer.
 2. Hero TV shows the current KL prayer period; changing the device clock (or `?sim=` on `/`) changes TV colours and the highlighted time.
-3. Cuba sekarang: typing a name updates the TV preview instantly in all 3 themes; nothing is stored or sent (no network requests in DevTools).
+3. Cuba sekarang: typing a name updates the TV preview instantly in every theme shown; nothing is stored or sent (no network requests in DevTools).
 4. `/tv?demo=1` runs without sign-in or internet after first load, shows the DEMO badge, and cycles the 4 demo slides.
 5. `/en` is fully English (no BM strings left except proper nouns and prayer names); BM/EN toggle keeps the anchor.
 6. Every link in §5 works; `/panduan` exists in BM and EN.

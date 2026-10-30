@@ -10,9 +10,10 @@ import { InView, useSnapshot } from "./lazy";
 import { NAME_MAX, tryMonogram } from "./monogram";
 import { Eyebrow, focusRing, h2Class, sectionPad } from "./sections";
 import { SHOWCASE_DATE } from "./showcase";
+import { landingThemes } from "./themes-list";
 
-/** Launch themes shown on the landing page (round-2 themes are added when launched). */
-const THEMES = ["tenang", "serambi", "alam"] as const satisfies readonly ThemeId[];
+/** 3 launch themes, or all 7 once round 2 is switched on (same switch as the admin). */
+const THEMES = landingThemes();
 /** Asar, 4:42 pm on the showcase Thursday (as in the design). */
 const TRY_AT = Date.UTC(2026, 9, 22, 16 - 8, 42);
 
@@ -31,7 +32,7 @@ export function TrySection({ lang }: { lang: Lang }) {
   const c = copy(lang);
   const k = c.try;
   const [name, setName] = useState(k.defaultName);
-  const [theme, setTheme] = useState<(typeof THEMES)[number]>("tenang");
+  const [theme, setTheme] = useState<ThemeId>("tenang");
   const inputId = useId();
   const themeLabelId = useId();
   return (

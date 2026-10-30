@@ -57,19 +57,23 @@
     "stats": [
       {
         "v": "7",
-        "l": "Waktu harian ikut zon"
+        "l": "Waktu harian ikut zon",
+        "id": ""
       },
       {
         "v": "10",
-        "l": "Templat pengumuman"
+        "l": "Templat pengumuman",
+        "id": ""
       },
       {
+        "id": "themes",
         "v": "3",
         "l": "Tema paparan"
       },
       {
         "v": "RM0",
-        "l": "Yuran, selama-lamanya"
+        "l": "Yuran, selama-lamanya",
+        "id": ""
       }
     ]
   },
@@ -128,7 +132,13 @@
         "t": "Tanpa internet pun jalan",
         "d": "Waktu setahun disimpan dalam TV. Menyegerak semula bila talian pulih."
       }
-    ]
+    ],
+    "dual": {
+      "t": "Dua TV, dua tugas",
+      "d": "Satu TV memaparkan waktu solat, satu lagi memaparkan pengumuman sepenuh skrin. Pilih “Pengumuman sahaja” untuk TV kedua.",
+      "prayer": "TV 1: waktu solat",
+      "poster": "TV 2: pengumuman sahaja"
+    }
   },
   "day": {
     "eyebrow": "SATU HARI DI SKRIN MASJID",
@@ -294,7 +304,11 @@
     "themes": {
       "tenang": "Tenang",
       "serambi": "Serambi",
-      "alam": "Alam"
+      "alam": "Alam",
+      "falak": "Falak",
+      "garis": "Garis Masa",
+      "kerawang": "Kerawang",
+      "seterusnya": "Seterusnya"
     },
     "cta": "Suka? Daftar masjid ini secara percuma →"
   },
@@ -336,18 +350,43 @@
     "body": "Tukar tema bila-bila masa tanpa menaip semula pengumuman. Lebih banyak tema akan datang.",
     "items": [
       {
+        "id": "tenang",
         "n": "Tenang",
         "d": "Minimal dan lapang, warna pastel yang lembut."
       },
       {
+        "id": "serambi",
         "n": "Serambi",
         "d": "Gelap dengan gerbang langit dan sentuhan emas."
       },
       {
+        "id": "alam",
         "n": "Alam",
         "d": "Langit dan landskap yang berubah sepanjang hari."
+      },
+      {
+        "id": "falak",
+        "n": "Falak",
+        "d": "Jam dail analog, cakera ikut waktu siang dan malam."
+      },
+      {
+        "id": "garis",
+        "n": "Garis Masa",
+        "d": "Hari sebagai satu garis: lebar setiap waktu ikut tempoh sebenar."
+      },
+      {
+        "id": "kerawang",
+        "n": "Kerawang",
+        "d": "Panel kayu berukir, waktu semasa bercahaya emas."
+      },
+      {
+        "id": "seterusnya",
+        "n": "Seterusnya",
+        "d": "Waktu seterusnya paling besar, dengan masa azan dan iqamah."
       }
-    ]
+    ],
+    "titleAll": "Tujuh tema, warna ikut waktu solat",
+    "bodyAll": "Tukar tema bila-bila masa tanpa menaip semula pengumuman. Setiap TV boleh guna tema sendiri."
   },
   "start": {
     "eyebrow": "CARA BERMULA",

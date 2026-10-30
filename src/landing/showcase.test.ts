@@ -15,6 +15,6 @@ describe("landing showcase times", () => {
   });
 
   it("Tema uses the fixed times from the PRD", () => {
-    expect(THEME_TIMES.map((t) => `${t.id} ${t.hour}:${String(t.minute).padStart(2, "0")}`)).toEqual(["tenang 13:20", "serambi 19:15", "alam 19:06"]);
+    expect(THEME_TIMES.map((t) => `${t.id} ${t.hour}:${String(t.minute).padStart(2, "0")}`)).toEqual(["tenang 13:20", "serambi 19:15", "alam 19:06", "falak 6:20", "garis 14:40", "kerawang 17:20", "seterusnya 21:10"]);
   });
 });

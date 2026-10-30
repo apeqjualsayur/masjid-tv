@@ -57,19 +57,23 @@
     "stats": [
       {
         "v": "7",
-        "l": "Daily times for your zone"
+        "l": "Daily times for your zone",
+        "id": ""
       },
       {
         "v": "10",
-        "l": "Announcement templates"
+        "l": "Announcement templates",
+        "id": ""
       },
       {
+        "id": "themes",
         "v": "3",
         "l": "Display themes"
       },
       {
         "v": "RM0",
-        "l": "Fees, forever"
+        "l": "Fees, forever",
+        "id": ""
       }
     ]
   },
@@ -128,7 +132,13 @@
         "t": "Works without internet",
         "d": "A whole year of prayer times is stored on the TV. It syncs again when the connection is back."
       }
-    ]
+    ],
+    "dual": {
+      "t": "Two TVs, two jobs",
+      "d": "One TV shows prayer times, the other shows announcements full screen. Choose “Announcements only” for the second TV.",
+      "prayer": "TV 1: prayer times",
+      "poster": "TV 2: announcements only"
+    }
   },
   "day": {
     "eyebrow": "A DAY ON THE MASJID SCREEN",
@@ -294,7 +304,11 @@
     "themes": {
       "tenang": "Tenang",
       "serambi": "Serambi",
-      "alam": "Alam"
+      "alam": "Alam",
+      "falak": "Falak",
+      "garis": "Garis Masa",
+      "kerawang": "Kerawang",
+      "seterusnya": "Seterusnya"
     },
     "cta": "Like it? Register this masjid for free →"
   },
@@ -336,18 +350,43 @@
     "body": "Change the theme any time without retyping your announcements. More themes are coming.",
     "items": [
       {
+        "id": "tenang",
         "n": "Tenang",
         "d": "Minimal and spacious, in soft pastel colours."
       },
       {
+        "id": "serambi",
         "n": "Serambi",
         "d": "Dark, with sky arches and a touch of gold."
       },
       {
+        "id": "alam",
         "n": "Alam",
         "d": "A sky and landscape that change through the day."
+      },
+      {
+        "id": "falak",
+        "n": "Falak",
+        "d": "An analogue dial whose face follows day and night."
+      },
+      {
+        "id": "garis",
+        "n": "Garis Masa",
+        "d": "The day as one line: each waktu as wide as it really lasts."
+      },
+      {
+        "id": "kerawang",
+        "n": "Kerawang",
+        "d": "Carved timber panels; the current waktu glows gold."
+      },
+      {
+        "id": "seterusnya",
+        "n": "Seterusnya",
+        "d": "The next waktu up front, with its azan and iqamah times."
       }
-    ]
+    ],
+    "titleAll": "Seven themes, colours that follow the prayer times",
+    "bodyAll": "Change theme any time without retyping announcements. Each TV can use its own theme."
   },
   "start": {
     "eyebrow": "GET STARTED",

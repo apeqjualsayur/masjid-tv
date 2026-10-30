@@ -9,7 +9,7 @@ export const DEVICE_ICONS = [
 export const STAT_ICONS = [
   "M12 7v5l3 2 M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z", // 7 waktu
   "M5 5h14v14H5Z M9 9h6", // 10 templat
-  "M12 3a9 9 0 1 0 0 18 M12 3v18", // 3 tema
+  "M12 3a9 9 0 1 0 0 18 M12 3v18", // tema
   "M5 12l5 5L20 7", // RM0
 ] as const;
 

@@ -26,10 +26,19 @@ export function InView({ children, placeholder, margin = "300px" }: { children: 
 let yearFile: Promise<YearFile> | null = null;
 export const loadYearFile = () => (yearFile ??= import("../../public/data/WLY01-2026.json").then((m) => (m.default ?? m) as unknown as YearFile));
 
+/** One chunk per theme, fetched the first time a section needs it. */
+const LOADERS: Record<ThemeId, () => Promise<ThemeDefinition>> = {
+  tenang: () => import("@/themes/tenang").then((m) => m.tenang),
+  serambi: () => import("@/themes/serambi").then((m) => m.serambi),
+  alam: () => import("@/themes/alam").then((m) => m.alam),
+  falak: () => import("@/themes/falak").then((m) => m.falak),
+  garis: () => import("@/themes/garis").then((m) => m.garis),
+  kerawang: () => import("@/themes/kerawang").then((m) => m.kerawang),
+  seterusnya: () => import("@/themes/seterusnya").then((m) => m.seterusnya),
+};
 const themes: Partial<Record<ThemeId, Promise<ThemeDefinition>>> = {};
 export function loadTheme(id: ThemeId): Promise<ThemeDefinition> {
-  return (themes[id] ??=
-    id === "serambi" ? import("@/themes/serambi").then((m) => m.serambi) : id === "alam" ? import("@/themes/alam").then((m) => m.alam) : import("@/themes/tenang").then((m) => m.tenang));
+  return (themes[id] ??= LOADERS[id]());
 }
 
 /** Theme + a frozen DisplayState for WLY01 at `at(dayTimes)`; null while loading or without data. */

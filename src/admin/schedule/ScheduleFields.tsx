@@ -1,9 +1,10 @@
 "use client";
 // Schedule form (PRD Phase 2 §4.5): start, optional end, seconds on screen, weekdays, priority,
-// target screens. Shared by the poster flow (2.8) and the template editor (2.9).
+// target screens (each with its layout; warns when only full screens are chosen, which never show
+// announcements). Shared by the poster flow (2.8) and the template editor (2.9).
 import { useId } from "react";
 import { useT } from "../i18n";
-import { DURATION, WEEKDAYS, type Schedule, type ScheduleErrors, type ScheduleRules } from "./logic";
+import { DURATION, WEEKDAYS, targetsShowNoSlides, type Schedule, type ScheduleErrors, type ScheduleRules } from "./logic";
 
 const label = "text-[13px] font-bold text-[#3A4E45]";
 const input = "h-12 w-full min-w-0 rounded-xl border bg-white px-3 text-[16px] text-adm-ink focus-visible:outline-2 focus-visible:outline-adm-green";
@@ -34,7 +35,7 @@ export function ScheduleFields({
   value: Schedule;
   onChange: (s: Schedule) => void;
   errors?: ScheduleErrors;
-  screens: { id: string; name: string }[];
+  screens: { id: string; name: string; layout: string }[];
   rules?: ScheduleRules;
 }) {
   const { t } = useT();
@@ -145,7 +146,7 @@ export function ScheduleFields({
                   <li key={s.id}>
                     <label className="flex min-h-11 cursor-pointer items-center gap-3 rounded-xl px-2 hover:bg-adm-ground">
                       <input type="checkbox" checked={on} onChange={() => set({ screenIds: on ? selected.filter((x) => x !== s.id) : [...selected, s.id] })} className="h-5 w-5 accent-[#146C4A]" />
-                      <span className="text-[15px]">{s.name}</span>
+                      <span className="text-[15px]">{t("schedule.screenOption", { name: s.name, layout: t(`layout.${s.layout}`) })}</span>
                     </label>
                   </li>
                 );
@@ -154,6 +155,11 @@ export function ScheduleFields({
           )}
           {errors.screens && <p className={err}>{t(errors.screens)}</p>}
         </div>
+      )}
+      {targetsShowNoSlides(value.screenIds, screens) && (
+        <p role="status" className="rounded-xl bg-[#FFF4DF] px-3.5 py-3 text-[13px] leading-[1.5] text-[#6B4A12]">
+          <b>{t("schedule.noSlidesWarning")}</b> {t("schedule.noSlidesHint")}
+        </p>
       )}
     </div>
   );

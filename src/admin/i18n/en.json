@@ -88,12 +88,17 @@
   "theme": {
     "alam": "Alam",
     "serambi": "Serambi",
-    "tenang": "Tenang"
+    "tenang": "Tenang",
+    "falak": "Falak",
+    "garis": "Garis Masa",
+    "kerawang": "Kerawang",
+    "seterusnya": "Seterusnya"
   },
   "layout": {
     "full": "Full",
     "bottom": "Bottom bar",
-    "side": "Side bar"
+    "side": "Side bar",
+    "poster": "Announcements only"
   },
   "template": {
     "pengumuman": "Announcement",
@@ -408,7 +413,11 @@
       "notAllowed": "Only a Pentadbir of an active masjid can connect screens.",
       "network": "No internet connection. Please try again.",
       "generic": "The screen could not be connected. Please try again."
-    }
+    },
+    "posterHelp": "For a second TV. No clock or prayer times.",
+    "posterTip": "Second TV? Choose “Announcements only”: this TV shows announcements full screen, while the first TV keeps showing prayer times.",
+    "posterTipUse": "Use Announcements only",
+    "posterTipDismiss": "Dismiss suggestion"
   },
   "poster": {
     "title": "Upload poster",
@@ -476,7 +485,8 @@
       "decode": "The picture could not be read. Try another file.",
       "tooBigOut": "The picture is still too large after compression. Try another file.",
       "noImage": "Choose a picture first."
-    }
+    },
+    "recNotePoster": "Full screen 16:9: a landscape poster fills the whole TV."
   },
   "schedule": {
     "title": "Display schedule",
@@ -524,7 +534,10 @@
       "endTooLate": "At most 7 days after the start.",
       "duration": "Between 5 and 120 seconds.",
       "screens": "Choose at least one screen."
-    }
+    },
+    "screenOption": "{name} · {layout}",
+    "noSlidesWarning": "These screens do not show announcements.",
+    "noSlidesHint": "The Full layout shows prayer times only. Choose another screen, or change its layout on the Screens page."
   },
   "picker": {
     "title": "New content",

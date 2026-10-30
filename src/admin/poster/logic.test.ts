@@ -88,3 +88,26 @@ describe("advice and recommended rows", () => {
     ]);
   });
 });
+describe("Pengumuman sahaja (poster layout, 16:9 area, round 2 §6)", () => {
+  it("recommended size 1920×1080; a 16:9 picture fills it", () => {
+    expect(SLOTS.poster).toEqual({ w: 1920, h: 1080 });
+    expect(fitOn(1920, 1080, "poster")).toMatchObject({ label: "full", scale: 1 });
+    expect(fitOn(1920, 800, "poster").label).toBe("blur"); // a 12:5 bottom-bar poster covers 74 % of 16:9
+  });
+  it("fit labels use the 16:9 area", () => {
+    // 1080×1350 portrait in 1920×1080: shown 864×1080 → 45 % → small
+    expect(fitOn(1080, 1350, "poster").label).toBe("small");
+    // 1350×1080 (5:4) → 1350×1080 shown, 70 % → blur
+    expect(fitOn(1350, 1080, "poster").label).toBe("blur");
+  });
+  it("low-resolution warning judges the 16:9 area", () => {
+    // 1280×720 → enlarged 1.5× on the poster screen (> 1.4)
+    expect(resolutionCheck(1280, 720, ["poster"])).toMatchObject({ upscaled: true, ok: false });
+    expect(resolutionCheck(1280, 720, ["bottom"]).upscaled).toBe(false); // only 1.11× in the 12:5 area
+    expect(resolutionCheck(1920, 1080, ["poster"]).ok).toBe(true);
+  });
+  it("a poster screen is listed with its 16:9 slot", () => {
+    const rows = recommendedRows([{ id: "1", name: "TV 2", theme: "garis", layout: "poster" }]);
+    expect(rows[0].slot).toEqual({ w: 1920, h: 1080 });
+  });
+});

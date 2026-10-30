@@ -124,6 +124,21 @@ export function scheduleToRow(s: Schedule): SlideScheduleRow {
     screen_ids: s.screenIds && s.screenIds.length ? [...s.screenIds] : null,
   };
 }
+export interface TargetScreen {
+  id: string;
+  layout: string;
+}
+
+/**
+ * True when every screen the slide would go to uses the `full` layout, which has no announcement
+ * area: the slide would never be seen ("Skrin ini tidak memaparkan pengumuman."). `screenIds` null =
+ * all screens. No screens (or none chosen) = no warning; the empty choice has its own error.
+ */
+export function targetsShowNoSlides(screenIds: string[] | null, screens: TargetScreen[]): boolean {
+  const chosen = screenIds === null ? screens : screens.filter((s) => screenIds.includes(s.id));
+  return chosen.length > 0 && chosen.every((s) => s.layout === "full");
+}
+
 /** Same schedule a number of days later ("Duplikasi untuk minggu depan"). */
 export function shiftSchedule(s: Schedule, days: number): Schedule {
   const add = (date: string) => {

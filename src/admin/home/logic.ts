@@ -1,13 +1,13 @@
 // Utama (home) data rules. Pure: no React, no Supabase.
-import { isEligible, type PlaylistItem } from "@/core";
+import { isEligible, type LayoutKey, type PlaylistItem, type ThemeId } from "@/core";
 
 export const ONLINE_WINDOW_MS = 3 * 60_000;
 
 export interface ScreenRow {
   id: string;
   name: string;
-  theme: "alam" | "serambi" | "tenang";
-  layout: "full" | "bottom" | "side";
+  theme: ThemeId;
+  layout: LayoutKey;
   last_seen_at: string | null;
   revoked_at: string | null;
 }

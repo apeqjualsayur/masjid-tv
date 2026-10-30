@@ -3,14 +3,16 @@
 // "Tambah skrin" sheet (code from the TV or ?pair= from its QR) → pair_claim, and per-screen
 // rename / theme / layout / revoke / delete.
 import { useCallback, useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
+import { THEMES_ROUND2_VISIBLE } from "@/config/features";
 import { getSupabase } from "@/lib/supabase";
 import { useDuration } from "../home/HomeView";
 import { useClock } from "../home/useHomeData";
 import { useT } from "../i18n";
 import { useAdmin } from "../session";
 import { Dialog } from "../shell/Dialog";
+import { ICON, Icon } from "../shell/icons";
 import { useToasts } from "../shell/Toast";
-import { LAYOUTS, NAME_MAX, PENDING_PAIR_KEY, THEMES, claimErrorKey, codeFromPaste, codeFromQuery, nameError, onlyDigits, screenStatus, sortScreens, type Layout, type Screen, type Theme } from "./logic";
+import { NAME_MAX, PENDING_PAIR_KEY, POSTER_TIP_KEY, claimErrorKey, codeFromPaste, codeFromQuery, layoutChoices, nameError, onlyDigits, screenStatus, sortScreens, suggestPosterLayout, themeChoices, type Layout, type Screen, type Theme } from "./logic";
 import { ThemeThumb } from "./ThemeThumb";
 
 const card = "rounded-[18px] bg-adm-card shadow-[0_1px_3px_rgba(18,38,30,0.08)]";
@@ -96,6 +98,7 @@ export function ScreensView() {
       {adding && (
         <AddSheet
           orgId={orgId}
+          screens={screens}
           initialCode={adding.code}
           onClose={closeAdd}
           onDone={(name) => {
@@ -231,11 +234,12 @@ function CodeBoxes({ value, onChange, invalid, describedBy }: { value: string; o
   );
 }
 
-function ThemePicker({ value, onChange, layout }: { value: Theme; onChange: (t: Theme) => void; layout: Layout }) {
+/** Theme choice: 3 launch themes, or all 7 with round 2 (thumbnails are real, lazy renders). */
+function ThemePicker({ value, onChange, layout, current }: { value: Theme; onChange: (t: Theme) => void; layout: Layout; current?: Theme }) {
   const { t } = useT();
   return (
-    <div role="radiogroup" aria-label={t("screens.theme")} className="grid grid-cols-3 gap-2">
-      {THEMES.map((th) => {
+    <div role="radiogroup" aria-label={t("screens.theme")} className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+      {themeChoices(THEMES_ROUND2_VISIBLE, current).map((th) => {
         const on = th === value;
         return (
           <button
@@ -255,11 +259,13 @@ function ThemePicker({ value, onChange, layout }: { value: Theme; onChange: (t: 
   );
 }
 
-function LayoutPicker({ value, onChange, theme }: { value: Layout; onChange: (l: Layout) => void; theme: Theme }) {
+/** Layout choice: 3, or 4 with round 2 ("Pengumuman sahaja" carries its helper text). */
+function LayoutPicker({ value, onChange, theme, current }: { value: Layout; onChange: (l: Layout) => void; theme: Theme; current?: Layout }) {
   const { t } = useT();
+  const choices = layoutChoices(THEMES_ROUND2_VISIBLE, current);
   return (
-    <div role="radiogroup" aria-label={t("screens.layout")} className="grid grid-cols-3 gap-2">
-      {LAYOUTS.map((l) => {
+    <div role="radiogroup" aria-label={t("screens.layout")} className={`grid gap-2 ${choices.length > 3 ? "grid-cols-2 sm:grid-cols-4" : "grid-cols-3"}`}>
+      {choices.map((l) => {
         const on = l === value;
         return (
           <button
@@ -267,11 +273,17 @@ function LayoutPicker({ value, onChange, theme }: { value: Layout; onChange: (l:
             type="button"
             role="radio"
             aria-checked={on}
+            aria-describedby={l === "poster" ? "layout-poster-help" : undefined}
             onClick={() => onChange(l)}
             className={`flex flex-col items-center gap-1.5 rounded-xl border-[1.5px] p-2 text-[13px] font-bold focus-visible:outline-2 focus-visible:outline-adm-green ${on ? "border-adm-green bg-[#F1F8F4] text-adm-ink" : "border-adm-line bg-white text-adm-muted"}`}
           >
             <ThemeThumb theme={theme} layout={l} width={88} />
             {t(`layout.${l}`)}
+            {l === "poster" && (
+              <span id="layout-poster-help" className="text-center text-[12px] leading-[1.35] font-medium text-adm-muted">
+                {t("screens.posterHelp")}
+              </span>
+            )}
           </button>
         );
       })}
@@ -279,7 +291,40 @@ function LayoutPicker({ value, onChange, theme }: { value: Layout; onChange: (l:
   );
 }
 
-function AddSheet({ orgId, initialCode, onClose, onDone }: { orgId: string; initialCode: string; onClose: () => void; onDone: (name: string) => void }) {
+/** "Second TV? Use Pengumuman sahaja": shown when the masjid has exactly one screen; dismissal remembered per browser. */
+function PosterTip({ screens, layout, onUse }: { screens: Screen[] | null; layout: Layout; onUse: () => void }) {
+  const { t } = useT();
+  const [dismissed, setDismissed] = useState(true);
+  useEffect(() => {
+    try {
+      setDismissed(localStorage.getItem(POSTER_TIP_KEY) === "1");
+    } catch {
+      setDismissed(false);
+    }
+  }, []);
+  if (layout === "poster" || !suggestPosterLayout(screens, dismissed, THEMES_ROUND2_VISIBLE)) return null;
+  const dismiss = () => {
+    setDismissed(true);
+    try {
+      localStorage.setItem(POSTER_TIP_KEY, "1");
+    } catch {}
+  };
+  return (
+    <div role="note" className="flex items-start gap-2 rounded-xl bg-adm-soft px-3.5 py-3 text-[13px] leading-[1.5] text-[#1E4A37]">
+      <div className="flex min-w-0 flex-1 flex-col items-start gap-2">
+        <p>{t("screens.posterTip")}</p>
+        <button type="button" onClick={onUse} className="min-h-11 rounded-xl border-[1.5px] border-adm-green bg-white px-3.5 text-[13px] font-bold text-adm-green">
+          {t("screens.posterTipUse")}
+        </button>
+      </div>
+      <button type="button" onClick={dismiss} aria-label={t("screens.posterTipDismiss")} className="-mt-1 -mr-1.5 flex h-11 w-11 flex-none items-center justify-center rounded-full hover:bg-white/60">
+        <Icon d={ICON.close} size={18} />
+      </button>
+    </div>
+  );
+}
+
+function AddSheet({ orgId, screens, initialCode, onClose, onDone }: { orgId: string; screens: Screen[] | null; initialCode: string; onClose: () => void; onDone: (name: string) => void }) {
   const { t } = useT();
   const [code, setCode] = useState(initialCode);
   const [name, setName] = useState("");
@@ -357,6 +402,7 @@ function AddSheet({ orgId, initialCode, onClose, onDone }: { orgId: string; init
         </div>
         <div className="flex flex-col gap-2">
           <span className={fieldLabel}>{t("screens.layout")}</span>
+          <PosterTip screens={screens} layout={layout} onUse={() => setLayout("poster")} />
           <LayoutPicker value={layout} onChange={setLayout} theme={theme} />
         </div>
         <button type="submit" disabled={busy} className={primary}>
@@ -426,11 +472,11 @@ function ManageSheet({ s, onClose, onDone, onError }: { s: Screen; onClose: () =
             </div>
             <div className="flex flex-col gap-2">
               <span className={fieldLabel}>{t("screens.theme")}</span>
-              <ThemePicker value={theme} onChange={setTheme} layout={layout} />
+              <ThemePicker value={theme} onChange={setTheme} layout={layout} current={s.theme} />
             </div>
             <div className="flex flex-col gap-2">
               <span className={fieldLabel}>{t("screens.layout")}</span>
-              <LayoutPicker value={layout} onChange={setLayout} theme={theme} />
+              <LayoutPicker value={layout} onChange={setLayout} theme={theme} current={s.layout} />
             </div>
             <button type="submit" disabled={busy || !dirty || Boolean(ne)} className={primary}>
               {busy ? t("screens.saving") : t("screens.save")}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { claimErrorKey, codeFromPaste, codeFromQuery, nameError, onlyDigits, screenStatus, sortScreens, type Screen } from "./logic";
+import { claimErrorKey, codeFromPaste, codeFromQuery, layoutChoices, nameError, onlyDigits, screenStatus, sortScreens, suggestPosterLayout, themeChoices, type Screen } from "./logic";
 
 describe("pairing code input", () => {
   it("keeps digits only, at most 6", () => {
@@ -54,5 +54,28 @@ describe("screen status", () => {
   it("sorts active by name, revoked last", () => {
     const s = (name: string, revoked: boolean): Screen => ({ id: name, name, theme: "tenang", layout: "full", last_seen_at: null, revoked_at: revoked ? "x" : null, app_version: null, created_at: "" });
     expect(sortScreens([s("Pintu", false), s("Lama", true), s("Dewan", false)]).map((x) => x.name)).toEqual(["Dewan", "Pintu", "Lama"]);
+  });
+});
+describe("round 2 choices and the poster-layout suggestion (PRD round 2 §6)", () => {
+  it("7 themes and 4 layouts when round 2 is visible; 3 and 3 when hidden", () => {
+    expect(themeChoices(true)).toEqual(["alam", "serambi", "tenang", "falak", "garis", "kerawang", "seterusnya"]);
+    expect(layoutChoices(true)).toEqual(["full", "bottom", "side", "poster"]);
+    expect(themeChoices(false)).toEqual(["alam", "serambi", "tenang"]);
+    expect(layoutChoices(false)).toEqual(["full", "bottom", "side"]);
+  });
+  it("hidden round 2 still lists a screen's own round-2 value", () => {
+    expect(themeChoices(false, "garis")).toEqual(["alam", "serambi", "tenang", "garis"]);
+    expect(layoutChoices(false, "poster")).toEqual(["full", "bottom", "side", "poster"]);
+    expect(themeChoices(false, "alam")).toEqual(["alam", "serambi", "tenang"]);
+  });
+  it("suggests Pengumuman sahaja only with exactly one active screen, not dismissed, round 2 visible", () => {
+    const one = [{ revoked_at: null }];
+    expect(suggestPosterLayout(one, false, true)).toBe(true);
+    expect(suggestPosterLayout(one, true, true)).toBe(false);
+    expect(suggestPosterLayout(one, false, false)).toBe(false);
+    expect(suggestPosterLayout([], false, true)).toBe(false);
+    expect(suggestPosterLayout(null, false, true)).toBe(false);
+    expect(suggestPosterLayout([{ revoked_at: null }, { revoked_at: null }], false, true)).toBe(false);
+    expect(suggestPosterLayout([{ revoked_at: null }, { revoked_at: "2026-10-01" }], false, true)).toBe(true);
   });
 });

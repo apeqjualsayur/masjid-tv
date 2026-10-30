@@ -1,11 +1,36 @@
-// Skrin rules (PRD Phase 2 §4.4, designs/admin/Screens). Pure: no React, no Supabase.
+// Skrin rules (PRD Phase 2 §4.4, designs/admin/Screens; round 2 §6). Pure: no React, no Supabase.
+import type { LayoutKey, ThemeId } from "@/core";
 import { isOnline, offlineFor } from "../home/logic";
 
-export const THEMES = ["alam", "serambi", "tenang"] as const;
-export const LAYOUTS = ["full", "bottom", "side"] as const;
-export type Theme = (typeof THEMES)[number];
-export type Layout = (typeof LAYOUTS)[number];
+/** Launch themes and layouts, then the round-2 additions (shown when THEMES_ROUND2_VISIBLE). */
+export const THEMES = ["alam", "serambi", "tenang"] as const satisfies readonly ThemeId[];
+export const ROUND2_THEMES = ["falak", "garis", "kerawang", "seterusnya"] as const satisfies readonly ThemeId[];
+export const LAYOUTS = ["full", "bottom", "side"] as const satisfies readonly LayoutKey[];
+export const ROUND2_LAYOUTS = ["poster"] as const satisfies readonly LayoutKey[];
+export type Theme = ThemeId;
+export type Layout = LayoutKey;
 export const NAME_MAX = 60;
+
+/**
+ * Choices to offer. With round 2 hidden, a screen that already uses a round-2 value still shows it
+ * (so editing its name never silently changes its theme or layout).
+ */
+export function themeChoices(round2: boolean, current?: Theme): Theme[] {
+  if (round2) return [...THEMES, ...ROUND2_THEMES];
+  return current && !(THEMES as readonly Theme[]).includes(current) ? [...THEMES, current] : [...THEMES];
+}
+export function layoutChoices(round2: boolean, current?: Layout): Layout[] {
+  if (round2) return [...LAYOUTS, ...ROUND2_LAYOUTS];
+  return current && !(LAYOUTS as readonly Layout[]).includes(current) ? [...LAYOUTS, current] : [...LAYOUTS];
+}
+
+/** localStorage key: the owner dismissed the "Pengumuman sahaja for the second TV" suggestion. */
+export const POSTER_TIP_KEY = "mv:poster-tip-dismissed";
+
+/** Suggest the poster layout in "Tambah skrin" when the masjid has exactly one (active) screen. */
+export function suggestPosterLayout(screens: Pick<Screen, "revoked_at">[] | null, dismissed: boolean, round2: boolean): boolean {
+  return round2 && !dismissed && (screens ?? []).filter((s) => !s.revoked_at).length === 1;
+}
 
 export interface Screen {
   id: string;

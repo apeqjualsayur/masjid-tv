@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { localToEpoch } from "@/core";
-import { defaultSchedule, scheduleFromRow, scheduleToRow, toEpoch, validateSchedule, type Schedule } from "./logic";
+import { defaultSchedule, scheduleFromRow, scheduleToRow, targetsShowNoSlides, toEpoch, validateSchedule, type Schedule } from "./logic";
 
 const NOW = localToEpoch(2026, 10, 22, 21, 7); // Khamis 22 Okt 2026, 9:07 malam MYT
 
@@ -57,5 +57,32 @@ describe("shiftSchedule", () => {
     const s = { ...defaultSchedule(NOW), hasEnd: true, endDate: "2026-10-29", endTime: "22:00" };
     expect(shiftSchedule(s, 7)).toMatchObject({ startDate: "2026-10-29", startTime: "21:07", endDate: "2026-11-05", endTime: "22:00" });
     expect(shiftSchedule({ ...s, startDate: "2026-12-30" }, 7).startDate).toBe("2027-01-06");
+  });
+});
+
+describe("warning: targets that never show announcements (round 2 §6)", () => {
+  const screens = [
+    { id: "a", layout: "full" },
+    { id: "b", layout: "full" },
+    { id: "c", layout: "bottom" },
+    { id: "d", layout: "poster" },
+  ];
+  it("warns when every chosen screen is full", () => {
+    expect(targetsShowNoSlides(["a"], screens)).toBe(true);
+    expect(targetsShowNoSlides(["a", "b"], screens)).toBe(true);
+  });
+  it("no warning when at least one chosen screen shows announcements", () => {
+    expect(targetsShowNoSlides(["a", "c"], screens)).toBe(false);
+    expect(targetsShowNoSlides(["d"], screens)).toBe(false);
+    expect(targetsShowNoSlides(null, screens)).toBe(false);
+  });
+  it("all screens: warns only when the masjid has nothing but full screens", () => {
+    expect(targetsShowNoSlides(null, screens.slice(0, 2))).toBe(true);
+    expect(targetsShowNoSlides(null, [{ id: "a", layout: "full" }])).toBe(true);
+  });
+  it("nothing chosen or no screens: no warning (the empty choice has its own error)", () => {
+    expect(targetsShowNoSlides([], screens)).toBe(false);
+    expect(targetsShowNoSlides(null, [])).toBe(false);
+    expect(targetsShowNoSlides(["gone"], screens)).toBe(false);
   });
 });

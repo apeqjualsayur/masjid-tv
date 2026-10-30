@@ -4,6 +4,7 @@
 // Step 2: schedule (shared ScheduleFields) → upload → media row → slide (type poster).
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useRef, useState, type DragEvent } from "react";
+import { THEMES_ROUND2_VISIBLE } from "@/config/features";
 import { getSupabase } from "@/lib/supabase";
 import { useT } from "../i18n";
 import { formatBytes } from "../platform/logic";
@@ -15,13 +16,15 @@ import { ICON, Icon } from "../shell/icons";
 import { useToasts } from "../shell/Toast";
 import { compressPoster } from "./compress";
 import type { Encoded } from "./encode";
-import { SLOTS, TV, fileError, fitOn, layoutAdvice, recommendedRows, resolutionCheck, shapeOf, type PosterLayout, type ScreenLite } from "./logic";
+import { GENERIC_LAYOUTS, SLOTS, TV, fileError, fitOn, layoutAdvice, recommendedRows, resolutionCheck, shapeOf, type PosterLayout, type ScreenLite } from "./logic";
 import { savePoster, supabasePosterBackend, type SlideStatus } from "./save";
 
 const card = "rounded-[18px] bg-adm-card shadow-[0_1px_3px_rgba(18,38,30,0.08)]";
 const primary = "h-[52px] rounded-[14px] bg-adm-green px-5 text-[15px] font-bold text-white hover:bg-adm-green-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green disabled:opacity-50";
-const themeBg: Record<ScreenLite["theme"], string> = { alam: "#E58A27", serambi: "#0B1114", tenang: "#EAF3F8" };
-const themePanel: Record<ScreenLite["theme"], string> = { alam: "rgba(8,18,28,0.35)", serambi: "#1C2A30", tenang: "#FFFFFF" };
+const themeBg: Record<ScreenLite["theme"], string> = { alam: "#E58A27", serambi: "#0B1114", tenang: "#EAF3F8", falak: "#14566A", garis: "#0F2230", kerawang: "#5E3D24", seterusnya: "#0E6C8A" };
+const themePanel: Record<ScreenLite["theme"], string> = { alam: "rgba(8,18,28,0.35)", serambi: "#1C2A30", tenang: "#FFFFFF", falak: "#F7F1E3", garis: "#8CCBF2", kerawang: "#3A2414", seterusnya: "rgba(0,0,0,0.18)" };
+/** Layouts shown when no screen has a poster area yet (+ "Pengumuman sahaja" with round 2). */
+const genericLayouts: PosterLayout[] = THEMES_ROUND2_VISIBLE ? [...GENERIC_LAYOUTS, "poster"] : GENERIC_LAYOUTS;
 
 interface Picture {
   url: string;
@@ -40,11 +43,12 @@ interface Existing {
   status: SlideStatus;
 }
 
-/** The poster drawn like the TV does it: contain, with a blurred copy filling the rest. */
+/** The poster drawn like the TV does it: contain, with a blurred copy filling the rest. "Pengumuman sahaja": the whole 16:9 screen, no prayer panel. */
 function PosterPreview({ pic, layout, theme, label }: { pic: Picture; layout: PosterLayout; theme: ScreenLite["theme"]; label: string }) {
   const slot = SLOTS[layout];
   const fit = fitOn(pic.width, pic.height, layout);
   const slotStyle = layout === "bottom" ? { left: 0, top: 0, width: "100%", height: `${(slot.h / TV.h) * 100}%` } : { left: 0, top: 0, height: "100%", width: `${(slot.w / TV.w) * 100}%` };
+  const panel = layout !== "poster";
   const panelStyle = layout === "bottom" ? { left: 0, right: 0, bottom: 0, height: `${(1 - slot.h / TV.h) * 100}%` } : { right: 0, top: 0, bottom: 0, width: `${(1 - slot.w / TV.w) * 100}%` };
   return (
     <div role="img" aria-label={label} style={{ background: themeBg[theme] }} className="relative aspect-video w-full overflow-hidden rounded-[10px] border-[5px] border-[#1B1B1B]">
@@ -60,11 +64,13 @@ function PosterPreview({ pic, layout, theme, label }: { pic: Picture; layout: Po
           style={{ left: `${fit.box.x * 100}%`, top: `${fit.box.y * 100}%`, width: `${fit.box.w * 100}%`, height: `${fit.box.h * 100}%` }}
         />
       </div>
-      <div className={`absolute flex gap-[4%] p-[2%] ${layout === "bottom" ? "flex-row" : "flex-col"}`} style={{ ...panelStyle, background: theme === "alam" ? "rgba(8,18,28,0.55)" : themeBg[theme] }}>
-        {[0, 1, 2, 3].map((i) => (
-          <div key={i} className="flex-1 rounded-[4px]" style={{ background: i === 1 ? "#E3B04B" : themePanel[theme] }} />
-        ))}
-      </div>
+      {panel && (
+        <div className={`absolute flex gap-[4%] p-[2%] ${layout === "bottom" ? "flex-row" : "flex-col"}`} style={{ ...panelStyle, background: theme === "alam" ? "rgba(8,18,28,0.55)" : themeBg[theme] }}>
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="flex-1 rounded-[4px]" style={{ background: i === 1 ? "#E3B04B" : themePanel[theme] }} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -157,7 +163,7 @@ export function PosterView({ editIdParam }: { editIdParam: string | null }) {
   const posterScreens = rows.filter((r) => r.slot).map((r) => r.screen) as (ScreenLite & { layout: PosterLayout })[];
   const targets: { key: string; name: string; theme: ScreenLite["theme"]; layout: PosterLayout }[] = posterScreens.length
     ? posterScreens.map((s) => ({ key: s.id, name: s.name, theme: s.theme, layout: s.layout }))
-    : (["bottom", "side"] as PosterLayout[]).map((l) => ({ key: l, name: t(`layout.${l}`), theme: "tenang" as const, layout: l }));
+    : genericLayouts.map((l) => ({ key: l, name: t(`layout.${l}`), theme: "tenang" as const, layout: l }));
   const layouts = targets.map((x) => x.layout);
   const res = pic ? resolutionCheck(pic.width, pic.height, layouts) : null;
   const advice = pic ? layoutAdvice(pic.width, pic.height, layouts) : null;
@@ -241,7 +247,7 @@ export function PosterView({ editIdParam }: { editIdParam: string | null }) {
         <div className="grid grid-cols-1 items-start gap-5 lg:grid-cols-[460px_minmax(0,1fr)] lg:gap-8">
           <section className={`${card} p-4 lg:p-5`} aria-label={t("schedule.title")}>
             <h2 className="mb-4 text-[17px] font-extrabold">{t("schedule.title")}</h2>
-            <ScheduleFields value={schedule} onChange={setSchedule} errors={schedErrors} screens={posterScreens.map((s) => ({ id: s.id, name: s.name }))} />
+            <ScheduleFields value={schedule} onChange={setSchedule} errors={schedErrors} screens={rows.map(({ screen: s }) => ({ id: s.id, name: s.name, layout: s.layout }))} />
           </section>
           {pic && (
             <div className="hidden flex-col gap-3 lg:flex">
@@ -278,7 +284,7 @@ export function PosterView({ editIdParam }: { editIdParam: string | null }) {
             ) : posterScreens.length === 0 ? (
               <>
                 <p className="text-[13px] text-adm-muted">{t("poster.recNone")}</p>
-                {(["bottom", "side"] as PosterLayout[]).map((l) => (
+                {genericLayouts.map((l) => (
                   <div key={l} className="flex justify-between gap-3 text-[14px]">
                     <span className="text-adm-muted">{t(`layout.${l}`)}</span>
                     <b className="text-adm-green">{t("poster.size", { w: SLOTS[l].w, h: SLOTS[l].h })}</b>
@@ -295,7 +301,7 @@ export function PosterView({ editIdParam }: { editIdParam: string | null }) {
                     <span className="flex min-w-0 flex-1 flex-col">
                       <span className="truncate text-[14px] font-bold">{s.name} · {t(`layout.${s.layout}`)}</span>
                       <span className={`text-[13px] font-extrabold ${slot ? "text-adm-green" : "text-adm-muted"}`}>{slot ? t("poster.size", { w: slot.w, h: slot.h }) : t("poster.recNotShown")}</span>
-                      <span className="text-[12px] text-adm-muted">{!slot ? t("poster.recNoteFull") : s.layout === "bottom" ? t("poster.recNoteWide") : t("poster.recNoteSquare")}</span>
+                      <span className="text-[12px] text-adm-muted">{!slot ? t("poster.recNoteFull") : s.layout === "bottom" ? t("poster.recNoteWide") : s.layout === "poster" ? t("poster.recNotePoster") : t("poster.recNoteSquare")}</span>
                     </span>
                   </li>
                 ))}

@@ -88,12 +88,17 @@
   "theme": {
     "alam": "Alam",
     "serambi": "Serambi",
-    "tenang": "Tenang"
+    "tenang": "Tenang",
+    "falak": "Falak",
+    "garis": "Garis Masa",
+    "kerawang": "Kerawang",
+    "seterusnya": "Seterusnya"
   },
   "layout": {
     "full": "Penuh",
     "bottom": "Bar bawah",
-    "side": "Bar sisi"
+    "side": "Bar sisi",
+    "poster": "Pengumuman sahaja"
   },
   "template": {
     "pengumuman": "Pengumuman",
@@ -408,7 +413,11 @@
       "notAllowed": "Hanya Pentadbir masjid yang aktif boleh menyambung skrin.",
       "network": "Tiada sambungan internet. Cuba lagi.",
       "generic": "Skrin tidak dapat disambungkan. Cuba lagi."
-    }
+    },
+    "posterHelp": "Untuk TV kedua. Tiada jam atau waktu solat.",
+    "posterTip": "TV kedua? Pilih “Pengumuman sahaja”: TV ini memaparkan pengumuman sepenuh skrin, manakala TV pertama terus memaparkan waktu solat.",
+    "posterTipUse": "Guna Pengumuman sahaja",
+    "posterTipDismiss": "Tutup cadangan"
   },
   "poster": {
     "title": "Muat naik poster",
@@ -476,7 +485,8 @@
       "decode": "Gambar tidak dapat dibaca. Cuba fail lain.",
       "tooBigOut": "Gambar masih terlalu besar selepas dimampatkan. Cuba fail lain.",
       "noImage": "Pilih gambar dahulu."
-    }
+    },
+    "recNotePoster": "Sepenuh skrin 16:9: poster landskap mengisi seluruh TV."
   },
   "schedule": {
     "title": "Jadual paparan",
@@ -524,7 +534,10 @@
       "endTooLate": "Maksimum 7 hari selepas mula.",
       "duration": "Tempoh 5 hingga 120 saat.",
       "screens": "Pilih sekurang-kurangnya satu skrin."
-    }
+    },
+    "screenOption": "{name} · {layout}",
+    "noSlidesWarning": "Skrin ini tidak memaparkan pengumuman.",
+    "noSlidesHint": "Susun atur Penuh hanya memaparkan waktu solat. Pilih skrin lain, atau tukar susun aturnya di halaman Skrin."
   },
   "picker": {
     "title": "Kandungan baru",

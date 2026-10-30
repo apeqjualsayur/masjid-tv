@@ -1,12 +1,15 @@
-// Poster rules (PRD Phase 2 §6, designs/admin/Poster + D-Poster). Pure: no React, no Supabase.
+// Poster rules (PRD Phase 2 §6, designs/admin/Poster + D-Poster; round 2 §6). Pure: no React, no Supabase.
+import type { ThemeId } from "@/core";
 
-export type PosterLayout = "bottom" | "side";
+/** Layouts with a poster area; "poster" = "Pengumuman sahaja", the whole 16:9 stage (round 2). */
+export type PosterLayout = "bottom" | "side" | "poster";
 export type AnyLayout = PosterLayout | "full";
 
-/** Poster area on the 1920×1080 TV per layout (theme contract §2.10). */
+/** Poster area on the 1920×1080 TV per layout (theme contract §2.10: 12:5, 5:4, 16:9). */
 export const SLOTS: Record<PosterLayout, { w: number; h: number }> = {
   bottom: { w: 1920, h: 800 },
   side: { w: 1350, h: 1080 },
+  poster: { w: 1920, h: 1080 },
 };
 export const TV = { w: 1920, h: 1080 } as const;
 
@@ -68,9 +71,15 @@ export interface Resolution {
   upscaled: boolean;
 }
 
-/** Resolution warning: upscaled > 1.4× on any target layout, or narrower than 1080 px. */
+/** Layouts judged when no screen has a poster area yet. */
+export const GENERIC_LAYOUTS: PosterLayout[] = ["bottom", "side"];
+
+/**
+ * Resolution warning: upscaled > 1.4× on any target layout (a poster screen is judged on its
+ * 16:9 area), or narrower than 1080 px. No targets = the bottom and side areas.
+ */
 export function resolutionCheck(w: number, h: number, layouts: PosterLayout[]): Resolution {
-  const targets = layouts.length ? layouts : (["bottom", "side"] as PosterLayout[]);
+  const targets = layouts.length ? layouts : GENERIC_LAYOUTS;
   const maxScale = Math.max(...targets.map((l) => fitOn(w, h, l).scale));
   const upscaled = maxScale > MAX_UPSCALE;
   const lowWidth = w < MIN_WIDTH;
@@ -87,7 +96,7 @@ export function layoutAdvice(w: number, h: number, layouts: PosterLayout[]): { g
 export interface ScreenLite {
   id: string;
   name: string;
-  theme: "alam" | "serambi" | "tenang";
+  theme: ThemeId;
   layout: AnyLayout;
   revoked_at?: string | null;
 }

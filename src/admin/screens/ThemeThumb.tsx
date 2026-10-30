@@ -1,52 +1,93 @@
 "use client";
-// Tiny CSS-only picture of a TV per theme and layout (designs/admin/Screens mini previews).
-// Not the real theme: just enough to tell Alam, Serambi and Tenang apart at a glance.
-import type { Layout, Theme } from "./logic";
+// Mini preview of a screen (designs/admin/Screens): the REAL theme layout, the same component the TV
+// draws, on a 1920×1080 stage scaled down to the thumbnail. To keep a page of thumbnails cheap:
+// - it mounts only while on screen (IntersectionObserver), and unmounts again when scrolled away;
+// - the theme's code is loaded on demand (the lazy chunk the TV uses, @/themes loadTheme);
+// - the clock is frozen: one fixed DisplayState (Thursday 2:30 pm, Zohor), never re-rendered per tick.
+// A poster screen ("Pengumuman sahaja") therefore shows its slide-only look.
+import { useEffect, useRef, useState } from "react";
+import { buildDisplayState, localToEpoch, type DisplayState, type LayoutKey, type ThemeId } from "@/core";
+import { sampleSlide } from "@/templates";
+import { loadTheme } from "@/themes";
+import type { ThemeDefinition } from "@/themes/types";
+import { readDurations, readIqamah } from "../settings/logic";
 
-function Content({ theme }: { theme: Theme }) {
-  if (theme === "serambi") {
-    return (
-      <div className="flex h-full items-end gap-[6%] p-[6%]">
-        {["linear-gradient(180deg,#2F7FC6,#8CC6EE)", "linear-gradient(180deg,#3D7DB8,#E9B36A)", "linear-gradient(180deg,#3B2D6B,#F2A65E)", "linear-gradient(180deg,#050B1A,#0E2A44)"].map((bg, i) => (
-          <div key={i} style={{ background: bg, height: i === 1 ? "62%" : "48%", opacity: i === 0 ? 0.45 : 1, boxShadow: i === 1 ? "0 0 0 1.5px #E3B04B" : undefined }} className="flex-1 rounded-t-[8px] rounded-b-[2px]" />
-        ))}
-      </div>
-    );
+const at = (h: number, m: number) => localToEpoch(2026, 10, 29, h, m);
+const DAY = {
+  date: "2026-10-29",
+  hijri: "1448-05-18",
+  times: { imsak: at(5, 38), subuh: at(5, 48), syuruk: at(6, 55), zohor: at(13, 0), asar: at(16, 19), maghrib: at(18, 59), isyak: at(20, 9) },
+};
+const SLIDE = sampleSlide("pengumuman");
+const frozen = new Map<LayoutKey, DisplayState>();
+
+/** One fixed state per layout (the poster layout gets mode `normal`, like the TV). */
+function frozenState(layout: LayoutKey): DisplayState {
+  let s = frozen.get(layout);
+  if (!s) {
+    s = buildDisplayState({
+      at: at(14, 30),
+      today: DAY,
+      tomorrowImsak: DAY.times.imsak + 86_400_000,
+      tomorrowSubuh: DAY.times.subuh + 86_400_000,
+      clock24h: false,
+      showArabic: true,
+      ticker: [],
+      lite: true, // no blur or glow at thumbnail size
+      masjid: { fullName: "Masjid", shortName: "M" },
+      modeConfig: { durations: readDurations(undefined), iqamahMin: readIqamah(undefined) },
+      layout,
+    });
+    frozen.set(layout, s);
   }
-  if (theme === "tenang") {
-    return (
-      <div className="flex h-full items-center gap-[8%] px-[9%]">
-        <div className="text-[0.95em] leading-none font-light text-[#14303D]">1:20</div>
-        <div className="flex flex-1 flex-col gap-[3px]">
-          <div className="h-[4px] rounded-sm bg-[#C9DCE6]" />
-          <div className="h-[7px] rounded bg-white" />
-          <div className="h-[4px] rounded-sm bg-[#C9DCE6]" />
-        </div>
-      </div>
-    );
-  }
-  return (
-    <div className="relative h-full overflow-hidden" style={{ background: "linear-gradient(180deg,#F7CF6A 0%,#F2AE3C 45%,#E58A27 100%)" }}>
-      <div className="absolute top-[14%] right-[18%] h-[22%] w-[13%] rounded-full bg-[#FFF4D2]" />
-      <div className="absolute -bottom-[30%] -left-[10%] h-[70%] w-[70%] rounded-[50%] bg-[#D9822B]" />
-      <div className="absolute -right-[10%] -bottom-[35%] h-[75%] w-[75%] rounded-[50%] bg-[#B5611C]" />
-      <div className="absolute inset-x-[22%] top-[34%] h-[16%] rounded-[3px] bg-white/35" />
-    </div>
-  );
+  return s;
 }
 
-const bg: Record<Theme, string> = { alam: "#E58A27", serambi: "#0B1114", tenang: "#EAF3F8" };
-const panel: Record<Theme, string> = { alam: "rgba(255,255,255,0.75)", serambi: "#1C262B", tenang: "#FFFFFF" };
+/** True while the element is in (or near) the viewport. */
+function useVisible<T extends Element>() {
+  const ref = useRef<T>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    if (typeof IntersectionObserver === "undefined") return setVisible(true);
+    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { rootMargin: "120px" });
+    io.observe(el);
+    return () => io.disconnect();
+  }, []);
+  return { ref, visible };
+}
 
-export function ThemeThumb({ theme, layout = "full", width = 112 }: { theme: Theme; layout?: Layout; width?: number }) {
+/** The theme definition once its chunk has loaded (null until then, or if loading failed). */
+function useThemeDef(theme: ThemeId, enabled: boolean): ThemeDefinition | null {
+  const [def, setDef] = useState<ThemeDefinition | null>(null);
+  useEffect(() => {
+    if (!enabled || def?.id === theme) return;
+    let off = false;
+    loadTheme(theme).then(
+      (d) => !off && setDef(d),
+      () => {},
+    );
+    return () => {
+      off = true;
+    };
+  }, [theme, enabled, def?.id]);
+  return def?.id === theme ? def : null;
+}
+
+export function ThemeThumb({ theme, layout = "full", width = 112 }: { theme: ThemeId; layout?: LayoutKey; width?: number }) {
   const h = Math.round((width * 9) / 16);
+  const { ref, visible } = useVisible<HTMLDivElement>();
+  const def = useThemeDef(theme, visible);
+  const Layout = def?.layouts[layout];
+  const inner = width - 6; // 3 px frame each side
   return (
-    <div aria-hidden="true" style={{ width, height: h, background: bg[theme], fontSize: Math.round(width / 6.2) }} className="relative flex flex-none overflow-hidden rounded-lg border-[3px] border-[#1B1B1B]">
-      <div className={layout === "side" ? "h-full w-[68%]" : layout === "bottom" ? "h-[72%] w-full" : "h-full w-full"}>
-        <Content theme={theme} />
-      </div>
-      {layout === "bottom" && <div style={{ background: panel[theme] }} className="absolute inset-x-[4%] bottom-[5%] h-[22%] rounded-[3px]" />}
-      {layout === "side" && <div style={{ background: panel[theme] }} className="absolute inset-y-[6%] right-[4%] w-[27%] rounded-[3px]" />}
+    <div ref={ref} aria-hidden="true" data-thumb={`${theme}-${layout}`} style={{ width, height: h }} className="relative flex-none overflow-hidden rounded-lg border-[3px] border-[#1B1B1B] bg-[#2A3330]">
+      {visible && Layout && (
+        <div style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transform: `scale(${inner / 1920})`, transformOrigin: "0 0", pointerEvents: "none" }}>
+          <Layout s={frozenState(layout)} slide={SLIDE} slideKey="thumb" />
+        </div>
+      )}
     </div>
   );
 }

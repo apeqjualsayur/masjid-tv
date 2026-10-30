@@ -5,6 +5,7 @@ import { formatHijri, formatTime, type ScheduleState } from "@/core";
 import { slideTitle, type TemplateKey } from "@/templates";
 import { useT } from "../i18n";
 import { ROUTES } from "../routing";
+import { ThemeThumb } from "../screens/ThemeThumb";
 import { useAdmin } from "../session";
 import { ICON, Icon } from "../shell/icons";
 import { durationParts, isOnline, liveSlides, offlineFor, targetCount, type ScreenRow, type SlideRow } from "./logic";
@@ -99,12 +100,6 @@ export function DesktopActions() {
   );
 }
 
-const THUMB: Record<ScreenRow["theme"], string> = {
-  alam: "linear-gradient(180deg,#F7CF6A,#E58A27)",
-  serambi: "linear-gradient(180deg,#0B1114 55%,#2F7FC6 55%,#E9B36A 100%)",
-  tenang: "#EAF3F8",
-};
-
 function ScreensCard({ screens, now }: { screens: ScreenRow[]; now: number }) {
   const { t } = useT();
   const { role } = useAdmin();
@@ -127,7 +122,9 @@ function ScreensCard({ screens, now }: { screens: ScreenRow[]; now: number }) {
           const cfg = `${t(`theme.${s.theme}`)} · ${t(`layout.${s.layout}`)}`;
           return (
             <li key={s.id} className={`flex items-center gap-3 px-4 py-3.5 lg:gap-3.5 lg:rounded-[14px] lg:bg-[#F7FAF8] lg:p-3 ${i > 0 ? "border-t border-adm-hair lg:border-t-0" : ""}`}>
-              <span aria-hidden="true" className="hidden h-[68px] w-[120px] flex-none rounded-lg border-[3px] border-[#1B1B1B] lg:block" style={{ background: THUMB[s.theme] }} />
+              <span className="hidden flex-none lg:block">
+                <ThemeThumb theme={s.theme} layout={s.layout} width={120} />
+              </span>
               <span aria-hidden="true" className={`h-2.5 w-2.5 flex-none rounded-full lg:hidden ${on ? "bg-[#1E9E62]" : "bg-[#C2410C]"}`} />
               <span className="flex min-w-0 flex-1 flex-col gap-0.5">
                 <span className="truncate text-[15px] font-bold lg:font-extrabold">{s.name}</span>

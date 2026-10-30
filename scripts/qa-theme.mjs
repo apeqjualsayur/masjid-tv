@@ -81,6 +81,7 @@ for (const [phase, time] of Object.entries(PHASES)) {
 const midday = `sim=${DAY}T14:30`;
 for (const mode of ["pre_azan", "azan", "iqamah", "solat"]) await shot(`mode-${mode}`, `${midday}&layout=full&mode=${mode}`);
 await shot("mode-khutbah", `sim=${FRI}T13:20&layout=full&mode=khutbah`);
+await shot("iqamah-midway", `sim=${DAY}T16:27&layout=full`); // Asar 4:19 + 3 min azan, 10 min iqamah → about half
 for (const layout of ["full", "bottom", "side"]) await shot(`friday-${layout}`, `sim=${FRI}T10:00&layout=${layout}&slide=program`);
 for (const layout of ["bottom", "side", "poster"]) await shot(`kematian-${layout}`, `${midday}&layout=${layout}&slide=kematian`);
 await shot("arabic-off-full", `${midday}&layout=full`, { showArabic: false });

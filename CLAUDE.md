@@ -57,5 +57,5 @@ If code and spec disagree, the spec wins — or update the spec first, deliberat
 Cloudflare Pages (static, preset None, build `npm run build`, output `out`, `NODE_VERSION=24`). Non-coder guide: `DEPLOY.md`. CI: `.github/workflows/test.yml`.
 
 - Production: https://masjidview.my/tv/ and https://masjidview.my/admin/ (custom domain on Cloudflare Pages project `masjid-tv-6d8`, also at https://masjid-tv-6d8.pages.dev; deploys from `main`)
-- Cloudflare Pages build variables (Plaintext, Production + Preview): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (publishable key). Baked in at build time: retry the deployment after changing them. Never the secret key.
+- Cloudflare Pages build variables (Plaintext, Production + Preview): `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY` (publishable key), `NEXT_PUBLIC_GOOGLE_CLIENT_ID` (Google's own sign-in button, src/admin/google-signin.ts; unset = redirect sign-in). Baked in at build time: retry the deployment after changing them. Never the secret key.
 - Repository: https://github.com/apeqjualsayur/masjid-tv

@@ -1,15 +1,26 @@
-// Landing-only sample content for the template thumbnails (PRD §10: no "[ … ]" placeholders on the
-// page). Generic, no real people. Kematian and Ayat are not rendered with content on the landing
-// page (a death notice needs a person's name; verses come from the list awaiting review), so they
-// use the design's abstract thumbnail instead.
-import type { TemplateFields, TemplateKey } from "@/templates";
+// Landing-only sample content for the template mockups (PRD §10: no "[ … ]" placeholders on the
+// page). Generic, no real people. This is TV content, so it is Malay on both language pages, as on a
+// real screen. Kematian shows no name (a death notice is about a real person) and Ayat shows no verse
+// text (the verse list is still awaiting review): their mockups draw the layout with bars instead.
+import type { TemplateFields } from "@/templates";
 
-export const ABSTRACT_THUMBS: Partial<Record<TemplateKey, { bg: string; fg: string }>> = {
-  kematian: { bg: "#ECECEC", fg: "#3A3A3A" },
-  ayat: { bg: "#F3EEDF", fg: "#6E5A1E" },
-};
+/** Fixed words drawn inside the mockups (labels the TV templates show). */
+export const MOCK_TEXT = {
+  kematian: "Makluman kematian",
+  jenazah: "Solat jenazah selepas Zohor",
+  istirja: "إِنَّا لِلَّٰهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ",
+  ayatRef: "Daripada sumber sahih",
+  bersama: "Bersama",
+  daripada: "daripada",
+  kutipan: "Kutipan",
+  belanja: "Belanja",
+  baki: "Baki",
+  waktu: "Waktu",
+  imam: "Imam",
+  bilal: "Bilal",
+} as const;
 
-export const LANDING_SAMPLES: Partial<TemplateFields> = {
+export const LANDING_SAMPLES: Omit<TemplateFields, "kematian" | "ayat"> = {
   pengumuman: {
     title: "Gotong-royong perdana",
     body: "Semua ahli kariah dijemput membersihkan kawasan masjid. Sarapan disediakan untuk peserta.",

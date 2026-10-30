@@ -7,6 +7,7 @@ import { bundleIntervalAt, bundleSlides, createFallbackLoader, createPrayerData,
 import { getTvSupabase } from "@/lib/supabase";
 import { bundleToScreenConfig } from "../bundle-config";
 import { APP_VERSION } from "../status";
+import { viewMode } from "../screen-mode";
 import { DisplayHost, type DisplaySource } from "../tv-app";
 import { PairedView, SuspendedView } from "./frame";
 
@@ -26,9 +27,18 @@ export function BundleDisplay({ secret, onRevoked }: { secret: string; onRevoked
     const sb = getTvSupabase();
     // Prayer times read like the display does (IndexedDB → bundled file): works offline.
     const prayer = createPrayerData({ store: idbMonthStore(), loadYear: createFallbackLoader() });
+    // Full-screen status goes with each call (migration 0010). Until that has run, the server only
+    // knows the 3-argument function: then the TV keeps calling without it.
+    let withViewMode = true;
     const sync = startBundleSync({
       call: async (since) => {
-        const { data, error } = await sb.rpc("screen_bundle", { p_secret: secret, p_since: since, p_app_version: APP_VERSION });
+        const args = { p_secret: secret, p_since: since, p_app_version: APP_VERSION };
+        let res = await sb.rpc("screen_bundle", withViewMode ? { ...args, p_view_mode: viewMode() } : args);
+        if (withViewMode && res.error && (res.error.code === "PGRST202" || /p_view_mode/.test(res.error.message))) {
+          withViewMode = false;
+          res = await sb.rpc("screen_bundle", args);
+        }
+        const { data, error } = res;
         return { data, error: error ? { message: error.message } : null };
       },
       store: idbBundleStore(),

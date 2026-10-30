@@ -13,6 +13,7 @@ export const ICON = {
   chevronDown: "M7 10l5 5 5-5",
   chevronLeft: "M15 18l-6-6 6-6",
   close: "M6 6l12 12 M18 6 6 18",
+  feedback: "M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.5A8 8 0 1 1 21 12Z M8.5 12h.01 M12 12h.01 M15.5 12h.01",
   user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z M4 21a8 8 0 0 1 16 0",
   check: "M5 12l5 5 9-10",
 } as const;

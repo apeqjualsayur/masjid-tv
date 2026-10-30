@@ -33,7 +33,8 @@
     "screens": "Screens",
     "settings": "Settings",
     "members": "Members",
-    "platform": "Platform"
+    "platform": "Platform",
+    "feedback": "Feedback"
   },
   "account": {
     "menu": "Account",
@@ -242,7 +243,8 @@
       "pending": "Pending",
       "active": "Active",
       "suspended": "Suspended",
-      "usage": "Usage"
+      "usage": "Usage",
+      "feedback": "Feedback"
     },
     "tabCount": "{label} ({n})",
     "tabs": "Masjid status",
@@ -417,7 +419,9 @@
     "posterHelp": "For a second TV. No clock or prayer times.",
     "posterTip": "Second TV? Choose “Announcements only”: this TV shows announcements full screen, while the first TV keeps showing prayer times.",
     "posterTipUse": "Use Announcements only",
-    "posterTipDismiss": "Dismiss suggestion"
+    "posterTipDismiss": "Dismiss suggestion",
+    "needsUpdate": "Needs update",
+    "notFullscreen": "Not full screen · how"
   },
   "poster": {
     "title": "Upload poster",
@@ -956,5 +960,48 @@
       "error": "Could not save: {message}",
       "checked": "Prices and limits checked on {date}. Limits and prices are stored in the usage_settings table."
     }
+  },
+  "update": {
+    "title": "Update available",
+    "whatsNew": "New: TVs can stay full screen (press OK on the remote), full-screen status on the Screens page, and a Feedback page to send us suggestions.",
+    "adminOutdated": "This page is an older version.",
+    "reload": "Reload",
+    "screensBehind": "{n} screen(s) not updated yet:",
+    "how": {
+      "tab": "press OK on the TV remote to update, then OK again for full screen.",
+      "app": "restart the kiosk app (or switch the TV off and on).",
+      "window": "the TV updates itself at 3:00 am. To update now: switch the TV off and on."
+    },
+    "guide": "How to update a TV",
+    "dismiss": "Dismiss update notice"
+  },
+  "feedback": {
+    "title": "Feedback",
+    "subtitle": "Send suggestions, problems or praise straight to the Masjid View team.",
+    "intro": "Tell us what we could improve, a problem you ran into, or a feature you want. You can send as much feedback as you like. We read all of it, but may not reply to each one.",
+    "label": "Your feedback",
+    "placeholder": "For example: I'd like a larger text size for the ticker.",
+    "hint": "Don't include passwords or other people's personal details.",
+    "count": "{n}/{max}",
+    "send": "Send",
+    "sending": "Sending…",
+    "sent": "Thank you! Your feedback has been sent.",
+    "sentTitle": "Feedback you sent",
+    "none": "No feedback sent yet.",
+    "loadError": "Could not load the list: {message}",
+    "err": {
+      "empty": "Write something first.",
+      "tooLong": "2000 characters at most.",
+      "tooMany": "You've reached 20 feedback messages today. Try again tomorrow.",
+      "notAllowed": "This account can't send feedback for this masjid.",
+      "network": "No internet connection. Try again.",
+      "generic": "Feedback could not be sent. Try again."
+    }
+  },
+  "platformFeedback": {
+    "title": "Feedback ({n})",
+    "empty": "No feedback yet.",
+    "error": "Could not load feedback: {message}",
+    "noOrg": "(no masjid)"
   }
 }

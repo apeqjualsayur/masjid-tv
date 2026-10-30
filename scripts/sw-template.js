@@ -34,6 +34,7 @@ function classify(url, request) {
   const isImage = request.destination === "image" || /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(u.pathname);
   if (u.origin !== self.location.origin) return isImage ? "cache-first" : "passthrough";
   if (request.mode === "navigate") return "page";
+  if (u.pathname === "/version.json") return "passthrough"; // always the live version, never cached
   if (u.pathname.startsWith("/_next/static/")) return "cache-first";
   if (u.pathname.startsWith("/data/")) return "cache-first";
   if (u.pathname.startsWith("/config/") && u.pathname.endsWith(".json")) return "network-first";

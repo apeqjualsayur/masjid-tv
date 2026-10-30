@@ -5,8 +5,9 @@ import { readFileSync, readdirSync, statSync, writeFileSync } from "node:fs";
 import { join, relative, sep } from "node:path";
 
 const OUT = join(process.cwd(), "out");
-// Not app files: the worker itself and Cloudflare Pages control files.
-const SKIP = new Set(["sw.js", "_headers", "_redirects"]);
+// Not app files: the worker itself and Cloudflare Pages control files. version.json must always come
+// from the network (it says whether a newer version is live), so it is not precached.
+const SKIP = new Set(["sw.js", "_headers", "_redirects", "version.json"]);
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {

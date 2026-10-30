@@ -338,6 +338,7 @@ async function run(orgIds: string[]) {
   const b2 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v1 });
   report((b2.data as { status?: string } | null)?.status === "unchanged", "second call with that version → unchanged", JSON.stringify(b2.data ?? b2.error));
   await usageChecks(A, P, screenA);
+  await fullscreenFeedbackChecks(A, B, P, orgA, orgB, tvSecret, screenA);
   const iq = await A.db.from("org_settings").update({ iqamah_min: { subuh: 10, zohor: 10, asar: 10, maghrib: 9, isyak: 10 } }).eq("org_id", orgA).select("org_id");
   report(!iq.error && (iq.data ?? []).length === 1, "A updates org A's iqamah minutes", fmt(iq.error));
   const b3 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v1 });
@@ -445,6 +446,40 @@ async function round2Checks(A: TestUser, orgA: string) {
   report(!onFull.some((sl) => sl.id === id), "the targeted slide is NOT in the full screen's bundle", `${onFull.length} slide(s) in the full screen's bundle`);
   const onPoster = (await bundle(poster.tv))?.slides ?? [];
   report(onPoster.some((sl) => sl.id === id), "the targeted slide IS in the poster screen's bundle", `${onPoster.length} slide(s) in the poster screen's bundle`);
+}
+
+// TV full-screen status and admin feedback (migration 0010). B is still a member of org B here.
+async function fullscreenFeedbackChecks(A: TestUser, B: TestUser, P: TestUser, orgA: string, orgB: string, tvSecret: string, screenA: string) {
+  console.log("\nFull-screen status + feedback (migration 0010)");
+  const probe = await A.db.rpc("send_feedback", { p_org: orgA, p_message: `[RLS check] ${RUN}`, p_page: "/admin/maklum-balas/", p_app_version: "rls-check" });
+  if (probe.error?.code === "PGRST202") {
+    report(false, "migration 0010 is applied", "send_feedback not found — apply supabase/migrations/0010_fullscreen_feedback.sql first");
+    return;
+  }
+  report(!probe.error && typeof probe.data === "string", "A sends feedback for org A (send_feedback)", fmt(probe.error));
+  expectOk("A can send a second feedback", await A.db.rpc("send_feedback", { p_org: orgA, p_message: "Kedua" }));
+  expectFail("A cannot send feedback as org B", await A.db.rpc("send_feedback", { p_org: orgB, p_message: "x" }), "not_allowed");
+  expectFail("an empty feedback is rejected", await A.db.rpc("send_feedback", { p_org: orgA, p_message: "   " }), "empty_message");
+  expectFail("anon cannot execute send_feedback", await anon.rpc("send_feedback", { p_org: orgA, p_message: "x" }), "42501");
+  expectFail("A cannot insert into feedback directly", await A.db.from("feedback").insert({ org_id: orgA, user_id: A.id, message: "direct" }).select("id"));
+  const own = await A.db.from("feedback").select("message").order("created_at");
+  report(!own.error && (own.data ?? []).length === 2, "A reads its own 2 feedback rows", own.error ? fmt(own.error) : `${(own.data ?? []).length} row(s)`);
+  expectNoRows("B cannot read A's feedback", await B.db.from("feedback").select("id").eq("user_id", A.id));
+  expectNoRows("anon cannot read feedback", await anon.from("feedback").select("id").limit(5));
+  const all = await P.db.rpc("platform_feedback");
+  const row = ((all.data ?? []) as { message: string; org_name: string | null; sender_email: string | null }[]).find((r) => r.message === `[RLS check] ${RUN}`);
+  report(!all.error && row?.sender_email === A.email && Boolean(row?.org_name), "P (platform owner) platform_feedback → message with masjid name and sender e-mail", all.error ? fmt(all.error) : JSON.stringify(row ?? null));
+  expectFail("A (not a platform owner) platform_feedback → not_allowed", await A.db.rpc("platform_feedback"), "not_allowed");
+  expectFail("anon cannot execute platform_feedback", await anon.rpc("platform_feedback"), "42501");
+
+  const tab = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: 0, p_app_version: "rls-check", p_view_mode: "tab" });
+  const mode1 = (await admin.from("screens").select("view_mode").eq("id", screenA).single()).data?.view_mode;
+  report(!tab.error && mode1 === "tab", "screen_bundle stores the TV's view mode (tab)", tab.error ? fmt(tab.error) : `view_mode = ${mode1}`);
+  const bad = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: 0, p_app_version: "rls-check", p_view_mode: "banana" });
+  const mode2 = (await admin.from("screens").select("view_mode").eq("id", screenA).single()).data?.view_mode;
+  report(!bad.error && mode2 === "tab", "an unknown view mode is ignored (stays tab)", bad.error ? fmt(bad.error) : `view_mode = ${mode2}`);
+  const old = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: 0, p_app_version: "rls-check" });
+  report(!old.error && (old.data as { status?: string } | null)?.status === "ok", "an older TV (3 arguments, no view mode) still syncs", fmt(old.error));
 }
 
 // Usage monitoring (migration 0008, _specs/30-PRD-usage.md §10.1). Runs after the screen above

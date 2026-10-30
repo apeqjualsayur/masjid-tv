@@ -27,16 +27,17 @@ export interface PlatformOrg {
 export type PlatformTab = "pending" | "active" | "suspended";
 export const TABS: PlatformTab[] = ["pending", "active", "suspended"];
 
-/** All tabs of /admin/platform: the three org lists plus Penggunaan (usage, PRD usage §7). */
-export type ViewTab = PlatformTab | "usage";
-export const VIEW_TABS: ViewTab[] = [...TABS, "usage"];
+/** All tabs of /admin/platform: the three org lists plus Penggunaan (usage, PRD usage §7) and Maklum balas (feedback). */
+export type ViewTab = PlatformTab | "usage" | "feedback";
+export const VIEW_TABS: ViewTab[] = [...TABS, "usage", "feedback"];
 /** ?tab= value per tab. */
-export const TAB_QUERY: Record<ViewTab, string> = { pending: "pending", active: "active", suspended: "suspended", usage: "penggunaan" };
+export const TAB_QUERY: Record<ViewTab, string> = { pending: "pending", active: "active", suspended: "suspended", usage: "penggunaan", feedback: "maklum-balas" };
 
 /** The tab named by ?tab= (BM or English names accepted); Menunggu when missing or unknown. */
 export function tabFromQuery(value: string | null | undefined): ViewTab {
   const v = (value ?? "").trim().toLowerCase();
   if (v === "penggunaan" || v === "usage") return "usage";
+  if (v === "maklum-balas" || v === "feedback") return "feedback";
   if (v === "active" || v === "aktif") return "active";
   if (v === "suspended" || v === "digantung") return "suspended";
   return "pending";

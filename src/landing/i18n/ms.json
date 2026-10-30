@@ -552,6 +552,37 @@
           "file": "pairing-code.png",
           "alt": "Skrin TV memaparkan kod pemasangan 6 digit dan kod QR"
         }
+      },
+      {
+        "id": "skrin-penuh",
+        "title": "Skrin penuh",
+        "steps": [
+          "Cara paling mudah (semua TV): apabila TV memaparkan “Tekan OK untuk skrin penuh”, tekan butang OK pada alat kawalan. Ulang selepas TV dimatikan dan dihidupkan.",
+          "Cara terbaik untuk TV Android / Google TV: pasang aplikasi Fully Kiosk Browser. Cari di Google Play pada TV. Jika tiada, pasang aplikasi Downloader dan muat turun Fully Kiosk Browser dari laman fully-kiosk.com.",
+          "Dalam tetapan Fully Kiosk Browser, tetapkan Start URL kepada https://masjidview.my/tv/, kemudian hidupkan Launch on Boot (dibuka sendiri apabila TV dihidupkan) dan Keep Screen On.",
+          "Di bahagian paparan (Toolbars & Appearance), matikan bar status dan bar navigasi supaya halaman memenuhi skrin. Nama tetapan mungkin sedikit berbeza mengikut versi aplikasi.",
+          "Komputer riba: buat pintasan (shortcut) dengan sasaran \"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" --kiosk https://masjidview.my/tv/ dan letakkan dalam folder Startup (tekan Win+R, taip shell:startup). Chrome dibuka skrin penuh setiap kali komputer dihidupkan. Tekan Alt+F4 untuk keluar.",
+          "Telefon atau tablet: buka masjidview.my/tv dalam Chrome, pilih Tambah ke skrin utama, kemudian buka dari ikon itu. Ia sentiasa dibuka skrin penuh."
+        ],
+        "img": {
+          "file": "fullscreen.png",
+          "alt": "TV memaparkan Masjid View skrin penuh tanpa bar pelayar"
+        }
+      },
+      {
+        "id": "kemas-kini",
+        "title": "Mengemas kini TV",
+        "steps": [
+          "Biasanya anda tidak perlu berbuat apa-apa: TV memuatkan versi terkini sendiri setiap pagi pukul 3:00.",
+          "TV yang dijadikan skrin penuh dengan butang OK tidak dimuat semula pada waktu malam, supaya kekal skrin penuh. Apabila versi baharu diperlukan, TV memaparkan “Versi baharu tersedia”: tekan OK untuk mengemas kini, kemudian OK sekali lagi untuk skrin penuh.",
+          "TV dengan Fully Kiosk Browser dikemas kini sendiri pada pukul 3:00 pagi dan kekal skrin penuh.",
+          "Cara segera untuk semua TV: matikan dan hidupkan semula TV, atau tutup dan buka semula pelayar.",
+          "Panel AJK memaparkan notis di bahagian atas jika ada skrin masjid anda yang belum dikemas kini, bersama langkah untuk setiap skrin."
+        ],
+        "img": {
+          "file": "update.png",
+          "alt": "Skrin TV memaparkan notis Versi baharu tersedia, tekan OK untuk kemas kini"
+        }
       }
     ],
     "trouble": {

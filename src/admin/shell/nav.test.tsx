@@ -5,11 +5,12 @@ const keys = (role: "pentadbir" | null, platform: boolean) => navItems(role, pla
 
 describe("admin navigation", () => {
   it("a masjid admin sees every masjid page", () => {
-    expect(keys("pentadbir", false)).toEqual(["home", "content", "screens", "settings", "members"]);
+    expect(keys("pentadbir", false)).toEqual(["home", "content", "screens", "settings", "members", "feedback"]);
   });
   it("platform owner with a masjid also gets Platform (sidebar on computer, account sheet on phone)", () => {
     const items = navItems("pentadbir", true);
-    expect(items.map((n) => n.key)).toEqual(["home", "content", "screens", "settings", "members", "platform"]);
+    expect(items.map((n) => n.key)).toEqual(["home", "content", "screens", "settings", "members", "feedback", "platform"]);
+    expect(items.find((n) => n.key === "feedback")?.phone).toBe(false);
     expect(items.find((n) => n.key === "platform")?.phone).toBe(false);
   });
   it("platform owner without a masjid sees Platform only, no links that bounce back", () => {

@@ -33,7 +33,8 @@
     "screens": "Skrin",
     "settings": "Tetapan",
     "members": "Ahli",
-    "platform": "Platform"
+    "platform": "Platform",
+    "feedback": "Maklum balas"
   },
   "account": {
     "menu": "Akaun",
@@ -242,7 +243,8 @@
       "pending": "Menunggu",
       "active": "Aktif",
       "suspended": "Digantung",
-      "usage": "Penggunaan"
+      "usage": "Penggunaan",
+      "feedback": "Maklum balas"
     },
     "tabCount": "{label} ({n})",
     "tabs": "Status masjid",
@@ -417,7 +419,9 @@
     "posterHelp": "Untuk TV kedua. Tiada jam atau waktu solat.",
     "posterTip": "TV kedua? Pilih “Pengumuman sahaja”: TV ini memaparkan pengumuman sepenuh skrin, manakala TV pertama terus memaparkan waktu solat.",
     "posterTipUse": "Guna Pengumuman sahaja",
-    "posterTipDismiss": "Tutup cadangan"
+    "posterTipDismiss": "Tutup cadangan",
+    "needsUpdate": "Perlu kemas kini",
+    "notFullscreen": "Bukan skrin penuh · cara"
   },
   "poster": {
     "title": "Muat naik poster",
@@ -956,5 +960,48 @@
       "error": "Tidak dapat disimpan: {message}",
       "checked": "Harga dan had disemak {date}. Had dan harga disimpan dalam jadual usage_settings."
     }
+  },
+  "update": {
+    "title": "Kemas kini tersedia",
+    "whatsNew": "Baharu: TV boleh kekal skrin penuh (tekan OK pada alat kawalan), status skrin penuh di halaman Skrin, dan halaman Maklum balas untuk menghantar cadangan kepada kami.",
+    "adminOutdated": "Halaman ini versi lama.",
+    "reload": "Muat semula",
+    "screensBehind": "{n} skrin belum dikemas kini:",
+    "how": {
+      "tab": "tekan OK pada alat kawalan TV untuk mengemas kini, kemudian OK sekali lagi untuk skrin penuh.",
+      "app": "mulakan semula aplikasi kiosk (atau matikan dan hidupkan TV).",
+      "window": "TV akan dikemas kini sendiri pada pukul 3:00 pagi. Untuk sekarang: matikan dan hidupkan TV."
+    },
+    "guide": "Cara kemas kini TV",
+    "dismiss": "Tutup notis kemas kini"
+  },
+  "feedback": {
+    "title": "Maklum balas",
+    "subtitle": "Hantar cadangan, masalah atau pujian terus kepada pasukan Masjid View.",
+    "intro": "Ceritakan apa yang boleh kami baiki, masalah yang anda hadapi, atau ciri yang anda mahu. Anda boleh menghantar seberapa banyak maklum balas. Kami membaca semuanya, tetapi mungkin tidak membalas setiap satu.",
+    "label": "Maklum balas anda",
+    "placeholder": "Contoh: Saya mahu pilihan saiz tulisan yang lebih besar untuk ticker.",
+    "hint": "Jangan masukkan kata laluan atau maklumat peribadi orang lain.",
+    "count": "{n}/{max}",
+    "send": "Hantar",
+    "sending": "Menghantar…",
+    "sent": "Terima kasih! Maklum balas anda telah dihantar.",
+    "sentTitle": "Maklum balas yang anda hantar",
+    "none": "Belum ada maklum balas dihantar.",
+    "loadError": "Tidak dapat memuatkan senarai: {message}",
+    "err": {
+      "empty": "Tulis sesuatu dahulu.",
+      "tooLong": "Maksimum 2000 aksara.",
+      "tooMany": "Had 20 maklum balas sehari dicapai. Cuba lagi esok.",
+      "notAllowed": "Akaun ini tidak boleh menghantar untuk masjid ini.",
+      "network": "Tiada sambungan internet. Cuba lagi.",
+      "generic": "Maklum balas tidak dapat dihantar. Cuba lagi."
+    }
+  },
+  "platformFeedback": {
+    "title": "Maklum balas ({n})",
+    "empty": "Belum ada maklum balas.",
+    "error": "Tidak dapat memuatkan maklum balas: {message}",
+    "noOrg": "(tiada masjid)"
   }
 }

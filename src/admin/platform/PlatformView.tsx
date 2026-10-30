@@ -10,6 +10,7 @@ import { Dialog } from "../shell/Dialog";
 import { OrgAvatar } from "../shell/OrgAvatar";
 import { useIsDesktop } from "../shell/useIsDesktop";
 import { UsageView } from "../usage/UsageView";
+import { PlatformFeedback } from "../feedback/PlatformFeedback";
 import { REASON_MAX, TAB_QUERY, VIEW_TABS, actionsFor, countByTab, filterOrgs, formatBytes, needsReason, reasonError, tabFromQuery, totals, type PlatformOrg, type PlatformTab, type ReviewAction, type ViewTab } from "./logic";
 
 const card = "rounded-[18px] bg-adm-card shadow-[0_1px_3px_rgba(18,38,30,0.08)]";
@@ -50,7 +51,8 @@ export function PlatformView({ tabParam }: { tabParam: string | null }) {
   const { orgs, error, loading, reload } = usePlatformOrgs();
   const [view, setView] = useState<ViewTab>(() => tabFromQuery(tabParam));
   useEffect(() => setView(tabFromQuery(tabParam)), [tabParam]);
-  const usage = view === "usage";
+  /** Penggunaan and Maklum balas replace the masjid list. */
+  const usage = view === "usage" || view === "feedback";
   const tab: PlatformTab = usage ? "pending" : view;
   const choose = (k: ViewTab) => {
     setView(k);
@@ -131,7 +133,7 @@ export function PlatformView({ tabParam }: { tabParam: string | null }) {
       )}
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-        <div role="tablist" aria-label={t("platform.tabs")} className="grid grid-cols-2 gap-1 rounded-[14px] bg-[#E3ECE7] p-1 min-[480px]:grid-cols-4 min-[480px]:gap-0 lg:w-[620px]">
+        <div role="tablist" aria-label={t("platform.tabs")} className="grid grid-cols-2 gap-1 rounded-[14px] bg-[#E3ECE7] p-1 min-[480px]:grid-cols-5 min-[480px]:gap-0 lg:w-[780px]">
           {VIEW_TABS.map((k) => {
             const on = view === k;
             return (
@@ -143,7 +145,7 @@ export function PlatformView({ tabParam }: { tabParam: string | null }) {
                 onClick={() => choose(k)}
                 className={`h-11 rounded-[11px] px-1 text-[14px] font-bold focus-visible:outline-2 focus-visible:outline-adm-green ${on ? "bg-white text-adm-ink shadow-[0_1px_3px_rgba(18,38,30,0.12)]" : "text-adm-muted"}`}
               >
-                {k === "usage" ? t("platform.tab.usage") : t("platform.tabCount", { label: t(`platform.tab.${k}`), n: counts[k] })}
+                {k === "usage" || k === "feedback" ? t(`platform.tab.${k}`) : t("platform.tabCount", { label: t(`platform.tab.${k}`), n: counts[k] })}
               </button>
             );
           })}
@@ -165,8 +167,10 @@ export function PlatformView({ tabParam }: { tabParam: string | null }) {
         )}
       </div>
 
-      {usage ? (
+      {view === "usage" ? (
         <UsageView />
+      ) : view === "feedback" ? (
+        <PlatformFeedback />
       ) : (
       <>
       {notice && (

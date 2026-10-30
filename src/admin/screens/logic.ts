@@ -40,6 +40,8 @@ export interface Screen {
   last_seen_at: string | null;
   revoked_at: string | null;
   app_version: string | null;
+  /** How the TV is shown (migration 0010): app = kiosk/installed, tab = full screen by key press, window = not full screen */
+  view_mode?: "app" | "tab" | "window" | null;
   created_at: string;
 }
 

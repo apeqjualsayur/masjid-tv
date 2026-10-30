@@ -11,9 +11,10 @@ import { useAdmin } from "../session";
 import { Dialog } from "./Dialog";
 import { ICON, Icon, LogoMark } from "./icons";
 import { OrgAvatar } from "./OrgAvatar";
+import { UpdateNotice } from "../update/UpdateNotice";
 
 export interface NavItem {
-  key: "home" | "content" | "screens" | "settings" | "members" | "platform";
+  key: "home" | "content" | "screens" | "settings" | "members" | "feedback" | "platform";
   route: AdminRoute;
   icon: string;
   /** shown in the phone bottom nav */
@@ -32,6 +33,7 @@ export function navItems(role: Membership["role"] | null, isPlatformAdmin: boole
     items.push({ key: "screens", route: ROUTES.screens, icon: ICON.screens, phone: true });
     items.push({ key: "settings", route: ROUTES.settings, icon: ICON.settings, phone: true });
     items.push({ key: "members", route: ROUTES.members, icon: ICON.members, phone: false });
+    items.push({ key: "feedback", route: ROUTES.feedback, icon: ICON.feedback, phone: false });
   }
   if (isPlatformAdmin) items.push({ key: "platform", route: ROUTES.platform, icon: ICON.platform, phone: !role });
   return items;
@@ -69,7 +71,7 @@ function OrgLine({ org }: { org: Membership }) {
   );
 }
 
-/** Phone/tablet account sheet: user, language, platform, sign out. */
+/** Phone/tablet account sheet: user, language, feedback, platform, sign out. */
 function AccountSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const a = useAdmin();
   const { t } = useT();
@@ -82,6 +84,12 @@ function AccountSheet({ open, onClose }: { open: boolean; onClose: () => void })
           <span className="text-[14px] font-bold">{t("lang.label")}</span>
           <LangToggle />
         </div>
+        {a.role && (
+          <Link href={ROUTES.feedback} onClick={onClose} className="flex h-12 items-center gap-3 rounded-[14px] border border-adm-line px-4 text-[15px] font-bold">
+            <Icon d={ICON.feedback} size={20} />
+            {t("nav.feedback")}
+          </Link>
+        )}
         {a.isPlatformAdmin && (
           <Link href={ROUTES.platform} onClick={onClose} className="flex h-12 items-center rounded-[14px] border border-adm-line px-4 text-[15px] font-bold">
             {t("nav.platform")}
@@ -223,6 +231,7 @@ export function AdminShell({ children, title, subtitle, actions }: { children: R
       <div className="lg:pl-[248px]">
         <PhoneHeader onAccount={() => setAccount(true)} />
         <main className="mx-auto flex w-full max-w-[640px] flex-col gap-5 px-5 pt-5 pb-[110px] lg:max-w-none lg:gap-6 lg:px-10 lg:py-8">
+          <UpdateNotice />
           {(title || actions) && (
             <div className="hidden items-center justify-between gap-4 lg:flex">
               <div className="flex flex-col gap-0.5">

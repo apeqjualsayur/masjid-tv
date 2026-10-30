@@ -12,3 +12,6 @@ designs/qa/
 
 # landing QA screenshots
 designs/landing/qa/
+
+# written by next.config.ts at build time
+public/version.json

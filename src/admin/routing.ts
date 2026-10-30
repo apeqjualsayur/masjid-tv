@@ -32,6 +32,7 @@ export const ROUTES = {
   screens: "/admin/skrin/",
   settings: "/admin/tetapan/",
   members: "/admin/ahli/",
+  feedback: "/admin/maklum-balas/",
   platform: "/admin/platform/",
   privacy: "/privasi/",
 } as const;

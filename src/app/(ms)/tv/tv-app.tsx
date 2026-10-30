@@ -32,7 +32,7 @@ import {
 import { SAMPLE_POSTER, SAMPLE_POSTER_LANDSCAPE, sampleSlide, type SlideView } from "@/templates";
 import { useTheme } from "@/themes";
 import { ThemeView, UnavailableView } from "@/themes/ThemeView";
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { parseUrlOverrides, type ScreenConfig, type UrlOverrides } from "./config";
 import { loadScreenConfig, type ConfigSource } from "./config-loader";
 import { DebugView, MetaFooter, type DebugMeta } from "./debug-view";
@@ -40,6 +40,8 @@ import { loadDemo, tvMode } from "./demo";
 import { DemoBadge } from "./demo-badge";
 import { ErrorBoundary } from "./error-boundary";
 import { useAutoLite, useDailyReload, useNow } from "./hooks";
+import { ScreenHint } from "./ScreenHint";
+import { setTvQuiet } from "./screen-mode";
 import { Stage } from "./stage";
 import { APP_VERSION, useOnline, useServiceWorker } from "./status";
 import { PairingFlow } from "./pairing/PairingFlow";
@@ -81,11 +83,17 @@ interface Boot {
 
 export function TvRoot() {
   const [mode, setMode] = useState<"demo" | "local" | "paired" | null>(null);
+  /** Bumped by the nightly soft restart: remounts the whole app without reloading the page. */
+  const [generation, setGeneration] = useState(0);
   useEffect(() => setMode(tvMode(window.location.search, supabaseConfigured())), []);
+  useDailyReload(() => setGeneration((g) => g + 1));
   const screen = mode === "demo" ? <DemoApp /> : mode === "local" ? <TvApp /> : mode === "paired" ? <PairingFlow /> : <div className="h-full bg-black" />;
   return (
     <ErrorBoundary>
-      <Stage>{screen}</Stage>
+      <Stage>
+        <Fragment key={generation}>{screen}</Fragment>
+      </Stage>
+      <ScreenHint />
     </ErrorBoundary>
   );
 }
@@ -143,7 +151,6 @@ export function DisplayHost({ source }: { source: DisplaySource }) {
   const [dataVersion, setDataVersion] = useState(0);
   const [sync, setSync] = useState<{ data: PrayerData; status: SyncStatus } | null>(null);
   const zone = source.config.zone;
-  useDailyReload();
 
   useEffect(() => {
     const store = idbMonthStore();
@@ -224,6 +231,9 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
   const lite = overrides.lite ?? autoLite;
   const forced = useRef<ForcedModeInput | null>(null);
   const forceFriday = useFridayKey(overrides.debug, overrides.forceFriday);
+  // Pre-azan to solat, and khutbah: no hints on screen (ScreenHint). Set after render, from this render's mode.
+  const quiet = useRef(false);
+  useEffect(() => setTvQuiet(quiet.current));
 
   const { theme, warning: themeWarning } = useTheme(overrides.theme ?? config.theme);
   const configuredLayout = overrides.layout ?? config.layout;
@@ -296,6 +306,7 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
     layout: configuredLayout,
   });
 
+  quiet.current = s.mode !== "normal";
   if (overrides.debugState) return <DebugView s={s} meta={meta} />;
   return (
     <>

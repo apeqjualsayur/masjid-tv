@@ -1,6 +1,6 @@
 "use client";
 import { getClockOffset, localParts, nowMs } from "@/core";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { createFrameMonitor } from "./frame-monitor";
 
 /** The app clock (offset + sim/speed), ticking once per (simulated) second. */
@@ -50,15 +50,34 @@ export function useAutoLite(enabled: boolean): boolean {
   return slow;
 }
 
-/** Reload the page daily at 03:00 local real time (not sim time). */
-export function useDailyReload(): void {
+/**
+ * Daily restart at 03:00 local real time (not sim time): a page reload, which also loads a new
+ * version. A TV kept full screen by a key press would lose full screen on reload (and nobody is there
+ * to press OK at 3 am), so it restarts the app in place instead (`onSoftRestart`); it gets a new
+ * version from the "Versi baharu" hint or when switched off and on (owner decision, plan 3b).
+ */
+export function useDailyReload(onSoftRestart: () => void): void {
+  const soft = useRef(onSoftRestart);
+  soft.current = onSoftRestart;
   useEffect(() => {
-    const loadedAt = Date.now();
+    let since = Date.now();
     const id = setInterval(() => {
-      const real = Date.now() + getClockOffset();
-      const { hour, minute } = localParts(real);
-      if (hour === 3 && minute === 0 && Date.now() - loadedAt > 2 * 60_000) window.location.reload();
+      const action = dailyRestart(Date.now() + getClockOffset(), Date.now() - since, Boolean(document.fullscreenElement));
+      if (action === "soft") {
+        since = Date.now();
+        soft.current();
+      } else if (action === "reload") window.location.reload();
     }, 20_000);
     return () => clearInterval(id);
   }, []);
+}
+
+/**
+ * What the daily restart does at `realMs` (Malaysia time): nothing outside 03:00–03:00:59 or within
+ * 2 min of the last (re)start; a soft restart when kept full screen by a key press; else a reload.
+ */
+export function dailyRestart(realMs: number, msSinceStart: number, keyFullscreen: boolean): "reload" | "soft" | null {
+  const { hour, minute } = localParts(realMs);
+  if (hour !== 3 || minute !== 0 || msSinceStart < 2 * 60_000) return null;
+  return keyFullscreen ? "soft" : "reload";
 }

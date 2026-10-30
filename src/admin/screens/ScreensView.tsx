@@ -4,6 +4,7 @@
 // rename / theme / layout / revoke / delete.
 import { useCallback, useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
 import { THEMES_ROUND2_VISIBLE } from "@/config/features";
+import { RELEASE, isOutdated } from "@/config/release";
 import { getSupabase } from "@/lib/supabase";
 import { useDuration } from "../home/HomeView";
 import { useClock } from "../home/useHomeData";
@@ -36,10 +37,12 @@ export function ScreensView() {
   const [managing, setManaging] = useState<Screen | null>(null);
 
   const load = useCallback(async () => {
-    const { data, error } = await getSupabase()
-      .from("screens")
-      .select("id, name, theme, layout, last_seen_at, revoked_at, app_version, created_at")
-      .eq("org_id", orgId);
+    const sb = getSupabase();
+    const cols = "id, name, theme, layout, last_seen_at, revoked_at, app_version, created_at";
+    // view_mode exists once migration 0010 has run; until then load without it.
+    let res: { data: unknown[] | null; error: { message: string } | null } = await sb.from("screens").select(`${cols}, view_mode`).eq("org_id", orgId);
+    if (res.error) res = await sb.from("screens").select(cols).eq("org_id", orgId);
+    const { data, error } = res;
     if (error) setLoadError(error.message);
     else {
       setLoadError(null);
@@ -139,10 +142,16 @@ export function AddScreenAction() {
   );
 }
 
+/** Guide section on full screen (landing /panduan). */
+const fullscreenGuide = (lang: string) => `${lang === "en" ? "/en/panduan/" : "/panduan/"}#skrin-penuh`;
+
 function ScreenCard({ s, now, canEdit, onManage }: { s: Screen; now: number; canEdit: boolean; onManage: () => void }) {
-  const { t } = useT();
+  const { t, lang } = useT();
   const dur = useDuration();
   const st = screenStatus(s, now);
+  const live = st.kind === "online" || st.kind === "offline";
+  const behind = live && isOutdated(s.app_version, RELEASE.minTvBuild);
+  const notFull = live && s.view_mode === "window";
   const status =
     st.kind === "online" ? (
       <span className="flex items-center gap-1.5 text-[13px] font-bold text-adm-ok"><span className="h-2 w-2 rounded-full bg-[#1E9E62]" />{t("screens.online")}</span>
@@ -163,6 +172,16 @@ function ScreenCard({ s, now, canEdit, onManage }: { s: Screen; now: number; can
           <span className="text-[12px] text-adm-muted">{t(`theme.${s.theme}`)} · {t(`layout.${s.layout}`)}</span>
         </div>
       </div>
+      {(behind || notFull) && (
+        <div className="flex flex-wrap gap-1.5">
+          {behind && <span className="rounded-full bg-[#FFF1D6] px-2.5 py-1 text-[12px] font-extrabold text-[#7A4700]">{t("screens.needsUpdate")}</span>}
+          {notFull && (
+            <a href={fullscreenGuide(lang)} target="_blank" rel="noopener" className="rounded-full bg-[#E3ECE7] px-2.5 py-1 text-[12px] font-extrabold text-[#3A4E45] underline-offset-2 hover:underline">
+              {t("screens.notFullscreen")}
+            </a>
+          )}
+        </div>
+      )}
       {st.kind === "offline" && <p className="rounded-xl bg-[#FFF4DF] px-3 py-2.5 text-[13px] leading-[1.45] text-[#6B4A12]">{t("screens.offlineNote")}</p>}
       {st.kind === "revoked" && <p className="rounded-xl bg-adm-ground px-3 py-2.5 text-[13px] leading-[1.45] text-adm-muted">{t("screens.revokedNote")}</p>}
       {canEdit && (

@@ -552,6 +552,37 @@
           "file": "pairing-code.png",
           "alt": "A TV screen showing a 6-digit pairing code and a QR code"
         }
+      },
+      {
+        "id": "skrin-penuh",
+        "title": "Full screen",
+        "steps": [
+          "Easiest (any TV): when the TV shows “Tekan OK untuk skrin penuh” (press OK for full screen), press OK on the remote. Do it again after the TV has been switched off and on.",
+          "Best for Android TV / Google TV: install the Fully Kiosk Browser app. Look for it in Google Play on the TV. If it isn't there, install the Downloader app and download Fully Kiosk Browser from fully-kiosk.com.",
+          "In Fully Kiosk Browser's settings, set the Start URL to https://masjidview.my/tv/, then turn on Launch on Boot (opens by itself when the TV is switched on) and Keep Screen On.",
+          "Under the display settings (Toolbars & Appearance), turn off the status bar and navigation bar so the page fills the screen. Setting names may differ slightly between app versions.",
+          "Laptop: make a shortcut with the target \"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" --kiosk https://masjidview.my/tv/ and put it in the Startup folder (press Win+R, type shell:startup). Chrome then opens full screen every time the computer starts. Press Alt+F4 to leave.",
+          "Phone or tablet: open masjidview.my/tv in Chrome, choose Add to Home screen, then open it from that icon. It always opens full screen."
+        ],
+        "img": {
+          "file": "fullscreen.png",
+          "alt": "A TV showing Masjid View full screen, without browser bars"
+        }
+      },
+      {
+        "id": "kemas-kini",
+        "title": "Updating a TV",
+        "steps": [
+          "Usually you don't need to do anything: the TV loads the latest version by itself every morning at 3:00.",
+          "A TV made full screen with the OK button is not reloaded at night, so it stays full screen. When a new version is needed, the TV shows “Versi baharu tersedia” (new version available): press OK to update, then OK again for full screen.",
+          "A TV with Fully Kiosk Browser updates itself at 3:00 am and stays full screen.",
+          "Quickest way for any TV: switch the TV off and on again, or close and reopen the browser.",
+          "The AJK panel shows a notice at the top when one of your masjid's screens is not updated yet, with the steps for each screen."
+        ],
+        "img": {
+          "file": "update.png",
+          "alt": "A TV screen showing the notice Versi baharu tersedia, press OK to update"
+        }
       }
     ],
     "trouble": {

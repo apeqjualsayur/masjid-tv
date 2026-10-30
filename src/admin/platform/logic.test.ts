@@ -5,6 +5,7 @@ describe("?tab= on /admin/platform", () => {
   it("?tab=penggunaan opens Penggunaan; the org tabs keep working", () => {
     expect(tabFromQuery("penggunaan")).toBe("usage");
     expect(tabFromQuery("usage")).toBe("usage");
+    expect(tabFromQuery("maklum-balas")).toBe("feedback");
     expect(tabFromQuery("active")).toBe("active");
     expect(tabFromQuery("Aktif")).toBe("active");
     expect(tabFromQuery("digantung")).toBe("suspended");

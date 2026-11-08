@@ -30,6 +30,7 @@ describe("bundleToScreenConfig", () => {
       durations: { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 45, jumaatSolatMin: 12, showFridayInfo: true }, // old bundle without the Friday keys: defaults
       iqamahMin: { subuh: 12, zohor: 10, asar: 10, maghrib: 9, isyak: 10 },
       ticker: ["Satu", "Dua"],
+      sound: { enabled: false, volume: 70, azan: "chime", iqamah: "hayya" }, // a bundle without sound: off (D8)
     });
     expect(accentColor).toBe("#8A2A4A");
   });

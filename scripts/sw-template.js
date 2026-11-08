@@ -6,6 +6,7 @@
  *   /_next/static .... cache-first (hashed, immutable)
  *   /data/*.json ..... cache-first (bundled per build)
  *   /config/*.json ... network-first, so AJK edits show up; cached copy when offline
+ *   /sounds/* ........ cache-first (precached: the azan/iqamah recording must play offline)
  *   posters/images ... cache-first, stored in the runtime cache on first view
  *   bundle media ..... (Supabase public bucket 'media': logo + posters) cache-first in its own cache,
  *                      fetched in CORS mode (no opaque responses filling the quota); the app sends
@@ -37,6 +38,7 @@ function classify(url, request) {
   if (u.pathname === "/version.json") return "passthrough"; // always the live version, never cached
   if (u.pathname.startsWith("/_next/static/")) return "cache-first";
   if (u.pathname.startsWith("/data/")) return "cache-first";
+  if (u.pathname.startsWith("/sounds/")) return "cache-first";
   if (u.pathname.startsWith("/config/") && u.pathname.endsWith(".json")) return "network-first";
   if (isImage) return "cache-first";
   return "network-first";

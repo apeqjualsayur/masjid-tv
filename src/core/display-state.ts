@@ -52,6 +52,8 @@ export interface DisplayState {
   modeRemainingSec?: number;
   /** 0..1 elapsed */
   modeProgress?: number;
+  /** When the current mode began, epoch ms (sound cues: _specs/50-PRD-sound.md D5). Not for drawing. */
+  modeStartMs?: number;
   isFriday: boolean;
   /** Friday strip data: on Friday from 00:00 until Solat Jumaat ends, if enabled (PRD §5.1). */
   friday?: FridayInfo;
@@ -125,7 +127,7 @@ export function buildDisplayState(i: DisplayInputs): DisplayState {
   const waktu = sched.waktu.map(view);
   const m =
     i.layout === "poster"
-      ? { mode: "normal" as const, target: undefined, remainingSec: undefined, progress: undefined }
+      ? { mode: "normal" as const, target: undefined, remainingSec: undefined, progress: undefined, startMs: undefined }
       : i.forced
         ? forcedMode(i.forced.mode, i.forced.target, i.forced.sinceMs, i.modeConfig, i.at, sched.isFriday)
         : computeMode(i.today.times, sched.isFriday, i.modeConfig, i.at);
@@ -145,6 +147,7 @@ export function buildDisplayState(i: DisplayInputs): DisplayState {
     modeTarget: modeTargetView(m.mode, m.target, waktu, sched.isFriday),
     modeRemainingSec: m.remainingSec,
     modeProgress: m.progress,
+    modeStartMs: m.startMs,
     isFriday: sched.isFriday,
     friday: fridayInfo(i.today, i.modeConfig.durations, i.at, i.clock24h, sched.isFriday),
     masjid: i.masjid,

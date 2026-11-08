@@ -90,6 +90,7 @@ describe("routing", () => {
     expect(classify(`${ORIGIN}/tv/?debug=1`, r("navigate"))).toBe("page");
     expect(classify(`${ORIGIN}/_next/static/chunks/a.js`, r())).toBe("cache-first");
     expect(classify(`${ORIGIN}/data/SGR01-2026.json`, r())).toBe("cache-first");
+    expect(classify(`${ORIGIN}/sounds/hayya-ala-solah.mp3`, r())).toBe("cache-first"); // azan/iqamah cue offline
     expect(classify(`${ORIGIN}/config/screen.json`, r())).toBe("network-first");
     expect(classify(`${ORIGIN}/config/poster-portrait.svg`, r("cors", "image"))).toBe("cache-first");
     expect(classify("https://cdn.example/poster.jpg", r("no-cors", "image"))).toBe("cache-first");

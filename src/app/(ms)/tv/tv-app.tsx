@@ -2,6 +2,7 @@
 // The TV display (local mode): config + URL overrides, data + clock sync, DisplayState every second,
 // rendered by the selected theme on the stage.
 import {
+  applySoundOverrides,
   buildDisplayState,
   computeSchedule,
   formatGregorian,
@@ -42,6 +43,7 @@ import { ErrorBoundary } from "./error-boundary";
 import { useAutoLite, useDailyReload, useNow } from "./hooks";
 import { ScreenHint } from "./ScreenHint";
 import { setTvQuiet } from "./screen-mode";
+import { SoundLayer } from "./sound";
 import { Stage } from "./stage";
 import { APP_VERSION, useOnline, useServiceWorker } from "./status";
 import { PairingFlow } from "./pairing/PairingFlow";
@@ -311,6 +313,10 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
   return (
     <>
       <ThemeView theme={theme} s={s} layout={layout} slide={pick.slide} slideKey={pick.slideKey} counter={pick.counter} />
+      {/* The live demo never plays sound (D10). The screen's own layout decides (poster: never). */}
+      {!boot.demo && (
+        <SoundLayer s={s} at={at} layout={configuredLayout} sound={applySoundOverrides(config.sound, overrides.sound)} speed={overrides.speed ?? 1} forced={Boolean(forced.current)} />
+      )}
       {boot.demo && <DemoBadge watch={`${theme.id}|${s.phase}|${s.mode}`} />}
       {overlay}
     </>

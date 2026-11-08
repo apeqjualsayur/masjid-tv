@@ -6,8 +6,9 @@ import { join, relative, sep } from "node:path";
 
 const OUT = join(process.cwd(), "out");
 // Not app files: the worker itself and Cloudflare Pages control files. version.json must always come
-// from the network (it says whether a newer version is live), so it is not precached.
-const SKIP = new Set(["sw.js", "_headers", "_redirects", "version.json"]);
+// from the network (it says whether a newer version is live), so it is not precached. The sounds
+// folder's README is a note for the owner, not an app file. Everything else in out/sounds/ is precached.
+const SKIP = new Set(["sw.js", "_headers", "_redirects", "version.json", "sounds/README.md"]);
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -25,7 +26,8 @@ export function toUrl(file: string): string {
 }
 
 function main() {
-  const files = walk(OUT).filter((f) => !SKIP.has(relative(OUT, f)) && !relative(OUT, f).startsWith("_not-found"));
+  const rel = (f: string) => relative(OUT, f).split(sep).join("/");
+  const files = walk(OUT).filter((f) => !SKIP.has(rel(f)) && !rel(f).startsWith("_not-found"));
   const hash = createHash("sha256");
   const urls: string[] = [];
   for (const f of files.sort()) {

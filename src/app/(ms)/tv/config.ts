@@ -1,5 +1,5 @@
 // Screen config (public/config/screen.json, PRD section 9.4) and URL overrides (PRD section 10).
-import { FALLBACK_LAYOUT, FALLBACK_THEME_ID, LAYOUT_KEYS, THEME_IDS, parseLocalDateTime, type IqamahMinutes, type LayoutKey, type ModeDurations, type ModeKey, type ThemeId } from "@/core";
+import { DEFAULT_SOUND, FALLBACK_LAYOUT, FALLBACK_THEME_ID, LAYOUT_KEYS, SOUND_KINDS, THEME_IDS, isSoundKind, parseLocalDateTime, parseSoundSettings, soundVolume, type IqamahMinutes, type LayoutKey, type ModeDurations, type ModeKey, type SoundOverrides, type SoundSettings, type ThemeId } from "@/core";
 import { findZone } from "@/data";
 import { TEMPLATE_KEYS, type TemplateKey } from "@/templates";
 
@@ -13,6 +13,8 @@ export interface ScreenConfig {
   durations: ModeDurations;
   iqamahMin: IqamahMinutes;
   ticker: string[];
+  /** Sound cues (_specs/50-PRD-sound.md). Missing → off. */
+  sound: SoundSettings;
 }
 
 /** Used for any field that is missing or invalid in screen.json. Same values as the shipped file. */
@@ -26,6 +28,7 @@ export const DEFAULT_SCREEN_CONFIG: ScreenConfig = {
   durations: { preAzanMin: 5, azanMin: 3, solatMin: 12, khutbahMin: 40, jumaatSolatMin: 12, showFridayInfo: true },
   iqamahMin: { subuh: 10, zohor: 10, asar: 10, maghrib: 7, isyak: 10 },
   ticker: ["[Teks pengumuman]"],
+  sound: DEFAULT_SOUND,
 };
 
 // Every theme and layout, incl. round 2 (falak, garis, kerawang, seterusnya; poster): config + debug params.
@@ -76,6 +79,14 @@ export function parseScreenConfig(raw: unknown): { config: ScreenConfig; warning
   if (Array.isArray(r.ticker) && r.ticker.every((t) => typeof t === "string")) ticker = r.ticker.filter((t) => t.trim());
   else if (r.ticker !== undefined) warnings.push("ticker invalid; using default");
 
+  // Sound (_specs/50-PRD-sound.md D8): bad fields fall back to the defaults (off), with a warning.
+  const sound = parseSoundSettings(r.sound);
+  if (r.sound !== undefined) {
+    const given = isObj(r.sound) ? r.sound : null;
+    const bad = !given || (Object.keys(sound) as (keyof SoundSettings)[]).some((k) => k in given && given[k] !== sound[k]);
+    if (bad) warnings.push("sound invalid; using defaults for the bad fields");
+  }
+
   // Missing logo field: default path. Empty string: no logo.
   const logo = typeof m.logo === "string" ? m.logo.trim() || undefined : d.masjid.logo;
 
@@ -109,9 +120,11 @@ export function parseScreenConfig(raw: unknown): { config: ScreenConfig; warning
         isyak: minutes(iq.isyak, d.iqamahMin.isyak, "iqamahMin.isyak"),
       },
       ticker,
+      sound,
     },
   };
 }
+
 
 export interface UrlOverrides {
   /** ?debug=1: show the debug overlay. */
@@ -130,7 +143,11 @@ export interface UrlOverrides {
   slide?: TemplateKey | "poster" | "poster-landscape";
   /** ?lite=1 forces lite on, ?lite=0 forces it off (no auto-detect). Always honoured. */
   lite?: boolean;
+  /** sound=1, soundAzan=, soundIqamah=, vol=, mute=1 (debug or localhost; never in the live demo). */
+  sound?: SoundOverrides;
 }
+
+const SOUND_PARAMS = ["sound", "soundAzan", "soundIqamah", "vol", "mute"] as const;
 
 const LOCAL_HOSTS = ["localhost", "127.0.0.1", "[::1]", "::1"];
 
@@ -149,7 +166,7 @@ export function parseUrlOverrides(search: string, hostname: string): { overrides
   if (lite === "1" || lite === "true") o.lite = true;
   else if (lite === "0" || lite === "false") o.lite = false;
 
-  const debugKeys = ["theme", "layout", "mode", "sim", "speed", "day", "slide"].filter((k) => q.has(k));
+  const debugKeys = ["theme", "layout", "mode", "sim", "speed", "day", "slide", ...SOUND_PARAMS].filter((k) => q.has(k));
   if (!debugAllowed) {
     if (debugKeys.length) warnings.push(`ignored ${debugKeys.join(", ")} (add ?debug=1)`);
     return { overrides: o, warnings };
@@ -186,8 +203,38 @@ export function parseUrlOverrides(search: string, hostname: string): { overrides
   const slide = q.get("slide");
   if (slide !== null) slide === "poster" || slide === "poster-landscape" || oneOf(TEMPLATE_KEYS, slide) ? (o.slide = slide) : warnings.push(`slide=${slide} unknown`);
 
+  const soundKeys = SOUND_PARAMS.filter((k) => q.has(k));
+  if (soundKeys.length && demo) warnings.push(`ignored ${soundKeys.join(", ")} (the demo never plays sound)`);
+  else if (soundKeys.length) o.sound = parseSoundParams(q, warnings);
+
   return { overrides: o, warnings };
 }
+function parseSoundParams(q: URLSearchParams, warnings: string[]): SoundOverrides {
+  const s: SoundOverrides = {};
+  const flag = (v: string) => v === "1" || v === "true";
+  const sound = q.get("sound");
+  if (sound !== null) {
+    if (flag(sound)) s.enabled = true;
+    else if (sound === "0" || sound === "false") s.enabled = false;
+    else warnings.push(`sound=${sound} invalid (use 1 or 0)`);
+  }
+  for (const [param, key] of [["soundAzan", "azan"], ["soundIqamah", "iqamah"]] as const) {
+    const v = q.get(param);
+    if (v === null) continue;
+    if (isSoundKind(v)) s[key] = v;
+    else warnings.push(`${param}=${v} unknown (${SOUND_KINDS.join("|")})`);
+  }
+  const vol = q.get("vol");
+  if (vol !== null) {
+    const n = soundVolume(vol);
+    if (n === null) warnings.push(`vol=${vol} invalid (0–100)`);
+    else s.volume = n;
+  }
+  const mute = q.get("mute");
+  if (mute !== null && flag(mute)) s.mute = true;
+  return s;
+}
+
 /**
  * Phase 2 (PRD §4.4): a TV pairs with a masjid and gets its content from Supabase.
  * Local mode = Phase 1 behaviour from public/config/screen.json: `?local=1` (development,

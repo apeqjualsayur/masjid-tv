@@ -41,8 +41,10 @@ quiet, never an error or a blank screen.
   - A small speaker-off icon shows when sound is enabled, audio is locked, the layout is not `poster`,
     and the mode is `normal` (the same quiet rule as the "press OK" hint; PRD §5: the SOLAT screen
     shows only a tiny clock).
-  - The icon is drawn by `src/app/tv`, never by theme code: top-right of the stage, 24 px margin, 44 px,
-    45 % opacity, no blur in any mode.
+  - The icon is drawn by `src/app/tv` (`sound.tsx`), never by theme code: bottom-right of the stage
+    (owner prompt 2026-11-08), 24 px margin, 44 px, 45 % opacity, no blur in any mode. Inside the stage,
+    so the burn-in shift applies. It touches the corner of the last prayer card in some bottom layouts
+    (never a time).
   - Any key, click or tap unlocks audio (`AudioContext.resume()`) and hides the icon. The same OK press
     also does the hint's full screen.
   - A locked or failing sound never throws, never blanks the screen and never delays a mode change:
@@ -52,7 +54,7 @@ quiet, never an error or a blank screen.
   | Sound | Length |
   |---|---|
   | beep | 3 × 180 ms, 880 Hz, 150 ms gaps (≈ 0.9 s) |
-  | chime | ≈ 3 s, 3-note bell with decay |
+  | chime | ≈ 3 s, soft two-note "ding-dong" (E5, C5), gentle attack, long decay |
   | alarm | 2-tone pulse, stops at ≤ 10 s |
   | hayya | the owner's recording plays in full (17.4 s, kept whole by owner decision 2026-11-08); a replacement file longer than 20 s is cut at 20 s with a 0.5 s fade |
 
@@ -83,16 +85,14 @@ quiet, never an error or a blank screen.
 
 | Folder | File | Change |
 |---|---|---|
-| `src/core` | `sound.ts` + `sound.test.ts` (new) | Pure, no DOM. `SoundKind`, `SoundSettings`, `DEFAULT_SOUND`, `parseSoundSettings(raw)` (lenient → defaults), `cueFor(prev, cur, opts)` → `"azan" \| "iqamah" \| null` (D2, D5), `cueKey()` for de-duplication, `cueTolerance(speed)` |
+| `src/core` | `soundCues.ts`, `soundSettings.ts` + tests (new) | Pure, no DOM. `soundCue(prev, cur, opts)` → `{ event, waktu }` or null (D2, D5), `cueKey()`, `cueToleranceMs(speed)`; `SoundKind`, `SoundSettings`, `DEFAULT_SOUND`, `parseSoundSettings(raw)`, `applySoundOverrides()`. `DisplayState.modeStartMs` added for the 3 s rule |
 | `src/core` | `index.ts` | export the above |
-| `src/audio` (new) | `engine.ts` | one `AudioContext`; `locked` state + `subscribe`; `unlock()`; every call wrapped, never throws |
 | `src/audio` | `synth.ts` + test | beep / chime / alarm as note lists (data, tested against D7), rendered with oscillators + gain |
-| `src/audio` | `hayya.ts` + test | fetch + decode `/sounds/hayya-ala-solah.mp3` once (fetch injected for tests); missing → chime + one warn; 20 s safety cut |
-| `src/audio` | `play.ts` + test | `playCue(kind, volume)`: fire-and-forget, stops the previous cue, no-op when locked, unsupported or `off` |
+| `src/audio` | `player.ts` + `audio.test.ts` | one lazy `AudioContext`; `prime()`, `unlock()`, `isLocked()` + `subscribe`; `setVolume()` ((v/100)²); `play(kind)`: fire-and-forget, stops the previous sound, no-op when locked, unsupported or `off`; hayya fetched + decoded once (missing → chime + one warn; 20 s safety cut); every function wrapped, never throws |
 | `src/data` | `bundle.ts` + test | `BundleScreen.sound?: SoundSettings` via `parseSoundSettings`; missing → undefined (OFF) |
 | `src/app/tv` | `config.ts` + test | `ScreenConfig.sound`; screen.json `sound`; test settings `sound`, `soundAzan`, `soundIqamah`, `vol`, `mute` (debug/localhost only, never demo) |
 | `src/app/tv` | `bundle-config.ts` + test | carry `bundle.screen.sound` into `ScreenConfig.sound` |
-| `src/app/tv` | `sound.tsx` (new) | `useSoundCues(...)`: keeps the previous tick, calls `cueFor`, then `playCue` after render; `SoundLockIcon` (D6) |
+| `src/app/tv` | `sound.tsx` (new) | `SoundLayer`: keeps the previous tick, calls `soundCue`, then `player.play` after render; unlock on keydown / pointerdown / touchstart; `SoundLockIcon` (D6) |
 | `src/app/tv` | `tv-app.tsx` | `Display` calls `useSoundCues`; renders `SoundLockIcon` next to the theme |
 | `src/app/tv` | `hooks.ts` + `screen-mode.test.ts` | D11: `dailyRestart(...)` is soft when kept full screen by a key press **or** audio is unlocked |
 | `src/admin/screens` | `logic.ts` + test | `Screen.sound?`, `SOUND_KINDS`, `soundOf(screen)`, `soundEqual` (dirty check) |

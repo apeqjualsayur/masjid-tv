@@ -118,3 +118,46 @@ describe("Friday durations (PRD §9.4)", () => {
     expect(bad.warnings).toHaveLength(2);
   });
 });
+
+describe("sound (_specs/50-PRD-sound.md D8, local mode)", () => {
+  const OFF = { enabled: false, volume: 70, azan: "chime", iqamah: "hayya" };
+
+  it("the shipped screen.json has sound off; a screen.json without `sound` is off too, no warning", () => {
+    expect(parseScreenConfig(shipped).config.sound).toEqual(OFF);
+    const { sound: _omit, ...old } = shipped;
+    expect(parseScreenConfig(old)).toMatchObject({ config: { sound: OFF }, warnings: [] });
+  });
+
+  it("valid sound is kept; bad fields fall back with one warning", () => {
+    expect(parseScreenConfig({ ...shipped, sound: { enabled: true, volume: 40, azan: "beep", iqamah: "alarm" } })).toMatchObject({
+      config: { sound: { enabled: true, volume: 40, azan: "beep", iqamah: "alarm" } },
+      warnings: [],
+    });
+    const bad = parseScreenConfig({ ...shipped, sound: { enabled: true, volume: 400, azan: "gong" } });
+    expect(bad.config.sound).toEqual({ ...OFF, enabled: true });
+    expect(bad.warnings).toEqual(["sound invalid; using defaults for the bad fields"]);
+    expect(parseScreenConfig({ ...shipped, sound: "on" }).config.sound).toEqual(OFF);
+  });
+
+  it("debug params: sound=1, soundAzan=, soundIqamah=, vol=, mute=1", () => {
+    const { overrides, warnings } = parseUrlOverrides("?debug=1&sound=1&soundAzan=alarm&soundIqamah=off&vol=35", "masjidview.my");
+    expect(overrides.sound).toEqual({ enabled: true, azan: "alarm", iqamah: "off", volume: 35 });
+    expect(warnings).toEqual([]);
+    expect(parseUrlOverrides("?sound=1&mute=1", "localhost").overrides.sound).toEqual({ enabled: true, mute: true });
+  });
+
+  it("debug params: invalid values are reported, not applied", () => {
+    const { overrides, warnings } = parseUrlOverrides("?debug=1&sound=yes&soundAzan=gong&vol=120", "masjidview.my");
+    expect(overrides.sound).toEqual({});
+    expect(warnings).toHaveLength(3);
+  });
+
+  it("ignored on a real host without debug=1, and always in the live demo", () => {
+    const real = parseUrlOverrides("?sound=1&vol=90", "masjidview.my");
+    expect(real.overrides.sound).toBeUndefined();
+    expect(real.warnings[0]).toMatch(/ignored sound, vol/);
+    const demo = parseUrlOverrides("?demo=1&sound=1&mute=1", "masjidview.my");
+    expect(demo.overrides.sound).toBeUndefined();
+    expect(demo.warnings).toEqual(["ignored sound, mute (the demo never plays sound)"]);
+  });
+});

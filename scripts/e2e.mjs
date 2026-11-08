@@ -247,6 +247,17 @@ async function main() {
   await check("12.5", "Offline: works from service worker + cache, 48 h later, then fallback, never guessed", async () => {
     const profile = profileDir("offline");
     const on = await launch(profile);
+    // The app fetches the months around the *server* time (/chrono), not around ?sim. Pin the server to
+    // the simulated day so it caches Oct + Nov 2026 whatever today's real date is (otherwise this check
+    // broke once the real calendar left October).
+    await on.send("Network.enable");
+    await on.send("Network.setBypassServiceWorker", { bypass: true });
+    await on.send("Fetch.enable", { patterns: [{ urlPattern: "*api.waktusolat.app/chrono*" }] });
+    on.on(async (m) => {
+      if (m.method !== "Fetch.requestPaused") return;
+      const body = JSON.stringify({ unix: Math.floor(Date.UTC(2026, 9, 17, 6, 30, 0) / 1000) }); // 17 Oct 2026, 14:30 MYT
+      await on.send("Fetch.fulfillRequest", { requestId: m.params.requestId, responseCode: 200, responseHeaders: [{ name: "content-type", value: "application/json" }, { name: "access-control-allow-origin", value: "*" }], body: Buffer.from(body).toString("base64") });
+    });
     await on.go("/tv/?local=1&debug=1&sim=2026-10-17T14:30:00", 3000);
     const sw = await waitFor(async () => ((await on.status("sw"))?.startsWith("aktif") ? on.status("sw") : null), 15000);
     assert(sw, `service worker not active: ${await on.status("sw")}`);

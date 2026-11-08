@@ -54,10 +54,9 @@ quiet, never an error or a blank screen.
   | beep | 3 × 180 ms, 880 Hz, 150 ms gaps (≈ 0.9 s) |
   | chime | ≈ 3 s, 3-note bell with decay |
   | alarm | 2-tone pulse, stops at ≤ 10 s |
-  | hayya | ≤ 15 s; a longer file is cut at 15 s with a 0.5 s fade |
+  | hayya | the owner's recording plays in full (17.4 s, kept whole by owner decision 2026-11-08); a replacement file longer than 20 s is cut at 20 s with a 0.5 s fade |
 
-  The owner trims the recording to ≤ 15 s (the first file is 17.4 s); the cut is only a safety net. A
-  new cue stops a cue still playing.
+  The 20 s cut is only a safety net against a wrong file. A new cue stops a cue still playing.
 - **D8 Sync:**
   - `screen_bundle` returns `screen.sound`; changing `screens.sound` bumps `bundle_version`.
   - Older TV apps drop the field (`parseBundleAnswer` keeps only known screen keys).
@@ -88,7 +87,7 @@ quiet, never an error or a blank screen.
 | `src/core` | `index.ts` | export the above |
 | `src/audio` (new) | `engine.ts` | one `AudioContext`; `locked` state + `subscribe`; `unlock()`; every call wrapped, never throws |
 | `src/audio` | `synth.ts` + test | beep / chime / alarm as note lists (data, tested against D7), rendered with oscillators + gain |
-| `src/audio` | `hayya.ts` + test | fetch + decode `/sounds/hayya-ala-solah.mp3` once (fetch injected for tests); missing → chime + one warn; 15 s cut |
+| `src/audio` | `hayya.ts` + test | fetch + decode `/sounds/hayya-ala-solah.mp3` once (fetch injected for tests); missing → chime + one warn; 20 s safety cut |
 | `src/audio` | `play.ts` + test | `playCue(kind, volume)`: fire-and-forget, stops the previous cue, no-op when locked, unsupported or `off` |
 | `src/data` | `bundle.ts` + test | `BundleScreen.sound?: SoundSettings` via `parseSoundSettings`; missing → undefined (OFF) |
 | `src/app/tv` | `config.ts` + test | `ScreenConfig.sound`; screen.json `sound`; test settings `sound`, `soundAzan`, `soundIqamah`, `vol`, `mute` (debug/localhost only, never demo) |
@@ -100,7 +99,7 @@ quiet, never an error or a blank screen.
 | `src/admin/screens` | `ScreensView.tsx` | Bunyi section in `ManageSheet`; select `sound` with a fallback before the migration (like `view_mode`); save sends `sound` only when the column was loaded |
 | `src/admin/i18n` | `ms.json`, `en.json` | `screens.sound.*` (title, switch, volume, azan, iqamah, the 5 options, try, help) |
 | `public/config` | `screen.json` | `"sound": { "enabled": false, "volume": 70, "azan": "chime", "iqamah": "hayya" }` (demo.json unchanged: never sound) |
-| `public/sounds` | `hayya-ala-solah.mp3` | owner's file (≤ 15 s); precached by `build-sw.ts` like every exported file |
+| `public/sounds` | `hayya-ala-solah.mp3` | owner's file (17.4 s, played whole); committed with the build; precached by `build-sw.ts` like every exported file |
 | `scripts` | `sw-template.js` | `/sounds/*` cache-first (a cue never waits on the network) |
 | `scripts` | `rls-check.ts` | `soundChecks()` (§5) |
 | `supabase/migrations` | `0011_screen_sound.sql` (new) | §4 |

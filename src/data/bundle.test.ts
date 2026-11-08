@@ -1,7 +1,8 @@
+import { IDBFactory } from "fake-indexeddb";
 import { describe, expect, it } from "vitest";
 import { isEligible, localToEpoch, localParts } from "@/core";
 import {
-  bundleSlides, dbDaysToPlaylist, isoForPlaylist, mediaUrl, parseBundleAnswer, referencedMedia, startBundleSync,
+  bundleSlides, bundleSound, dbDaysToPlaylist, idbBundleStore, isoForPlaylist, mediaUrl, parseBundleAnswer, referencedMedia, startBundleSync,
   type Bundle, type BundleState, type BundleStore, type StoredBundle,
 } from "./bundle";
 
@@ -237,5 +238,57 @@ describe("template images (QR, speaker photo)", () => {
   });
   it("are kept by the media cache", () => {
     expect(referencedMedia(withQr(), SB)).toContain(`${SB}/storage/v1/object/public/media/${ORG}/qr.webp`);
+  });
+});
+
+describe("screen.sound (migration 0011, _specs/50-PRD-sound.md D8)", () => {
+  const OFF = { enabled: false, volume: 70, azan: "chime", iqamah: "hayya" };
+  const withSound = (sound: unknown) => okBundle({ screen: { id: "scr-1", name: "Dewan", theme: "serambi", layout: "bottom", sound } });
+
+  it("valid settings are kept", () => {
+    expect(withSound({ enabled: true, volume: 40, azan: "beep", iqamah: "alarm" }).screen.sound).toEqual({ enabled: true, volume: 40, azan: "beep", iqamah: "alarm" });
+    expect(withSound({ enabled: false, volume: 0, azan: "off", iqamah: "hayya" }).screen.sound).toEqual({ enabled: false, volume: 0, azan: "off", iqamah: "hayya" });
+  });
+
+  it("missing (a server before migration 0011): off, with the default choices", () => {
+    expect(okBundle().screen.sound).toEqual(OFF);
+    expect(withSound(undefined).screen.sound).toEqual(OFF);
+    expect(withSound(null).screen.sound).toEqual(OFF);
+  });
+
+  it("not an object: off, with the default choices", () => {
+    expect(bundleSound("on")).toEqual(OFF);
+    expect(bundleSound([true, 40])).toEqual(OFF);
+    expect(bundleSound(1)).toEqual(OFF);
+  });
+
+  it("invalid fields: enabled only when true; an unknown sound becomes off", () => {
+    expect(bundleSound({ enabled: "yes", volume: 50, azan: "banana", iqamah: 3 })).toEqual({ enabled: false, volume: 50, azan: "off", iqamah: "off" });
+    expect(bundleSound({ enabled: true })).toEqual({ enabled: true, volume: 70, azan: "off", iqamah: "off" });
+  });
+
+  it("volume is clamped to 0–100 and rounded; not a number → 70", () => {
+    expect(bundleSound({ ...OFF, volume: 150 }).volume).toBe(100);
+    expect(bundleSound({ ...OFF, volume: -20 }).volume).toBe(0);
+    expect(bundleSound({ ...OFF, volume: 42.6 }).volume).toBe(43);
+    expect(bundleSound({ ...OFF, volume: "80" }).volume).toBe(70);
+    expect(bundleSound({ ...OFF, volume: Number.NaN }).volume).toBe(70);
+  });
+
+  it("an offline TV keeps its last setting: the stored bundle carries the sound", async () => {
+    const store = idbBundleStore(new IDBFactory());
+    const b = withSound({ enabled: true, volume: 35, azan: "alarm", iqamah: "hayya" });
+    await store.put({ bundle: b, savedAt: 1, suspended: false });
+    expect((await store.get())?.bundle.screen.sound).toEqual({ enabled: true, volume: 35, azan: "alarm", iqamah: "hayya" });
+  });
+
+  it("a bundle stored by an older app (no sound field) loads with sound off", async () => {
+    const store = idbBundleStore(new IDBFactory());
+    const old = okBundle();
+    const { sound: _drop, ...screenWithoutSound } = old.screen;
+    await store.put({ bundle: { ...old, screen: screenWithoutSound } as unknown as Bundle, savedAt: 1, suspended: false });
+    const got = await store.get();
+    expect(got?.bundle.screen.name).toBe("Dewan Solat Utama");
+    expect(got?.bundle.screen.sound).toEqual(OFF);
   });
 });

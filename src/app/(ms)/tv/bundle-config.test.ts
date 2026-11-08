@@ -61,4 +61,18 @@ describe("bundleToScreenConfig", () => {
     expect(warnings.length).toBeGreaterThanOrEqual(3);
     expect(warnings.every((w) => w.startsWith("bundle: "))).toBe(true);
   });
+
+  it("sound comes from the bundle (Supabase mode), not the screen.json default", () => {
+    const on = { enabled: true, volume: 55, azan: "alarm", iqamah: "beep" };
+    expect(bundleToScreenConfig(bundle({}, { sound: on }), SB).config.sound).toEqual(on);
+    // An unknown sound from a newer server is "off", not a default the masjid never picked.
+    expect(bundleToScreenConfig(bundle({}, { sound: { ...on, azan: "gong" } }), SB).config.sound).toEqual({ ...on, azan: "off" });
+  });
+
+  it("a bundle stored by an older app (screen without sound) maps to sound off", () => {
+    const b = bundle();
+    const { sound: _drop, ...screen } = b.screen;
+    const old = { ...b, screen } as unknown as typeof b;
+    expect(bundleToScreenConfig(old, SB).config.sound).toEqual({ enabled: false, volume: 70, azan: "chime", iqamah: "hayya" });
+  });
 });

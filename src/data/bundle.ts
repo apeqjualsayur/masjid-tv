@@ -2,7 +2,7 @@
 // 'ok' → validate, store in IndexedDB, apply; 'unchanged' → nothing; 'revoked' → wipe;
 // 'suspended' → calm screen. Boot starts from the stored bundle, so a network error never blanks
 // the screen. Pure parts are exported for tests; I/O is injected.
-import { FALLBACK_LAYOUT, FALLBACK_THEME_ID, isLayoutKey, isThemeId, type LayoutKey, type PlaylistItem, type ThemeId } from "@/core";
+import { DEFAULT_SOUND, FALLBACK_LAYOUT, FALLBACK_THEME_ID, isLayoutKey, isSoundKind, isThemeId, type LayoutKey, type PlaylistItem, type SoundSettings, type ThemeId } from "@/core";
 import type { SlideView } from "@/templates";
 import { IMAGE_FIELD_KEYS } from "@/templates/schema";
 import { parseSlides, type RawSlide } from "./slides";
@@ -12,6 +12,8 @@ export interface BundleScreen {
   name: string;
   theme: ThemeId;
   layout: LayoutKey;
+  /** Sound cues (migration 0011, _specs/50-PRD-sound.md D8). Always set: missing → off. */
+  sound: SoundSettings;
   /** Values from the server this app did not know and replaced (for the debug warnings). */
   replaced?: { theme?: string; layout?: string };
 }
@@ -20,6 +22,23 @@ export interface BundleScreen {
 export const bundleTheme = (v: unknown): ThemeId => (isThemeId(v) ? v : FALLBACK_THEME_ID);
 /** Unknown layout → full (D7). */
 export const bundleLayout = (v: unknown): LayoutKey => (isLayoutKey(v) ? v : FALLBACK_LAYOUT);
+
+/**
+ * screen.sound from the server (D8). Not an object (missing: a server before migration 0011, or a
+ * bundle stored by an older app) → the defaults, i.e. off. Otherwise field by field: enabled only when
+ * true; volume clamped to 0–100 (not a number → 70); an unknown sound → "off" (never a sound the
+ * masjid did not choose).
+ */
+export function bundleSound(v: unknown): SoundSettings {
+  if (!isObj(v)) return { ...DEFAULT_SOUND };
+  const vol = typeof v.volume === "number" && Number.isFinite(v.volume) ? Math.round(Math.min(100, Math.max(0, v.volume))) : DEFAULT_SOUND.volume;
+  return {
+    enabled: v.enabled === true,
+    volume: vol,
+    azan: isSoundKind(v.azan) ? v.azan : "off",
+    iqamah: isSoundKind(v.iqamah) ? v.iqamah : "off",
+  };
+}
 export interface BundleOrg {
   fullName: string;
   shortName: string;
@@ -91,6 +110,7 @@ export function parseBundleAnswer(raw: unknown): BundleAnswer {
         name: s(screen.name)!,
         theme: bundleTheme(screen.theme),
         layout: bundleLayout(screen.layout),
+        sound: bundleSound(screen.sound),
         ...(isThemeId(screen.theme) && isLayoutKey(screen.layout)
           ? {}
           : {

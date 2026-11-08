@@ -1,6 +1,6 @@
 // Bundle (PRD Phase 2 §7) → the Phase 1 ScreenConfig, through the same validation and defaults
 // as screen.json, so the engine, themes and playlist work unchanged.
-import { bundleLayout, bundleTheme, mediaUrl, type Bundle } from "@/data/bundle";
+import { bundleLayout, bundleSound, bundleTheme, mediaUrl, type Bundle } from "@/data/bundle";
 import { parseScreenConfig, type ScreenConfig } from "./config";
 
 export interface BundleConfig {
@@ -24,6 +24,9 @@ export function bundleToScreenConfig(b: Bundle, supabaseUrl: string): BundleConf
     iqamahMin: b.settings.iqamahMin,
     ticker: b.settings.ticker,
   });
+  // Sound comes from the bundle, already checked by parseBundleAnswer (an unknown sound is "off" there,
+  // not the screen.json default). bundleSound again for a bundle stored by an app without the field.
+  config.sound = bundleSound(b.screen.sound);
   const accent = b.org.accentColor && /^#[0-9A-Fa-f]{6}$/.test(b.org.accentColor) ? b.org.accentColor : null;
   // Replaced while parsing (fresh bundle) or unknown in a bundle stored by an older app version.
   const badTheme = b.screen.replaced?.theme ?? (bundleTheme(b.screen.theme) !== b.screen.theme ? String(b.screen.theme) : undefined);

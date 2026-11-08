@@ -2,6 +2,8 @@
 // Sound cues on the TV (_specs/50-PRD-sound.md D2, D5, D6). The engine decides (src/core/soundCues),
 // the player plays (src/audio); this wires them to the display. Playback happens after render and
 // is fire-and-forget: a locked, missing or failing sound never delays or blanks anything.
+// Settings (bundle in Supabase mode, screen.json with ?local=1, plus debug params) apply as they
+// change, without a reload. Only a clock tick runs the cue check: a settings change never plays a cue.
 // The speaker-off icon (D6) is drawn here, inside the stage (so the burn-in shift applies), never by
 // a theme: bottom-right, only when sound is on, audio is still locked, the screen is not a poster
 // screen and the mode is normal (the same quiet rule as the "press OK" hint).
@@ -16,6 +18,9 @@ export function SoundLayer({ s, at, layout, sound, speed, forced }: { s: Display
   const prev = useRef<CueTick | null>(null);
   const played = useRef(new Set<string>());
   const locked = useSyncExternalStore(player.subscribe, player.isLocked, () => false);
+  // Latest settings for the tick effect, which must not re-run (and so never cue) when they change.
+  const live = useRef({ active, sound });
+  live.current = { active, sound };
 
   // Set up the player while sound is on: the context (still locked), the volume, the recording.
   useEffect(() => {
@@ -26,6 +31,10 @@ export function SoundLayer({ s, at, layout, sound, speed, forced }: { s: Display
   useEffect(() => {
     player.setVolume(sound.volume);
   }, [sound.volume]);
+  // Switched off (or the screen became a poster screen): stop a sound still playing.
+  useEffect(() => {
+    if (!active) player.stop();
+  }, [active]);
 
   // Any key, click or tap unlocks audio (browsers only allow it right after a user gesture).
   useEffect(() => {
@@ -40,14 +49,15 @@ export function SoundLayer({ s, at, layout, sound, speed, forced }: { s: Display
   // One check per clock tick, after render. The previous tick is kept even while sound is off, so
   // switching it on never plays a cue for a mode that started earlier.
   useEffect(() => {
+    const { active: on, sound: cfg } = live.current;
     const cur: CueTick = { at, mode: s.mode, waktu: s.modeTarget?.key, modeStartMs: s.modeStartMs, layout, isFriday: s.isFriday, forced };
-    const cue = active ? soundCue(prev.current, cur, { firstTick: prev.current === null, toleranceMs: cueToleranceMs(speed), played: played.current }) : null;
+    const cue = on ? soundCue(prev.current, cur, { firstTick: prev.current === null, toleranceMs: cueToleranceMs(speed), played: played.current }) : null;
     prev.current = cur;
     if (!cue) return;
     played.current.add(cueKey(cue, cur.modeStartMs ?? at));
-    player.setVolume(sound.volume);
-    void player.play(cue.event === "azan" ? sound.azan : sound.iqamah);
-  }, [at, s.mode, s.modeTarget?.key, s.modeStartMs, s.isFriday, layout, forced, active, speed, sound.volume, sound.azan, sound.iqamah]);
+    player.setVolume(cfg.volume);
+    void player.play(cue.event === "azan" ? cfg.azan : cfg.iqamah);
+  }, [at, s.mode, s.modeTarget?.key, s.modeStartMs, s.isFriday, layout, forced, speed]);
 
   if (!active || !locked || s.mode !== "normal") return null;
   return <SoundLockIcon />;

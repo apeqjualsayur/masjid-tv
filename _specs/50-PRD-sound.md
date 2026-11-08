@@ -63,6 +63,12 @@ quiet, never an error or a blank screen.
   - `screen_bundle` returns `screen.sound`; changing `screens.sound` bumps `bundle_version`.
   - Older TV apps drop the field (`parseBundleAnswer` keeps only known screen keys).
   - A bundle without the field (or a stored bundle from an older version) means OFF.
+  - The TV checks `screen.sound` field by field (`bundleSound`, src/data/bundle.ts): `enabled` only when
+    `true`; `volume` clamped to 0–100 (not a number → 70); an unknown sound → `off` (never a sound the
+    masjid did not choose). Not an object → the defaults (off). The setting is kept in the stored bundle,
+    so an offline TV keeps its last setting.
+  - Paired TVs use the bundle's setting; `?local=1` uses screen.json. Changes apply without a reload,
+    and a settings change never plays a cue (only a clock tick runs the cue check).
   - Local mode: a `sound` object in screen.json.
   - Test settings, only with `?debug=1` or on localhost, never with `?demo=1`: `sound=1` (on),
     `soundAzan=` and `soundIqamah=` (`off|beep|chime|alarm|hayya`), `vol=` (0–100), `mute=1` (forces off).

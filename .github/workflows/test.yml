@@ -26,6 +26,16 @@ jobs:
           npm run build || { echo "::warning::Build failed (often a Google Fonts download from the runner); retrying once in 30 s"; sleep 30; npm run build; }
       - name: Build contains the service worker
         run: test -f out/sw.js && test -f out/tv/index.html && test -f out/data/SGR01-2026.json
+      # The browser checks test this exact build. Building again in the e2e job meant a second
+      # Google Fonts download per push, which kept failing on the runner.
+      - name: Keep the build for the browser checks
+        if: github.ref == 'refs/heads/main' || github.event_name == 'workflow_dispatch'
+        uses: actions/upload-artifact@v4
+        with:
+          name: site
+          path: out/
+          retention-days: 1
+          include-hidden-files: true
 
   e2e:
     name: Browser acceptance checks (PRD 12)
@@ -39,11 +49,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version-file: .node-version
-          cache: npm
-      - run: npm ci
-      - name: "Build (one retry, as above)"
-        run: |
-          npm run build || { echo "::warning::Build failed (often a Google Fonts download from the runner); retrying once in 30 s"; sleep 30; npm run build; }
+      # scripts/e2e.mjs uses only Node built-ins, so no npm ci; the site comes from the test job.
+      - name: The build from the test job
+        uses: actions/download-artifact@v4
+        with:
+          name: site
+          path: out/
       - name: Browser checks
         run: npm run e2e
         env:

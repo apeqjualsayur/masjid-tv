@@ -42,6 +42,11 @@ export interface MockNet {
   serverAheadMs: number;
   /** Serve public/data/SGR01-2026.json at /data/. */
   bundled: boolean;
+  /**
+   * The device clock the test pretends (default: the real clock). /chrono answers this + serverAheadMs,
+   * so a test pinned to a date keeps that date after the clock sync, whatever today's real date is.
+   */
+  deviceNow: () => number;
 }
 
 export function mockNet(opts: Partial<Omit<MockNet, "fetch" | "calls">> = {}): MockNet {
@@ -50,6 +55,7 @@ export function mockNet(opts: Partial<Omit<MockNet, "fetch" | "calls">> = {}): M
     online: opts.online ?? true,
     serverAheadMs: opts.serverAheadMs ?? 0,
     bundled: opts.bundled ?? true,
+    deviceNow: opts.deviceNow ?? (() => Date.now()), // called each time, so fake timers apply
     fetch: async (url: string) => {
       net.calls.push(url);
       if (url.startsWith("/data/")) {
@@ -57,7 +63,7 @@ export function mockNet(opts: Partial<Omit<MockNet, "fetch" | "calls">> = {}): M
       }
       if (!net.online) throw new TypeError("Failed to fetch");
       const u = new URL(url);
-      if (u.pathname === "/chrono") return json({ unix: Math.floor((Date.now() + net.serverAheadMs) / 1000) });
+      if (u.pathname === "/chrono") return json({ unix: Math.floor((net.deviceNow() + net.serverAheadMs) / 1000) });
       const m = /^\/v2\/solat\/(\w+)$/.exec(u.pathname);
       const year = Number(u.searchParams.get("year"));
       const month = Number(u.searchParams.get("month"));

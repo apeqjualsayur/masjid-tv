@@ -13,6 +13,8 @@ import { YEAR_2026, memoryStorage, mockNet, type MockNet } from "./__fixtures__/
 const OCT = YEAR_2026.months[9];
 const NOV = YEAR_2026.months[10];
 const DEVICE_NOW = Date.UTC(2026, 9, 17, 2, 0, 0); // Sat 17 Oct 2026, 10:00 MYT
+/** The mock network with its time server on the test's device clock (not today's real date). */
+const mock = (o: Parameters<typeof mockNet>[0] = {}) => mockNet({ deviceNow: () => DEVICE_NOW, ...o });
 
 let idb: IDBFactory;
 beforeEach(() => {
@@ -38,7 +40,7 @@ async function boot(net: MockNet) {
 
 describe("online", () => {
   it("fetches current + next month, stores them, serves them as live, applies the clock offset", async () => {
-    const net = mockNet();
+    const net = mock();
     const { store, storage, sync, data } = await boot(net);
 
     expect(net.calls).toContain("https://api.waktusolat.app/v2/solat/SGR01?year=2026&month=10");
@@ -55,7 +57,7 @@ describe("online", () => {
   });
 
   it("tomorrow Imsak crosses the month boundary (31 Oct to 1 Nov)", async () => {
-    const { data } = await boot(mockNet());
+    const { data } = await boot(mock());
     const day = await data.getDay("SGR01", "2026-10-31");
     expect(day.status === "ok" && day.tomorrowImsak).toBe(NOV.days[0].times.imsak);
   });
@@ -63,8 +65,8 @@ describe("online", () => {
 
 describe("offline with cache", () => {
   it("uses IndexedDB from an earlier online session", async () => {
-    await boot(mockNet()); // yesterday: online
-    const net = mockNet({ online: false }); // today: WiFi down
+    await boot(mock()); // yesterday: online
+    const net = mock({ online: false }); // today: WiFi down
     const { data, sync } = await boot(net);
 
     expect(sync.status.lastDataSync).toBeNull();
@@ -76,7 +78,7 @@ describe("offline with cache", () => {
 
 describe("offline without cache", () => {
   it("falls back to the bundled year file", async () => {
-    const net = mockNet({ online: false });
+    const net = mock({ online: false });
     const { data } = await boot(net);
     const day = await data.getDay("SGR01", "2026-10-17");
     expect(day).toMatchObject({ status: "ok", source: "fallback", today: OCT.days[16], tomorrowImsak: OCT.days[17].times.imsak });
@@ -84,19 +86,19 @@ describe("offline without cache", () => {
   });
 
   it("covers dates outside the two cached months", async () => {
-    await boot(mockNet()); // caches Oct + Nov
-    const { data } = await boot(mockNet({ online: false }));
+    await boot(mock()); // caches Oct + Nov
+    const { data } = await boot(mock({ online: false }));
     expect(await data.getDay("SGR01", "2026-12-01")).toMatchObject({ status: "ok", source: "fallback" });
   });
 
   it("no cache and no bundled file: explicit unavailable, never guessed times", async () => {
-    const { data } = await boot(mockNet({ online: false, bundled: false }));
+    const { data } = await boot(mock({ online: false, bundled: false }));
     expect(await data.getDay("SGR01", "2026-10-17")).toEqual({ status: "unavailable", message: UNAVAILABLE_MESSAGE });
     expect(UNAVAILABLE_MESSAGE).toBe("Data waktu tidak tersedia");
   });
 
   it("tomorrow not published (31 Dec 2026, no 2027 data): today shown, tomorrowImsak null", async () => {
-    const { data } = await boot(mockNet({ online: false }));
+    const { data } = await boot(mock({ online: false }));
     expect(await data.getDay("SGR01", "2026-12-31")).toMatchObject({ status: "ok", source: "fallback", tomorrowImsak: null });
   });
 });
@@ -119,7 +121,7 @@ describe("corrupted cache", () => {
     it(`${name}: discarded, falls back to the bundled file`, async () => {
       const store = idbMonthStore(idb);
       await corruptOct(store, make);
-      const data = createPrayerData({ store, loadYear: createFallbackLoader(mockNet({ online: false }).fetch) });
+      const data = createPrayerData({ store, loadYear: createFallbackLoader(mock({ online: false }).fetch) });
       expect(await data.getDay("SGR01", "2026-10-17")).toMatchObject({ status: "ok", source: "fallback", today: OCT.days[16] });
       expect(await store.get(monthKey("SGR01", 2026, 10))).toBeUndefined(); // bad entry removed
     });
@@ -128,7 +130,7 @@ describe("corrupted cache", () => {
   it("corrupted cache and no fallback: unavailable, not the corrupted times", async () => {
     const store = idbMonthStore(idb);
     await corruptOct(store, corruptions[2][1]);
-    const data = createPrayerData({ store, loadYear: createFallbackLoader(mockNet({ online: false, bundled: false }).fetch) });
+    const data = createPrayerData({ store, loadYear: createFallbackLoader(mock({ online: false, bundled: false }).fetch) });
     expect(await data.getDay("SGR01", "2026-10-17")).toEqual({ status: "unavailable", message: UNAVAILABLE_MESSAGE });
   });
 
@@ -136,7 +138,7 @@ describe("corrupted cache", () => {
     const broken = { open: () => { throw new Error("SecurityError"); } } as unknown as IDBFactory;
     const store = idbMonthStore(broken);
     expect(await store.get("SGR01:2026-10")).toBeUndefined();
-    const data = createPrayerData({ store, loadYear: createFallbackLoader(mockNet({ online: false }).fetch) });
+    const data = createPrayerData({ store, loadYear: createFallbackLoader(mock({ online: false }).fetch) });
     expect(await data.getDay("SGR01", "2026-10-17")).toMatchObject({ status: "ok", source: "fallback" });
   });
 

@@ -8,6 +8,14 @@
 -- Usage monitoring = 0008_usage.sql (= 32-usage-migration.sql): usage_* tables and functions,
 -- platform_usage(), and a screen_bundle() that also calls usage_note_ping(). Run it after this file;
 -- §7 below keeps the pre-0008 screen_bundle so this file still works on its own.
+-- Themes round 2 = 0009_themes_round2.sql (= 42-themes-round2-migration.sql): the theme_key / layout_key
+-- enum values falak, garis, kerawang, seterusnya and poster (§1 below lists the launch values only).
+-- 0010_fullscreen_feedback.sql: screens.view_mode (merged in §2), the feedback table with
+-- send_feedback() / platform_feedback() (merged in §7a + §8), and screen_bundle(p_secret, p_since,
+-- p_app_version, p_view_mode), which replaces the 3-argument version (needs 0008; run it after this file).
+-- 0011_screen_sound.sql: screens.sound + check (merged in §2), sound in screens_after_change (§4)
+-- and in screen_bundle's 'screen' object (§7 here; 0011 has the same change on the 0010 version).
+-- Migrations after this file, in order: 0008, 0009, 0010, 0011 (each is safe to re-run on top of it).
 -- source of truth for supabase/migrations/0001_init.sql
 -- Run once on a fresh project (SQL editor or `supabase db push`).
 -- =====================================================================
@@ -102,10 +110,29 @@ create table public.screens (
   layout             public.layout_key not null default 'full',
   device_secret_hash text not null unique,
   app_version        text,
+  -- How the TV is shown, reported on every sync (0010): app = kiosk/installed, tab = full screen by
+  -- a key press, window = not full screen. Not display-relevant: no bundle_version bump.
+  view_mode          text check (view_mode in ('app', 'tab', 'window')),
+  -- Sound cues at azan and iqamah (0011, _specs/50-PRD-sound.md D4). Default off.
+  sound              jsonb not null default '{"enabled":false,"volume":70,"azan":"chime","iqamah":"hayya"}'::jsonb,
   last_seen_at       timestamptz,
   revoked_at         timestamptz,
   created_by         uuid references auth.users on delete set null,
-  created_at         timestamptz not null default now()
+  created_at         timestamptz not null default now(),
+  -- Exactly enabled (boolean), volume (integer 0–100), azan and iqamah (off|beep|chime|alarm|hayya).
+  -- CASE evaluates in order, so later tests only run on a JSON object.
+  constraint screens_sound_valid check (
+    case
+      when jsonb_typeof(sound) is distinct from 'object' then false
+      when not (sound ?& array['enabled', 'volume', 'azan', 'iqamah']) then false
+      when (sound - array['enabled', 'volume', 'azan', 'iqamah']) <> '{}'::jsonb then false
+      when jsonb_typeof(sound -> 'enabled') <> 'boolean' then false
+      when jsonb_typeof(sound -> 'volume') <> 'number' or (sound ->> 'volume') !~ '^[0-9]{1,3}$' then false
+      when (sound ->> 'azan') not in ('off', 'beep', 'chime', 'alarm', 'hayya') then false
+      when (sound ->> 'iqamah') not in ('off', 'beep', 'chime', 'alarm', 'hayya') then false
+      else (sound ->> 'volume')::int between 0 and 100
+    end
+  )
 );
 create index screens_org_idx on public.screens (org_id);
 
@@ -254,9 +281,9 @@ create or replace function public.screens_after_change()
 returns trigger language plpgsql security definer set search_path = public as $$
 begin
   if tg_op = 'UPDATE'
-     and (new.name, new.theme, new.layout, new.revoked_at) is not distinct from
-         (old.name, old.theme, old.layout, old.revoked_at) then
-    return null;   -- last_seen_at / app_version only: no bump
+     and (new.name, new.theme, new.layout, new.revoked_at, new.sound) is not distinct from
+         (old.name, old.theme, old.layout, old.revoked_at, old.sound) then
+    return null;   -- last_seen_at / app_version / view_mode only: no bump
   end if;
   perform public.bump_org_version(coalesce(new.org_id, old.org_id));
   return null;
@@ -729,7 +756,7 @@ begin
   return jsonb_build_object(
     'status', 'ok',
     'version', o.bundle_version,
-    'screen', jsonb_build_object('id', s.id, 'name', s.name, 'theme', s.theme, 'layout', s.layout),
+    'screen', jsonb_build_object('id', s.id, 'name', s.name, 'theme', s.theme, 'layout', s.layout, 'sound', s.sound),
     'org', jsonb_build_object('fullName', o.full_name, 'shortName', o.short_name, 'kind', o.kind,
                               'zone', o.zone, 'accentColor', o.accent_color, 'logoPath', o.logo_path),
     'settings', jsonb_build_object('iqamahMin', st.iqamah_min, 'durations', st.durations,
@@ -751,6 +778,67 @@ begin
          and (sl.screen_ids is null or s.id = any (sl.screen_ids))
     ), '[]'::jsonb)
   );
+end $$;
+
+-- ---------------------------------------------------------------------
+-- 7a. Feedback from masjid admins (0010): each sender reads their own; platform owners read all.
+--     Nobody writes the table directly (send_feedback only). No replies.
+-- ---------------------------------------------------------------------
+create table if not exists public.feedback (
+  id          uuid primary key default gen_random_uuid(),
+  org_id      uuid references public.organisations(id) on delete set null,
+  user_id     uuid not null references auth.users(id) on delete cascade,
+  message     text not null check (char_length(message) between 1 and 2000),
+  page        text check (char_length(page) <= 200),
+  app_version text check (char_length(app_version) <= 60),
+  created_at  timestamptz not null default now()
+);
+create index if not exists feedback_created_idx on public.feedback (created_at desc);
+create index if not exists feedback_user_idx on public.feedback (user_id, created_at desc);
+alter table public.feedback enable row level security;
+-- Each sender reads their own feedback; nobody writes the table directly (send_feedback only).
+drop policy if exists feedback_select_own on public.feedback;
+create policy feedback_select_own on public.feedback for select to authenticated using (user_id = auth.uid());
+revoke all on public.feedback from anon;
+revoke insert, update, delete on public.feedback from authenticated;
+
+/** Send one feedback. Members of p_org only (p_org null = account without a masjid). 20 per user per day. */
+create or replace function public.send_feedback(p_org uuid, p_message text, p_page text default null, p_app_version text default null)
+returns uuid language plpgsql security definer set search_path = public as $$
+declare v_msg text := btrim(coalesce(p_message, '')); v_id uuid;
+begin
+  if auth.uid() is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  if p_org is not null and not public.is_member(p_org) then
+    raise exception 'not_allowed' using errcode = '42501';
+  end if;
+  if v_msg = '' then raise exception 'empty_message' using errcode = 'P0001'; end if;
+  if char_length(v_msg) > 2000 then raise exception 'too_long' using errcode = 'P0001'; end if;
+  if (select count(*) from feedback where user_id = auth.uid() and created_at > now() - interval '1 day') >= 20 then
+    raise exception 'too_many' using errcode = 'P0001';
+  end if;
+  insert into feedback (org_id, user_id, message, page, app_version)
+  values (p_org, auth.uid(), v_msg, left(p_page, 200), left(p_app_version, 60))
+  returning id into v_id;
+  return v_id;
+end $$;
+
+/** All feedback, newest first, with the masjid and the sender's e-mail. Platform owners only. */
+create or replace function public.platform_feedback(p_limit int default 300)
+returns table (id uuid, created_at timestamptz, message text, page text, app_version text,
+               org_id uuid, org_name text, sender_email text)
+language plpgsql stable security definer set search_path = public as $$
+#variable_conflict use_column
+begin
+  if not public.is_platform_admin() then
+    raise exception 'not_allowed' using errcode = '42501';
+  end if;
+  return query
+  select f.id, f.created_at, f.message, f.page, f.app_version, f.org_id, o.full_name, u.email::text
+    from feedback f
+    left join organisations o on o.id = f.org_id
+    left join auth.users u on u.id = f.user_id
+   order by f.created_at desc
+   limit greatest(1, least(coalesce(p_limit, 300), 1000));
 end $$;
 
 -- ---------------------------------------------------------------------
@@ -776,6 +864,8 @@ grant execute on function public.member_role_of(uuid)                   to authe
 grant execute on function public.is_member(uuid)                        to authenticated;
 grant execute on function public.is_pentadbir(uuid)                     to authenticated;
 grant execute on function public.is_active_org(uuid)                    to authenticated;
+grant execute on function public.send_feedback(uuid, text, text, text)  to authenticated;
+grant execute on function public.platform_feedback(int)                 to authenticated;
 -- Note: trigger functions run as the table owner context; they need no grants.
 
 -- ---------------------------------------------------------------------
@@ -796,28 +886,7 @@ create policy media_obj_delete on storage.objects for delete to authenticated
 create policy media_obj_select on storage.objects for select to authenticated
   using (
     case
-      when bucket_id = 'media' and (storage.foldername(name))[1] ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}
-
--- ---------------------------------------------------------------------
--- 10. Nightly cleanup (requires pg_cron extension)
--- ---------------------------------------------------------------------
--- select cron.schedule('masjidview-cleanup', '30 19 * * *',  -- 03:30 Malaysia time (UTC+8)
--- $$
---   delete from public.slides where template_key = 'kematian' and ends_at < now() - interval '30 days';
---   delete from public.pairing_codes where (claimed_at is null and expires_at < now() - interval '1 day')
---                                       or claimed_at < now() - interval '30 days';
---   delete from public.pair_attempts where attempted_at < now() - interval '1 day';
---   delete from public.invitations where accepted_at is null and expires_at < now() - interval '30 days';
--- $$);
--- Note: deleting a kematian slide does not delete Storage files; kematian has no images by design.
-
--- ---------------------------------------------------------------------
--- 11. After running: make yourself platform owner
--- ---------------------------------------------------------------------
--- 1) Sign in once at /admin with your Google account.
--- 2) Run: insert into public.platform_admins (user_id)
---         select id from auth.users where email = 'YOUR_EMAIL';
-
+      when bucket_id = 'media' and (storage.foldername(name))[1] ~ '^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$'
         then public.is_member(((storage.foldername(name))[1])::uuid)
       else false
     end

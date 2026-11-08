@@ -25,6 +25,7 @@ If code and spec disagree, the spec wins — or update the spec first, deliberat
 |---|---|
 | `src/core/` | Prayer engine: time/`now()`, schedule (current/next/phase), mode state machine, formatting. **Pure TS** |
 | `src/data/` | API client (waktusolat.app), IndexedDB cache, bundled fallback, zones list; `bundle.ts`: Phase 2 TV content sync (screen_bundle every 60 s, stored bundle in IndexedDB) |
+| `src/audio/` | TV sound cues (`_specs/50-PRD-sound.md`): Web Audio playback, synthesised beep/chime/alarm, the owner's recording `public/sounds/hayya-ala-solah.mp3`. When a cue fires is decided in `src/core/sound.ts`. Never blocks rendering; never plays on the `poster` layout |
 | `src/themes/` | `types.ts` (ThemeDefinition), `index.ts` (TV: lazy per-theme loading, `useTheme`), `registry.ts` (synchronous, for the admin preview and tests), `ThemeView.tsx` (picks layout vs full-screen mode). Theme render tests in `themes.test.tsx` |
 | `src/themes/{alam,serambi,tenang,falak,garis,kerawang,seterusnya}/` | One self-contained folder per theme implementing `ThemeDefinition` |
 | `src/config/` | Build-time feature switches (`features.ts`: `THEMES_ROUND2_VISIBLE`, on in production since 2026-10-30); `release.ts`: the current rollout (`RELEASE.minTvBuild`, bump when every TV must update; drives the admin update notice and the TV "Versi baharu" hint via `public/version.json`) |

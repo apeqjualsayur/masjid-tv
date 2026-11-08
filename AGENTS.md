@@ -7,7 +7,7 @@ Project rules for the coding agent (Antigravity / Gemini, Claude Code, Cursor, C
 - Phase 1 = TV display (no backend). Phase 2 = admin app + Supabase backend + TV sync.
 
 ## Source of truth
-- **Always read `_specs/` before changing behaviour.** `00-PRD.md` (display), `01-theme-contract.md` (theme interface + tokens), `10-PRD-phase2.md` (admin + backend), `11-schema.sql` (database), `40-PRD-themes-round2.md` (4 new themes + announcement-only screen), `02-*-prompts.md` / `12-phase2-prompts.md` / `41-themes-round2-prompts.md` (build order).
+- **Always read `_specs/` before changing behaviour.** `00-PRD.md` (display), `01-theme-contract.md` (theme interface + tokens), `10-PRD-phase2.md` (admin + backend), `11-schema.sql` (database), `40-PRD-themes-round2.md` (4 new themes + announcement-only screen), `50-PRD-sound.md` (sound cues at azan and iqamah), `02-*-prompts.md` / `12-phase2-prompts.md` / `41-themes-round2-prompts.md` (build order).
 - If code and spec disagree, the spec wins. If the spec is unclear or contradicts itself, STOP and ask — do not guess.
 - `_specs/designs/*.dc.html` (TV: `A-*` alam, `D-*` serambi, `F-*` tenang, `G-*` falak, `I-*` garis, `J-*` kerawang, `K-*` seterusnya; G–K are 1280×720 mockups, scale ×1.5) and `_specs/designs/admin/*.dc.html` (admin) are design-tool source. They do NOT run in a browser. Read markup, inline styles and the script data block. If `designs/ref/*.png` or `designs/admin/ref/*.png` exist, they are screenshots for visual comparison.
 
@@ -21,7 +21,8 @@ Project rules for the coding agent (Antigravity / Gemini, Claude Code, Cursor, C
 ## Folder rules (hard)
 - `src/core/` — pure TypeScript prayer engine + playlist logic. **No React, no DOM, no styling, no fetch.** Everything time-related goes through the single `now()` in `src/core/time.ts`.
 - `src/data/` — prayer API, IndexedDB cache, bundled fallback, Phase 2 bundle sync (`bundle.ts`). No styling.
-- `src/themes/<id>/` — styling only. **No prayer logic, no Supabase calls.** Themes receive a `DisplayState` and render it.
+- `src/audio/` — TV sound playback (Web Audio: synthesised beep/chime/alarm, the owner's recording in `public/sounds/`). No React, no styling, no prayer logic: *when* a cue plays is decided in `src/core/sound.ts`. Never generate or download voice audio.
+- `src/themes/<id>/` — styling only. **No prayer logic, no Supabase calls.** Themes receive a `DisplayState` and render it. Themes never play sound or draw the sound icon.
 - `src/templates/` — template field schemas, validation, sample data, `ayat-sources.json`.
 - `src/app/tv/` — the display page that wires engine → theme.
 - `src/app/admin/**` — admin pages (client components). `src/admin/` — admin components, hooks, `i18n/ms.json` + `en.json`.
@@ -40,6 +41,7 @@ Project rules for the coding agent (Antigravity / Gemini, Claude Code, Cursor, C
 - Kematian template: no accent colour, no decoration.
 - Arabic text: `lang="ar" dir="rtl"`.
 - Network failures never blank the TV screen.
+- Audio never blocks rendering and never plays on the `poster` layout. A locked, missing or failing sound never throws, never blanks the screen and never delays a mode change. Sound is off unless the screen's `sound.enabled` is true (`_specs/50-PRD-sound.md`).
 
 ## Non-negotiables (admin + backend, Phase 2)
 - **Never** put the Supabase service-role/secret key in app code, `NEXT_PUBLIC_*` vars, logs or commits. It is allowed only in `.env.local` for local scripts and in CI secrets.
@@ -60,7 +62,7 @@ Project rules for the coding agent (Antigravity / Gemini, Claude Code, Cursor, C
 7. No new npm dependencies without saying why in the plan.
 
 ## Debug URL params (only with `?debug=1` or on localhost)
-`sim=2026-10-17T13:04:30` · `speed=10` · `theme=alam|serambi|tenang|falak|garis|kerawang|seterusnya` · `layout=full|bottom|side|poster` (unknown values fall back to tenang / full) · `mode=azan|iqamah|solat|khutbah` · `day=fri` · `lite=1` · `local=1` (use screen.json instead of Supabase)
+`sim=2026-10-17T13:04:30` · `speed=10` · `theme=alam|serambi|tenang|falak|garis|kerawang|seterusnya` · `layout=full|bottom|side|poster` (unknown values fall back to tenang / full) · `mode=azan|iqamah|solat|khutbah` · `day=fri` · `lite=1` · `local=1` (use screen.json instead of Supabase) · `sound=1` (sound on) · `soundAzan=off|beep|chime|alarm|hayya` · `soundIqamah=off|beep|chime|alarm|hayya` · `vol=0..100` · `mute=1` (sound off). The sound params are never honoured with `?demo=1`.
 
 <!-- BEGIN:nextjs-agent-rules -->
 

@@ -987,7 +987,7 @@
   },
   "update": {
     "title": "Update available",
-    "whatsNew": "New: TVs can stay full screen (press OK on the remote), full-screen status on the Screens page, and a Feedback page to send us suggestions.",
+    "whatsNew": "New: sound on the TV at azan and iqamah. Switch it on in Screens → Manage screen → Sound, then press OK on the TV remote once.",
     "adminOutdated": "This page is an older version.",
     "reload": "Reload",
     "screensBehind": "{n} screen(s) not updated yet:",
@@ -997,7 +997,12 @@
       "window": "the TV updates itself at 3:00 am. To update now: switch the TV off and on."
     },
     "guide": "How to update a TV",
-    "dismiss": "Dismiss update notice"
+    "dismiss": "Dismiss update notice",
+    "newsTitle": "New: sound on the TV",
+    "newsBody": "TVs can play a sound when the azan starts and when the iqamah countdown ends. Sound is off at first: switch it on for the screens you want in Screens → Manage screen → Sound, then press OK on the TV remote once.",
+    "newsOpen": "Open Screens",
+    "newsGuide": "Sound guide",
+    "newsDismiss": "Dismiss sound notice"
   },
   "feedback": {
     "title": "Feedback",

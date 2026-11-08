@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { buildTimeOf, isOutdated, parseLiveVersion } from "@/config/release";
-import { adminOutdated, howKey, outdatedScreens, updateNotice, type ScreenVersionRow } from "./logic";
+import { adminOutdated, howKey, outdatedScreens, updateNotice, type ScreenVersionRow, showNews } from "./logic";
 
 const NOW = Date.parse("2026-10-31T02:00:00Z");
 const MIN = "2026-10-30 16:00";
@@ -70,5 +70,18 @@ describe("update notice", () => {
     expect(howKey("app")).toBe("update.how.app");
     expect(howKey("window")).toBe("update.how.window");
     expect(howKey(null)).toBe("update.how.window");
+  });
+});
+
+describe("what's new card (NEWS)", () => {
+  it("shows until dismissed, for every admin", () => {
+    expect(showNews("2026-11-08-bunyi", null, false)).toBe(true);
+    expect(showNews("2026-11-08-bunyi", "2026-11-08-bunyi", false)).toBe(false);
+  });
+  it("a newer news id shows again after an older one was dismissed", () => {
+    expect(showNews("2026-12-01-next", "2026-11-08-bunyi", false)).toBe(true);
+  });
+  it("never together with the update notice (that one already says what's new)", () => {
+    expect(showNews("2026-11-08-bunyi", null, true)).toBe(false);
   });
 });

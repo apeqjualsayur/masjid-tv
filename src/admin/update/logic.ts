@@ -49,3 +49,10 @@ export function updateNotice(p: { releaseId: string; minTvBuild: string; adminVe
 }
 
 export const DISMISS_KEY = "mv:update-dismissed";
+export const NEWS_DISMISS_KEY = "mv:news-dismissed";
+
+/**
+ * The "what's new" card (NEWS): only when the update notice is not showing (that one already says
+ * what's new) and this news was not dismissed in this browser.
+ */
+export const showNews = (newsId: string, dismissedNews: string | null, noticeShown: boolean) => !noticeShown && dismissedNews !== newsId;

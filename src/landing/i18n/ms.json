@@ -570,12 +570,29 @@
         }
       },
       {
+        "id": "bunyi",
+        "title": "Bunyi semasa azan dan iqamah",
+        "steps": [
+          "Bunyi dimatikan pada mulanya untuk setiap skrin. Untuk menghidupkannya: di panel AJK buka Skrin, tekan Urus skrin, kemudian di bahagian Bunyi hidupkan “Bunyi pada TV”, pilih bunyi untuk azan dan iqamah, dan tekan Simpan. Perubahan sampai ke TV dalam lebih kurang 70 saat.",
+          "Tekan Cuba untuk mendengar setiap bunyi pada telefon anda dahulu.",
+          "Pastikan TV tidak disenyapkan dan kelantangan TV dinaikkan. Bunyi dimainkan melalui pembesar suara TV.",
+          "Selepas TV dihidupkan, tekan butang OK pada alat kawalan sekali. Selagi belum ditekan, ikon pembesar suara bersilang dipaparkan di penjuru kanan bawah skrin dan bunyi tidak dimainkan: pelayar hanya membenarkan bunyi selepas butang ditekan.",
+          "Bunyi dimainkan apabila azan bermula dan apabila kiraan iqamah tamat. Tiada bunyi untuk Imsak dan Syuruk, dan tiada bunyi iqamah pada hari Jumaat (khutbah). Skrin “Pengumuman sahaja” tidak memainkan bunyi.",
+          "Selepas OK ditekan, TV tidak dimuat semula pada pukul 3:00 pagi supaya bunyi kekal berfungsi. Apabila versi baharu diperlukan, TV memaparkan “Versi baharu tersedia” (lihat Mengemas kini TV).",
+          "Jika azan sudah dilaungkan melalui pembesar suara masjid, pilih bunyi yang lembut (Loceng) atau Tiada untuk azan, supaya tidak bertindih."
+        ],
+        "img": {
+          "file": "bunyi.png",
+          "alt": "Bahagian Bunyi dalam Urus skrin di panel AJK, dengan suis, kelantangan dan pilihan bunyi"
+        }
+      },
+      {
         "id": "kemas-kini",
         "title": "Mengemas kini TV",
         "steps": [
           "Biasanya anda tidak perlu berbuat apa-apa: TV memuatkan versi terkini sendiri setiap pagi pukul 3:00.",
-          "TV yang dijadikan skrin penuh dengan butang OK tidak dimuat semula pada waktu malam, supaya kekal skrin penuh. Apabila versi baharu diperlukan, TV memaparkan “Versi baharu tersedia”: tekan OK untuk mengemas kini, kemudian OK sekali lagi untuk skrin penuh.",
-          "TV dengan Fully Kiosk Browser dikemas kini sendiri pada pukul 3:00 pagi dan kekal skrin penuh.",
+          "TV yang dijadikan skrin penuh dengan butang OK, atau yang bunyinya dibenarkan dengan butang OK, tidak dimuat semula pada waktu malam, supaya kekal skrin penuh dan bunyi terus berfungsi. Apabila versi baharu diperlukan, TV memaparkan “Versi baharu tersedia”: tekan OK untuk mengemas kini, kemudian OK sekali lagi untuk skrin penuh.",
+          "TV dengan Fully Kiosk Browser dikemas kini sendiri pada pukul 3:00 pagi dan kekal skrin penuh, kecuali jika bunyi dihidupkan: ketika itu ia juga memaparkan “Versi baharu tersedia”.",
           "Cara segera untuk semua TV: matikan dan hidupkan semula TV, atau tutup dan buka semula pelayar.",
           "Panel AJK memaparkan notis di bahagian atas jika ada skrin masjid anda yang belum dikemas kini, bersama langkah untuk setiap skrin."
         ],

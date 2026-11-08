@@ -1,14 +1,16 @@
 "use client";
 // The update notice at the top of every admin page (./logic). Reads public/version.json (what is
 // live) and this masjid's screens; shown only when something is behind, dismissible (per browser)
-// until something new falls behind.
+// until something new falls behind. Otherwise a one-time "what's new" card (NEWS) until dismissed.
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
-import { RELEASE, VERSION_URL, parseLiveVersion, type LiveVersion } from "@/config/release";
+import { NEWS, RELEASE, VERSION_URL, parseLiveVersion, type LiveVersion } from "@/config/release";
 import { getSupabase } from "@/lib/supabase";
 import { useT } from "../i18n";
+import { ROUTES } from "../routing";
 import { useAdmin } from "../session";
 import { ICON, Icon } from "../shell/icons";
-import { DISMISS_KEY, howKey, updateNotice, type ScreenVersionRow } from "./logic";
+import { DISMISS_KEY, NEWS_DISMISS_KEY, howKey, showNews, updateNotice, type ScreenVersionRow } from "./logic";
 
 const ADMIN_VERSION = process.env.NEXT_PUBLIC_APP_VERSION ?? "dev";
 const REFRESH_MS = 10 * 60_000;
@@ -22,8 +24,8 @@ async function loadScreens(orgId: string): Promise<ScreenVersionRow[]> {
   return (basic.data ?? []) as ScreenVersionRow[];
 }
 
-export function guideHref(lang: string) {
-  return `${lang === "en" ? "/en/panduan/" : "/panduan/"}#kemas-kini`;
+export function guideHref(lang: string, section = "kemas-kini") {
+  return `${lang === "en" ? "/en/panduan/" : "/panduan/"}#${section}`;
 }
 
 export function UpdateNotice() {
@@ -33,6 +35,7 @@ export function UpdateNotice() {
   const [live, setLive] = useState<LiveVersion | null>(null);
   const [rows, setRows] = useState<ScreenVersionRow[]>([]);
   const [dismissed, setDismissed] = useState<string | null>(null);
+  const [newsDismissed, setNewsDismissed] = useState<string | null>(NEWS.id); // hidden until read
   const [now, setNow] = useState(() => Date.now());
 
   const refresh = useCallback(async () => {
@@ -47,6 +50,7 @@ export function UpdateNotice() {
   useEffect(() => {
     try {
       setDismissed(localStorage.getItem(DISMISS_KEY));
+      setNewsDismissed(localStorage.getItem(NEWS_DISMISS_KEY));
     } catch {}
     refresh();
     const id = setInterval(refresh, REFRESH_MS);
@@ -54,11 +58,19 @@ export function UpdateNotice() {
   }, [refresh]);
 
   const notice = updateNotice({ releaseId: RELEASE.id, minTvBuild: RELEASE.minTvBuild, adminVersion: ADMIN_VERSION, live, rows, now });
-  if (!notice || notice.key === dismissed) return null;
-  const dismiss = () => {
-    setDismissed(notice.key);
+  const noticeShown = Boolean(notice) && notice!.key !== dismissed;
+  const dismissNews = () => {
+    setNewsDismissed(NEWS.id);
     try {
-      localStorage.setItem(DISMISS_KEY, notice.key);
+      localStorage.setItem(NEWS_DISMISS_KEY, NEWS.id);
+    } catch {}
+  };
+  if (!noticeShown) return showNews(NEWS.id, newsDismissed, false) ? <NewsCard onDismiss={dismissNews} /> : null;
+  const dismiss = () => {
+    setDismissed(notice!.key);
+    dismissNews(); // the notice already said what's new
+    try {
+      localStorage.setItem(DISMISS_KEY, notice!.key);
     } catch {}
   };
 
@@ -70,7 +82,7 @@ export function UpdateNotice() {
           {t("update.title")}
         </h2>
         <p>{t("update.whatsNew")}</p>
-        {notice.admin && (
+        {notice!.admin && (
           <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5">
             <span>{t("update.adminOutdated")}</span>
             <button type="button" onClick={() => window.location.reload()} className="min-h-11 rounded-xl bg-[#9A6A00] px-4 text-[14px] font-bold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#9A6A00]">
@@ -78,11 +90,11 @@ export function UpdateNotice() {
             </button>
           </div>
         )}
-        {notice.screens.length > 0 && (
+        {notice!.screens.length > 0 && (
           <div className="flex flex-col gap-1.5">
-            <p className="font-bold">{t("update.screensBehind", { n: notice.screens.length })}</p>
+            <p className="font-bold">{t("update.screensBehind", { n: notice!.screens.length })}</p>
             <ul className="flex flex-col gap-1.5">
-              {notice.screens.map((s) => (
+              {notice!.screens.map((s) => (
                 <li key={s.id} className="rounded-xl bg-white/70 px-3 py-2">
                   <b>{s.name}</b> · {t(howKey(s.view_mode))}
                 </li>
@@ -95,6 +107,33 @@ export function UpdateNotice() {
         )}
       </div>
       <button type="button" onClick={dismiss} aria-label={t("update.dismiss")} className="-mt-1.5 -mr-2 flex h-11 w-11 flex-none items-center justify-center rounded-full hover:bg-white/60 focus-visible:outline-2 focus-visible:outline-[#9A6A00]">
+        <Icon d={ICON.close} size={18} />
+      </button>
+    </section>
+  );
+}
+
+/** "Baharu: bunyi pada TV" (NEWS): what's new, where to switch it on, the guide. Dismissed per browser. */
+function NewsCard({ onDismiss }: { onDismiss: () => void }) {
+  const { t, lang } = useT();
+  return (
+    <section aria-labelledby="news-title" className="flex gap-3 rounded-[16px] border border-[#BFDCCB] bg-adm-soft px-4 py-3.5 text-[14px] leading-[1.5] text-[#1E4A37]">
+      <Icon d="M11 5 6 9H2v6h4l5 4V5z M15.5 8.5a5 5 0 0 1 0 7 M19 5a10 10 0 0 1 0 14" size={22} className="mt-0.5 flex-none text-adm-green" />
+      <div className="flex min-w-0 flex-1 flex-col gap-2">
+        <h2 id="news-title" className="text-[15px] font-extrabold">
+          {t("update.newsTitle")}
+        </h2>
+        <p>{t("update.newsBody")}</p>
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+          <Link href={ROUTES.screens} className="flex min-h-11 items-center rounded-xl bg-adm-green px-4 text-[14px] font-bold text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green">
+            {t("update.newsOpen")}
+          </Link>
+          <a href={guideHref(lang, "bunyi")} target="_blank" rel="noopener" className="flex min-h-11 items-center font-bold text-adm-green underline underline-offset-2">
+            {t("update.newsGuide")}
+          </a>
+        </div>
+      </div>
+      <button type="button" onClick={onDismiss} aria-label={t("update.newsDismiss")} className="-mt-1.5 -mr-2 flex h-11 w-11 flex-none items-center justify-center rounded-full hover:bg-white/60 focus-visible:outline-2 focus-visible:outline-adm-green">
         <Icon d={ICON.close} size={18} />
       </button>
     </section>

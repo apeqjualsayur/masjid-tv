@@ -4,10 +4,16 @@
 // notice shows again), and update `update.whatsNew` in the admin i18n files.
 
 export const RELEASE = {
-  id: "2026-10-30-fullscreen",
-  /** TVs built before this need an update. */
-  minTvBuild: "2026-10-30 16:00",
+  id: "2026-11-08-sound",
+  /** TVs built before this need an update: sound cues + D11 (_specs/50-PRD-sound.md), live 17:21. */
+  minTvBuild: "2026-11-08 17:21",
 } as const;
+
+/**
+ * A one-time "what's new" card for every admin (also masjids whose TVs are up to date or switched
+ * off), until dismissed. A new `id` shows it again; texts `update.news*` in the admin i18n files.
+ */
+export const NEWS = { id: "2026-11-08-bunyi" } as const;
 
 /** "0.1.0 (2026-10-30 14:15)" → "2026-10-30 14:15"; null when the string has no build time. */
 export function buildTimeOf(appVersion: string | null | undefined): string | null {

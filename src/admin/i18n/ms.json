@@ -987,7 +987,7 @@
   },
   "update": {
     "title": "Kemas kini tersedia",
-    "whatsNew": "Baharu: TV boleh kekal skrin penuh (tekan OK pada alat kawalan), status skrin penuh di halaman Skrin, dan halaman Maklum balas untuk menghantar cadangan kepada kami.",
+    "whatsNew": "Baharu: bunyi pada TV semasa azan dan iqamah. Hidupkan di Skrin → Urus skrin → Bunyi, kemudian tekan OK pada alat kawalan TV sekali.",
     "adminOutdated": "Halaman ini versi lama.",
     "reload": "Muat semula",
     "screensBehind": "{n} skrin belum dikemas kini:",
@@ -997,7 +997,12 @@
       "window": "TV akan dikemas kini sendiri pada pukul 3:00 pagi. Untuk sekarang: matikan dan hidupkan TV."
     },
     "guide": "Cara kemas kini TV",
-    "dismiss": "Tutup notis kemas kini"
+    "dismiss": "Tutup notis kemas kini",
+    "newsTitle": "Baharu: bunyi pada TV",
+    "newsBody": "TV boleh memainkan bunyi apabila azan bermula dan apabila kiraan iqamah tamat. Bunyi dimatikan pada mulanya: hidupkan untuk skrin yang anda mahu di Skrin → Urus skrin → Bunyi, kemudian tekan OK pada alat kawalan TV sekali.",
+    "newsOpen": "Buka Skrin",
+    "newsGuide": "Panduan bunyi",
+    "newsDismiss": "Tutup notis bunyi"
   },
   "feedback": {
     "title": "Maklum balas",

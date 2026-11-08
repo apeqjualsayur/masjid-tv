@@ -339,7 +339,8 @@ async function run(orgIds: string[]) {
   report((b2.data as { status?: string } | null)?.status === "unchanged", "second call with that version → unchanged", JSON.stringify(b2.data ?? b2.error));
   await usageChecks(A, P, screenA);
   await fullscreenFeedbackChecks(A, B, P, orgA, orgB, tvSecret, screenA);
-  const iq = await A.db.from("org_settings").update({ iqamah_min: { subuh: 10, zohor: 10, asar: 10, maghrib: 9, isyak: 10 } }).eq("org_id", orgA).select("org_id");
+  await soundChecks(A, B, tvSecret, screenA);
+  const iq =await A.db.from("org_settings").update({ iqamah_min: { subuh: 10, zohor: 10, asar: 10, maghrib: 9, isyak: 10 } }).eq("org_id", orgA).select("org_id");
   report(!iq.error && (iq.data ?? []).length === 1, "A updates org A's iqamah minutes", fmt(iq.error));
   const b3 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v1 });
   const v3 = (b3.data as { version?: number } | null)?.version ?? 0;
@@ -480,6 +481,65 @@ async function fullscreenFeedbackChecks(A: TestUser, B: TestUser, P: TestUser, o
   report(!bad.error && mode2 === "tab", "an unknown view mode is ignored (stays tab)", bad.error ? fmt(bad.error) : `view_mode = ${mode2}`);
   const old = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: 0, p_app_version: "rls-check" });
   report(!old.error && (old.data as { status?: string } | null)?.status === "ok", "an older TV (3 arguments, no view mode) still syncs", fmt(old.error));
+}
+
+// TV sound cues (migration 0011, _specs/50-PRD-sound.md D4, D8). B is an admin of another masjid
+// (org B) here. Screen A was paired before these checks without any sound, so it shows the default.
+async function soundChecks(A: TestUser, B: TestUser, tvSecret: string, screenA: string) {
+  console.log("\nSound cues (migration 0011)");
+  const DEFAULT = { enabled: false, volume: 70, azan: "chime", iqamah: "hayya" };
+  const same = (a: unknown, b: unknown) => JSON.stringify(a, Object.keys((a ?? {}) as object).sort()) === JSON.stringify(b, Object.keys((b ?? {}) as object).sort());
+  const read = async () => (await admin.from("screens").select("sound").eq("id", screenA).single()).data?.sound as unknown;
+  const probe = await admin.from("screens").select("sound").eq("id", screenA).single();
+  if (probe.error) {
+    report(false, "migration 0011 is applied", `${fmt(probe.error)} — apply supabase/migrations/0011_screen_sound.sql first`);
+    return;
+  }
+  report(same(probe.data?.sound, DEFAULT), "a screen without sound settings has the default (enabled=false, volume 70, chime, hayya)", JSON.stringify(probe.data?.sound));
+  const on = (await admin.from("screens").select("id", { count: "exact", head: true }).eq("org_id", (await admin.from("screens").select("org_id").eq("id", screenA).single()).data?.org_id).eq("sound->>enabled", "true")).count;
+  report(on === 0, "no screen of the test masjid has sound on by default", `${on} with sound on`);
+
+  type Bundle = { status?: string; version?: number; screen?: { sound?: unknown } } | null;
+  const b0 = (await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: 0 })).data as Bundle;
+  const v0 = b0?.version ?? 0;
+  report(b0?.status === "ok" && same(b0?.screen?.sound, DEFAULT), "screen_bundle returns screen.sound (the default)", JSON.stringify(b0?.screen ?? b0));
+
+  const ON = { enabled: true, volume: 40, azan: "beep", iqamah: "hayya" };
+  const upd = await A.db.from("screens").update({ sound: ON }).eq("id", screenA).select("id");
+  report(!upd.error && (upd.data ?? []).length === 1, "A (pentadbir) turns sound on for org A's screen", fmt(upd.error));
+  const b1 = (await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v0 })).data as Bundle;
+  const v1 = b1?.version ?? 0;
+  report(b1?.status === "ok" && v1 > v0, "changing sound bumps bundle_version", `v${v0} → v${v1} (${b1?.status})`);
+  report(same(b1?.screen?.sound, ON), "screen_bundle returns the new screen.sound", JSON.stringify(b1?.screen?.sound));
+  await A.db.from("screens").update({ sound: ON }).eq("id", screenA);
+  const b2 = (await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v1 })).data as Bundle;
+  report(b2?.status === "unchanged", "saving the same sound again does not bump the version", JSON.stringify(b2));
+
+  const bad: [string, unknown][] = [
+    ["volume 150", { ...ON, volume: 150 }],
+    ["volume -1", { ...ON, volume: -1 }],
+    ["volume 70.5 (not an integer)", { ...ON, volume: 70.5 }],
+    ['volume "70" (a string)', { ...ON, volume: "70" }],
+    ["azan 'banana'", { ...ON, azan: "banana" }],
+    ["iqamah 'banana'", { ...ON, iqamah: "banana" }],
+    ['enabled "yes" (not a boolean)', { ...ON, enabled: "yes" }],
+    ["an extra key", { ...ON, extra: 1 }],
+    ["a missing key (no iqamah)", { enabled: true, volume: 40, azan: "beep" }],
+    ["a non-object (string)", "on"],
+    ["a non-object (array)", [true, 40, "beep", "hayya"]],
+    ["null", null],
+  ];
+  for (const [name, value] of bad) {
+    // 23514 = check constraint, 23502 = not null.
+    const res = await A.db.from("screens").update({ sound: value }).eq("id", screenA).select("id");
+    const e = res.error;
+    report(!!e && (e.code === "23514" || e.code === "23502"), `sound with ${name} is rejected`, e ? fmt(e) : "it was saved");
+  }
+  report(same(await read(), ON), "after the rejected updates the screen keeps its sound (service role)", JSON.stringify(await read()));
+
+  expectNoRows("B (admin of another masjid) cannot change org A's screen sound", await B.db.from("screens").update({ sound: DEFAULT }).eq("id", screenA).select("id"));
+  expectNoRows("anon cannot change a screen's sound", await anon.from("screens").update({ sound: DEFAULT }).eq("id", screenA).select("id"));
+  report(same(await read(), ON), "org A's screen sound is unchanged after B and anon tried (service role)", JSON.stringify(await read()));
 }
 
 // Usage monitoring (migration 0008, _specs/30-PRD-usage.md §10.1). Runs after the screen above

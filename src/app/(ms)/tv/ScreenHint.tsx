@@ -2,10 +2,12 @@
 // "Tekan OK untuk skrin penuh" / "Versi baharu tersedia" (full-screen plan, phases 2 and 3b).
 // Browsers only enter full screen right after a key press or tap on the device itself, so the TV
 // shows a small hint and the next press (remote OK, keyboard, touch) does it. A TV kept full screen
-// this way skips its nightly reload (hooks.ts), so when a newer version is required the same press
-// reloads instead; after the reload the hint offers full screen again. Hidden from the pre-azan
+// this way, or with audio unlocked for the sound cues (_specs/50-PRD-sound.md D11), skips its nightly
+// reload (hooks.ts), so when a newer version is required the same press reloads instead; after the
+// reload the hint offers full screen again (and the sound icon asks for one more press). Hidden from the pre-azan
 // banner to the end of solat and khutbah. Not shown in a kiosk browser or installed app (already full screen).
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { player } from "@/audio";
 import { canGoFullscreen, useTvQuiet, useUpdateNeeded, useViewMode } from "./screen-mode";
 
 const IGNORED_KEYS = new Set(["Escape", "Shift", "Control", "Alt", "Meta", "Tab"]);
@@ -14,11 +16,14 @@ export function ScreenHint() {
   const mode = useViewMode();
   const quiet = useTvQuiet();
   const update = useUpdateNeeded();
+  const audioUnlocked = useSyncExternalStore(player.subscribe, player.isUnlocked, () => false);
   const [failed, setFailed] = useState(false);
   const [supported, setSupported] = useState(false);
   useEffect(() => setSupported(canGoFullscreen()), []);
 
-  const action: "update" | "fullscreen" | null = update && mode === "tab" ? "update" : mode === "window" && supported && !failed ? "fullscreen" : null;
+  // Only TVs that skip the nightly reload need the press to update (the others reload at 03:00).
+  const skipsReload = mode === "tab" || audioUnlocked;
+  const action: "update" | "fullscreen" | null = update && skipsReload ? "update" : mode === "window" && supported && !failed ? "fullscreen" : null;
   const actionRef = useRef(action);
   actionRef.current = action;
 

@@ -1,5 +1,6 @@
 "use client";
 import { getClockOffset, localParts, nowMs } from "@/core";
+import { player } from "@/audio";
 import { useEffect, useRef, useState } from "react";
 import { createFrameMonitor } from "./frame-monitor";
 
@@ -52,9 +53,10 @@ export function useAutoLite(enabled: boolean): boolean {
 
 /**
  * Daily restart at 03:00 local real time (not sim time): a page reload, which also loads a new
- * version. A TV kept full screen by a key press would lose full screen on reload (and nobody is there
- * to press OK at 3 am), so it restarts the app in place instead (`onSoftRestart`); it gets a new
- * version from the "Versi baharu" hint or when switched off and on (owner decision, plan 3b).
+ * version. A reload undoes what a key press allowed, and nobody is there to press OK at 3 am: full
+ * screen by a key press (owner decision, plan 3b) and unlocked audio for the sound cues
+ * (_specs/50-PRD-sound.md D11). Such a TV restarts the app in place instead (`onSoftRestart`); it gets
+ * a new version from the "Versi baharu" hint or when switched off and on.
  */
 export function useDailyReload(onSoftRestart: () => void): void {
   const soft = useRef(onSoftRestart);
@@ -62,7 +64,7 @@ export function useDailyReload(onSoftRestart: () => void): void {
   useEffect(() => {
     let since = Date.now();
     const id = setInterval(() => {
-      const action = dailyRestart(Date.now() + getClockOffset(), Date.now() - since, Boolean(document.fullscreenElement));
+      const action = dailyRestart(Date.now() + getClockOffset(), Date.now() - since, Boolean(document.fullscreenElement) || player.isUnlocked());
       if (action === "soft") {
         since = Date.now();
         soft.current();
@@ -74,10 +76,11 @@ export function useDailyReload(onSoftRestart: () => void): void {
 
 /**
  * What the daily restart does at `realMs` (Malaysia time): nothing outside 03:00–03:00:59 or within
- * 2 min of the last (re)start; a soft restart when kept full screen by a key press; else a reload.
+ * 2 min of the last (re)start; a soft restart when a reload would lose what a key press allowed
+ * (`keepsGesture`: full screen by a key press, or unlocked audio); else a reload.
  */
-export function dailyRestart(realMs: number, msSinceStart: number, keyFullscreen: boolean): "reload" | "soft" | null {
+export function dailyRestart(realMs: number, msSinceStart: number, keepsGesture: boolean): "reload" | "soft" | null {
   const { hour, minute } = localParts(realMs);
   if (hour !== 3 || minute !== 0 || msSinceStart < 2 * 60_000) return null;
-  return keyFullscreen ? "soft" : "reload";
+  return keepsGesture ? "soft" : "reload";
 }

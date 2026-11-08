@@ -139,8 +139,10 @@ describe("volume", () => {
 describe("unlock", () => {
   it("resolves once audio runs, so a preview can play right after (admin Cuba)", async () => {
     const { ctx, p } = setup();
+    expect(p.isUnlocked()).toBe(false);
     await p.unlock();
     expect(p.isLocked()).toBe(false);
+    expect(p.isUnlocked()).toBe(true); // the TV's 03:00 restart then stays in the page (D11)
     await p.play("beep");
     expect(ctx!.playing.size).toBe(3);
   });
@@ -170,6 +172,7 @@ describe("unlock", () => {
     const { p } = setup({ ctx: null });
     p.prime(); // the TV primes as soon as sound is on
     expect(p.isLocked()).toBe(false);
+    expect(p.isUnlocked()).toBe(false); // no audio: the nightly reload stays as it was
     await expect(p.unlock()).resolves.toBeUndefined();
     await expect(p.play("chime")).resolves.toBeUndefined();
     await expect(p.play("hayya")).resolves.toBeUndefined();

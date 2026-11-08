@@ -34,7 +34,7 @@ describe("daily restart at 3:00 am (plan 3b)", () => {
   it("reloads a TV that is not kept full screen by a key press", () => {
     expect(dailyRestart(at(3, 0), 10 * 60_000, false)).toBe("reload");
   });
-  it("restarts in place when full screen came from a key press", () => {
+  it("restarts in place when a reload would lose a key press (full screen by OK, or unlocked audio: D11)", () => {
     expect(dailyRestart(at(3, 0), 10 * 60_000, true)).toBe("soft");
   });
   it("nothing outside 3:00, or within 2 minutes of the last start", () => {

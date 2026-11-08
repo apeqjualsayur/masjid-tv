@@ -89,9 +89,11 @@ quiet, never an error or a blank screen.
   - Not in "Tambah skrin": new screens start with sound off.
 - **D10 Out of scope:** pre-azan sound, per-waktu exceptions, quiet hours. The live demo
   (`/tv?demo=1`) never plays sound.
-- **D11 Daily restart:** once audio has been unlocked on a TV, the 03:00 daily restart is a soft restart
-  (no page reload), so sound keeps working. New app versions then load through the "Versi baharu" hint
-  or by switching the TV off and on (as for TVs kept full screen by a key press).
+- **D11 Daily restart:** once audio has been unlocked on a TV (`player.isUnlocked()`), the 03:00 daily
+  restart is a soft restart (no page reload), so sound keeps working (`dailyRestart` in
+  `src/app/tv/hooks.ts`, same as for TVs kept full screen by a key press). New app versions then load
+  through the "Versi baharu" hint, which such a TV now also shows (`ScreenHint.tsx`), or by switching the
+  TV off and on. After that reload the sound icon asks for one more press.
 
 ## 3. Files to create or change
 

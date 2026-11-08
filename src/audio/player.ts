@@ -32,6 +32,8 @@ export interface Player {
   unlock(): Promise<void>;
   /** True until the context runs. False when the browser has no Web Audio (nothing to unlock). */
   isLocked(): boolean;
+  /** Audio is running: a key press has unlocked it (or the kiosk browser allows autoplay). */
+  isUnlocked(): boolean;
   subscribe(listener: () => void): () => void;
   setVolume(volume: number): void;
   play(sound: SoundKind): Promise<void>;
@@ -146,6 +148,9 @@ export function createPlayer(deps: PlayerDeps): Player {
     },
     isLocked() {
       return !unsupported && (!ctx || ctx.state !== "running");
+    },
+    isUnlocked() {
+      return !!ctx && ctx.state === "running";
     },
     subscribe(listener) {
       listeners.add(listener);

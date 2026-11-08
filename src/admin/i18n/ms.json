@@ -421,7 +421,31 @@
     "posterTipUse": "Guna Pengumuman sahaja",
     "posterTipDismiss": "Tutup cadangan",
     "needsUpdate": "Perlu kemas kini",
-    "notFullscreen": "Bukan skrin penuh · cara"
+    "notFullscreen": "Bukan skrin penuh · cara",
+    "sound": {
+      "title": "Bunyi",
+      "switch": "Bunyi pada TV",
+      "volume": "Kelantangan",
+      "volumeValue": "{n}%",
+      "azan": "Semasa azan",
+      "iqamah": "Semasa iqamah",
+      "kind": {
+        "off": "Tiada",
+        "beep": "Bip",
+        "chime": "Loceng",
+        "alarm": "Penggera",
+        "hayya": "Hayya 'alas solah"
+      },
+      "try": "Cuba",
+      "tryLabel": "Cuba bunyi {sound} pada peranti ini",
+      "help": "Bunyi dimainkan melalui pembesar suara TV. Pastikan TV tidak disenyapkan dan tekan butang OK pada remote sekali selepas TV dipasangkan.",
+      "delay": "Perubahan sampai ke TV dalam lebih kurang 70 saat.",
+      "notOnPoster": "Skrin ini tidak memainkan bunyi.",
+      "err": {
+        "invalid": "Tetapan bunyi tidak sah. Pilih semula pilihan bunyi.",
+        "volume": "Kelantangan mesti antara 0 dan 100."
+      }
+    }
   },
   "poster": {
     "title": "Muat naik poster",

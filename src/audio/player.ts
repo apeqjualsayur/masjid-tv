@@ -28,8 +28,8 @@ export interface PlayerDeps {
 export interface Player {
   /** Create the context early (still locked), so isLocked() is known before the first cue. */
   prime(): void;
-  /** Call from a key press / click / tap: resumes the context. */
-  unlock(): void;
+  /** Call from a key press / click / tap: resumes the context. Resolves once it runs (or failed); never rejects. */
+  unlock(): Promise<void>;
   /** True until the context runs. False when the browser has no Web Audio (nothing to unlock). */
   isLocked(): boolean;
   subscribe(listener: () => void): () => void;
@@ -134,11 +134,12 @@ export function createPlayer(deps: PlayerDeps): Player {
     prime() {
       ensure();
     },
-    unlock() {
+    async unlock() {
       try {
         const c = ensure();
         if (!c || c.state === "running") return;
-        c.resume().then(notify, () => undefined);
+        // resume() is called synchronously inside the gesture; awaiting it afterwards is fine.
+        await c.resume().then(notify, () => undefined);
       } catch {
         // stays locked
       }

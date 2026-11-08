@@ -1,5 +1,5 @@
 // Skrin rules (PRD Phase 2 §4.4, designs/admin/Screens; round 2 §6). Pure: no React, no Supabase.
-import type { LayoutKey, ThemeId } from "@/core";
+import { DEFAULT_SOUND, SOUND_KINDS, isSoundKind, parseSoundSettings, type LayoutKey, type SoundSettings, type ThemeId } from "@/core";
 import { isOnline, offlineFor } from "../home/logic";
 
 /** Launch themes and layouts, then the round-2 additions (shown when THEMES_ROUND2_VISIBLE). */
@@ -42,7 +42,52 @@ export interface Screen {
   app_version: string | null;
   /** How the TV is shown (migration 0010): app = kiosk/installed, tab = full screen by key press, window = not full screen */
   view_mode?: "app" | "tab" | "window" | null;
+  /** Sound cues (migration 0011, _specs/50-PRD-sound.md D9). Missing before the migration. */
+  sound?: SoundSettings | null;
   created_at: string;
+}
+
+// ---------------------------------------------------------------- sound (D9)
+
+/** The five choices per cue, in the order the sheet shows them. */
+export const SOUND_CHOICES = SOUND_KINDS;
+export const VOLUME_STEP = 5;
+
+/** A poster screen ("Pengumuman sahaja") never plays sound: the Bunyi section is hidden (D1). */
+export const soundSectionVisible = (layout: Layout) => layout !== "poster";
+
+/** The screen's sound settings for the form; defaults (off) when the row has none. */
+export const soundOf = (s: Pick<Screen, "sound">): SoundSettings => (s.sound ? parseSoundSettings(s.sound) : { ...DEFAULT_SOUND });
+
+export const soundEqual = (a: SoundSettings, b: SoundSettings) => a.enabled === b.enabled && a.volume === b.volume && a.azan === b.azan && a.iqamah === b.iqamah;
+
+/**
+ * Same rules as the database check (screens_sound_valid, migration 0011): exactly enabled (boolean),
+ * volume (integer 0–100), azan and iqamah (off|beep|chime|alarm|hayya). i18n key, or null when valid.
+ */
+export function soundError(v: unknown): string | null {
+  if (!v || typeof v !== "object" || Array.isArray(v)) return "screens.sound.err.invalid";
+  const o = v as Record<string, unknown>;
+  const keys = Object.keys(o).sort().join(",");
+  if (keys !== "azan,enabled,iqamah,volume") return "screens.sound.err.invalid";
+  if (typeof o.enabled !== "boolean") return "screens.sound.err.invalid";
+  if (typeof o.volume !== "number" || !Number.isInteger(o.volume) || o.volume < 0 || o.volume > 100) return "screens.sound.err.volume";
+  if (!isSoundKind(o.azan) || !isSoundKind(o.iqamah)) return "screens.sound.err.invalid";
+  return null;
+}
+
+/**
+ * What the Save button writes. Sound only when the section is visible (not a poster screen) and the
+ * database has the column; it keeps the stored value otherwise (D1).
+ */
+export function screenUpdate(
+  s: Pick<Screen, "name" | "theme" | "layout" | "sound">,
+  form: { name: string; theme: Theme; layout: Layout; sound: SoundSettings },
+  soundAvailable: boolean,
+): { name: string; theme: Theme; layout: Layout; sound?: SoundSettings } {
+  const out: { name: string; theme: Theme; layout: Layout; sound?: SoundSettings } = { name: form.name.trim(), theme: form.theme, layout: form.layout };
+  if (soundAvailable && soundSectionVisible(form.layout) && !soundEqual(form.sound, soundOf(s))) out.sound = form.sound;
+  return out;
 }
 
 /** Digits only, at most 6. */

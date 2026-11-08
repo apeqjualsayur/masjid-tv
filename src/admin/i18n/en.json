@@ -421,7 +421,31 @@
     "posterTipUse": "Use Announcements only",
     "posterTipDismiss": "Dismiss suggestion",
     "needsUpdate": "Needs update",
-    "notFullscreen": "Not full screen · how"
+    "notFullscreen": "Not full screen · how",
+    "sound": {
+      "title": "Sound",
+      "switch": "Sound on the TV",
+      "volume": "Volume",
+      "volumeValue": "{n}%",
+      "azan": "At azan",
+      "iqamah": "At iqamah",
+      "kind": {
+        "off": "None",
+        "beep": "Beep",
+        "chime": "Chime",
+        "alarm": "Alarm",
+        "hayya": "Hayya 'alas solah"
+      },
+      "try": "Try",
+      "tryLabel": "Try the {sound} sound on this device",
+      "help": "The sound plays through the TV's speakers. Make sure the TV is not muted, and press OK on the remote once after the TV is switched on.",
+      "delay": "Changes reach the TV in about 70 seconds.",
+      "notOnPoster": "This screen does not play sound.",
+      "err": {
+        "invalid": "The sound settings are not valid. Choose the sounds again.",
+        "volume": "Volume must be between 0 and 100."
+      }
+    }
   },
   "poster": {
     "title": "Upload poster",

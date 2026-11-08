@@ -73,14 +73,20 @@ quiet, never an error or a blank screen.
   - Test settings, only with `?debug=1` or on localhost, never with `?demo=1`: `sound=1` (on),
     `soundAzan=` and `soundIqamah=` (`off|beep|chime|alarm|hayya`), `vol=` (0–100), `mute=1` (forces off).
     They override the bundle on paired TVs too, like `theme=`.
-- **D9 Admin:** the Skrin edit sheet gets a **Bunyi** section, hidden when the layout chosen is `poster`:
-  - an on/off switch;
-  - a volume slider (0–100, step 5);
-  - two choice groups, *Semasa azan* and *Semasa iqamah*: Tiada / Bip / Loceng / Penggera /
-    Hayya 'alas solah, with a **Cuba** button per option that plays on this device at the chosen volume;
-  - helper text: the sound plays through the TV's speakers, so the TV must not be muted and its volume
-    must be up; *Cuba* plays on this phone or computer only.
-  - Saved with the sheet's existing Save button.
+- **D9 Admin:** the Skrin edit sheet gets a **Bunyi** section (`src/admin/screens/ScreensView.tsx`):
+  - a switch *Bunyi pada TV*;
+  - a volume slider (real `input type=range`, 0–100, step 5, labelled with the value);
+  - two radio groups, *Semasa azan* and *Semasa iqamah*: Tiada / Bip / Loceng / Penggera /
+    Hayya 'alas solah, with a **Cuba** button per option (not for Tiada: nothing to play) that plays it on
+    this device through `src/audio/player.ts` at the chosen volume;
+  - helper text: "Bunyi dimainkan melalui pembesar suara TV. Pastikan TV tidak disenyapkan dan tekan
+    butang OK pada remote sekali selepas TV dipasangkan." and "Perubahan sampai ke TV dalam lebih kurang
+    70 saat."
+  - On a poster screen (also when the layout is switched to poster in the same sheet) the section is
+    hidden and the sheet says "Skrin ini tidak memainkan bunyi."; the stored value is kept (not sent).
+  - Saved with the sheet's existing Save button (normal update, RLS decides), validated first with the
+    same rules as the database check. Shown only once the database has the column (migration 0011).
+  - Not in "Tambah skrin": new screens start with sound off.
 - **D10 Out of scope:** pre-azan sound, per-waktu exceptions, quiet hours. The live demo
   (`/tv?demo=1`) never plays sound.
 - **D11 Daily restart:** once audio has been unlocked on a TV, the 03:00 daily restart is a soft restart

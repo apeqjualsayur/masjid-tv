@@ -1,10 +1,12 @@
 "use client";
 // Skrin (PRD Phase 2 §4.4, designs/admin/Screens): list with mini previews and status,
 // "Tambah skrin" sheet (code from the TV or ?pair= from its QR) → pair_claim, and per-screen
-// rename / theme / layout / revoke / delete.
+// rename / theme / layout / sound (Bunyi, _specs/50-PRD-sound.md D9) / revoke / delete.
 import { useCallback, useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
 import { THEMES_ROUND2_VISIBLE } from "@/config/features";
 import { RELEASE, isOutdated } from "@/config/release";
+import { player } from "@/audio";
+import type { SoundKind, SoundSettings } from "@/core";
 import { getSupabase } from "@/lib/supabase";
 import { useDuration } from "../home/HomeView";
 import { useClock } from "../home/useHomeData";
@@ -13,7 +15,7 @@ import { useAdmin } from "../session";
 import { Dialog } from "../shell/Dialog";
 import { ICON, Icon } from "../shell/icons";
 import { useToasts } from "../shell/Toast";
-import { NAME_MAX, PENDING_PAIR_KEY, POSTER_TIP_KEY, claimErrorKey, codeFromPaste, codeFromQuery, layoutChoices, nameError, onlyDigits, screenStatus, sortScreens, suggestPosterLayout, themeChoices, type Layout, type Screen, type Theme } from "./logic";
+import { NAME_MAX, PENDING_PAIR_KEY, POSTER_TIP_KEY, SOUND_CHOICES, VOLUME_STEP, claimErrorKey, codeFromPaste, codeFromQuery, layoutChoices, nameError, onlyDigits, screenStatus, screenUpdate, sortScreens, soundError, soundOf, soundSectionVisible, suggestPosterLayout, themeChoices, type Layout, type Screen, type Theme } from "./logic";
 import { ThemeThumb } from "./ThemeThumb";
 
 const card = "rounded-[18px] bg-adm-card shadow-[0_1px_3px_rgba(18,38,30,0.08)]";
@@ -35,12 +37,16 @@ export function ScreensView() {
   const [loadError, setLoadError] = useState<string | null>(null);
   const [adding, setAdding] = useState<{ code: string } | null>(null);
   const [managing, setManaging] = useState<Screen | null>(null);
+  /** The database has screens.sound (migration 0011): only then the sheet shows Bunyi. */
+  const [soundAvailable, setSoundAvailable] = useState(false);
 
   const load = useCallback(async () => {
     const sb = getSupabase();
     const cols = "id, name, theme, layout, last_seen_at, revoked_at, app_version, created_at";
-    // view_mode exists once migration 0010 has run; until then load without it.
-    let res: { data: unknown[] | null; error: { message: string } | null } = await sb.from("screens").select(`${cols}, view_mode`).eq("org_id", orgId);
+    // view_mode exists once migration 0010 has run, sound once 0011 has; until then load without them.
+    let res: { data: unknown[] | null; error: { message: string } | null } = await sb.from("screens").select(`${cols}, view_mode, sound`).eq("org_id", orgId);
+    setSoundAvailable(!res.error);
+    if (res.error) res = await sb.from("screens").select(`${cols}, view_mode`).eq("org_id", orgId);
     if (res.error) res = await sb.from("screens").select(cols).eq("org_id", orgId);
     const { data, error } = res;
     if (error) setLoadError(error.message);
@@ -114,6 +120,7 @@ export function ScreensView() {
       {managing && (
         <ManageSheet
           s={managing}
+          soundAvailable={soundAvailable}
           onClose={() => setManaging(null)}
           onDone={(text) => {
             setManaging(null);
@@ -432,16 +439,21 @@ function AddSheet({ orgId, screens, initialCode, onClose, onDone }: { orgId: str
   );
 }
 
-function ManageSheet({ s, onClose, onDone, onError }: { s: Screen; onClose: () => void; onDone: (text: string) => void; onError: (m: string) => void }) {
+function ManageSheet({ s, soundAvailable, onClose, onDone, onError }: { s: Screen; soundAvailable: boolean; onClose: () => void; onDone: (text: string) => void; onError: (m: string) => void }) {
   const { t } = useT();
   const [name, setName] = useState(s.name);
   const [theme, setTheme] = useState<Theme>(s.theme);
   const [layout, setLayout] = useState<Layout>(s.layout);
+  const [sound, setSound] = useState<SoundSettings>(() => soundOf(s));
   const [busy, setBusy] = useState(false);
   const [confirm, setConfirm] = useState<"revoke" | "delete" | null>(null);
   const revoked = Boolean(s.revoked_at);
   const ne = nameError(name);
-  const dirty = name.trim() !== s.name || theme !== s.theme || layout !== s.layout;
+  const update = screenUpdate(s, { name, theme, layout, sound }, soundAvailable);
+  const dirty = update.name !== s.name || theme !== s.theme || layout !== s.layout || update.sound !== undefined;
+  const soundErr = update.sound ? soundError(update.sound) : null;
+  // A preview still playing stops when the sheet closes.
+  useEffect(() => () => player.stop(), []);
 
   const run = async (op: () => PromiseLike<{ error: { message: string } | null }>, okText: string) => {
     setBusy(true);
@@ -451,7 +463,7 @@ function ManageSheet({ s, onClose, onDone, onError }: { s: Screen; onClose: () =
     else onDone(okText);
   };
   const sb = getSupabase();
-  const save = () => run(() => sb.from("screens").update({ name: name.trim(), theme, layout }).eq("id", s.id), t("screens.saved"));
+  const save = () => run(() => sb.from("screens").update(update).eq("id", s.id), t("screens.saved"));
   const revoke = () => run(() => sb.from("screens").update({ revoked_at: new Date().toISOString() }).eq("id", s.id), t("screens.revokedDone", { name: s.name }));
   const remove = () => run(() => sb.from("screens").delete().eq("id", s.id), t("screens.deleted", { name: s.name }));
 
@@ -478,7 +490,7 @@ function ManageSheet({ s, onClose, onDone, onError }: { s: Screen; onClose: () =
         noValidate
         onSubmit={(e) => {
           e.preventDefault();
-          if (!ne && dirty && !busy) save();
+          if (!ne && !soundErr && dirty && !busy) save();
         }}
         className="flex flex-col gap-4"
       >
@@ -497,7 +509,13 @@ function ManageSheet({ s, onClose, onDone, onError }: { s: Screen; onClose: () =
               <span className={fieldLabel}>{t("screens.layout")}</span>
               <LayoutPicker value={layout} onChange={setLayout} theme={theme} current={s.layout} />
             </div>
-            <button type="submit" disabled={busy || !dirty || Boolean(ne)} className={primary}>
+            {soundAvailable &&
+              (soundSectionVisible(layout) ? (
+                <SoundSection value={sound} onChange={setSound} error={soundErr} />
+              ) : (
+                <p className="rounded-xl bg-adm-ground px-3.5 py-3 text-[13px] leading-[1.5] text-adm-muted">{t("screens.sound.notOnPoster")}</p>
+              ))}
+            <button type="submit" disabled={busy || !dirty || Boolean(ne) || Boolean(soundErr)} className={primary}>
               {busy ? t("screens.saving") : t("screens.save")}
             </button>
           </>
@@ -514,5 +532,106 @@ function ManageSheet({ s, onClose, onDone, onError }: { s: Screen; onClose: () =
         </div>
       </form>
     </Dialog>
+  );
+}
+
+/** Switch like the schedule form's (a real button with role="switch"), with a 44 px tap area. */
+function SoundSwitch({ on, onChange, labelledBy }: { on: boolean; onChange: (v: boolean) => void; labelledBy: string }) {
+  return (
+    <button
+      type="button"
+      role="switch"
+      aria-checked={on}
+      aria-labelledby={labelledBy}
+      onClick={() => onChange(!on)}
+      className="flex h-11 w-[58px] flex-none items-center justify-center rounded-full focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green"
+    >
+      <span className={`relative h-7 w-[46px] rounded-full transition-colors ${on ? "bg-adm-green" : "bg-[#B9C8C0]"}`}>
+        <span className={`absolute top-[3px] h-[22px] w-[22px] rounded-full bg-white shadow transition-[left] ${on ? "left-[21px]" : "left-[3px]"}`} />
+      </span>
+    </button>
+  );
+}
+
+/** Plays a choice on this device at the chosen volume. The click is the gesture that allows audio. */
+async function preview(kind: SoundKind, volume: number) {
+  await player.unlock();
+  player.setVolume(volume);
+  await player.play(kind);
+}
+
+/** Bunyi (D9): on/off, volume, and the sound for each cue with a "Cuba" preview per option. */
+function SoundSection({ value, onChange, error }: { value: SoundSettings; onChange: (v: SoundSettings) => void; error: string | null }) {
+  const { t } = useT();
+  const set = (patch: Partial<SoundSettings>) => onChange({ ...value, ...patch });
+  const group = (cue: "azan" | "iqamah") => (
+    <fieldset className="flex min-w-0 flex-col gap-1.5">
+      <legend className={`${fieldLabel} mb-1.5`}>{t(`screens.sound.${cue}`)}</legend>
+      {SOUND_CHOICES.map((kind) => {
+        const id = `snd-${cue}-${kind}`;
+        const on = value[cue] === kind;
+        return (
+          <div key={kind} className={`flex items-center gap-2 rounded-xl border-[1.5px] pr-1.5 ${on ? "border-adm-green bg-[#F1F8F4]" : "border-adm-line bg-white"}`}>
+            <label htmlFor={id} className="flex min-h-11 min-w-0 flex-1 cursor-pointer items-center gap-3 px-3 text-[15px] font-semibold">
+              <input
+                id={id}
+                type="radio"
+                name={`snd-${cue}`}
+                value={kind}
+                checked={on}
+                onChange={() => set({ [cue]: kind })}
+                className="h-5 w-5 flex-none accent-[#146C4A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green"
+              />
+              <span className="truncate">{t(`screens.sound.kind.${kind}`)}</span>
+            </label>
+            {kind !== "off" && (
+              <button
+                type="button"
+                onClick={() => void preview(kind, value.volume)}
+                aria-label={t("screens.sound.tryLabel", { sound: t(`screens.sound.kind.${kind}`) })}
+                className="h-11 flex-none rounded-lg px-3 text-[14px] font-bold text-adm-green hover:bg-adm-soft focus-visible:outline-2 focus-visible:outline-adm-green"
+              >
+                {t("screens.sound.try")}
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </fieldset>
+  );
+  return (
+    <section aria-labelledby="snd-title" className="flex flex-col gap-4 border-t border-adm-hair pt-4">
+      <h3 id="snd-title" className="text-[16px] font-extrabold">{t("screens.sound.title")}</h3>
+      <div className="flex items-center justify-between gap-3">
+        <span id="snd-switch" className="text-[15px] font-semibold">{t("screens.sound.switch")}</span>
+        <SoundSwitch on={value.enabled} onChange={(v) => set({ enabled: v })} labelledBy="snd-switch" />
+      </div>
+      <div className="flex flex-col gap-1">
+        <label htmlFor="snd-volume" className="flex items-baseline justify-between text-[13px] font-bold text-[#3A4E45]">
+          {t("screens.sound.volume")}
+          <span className="text-[15px] font-extrabold text-adm-ink">{t("screens.sound.volumeValue", { n: value.volume })}</span>
+        </label>
+        <input
+          id="snd-volume"
+          type="range"
+          min={0}
+          max={100}
+          step={VOLUME_STEP}
+          value={value.volume}
+          onChange={(e) => set({ volume: Number(e.target.value) })}
+          aria-valuetext={t("screens.sound.volumeValue", { n: value.volume })}
+          className="h-11 w-full cursor-pointer accent-[#146C4A] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-adm-green"
+        />
+      </div>
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        {group("azan")}
+        {group("iqamah")}
+      </div>
+      <div className="flex flex-col gap-1.5 rounded-xl bg-adm-soft px-3.5 py-3 text-[13px] leading-[1.5] text-[#1E4A37]">
+        <p>{t("screens.sound.help")}</p>
+        <p>{t("screens.sound.delay")}</p>
+      </div>
+      {error && <p role="alert" className="text-[13px] font-semibold text-adm-danger">{t(error)}</p>}
+    </section>
   );
 }

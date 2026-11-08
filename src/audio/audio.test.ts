@@ -137,6 +137,14 @@ describe("volume", () => {
 });
 
 describe("unlock", () => {
+  it("resolves once audio runs, so a preview can play right after (admin Cuba)", async () => {
+    const { ctx, p } = setup();
+    await p.unlock();
+    expect(p.isLocked()).toBe(false);
+    await p.play("beep");
+    expect(ctx!.playing.size).toBe(3);
+  });
+
   it("locked until unlock(); listeners hear the change", async () => {
     const { p } = setup();
     const heard = vi.fn();
@@ -154,8 +162,7 @@ describe("unlock", () => {
     const ctx = new FakeCtx();
     ctx.resumeFails = true;
     const { p } = setup({ ctx });
-    expect(() => p.unlock()).not.toThrow();
-    await flush();
+    await expect(p.unlock()).resolves.toBeUndefined();
     expect(p.isLocked()).toBe(true);
   });
 
@@ -163,7 +170,7 @@ describe("unlock", () => {
     const { p } = setup({ ctx: null });
     p.prime(); // the TV primes as soon as sound is on
     expect(p.isLocked()).toBe(false);
-    expect(() => p.unlock()).not.toThrow();
+    await expect(p.unlock()).resolves.toBeUndefined();
     await expect(p.play("chime")).resolves.toBeUndefined();
     await expect(p.play("hayya")).resolves.toBeUndefined();
   });

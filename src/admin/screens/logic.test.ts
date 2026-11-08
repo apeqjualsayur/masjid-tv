@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { claimErrorKey, codeFromPaste, codeFromQuery, layoutChoices, nameError, onlyDigits, screenStatus, sortScreens, suggestPosterLayout, themeChoices, type Screen } from "./logic";
+import { SOUND_CHOICES, claimErrorKey, codeFromPaste, codeFromQuery, layoutChoices, nameError, onlyDigits, screenStatus, screenUpdate, sortScreens, soundError, soundOf, soundSectionVisible, suggestPosterLayout, themeChoices, type Screen } from "./logic";
 
 describe("pairing code input", () => {
   it("keeps digits only, at most 6", () => {
@@ -77,5 +77,56 @@ describe("round 2 choices and the poster-layout suggestion (PRD round 2 §6)", (
     expect(suggestPosterLayout(null, false, true)).toBe(false);
     expect(suggestPosterLayout([{ revoked_at: null }, { revoked_at: null }], false, true)).toBe(false);
     expect(suggestPosterLayout([{ revoked_at: null }, { revoked_at: "2026-10-01" }], false, true)).toBe(true);
+  });
+});
+
+describe("Bunyi (sound, _specs/50-PRD-sound.md D9)", () => {
+  const OFF = { enabled: false, volume: 70, azan: "chime", iqamah: "hayya" } as const;
+  const ON = { enabled: true, volume: 40, azan: "beep", iqamah: "alarm" } as const;
+  const row = (over: Partial<Screen> = {}): Pick<Screen, "name" | "theme" | "layout" | "sound"> => ({ name: "Dewan", theme: "tenang", layout: "full", sound: { ...OFF }, ...over });
+
+  it("the section is hidden on a poster screen only", () => {
+    expect(soundSectionVisible("poster")).toBe(false);
+    for (const l of ["full", "bottom", "side"] as const) expect(soundSectionVisible(l)).toBe(true);
+  });
+
+  it("five choices per cue, in the sheet's order", () => {
+    expect(SOUND_CHOICES).toEqual(["off", "beep", "chime", "alarm", "hayya"]);
+  });
+
+  it("soundOf: the stored setting, or off when the row has none (before migration 0011)", () => {
+    expect(soundOf({ sound: { ...ON } })).toEqual(ON);
+    expect(soundOf({ sound: null })).toEqual(OFF);
+    expect(soundOf({})).toEqual(OFF);
+  });
+
+  it("validation matches the database check", () => {
+    expect(soundError(ON)).toBeNull();
+    expect(soundError({ ...ON, volume: 0 })).toBeNull();
+    expect(soundError({ ...ON, volume: 100 })).toBeNull();
+    expect(soundError({ ...ON, volume: 150 })).toBe("screens.sound.err.volume");
+    expect(soundError({ ...ON, volume: -5 })).toBe("screens.sound.err.volume");
+    expect(soundError({ ...ON, volume: 70.5 })).toBe("screens.sound.err.volume");
+    expect(soundError({ ...ON, volume: "70" })).toBe("screens.sound.err.volume");
+    expect(soundError({ ...ON, azan: "banana" })).toBe("screens.sound.err.invalid");
+    expect(soundError({ ...ON, enabled: "yes" })).toBe("screens.sound.err.invalid");
+    expect(soundError({ ...ON, extra: 1 })).toBe("screens.sound.err.invalid");
+    expect(soundError({ enabled: true, volume: 40, azan: "beep" })).toBe("screens.sound.err.invalid");
+    expect(soundError("on")).toBe("screens.sound.err.invalid");
+    expect(soundError([ON])).toBe("screens.sound.err.invalid");
+    expect(soundError(null)).toBe("screens.sound.err.invalid");
+  });
+
+  it("save sends sound only when it changed", () => {
+    expect(screenUpdate(row(), { name: " Dewan ", theme: "tenang", layout: "full", sound: { ...OFF } }, true)).toEqual({ name: "Dewan", theme: "tenang", layout: "full" });
+    expect(screenUpdate(row(), { name: "Dewan", theme: "tenang", layout: "full", sound: { ...ON } }, true)).toEqual({ name: "Dewan", theme: "tenang", layout: "full", sound: ON });
+  });
+
+  it("switching the layout to poster in the same sheet: the sound change is not sent, the stored value stays", () => {
+    expect(screenUpdate(row(), { name: "Dewan", theme: "tenang", layout: "poster", sound: { ...ON } }, true)).toEqual({ name: "Dewan", theme: "tenang", layout: "poster" });
+  });
+
+  it("before migration 0011 (no sound column) sound is never sent", () => {
+    expect(screenUpdate(row({ sound: undefined }), { name: "Dewan", theme: "tenang", layout: "full", sound: { ...ON } }, false)).not.toHaveProperty("sound");
   });
 });

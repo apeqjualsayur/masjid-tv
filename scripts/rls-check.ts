@@ -100,6 +100,8 @@ const secret = () => {
 const WEBP = Uint8Array.from(Buffer.from("UklGRhoAAABXRUJQVlA4TA0AAAAvAAAAEAcQERGIiP4HAA==", "base64"));
 const kuliahFields = { series: "Kuliah Maghrib", topic: "[RLS check]", speaker: "[Ustaz]", date: "[Tarikh]", time: "[Masa]", venue: "[Dewan]" };
 const inDays = (d: number) => new Date(Date.now() + d * 86_400_000).toISOString();
+/** Test takwim row: highest allowed Hijri year, Gregorian 2100, so no real TV ever shows it. */
+const TEST_HIJRI_YEAR = 1600;
 
 // ---------------------------------------------------------------------------- cleanup
 async function cleanup(orgIds: string[]) {
@@ -117,8 +119,18 @@ async function cleanup(orgIds: string[]) {
     await admin.from("media").delete().in("org_id", ids);
     // Usage telemetry has no foreign keys (migration 0008); harmless if the table does not exist yet.
     await admin.from("usage_screen_daily").delete().in("org_id", ids);
+    // Roster (migration 0012); harmless if the tables do not exist yet. Slots first, then petugas.
+    await admin.from("roster_slots").delete().in("org_id", ids);
+    await admin.from("petugas").delete().in("org_id", ids);
     const del = await admin.from("organisations").delete().in("id", ids);
     if (del.error) console.log(`  could not delete test orgs: ${fmt(del.error)}`);
+  }
+  // The test takwim row (hijri year 1600, year 2100: outside every bundle window). Deleted only when
+  // found, because any delete on islamic_events bumps every active masjid's bundle_version.
+  const { data: ev } = await admin.from("islamic_events").select("id").eq("hijri_year", TEST_HIJRI_YEAR).like("note", `[${TAG}%`);
+  if (ev?.length) {
+    const delEv = await admin.from("islamic_events").delete().in("id", ev.map((e) => e.id as string));
+    if (delEv.error) console.log(`  could not delete the test takwim row: ${fmt(delEv.error)}`);
   }
   if (secrets.length) {
     const hashes = secrets.map((s) => createHash("sha256").update(s).digest("hex"));
@@ -340,6 +352,7 @@ async function run(orgIds: string[]) {
   await usageChecks(A, P, screenA);
   await fullscreenFeedbackChecks(A, B, P, orgA, orgB, tvSecret, screenA);
   await soundChecks(A, B, tvSecret, screenA);
+  await enhancementChecks(A, B, P, orgA, orgB, tvSecret, orgIds);
   const iq =await A.db.from("org_settings").update({ iqamah_min: { subuh: 10, zohor: 10, asar: 10, maghrib: 9, isyak: 10 } }).eq("org_id", orgA).select("org_id");
   report(!iq.error && (iq.data ?? []).length === 1, "A updates org A's iqamah minutes", fmt(iq.error));
   const b3 = await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: v1 });
@@ -540,6 +553,111 @@ async function soundChecks(A: TestUser, B: TestUser, tvSecret: string, screenA: 
   expectNoRows("B (admin of another masjid) cannot change org A's screen sound", await B.db.from("screens").update({ sound: DEFAULT }).eq("id", screenA).select("id"));
   expectNoRows("anon cannot change a screen's sound", await anon.from("screens").update({ sound: DEFAULT }).eq("id", screenA).select("id"));
   report(same(await read(), ON), "org A's screen sound is unchanged after B and anon tried (service role)", JSON.stringify(await read()));
+}
+
+// Enhancements (migration 0012, _specs/60-PRD-enhancements.md §9, acceptance 2, 6, 7): activity
+// notices, the 3 new template keys, the platform takwim, petugas and the roster, and the two new
+// bundle keys. Org A and org B are both active here; E registers a pending masjid.
+async function enhancementChecks(A: TestUser, B: TestUser, P: TestUser, orgA: string, orgB: string, tvSecret: string, orgIds: string[]) {
+  console.log("\nEnhancements: notices, takwim, petugas, roster (migration 0012)");
+  const probe = await admin.from("petugas").select("id").limit(1);
+  if (probe.error) {
+    report(false, "migration 0012 is applied", `${fmt(probe.error)} — apply supabase/migrations/0012_enhancements.sql first`);
+    return;
+  }
+
+  // Notices (fields.notice) -------------------------------------------------------
+  const slide = (template_key: string, fields: Record<string, unknown>) =>
+    A.db.from("slides").insert({ org_id: orgA, type: "template", template_key, fields }).select("id");
+  const notice = (n: Record<string, unknown>) => ({ ...kuliahFields, notice: { setAt: new Date().toISOString(), prevPriority: false, ...n } });
+  expectOk("a Tangguh notice (with newAt and reason) is accepted on kuliah", await slide("kuliah", notice({ kind: "tangguh", newAt: "2026-11-28T20:45", reason: "Penceramah uzur" })));
+  expectOk("a Batal notice without newAt is accepted on kuliah", await slide("kuliah", notice({ kind: "batal", newAt: null, reason: null })));
+  expectFail("a notice on pengumuman is rejected", await slide("pengumuman", { title: "[RLS]", body: "[RLS]", notice: { kind: "batal", newAt: null, reason: null } }), "23514");
+  expectFail("Batal with a newAt is rejected", await slide("kuliah", notice({ kind: "batal", newAt: "2026-11-28T20:45" })), "23514");
+  expectFail("a notice kind other than tangguh/batal is rejected", await slide("kuliah", notice({ kind: "ubah" })), "23514");
+  expectFail("a notice reason of 101 characters is rejected", await slide("kuliah", notice({ kind: "tangguh", newAt: null, reason: "x".repeat(101) })), "23514");
+  expectOk("a notice reason of 100 characters is accepted", await slide("kuliah", notice({ kind: "tangguh", newAt: null, reason: "x".repeat(100) })));
+  for (const key of ["penangguhan", "hari_kebesaran", "jadual_petugas"]) expectOk(`template key ${key} is accepted`, await slide(key, {}));
+
+  // Takwim (islamic_events) ------------------------------------------------------
+  const TEST_EVENT = { event_key: "awal_muharram", hijri_year: TEST_HIJRI_YEAR, greg_date: "2100-01-01", status: "jangkaan", note: `[${TAG} ${RUN}]` };
+  expectFail("a masjid admin (A) cannot insert into islamic_events", await A.db.from("islamic_events").insert(TEST_EVENT).select("id"), "42501");
+  const E = await makeUser("E");
+  const orgE = must("E registers a masjid (stays pending)", await E.db.rpc("register_org", { p_kind: "surau", p_full_name: `RLS Check E ${RUN}`, p_short_name: "RE", p_state: "Selangor", p_district: "Klang", p_zone: "SGR01" })) as string;
+  orgIds.push(orgE);
+  const versions = async () =>
+    Object.fromEntries(((await admin.from("organisations").select("id, bundle_version").in("id", [orgA, orgB, orgE])).data ?? []).map((r) => [r.id as string, Number(r.bundle_version)]));
+  const before = await versions();
+  expectOk("the platform owner (P) can insert into islamic_events", await P.db.from("islamic_events").insert(TEST_EVENT).select("id"));
+  const after = await versions();
+  report(after[orgA] > before[orgA] && after[orgB] > before[orgB], "a takwim change bumps every active masjid's bundle_version (A and B)", `A v${before[orgA]} → v${after[orgA]}, B v${before[orgB]} → v${after[orgB]}`);
+  report(after[orgE] === before[orgE], "a takwim change does not bump a pending masjid's bundle_version (E)", `E v${before[orgE]} → v${after[orgE]}`);
+  const aReads = await A.db.from("islamic_events").select("id").eq("hijri_year", TEST_HIJRI_YEAR);
+  report(!aReads.error && (aReads.data ?? []).length === 1, "a signed-in masjid admin (A) can read the takwim", aReads.error ? fmt(aReads.error) : `${(aReads.data ?? []).length} row(s)`);
+  expectNoRows("a masjid admin (A) cannot update the takwim", await A.db.from("islamic_events").update({ status: "rasmi" }).eq("hijri_year", TEST_HIJRI_YEAR).select("id"));
+  expectNoRows("anon cannot read the takwim", await anon.from("islamic_events").select("id").limit(5));
+
+  // Petugas ------------------------------------------------------------------------
+  const addP = (u: TestUser, org: string, name: string, roles: string[], sort_order = 0) =>
+    u.db.from("petugas").insert({ org_id: org, name, roles, sort_order }).select("id").single();
+  const r1 = await addP(A, orgA, "Ahmad Zaki", ["imam", "bilal"], 1);
+  expectOk("A adds a petugas (imam + bilal) to org A", r1);
+  const p1 = (r1.data as { id: string } | null)?.id;
+  const p2 = (must("A adds a bilal-only petugas to org A", await addP(A, orgA, "Hamid Yusof", ["bilal"], 2)) as { id: string }).id;
+  if (!p1) throw new Fatal("no petugas in org A; the roster checks depend on it");
+  expectFail("A cannot add a petugas to org B", await A.db.from("petugas").insert({ org_id: orgB, name: "[RLS]", roles: ["imam"] }).select("id"), "42501");
+  const pB = (must("B adds a petugas to org B", await addP(B, orgB, "Imam Surau B", ["imam"])) as { id: string }).id;
+  expectNoRows("B cannot read org A's petugas", await B.db.from("petugas").select("id").eq("org_id", orgA));
+  expectNoRows("B cannot update org A's petugas", await B.db.from("petugas").update({ name: "hacked" }).eq("org_id", orgA).select("id"));
+  expectFail("a pending masjid (E) cannot add a petugas", await E.db.from("petugas").insert({ org_id: orgE, name: "[RLS]", roles: ["imam"] }).select("id"), "42501");
+  expectFail("a petugas with an unknown role (khatib) is rejected", await A.db.from("petugas").insert({ org_id: orgA, name: "[RLS]", roles: ["khatib"] }).select("id"), "23514");
+
+  // Roster (roster_save) --------------------------------------------------------------
+  const grid = [
+    { day: 1, waktu: null, role: "imam", petugasId: p1 },
+    { day: 1, waktu: null, role: "bilal", petugasId: p2 },
+    { day: 2, waktu: "maghrib", role: "imam", petugasId: p1 },
+    { day: 2, waktu: null, role: "bilal", petugasId: p1 },
+  ];
+  const slotCount = async () => (await admin.from("roster_slots").select("id", { count: "exact", head: true }).eq("org_id", orgA)).count;
+  const saved = await A.db.rpc("roster_save", { p_org: orgA, p_slots: grid });
+  report(!saved.error && saved.data === 4, "A saves org A's roster (roster_save → 4 slots)", saved.error ? fmt(saved.error) : `returned ${JSON.stringify(saved.data)}`);
+  expectFail("A cannot save org B's roster (roster_save → not_allowed)", await A.db.rpc("roster_save", { p_org: orgB, p_slots: [] }), "not_allowed");
+  expectFail("roster_save rejects a petugas without that role (bilal-only as imam)", await A.db.rpc("roster_save", { p_org: orgA, p_slots: [{ day: 3, waktu: null, role: "imam", petugasId: p2 }] }), "bad_petugas");
+  expectFail("roster_save rejects another masjid's petugas", await A.db.rpc("roster_save", { p_org: orgA, p_slots: [{ day: 3, waktu: null, role: "imam", petugasId: pB }] }), "bad_petugas");
+  expectFail("roster_save rejects a duplicate slot", await A.db.rpc("roster_save", { p_org: orgA, p_slots: [...grid, grid[0]] }), "23505");
+  expectFail("roster_save rejects more than 100 slots", await A.db.rpc("roster_save", { p_org: orgA, p_slots: Array.from({ length: 101 }, (_, i) => ({ day: (i % 7) + 1, waktu: null, role: "imam", petugasId: p1 })) }), "bad_slots");
+  const kept = await slotCount();
+  report(kept === 4, "after the rejected saves org A keeps its previous grid (4 slots, service role)", `${kept} slot(s)`);
+  expectFail("A cannot insert into roster_slots directly", await A.db.from("roster_slots").insert({ org_id: orgA, day_of_week: 3, role: "imam", petugas_id: p1 }).select("id"), "42501");
+  expectFail("anon cannot execute roster_save", await anon.rpc("roster_save", { p_org: orgA, p_slots: [] }), "42501");
+  expectNoRows("B cannot read org A's roster", await B.db.from("roster_slots").select("id").eq("org_id", orgA));
+
+  // Role removal: the imam slots of that petugas go, the bilal slot stays.
+  expectOk("A removes the imam role from the first petugas", await A.db.from("petugas").update({ roles: ["bilal"] }).eq("id", p1).select("id"));
+  const left = ((await admin.from("roster_slots").select("role, day_of_week").eq("petugas_id", p1)).data ?? []) as { role: string; day_of_week: number }[];
+  report(left.length === 1 && left[0].role === "bilal", "removing the imam role deletes that petugas' imam slots (bilal slot kept)", JSON.stringify(left));
+
+  // Bundle ------------------------------------------------------------------------------
+  type RB = { status?: string; version?: number; islamicEvents?: { hijriYear?: number }[]; roster?: { petugas?: { id?: string }[]; slots?: { petugasId?: string }[] } } | null;
+  const bundle = async (since = 0) => (await anon.rpc("screen_bundle", { p_secret: tvSecret, p_since: since })).data as RB;
+  const b1 = await bundle();
+  report(b1?.status === "ok" && Array.isArray(b1.islamicEvents) && Array.isArray(b1.roster?.petugas) && Array.isArray(b1.roster?.slots),
+    "screen_bundle returns islamicEvents and roster", JSON.stringify(b1 ? { status: b1.status, islamicEvents: b1.islamicEvents, roster: b1.roster } : null).slice(0, 200));
+  report(!(b1?.islamicEvents ?? []).some((e) => e.hijriYear === TEST_HIJRI_YEAR), "the test takwim row (year 2100) is outside the bundle window");
+  report((b1?.roster?.petugas ?? []).some((p) => p.id === p2) && (b1?.roster?.slots ?? []).some((x) => x.petugasId === p2), "the bundle lists the active bilal-only petugas and its slot");
+  report(!(b1?.roster?.petugas ?? []).some((p) => p.id === pB), "org B's petugas is not in org A's bundle");
+  expectOk("A deactivates the bilal-only petugas", await A.db.from("petugas").update({ active: false }).eq("id", p2).select("id"));
+  const b2 = await bundle();
+  report(b2?.status === "ok" && !(b2.roster?.petugas ?? []).some((p) => p.id === p2) && !(b2.roster?.slots ?? []).some((x) => x.petugasId === p2),
+    "a deactivated petugas disappears from the bundle (with its slots)", JSON.stringify(b2?.roster ?? b2).slice(0, 200));
+  const un = (await bundle(b2?.version ?? 0)) as Record<string, unknown> | null;
+  report(un?.status === "unchanged" && !("islamicEvents" in (un ?? {})) && !("roster" in (un ?? {})), "the 'unchanged' reply does not include islamicEvents or roster", JSON.stringify(un));
+
+  // Limit: 40 petugas per masjid (2 above + 38 in one insert = 40; the 41st is refused).
+  const fill = await A.db.from("petugas").insert(Array.from({ length: 38 }, (_, i) => ({ org_id: orgA, name: `[RLS] Petugas ${i + 3}`, roles: ["imam"], sort_order: i + 3 }))).select("id");
+  report(!fill.error && (fill.data ?? []).length === 38, "A adds petugas up to 40 in org A", fill.error ? fmt(fill.error) : `${(fill.data ?? []).length} added`);
+  expectFail("the 41st petugas is rejected (petugas_full)", await A.db.from("petugas").insert({ org_id: orgA, name: "[RLS] Petugas 41", roles: ["imam"] }).select("id"), "petugas_full");
 }
 
 // Usage monitoring (migration 0008, _specs/30-PRD-usage.md §10.1). Runs after the screen above

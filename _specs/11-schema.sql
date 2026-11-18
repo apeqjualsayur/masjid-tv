@@ -15,7 +15,12 @@
 -- p_app_version, p_view_mode), which replaces the 3-argument version (needs 0008; run it after this file).
 -- 0011_screen_sound.sql: screens.sound + check (merged in §2), sound in screens_after_change (§4)
 -- and in screen_bundle's 'screen' object (§7 here; 0011 has the same change on the 0010 version).
--- Migrations after this file, in order: 0008, 0009, 0010, 0011 (each is safe to re-run on top of it).
+-- 0012_enhancements.sql (= 62-enhancements-migration.sql, _specs/60-PRD-enhancements.md): 13 template keys +
+-- slides_notice_shape (merged in §2), islamic_events / petugas / roster_slots (§2, §4, §5), roster_save (§6),
+-- bundle_islamic_events() / bundle_roster() and the 'islamicEvents' + 'roster' keys in screen_bundle (§7).
+-- Migrations after this file, in order: 0008, 0009, 0010, 0011 (each is safe to re-run on top of it),
+-- then ONLY §7's screen_bundle from 0012 (0010/0011 replace screen_bundle without the two new keys;
+-- the rest of 0012 is already in this file and would fail if run again).
 -- source of truth for supabase/migrations/0001_init.sql
 -- Run once on a fresh project (SQL editor or `supabase db push`).
 -- =====================================================================
@@ -173,8 +178,9 @@ create table public.slides (
   id           uuid primary key default gen_random_uuid(),
   org_id       uuid not null references public.organisations on delete cascade,
   type         public.slide_type not null,
-  template_key text check (template_key in ('pengumuman','kuliah','kematian','program','infaq',
-                                            'mesyuarat','imam_bilal','kewangan','ayat','ucapan')),
+  template_key text constraint slides_template_key_check check (template_key in (
+                 'pengumuman','kuliah','kematian','program','infaq','mesyuarat','imam_bilal','kewangan',
+                 'ayat','ucapan','penangguhan','hari_kebesaran','jadual_petugas')),   -- last 3: 0012
   fields       jsonb not null default '{}',
   media_id     uuid references public.media on delete restrict,
   status       public.slide_status not null default 'draft',
@@ -193,9 +199,66 @@ create table public.slides (
       or (type = 'template' and template_key is not null)),
   check (ends_at is null or ends_at > starts_at),
   check (template_key is distinct from 'kematian'
-      or (ends_at is not null and ends_at <= starts_at + interval '7 days'))
+      or (ends_at is not null and ends_at <= starts_at + interval '7 days')),
+  -- fields.notice (0012): only on kuliah/program/mesyuarat; kind tangguh|batal; reason <= 100 chars;
+  -- newAt only for tangguh.
+  constraint slides_notice_shape check (
+    not (fields ? 'notice')
+    or (
+      template_key in ('kuliah', 'program', 'mesyuarat')
+      and jsonb_typeof(fields -> 'notice') = 'object'
+      and (fields -> 'notice' ->> 'kind') in ('tangguh', 'batal')
+      and coalesce(char_length(fields -> 'notice' ->> 'reason'), 0) <= 100
+      and (fields -> 'notice' ->> 'kind' = 'tangguh'
+           or coalesce(jsonb_typeof(fields -> 'notice' -> 'newAt'), 'null') = 'null')
+    )
+  )
 );
 create index slides_org_idx on public.slides (org_id, status, sort_order);
+
+-- Islamic events (0012): platform-wide takwim, filled by the platform owner.
+create table public.islamic_events (
+  id          uuid primary key default gen_random_uuid(),
+  event_key   text not null check (event_key in (
+                'awal_muharram','maulidur_rasul','israk_mikraj','nisfu_syaaban','awal_ramadan',
+                'nuzul_quran','aidilfitri','hari_arafah','aidiladha')),
+  hijri_year  int  not null check (hijri_year between 1440 and 1600),
+  greg_date   date not null,
+  status      text not null default 'jangkaan' check (status in ('jangkaan', 'rasmi')),
+  note        text check (char_length(note) <= 120),
+  updated_by  uuid references auth.users on delete set null,
+  updated_at  timestamptz not null default now(),
+  unique (event_key, hijri_year)
+);
+create index islamic_events_date_idx on public.islamic_events (greg_date);
+
+-- Petugas (0012): imam / bilal names per masjid, max 40 (petugas_before_write).
+create table public.petugas (
+  id          uuid primary key default gen_random_uuid(),
+  org_id      uuid not null references public.organisations on delete cascade,
+  name        text not null check (char_length(trim(name)) between 2 and 60),
+  title       text check (char_length(title) <= 20),
+  roles       text[] not null default '{imam}'
+              check (cardinality(roles) between 1 and 2 and roles <@ array['imam','bilal']::text[]),
+  active      boolean not null default true,
+  sort_order  int not null default 0,
+  created_at  timestamptz not null default now(),
+  updated_at  timestamptz not null default now()
+);
+create index petugas_org_idx on public.petugas (org_id, sort_order);
+
+-- Roster slots (0012): day x (all-day | waktu) x role -> petugas. Written only by roster_save().
+create table public.roster_slots (
+  id          uuid primary key default gen_random_uuid(),
+  org_id      uuid not null references public.organisations on delete cascade,
+  day_of_week smallint not null check (day_of_week between 1 and 7),          -- 1 = Isnin … 7 = Ahad
+  waktu       text check (waktu in ('subuh','zohor','asar','maghrib','isyak')),  -- null = sepanjang hari
+  role        text not null check (role in ('imam','bilal')),
+  petugas_id  uuid not null references public.petugas on delete cascade,
+  created_at  timestamptz not null default now()
+);
+create unique index roster_slots_uniq on public.roster_slots (org_id, day_of_week, coalesce(waktu, '*'), role);
+create index roster_slots_petugas_idx on public.roster_slots (petugas_id);
 
 -- ---------------------------------------------------------------------
 -- 3. Helper functions (used by RLS)
@@ -312,6 +375,75 @@ begin
 end $$;
 create trigger slides_before_write before insert or update on public.slides
   for each row execute function public.slides_before_write();
+
+-- islamic_events (0012): stamp the writer; any change reaches every ACTIVE masjid's TVs.
+create or replace function public.islamic_events_before_write()
+returns trigger language plpgsql set search_path = public as $$
+begin
+  new.updated_at := now();
+  new.updated_by := auth.uid();
+  return new;
+end $$;
+create trigger islamic_events_before_write before insert or update on public.islamic_events
+  for each row execute function public.islamic_events_before_write();
+
+create or replace function public.islamic_events_after_change()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  update organisations set bundle_version = bundle_version + 1 where status = 'active';
+  return null;
+end $$;
+create trigger islamic_events_after_change after insert or update or delete on public.islamic_events
+  for each statement execute function public.islamic_events_after_change();
+
+-- petugas (0012): org fixed; max 40 per masjid (locks the org row so two inserts cannot race)
+create trigger petugas_touch before update on public.petugas
+  for each row execute function public.touch_updated_at();
+
+create or replace function public.petugas_before_write()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'UPDATE' and new.org_id <> old.org_id then
+    raise exception 'org_change_not_allowed' using errcode = '42501';
+  end if;
+  if tg_op = 'INSERT' then
+    perform 1 from organisations where id = new.org_id for update;
+    if (select count(*) from petugas where org_id = new.org_id) >= 40 then
+      raise exception 'petugas_full' using errcode = 'P0001';
+    end if;
+  end if;
+  new.name := trim(new.name);
+  new.title := nullif(trim(new.title), '');
+  return new;
+end $$;
+create trigger petugas_before_write before insert or update on public.petugas
+  for each row execute function public.petugas_before_write();
+
+-- roster_slots (0012): a slot must point to a petugas of the same masjid that has this role
+create or replace function public.roster_slots_check()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if not exists (select 1 from petugas p
+                  where p.id = new.petugas_id and p.org_id = new.org_id and new.role = any (p.roles)) then
+    raise exception 'bad_petugas' using errcode = 'P0001';
+  end if;
+  return new;
+end $$;
+create trigger roster_slots_check before insert or update on public.roster_slots
+  for each row execute function public.roster_slots_check();
+
+-- petugas changes (0012): drop slots for a removed role; bump the masjid's bundle
+create or replace function public.petugas_after_change()
+returns trigger language plpgsql security definer set search_path = public as $$
+begin
+  if tg_op = 'UPDATE' then
+    delete from roster_slots where petugas_id = new.id and not (role = any (new.roles));
+  end if;
+  perform public.bump_org_version(coalesce(new.org_id, old.org_id));
+  return null;
+end $$;
+create trigger petugas_after_change after insert or update or delete on public.petugas
+  for each row execute function public.petugas_after_change();
 
 -- members: never leave an org without a pentadbir
 create or replace function public.members_keep_pentadbir()
@@ -431,6 +563,32 @@ create policy slides_update on public.slides for update to authenticated
   with check (public.is_member(org_id) and public.is_active_org(org_id));
 create policy slides_delete on public.slides for delete to authenticated
   using (public.is_member(org_id));
+
+-- islamic_events (0012): every signed-in user reads; platform owners write. anon: nothing.
+alter table public.islamic_events enable row level security;
+create policy ie_select on public.islamic_events for select to authenticated using (true);
+create policy ie_insert on public.islamic_events for insert to authenticated
+  with check (public.is_platform_admin());
+create policy ie_update on public.islamic_events for update to authenticated
+  using (public.is_platform_admin()) with check (public.is_platform_admin());
+create policy ie_delete on public.islamic_events for delete to authenticated
+  using (public.is_platform_admin());
+
+-- petugas + roster_slots (0012)
+alter table public.petugas      enable row level security;
+alter table public.roster_slots enable row level security;
+create policy petugas_select on public.petugas for select to authenticated
+  using (public.is_member(org_id) or public.is_platform_admin());
+create policy petugas_insert on public.petugas for insert to authenticated
+  with check (public.is_pentadbir(org_id) and public.is_active_org(org_id));
+create policy petugas_update on public.petugas for update to authenticated
+  using (public.is_pentadbir(org_id) and public.is_active_org(org_id))
+  with check (public.is_pentadbir(org_id) and public.is_active_org(org_id));
+create policy petugas_delete on public.petugas for delete to authenticated
+  using (public.is_pentadbir(org_id));
+create policy roster_select on public.roster_slots for select to authenticated
+  using (public.is_member(org_id) or public.is_platform_admin());
+-- no insert/update/delete policies on roster_slots: written only by roster_save()
 
 
 -- ---------------------------------------------------------------------
@@ -634,6 +792,29 @@ begin
   delete from invitations where org_id = p_org and accepted_at is null;
 end $$;
 
+-- Roster (0012): replace a masjid's whole grid in one transaction.
+-- p_slots = [{"day":1,"waktu":null,"role":"imam","petugasId":"<uuid>"}, …]  (max 100)
+-- Any bad slot raises, so the delete is rolled back and the previous grid stays.
+create or replace function public.roster_save(p_org uuid, p_slots jsonb)
+returns int language plpgsql security definer set search_path = public as $$
+declare n int;
+begin
+  if auth.uid() is null then raise exception 'not_authenticated' using errcode = '28000'; end if;
+  if not public.is_pentadbir(p_org) or not public.is_active_org(p_org) then
+    raise exception 'not_allowed' using errcode = '42501';
+  end if;
+  if p_slots is null or jsonb_typeof(p_slots) <> 'array' or jsonb_array_length(p_slots) > 100 then
+    raise exception 'bad_slots' using errcode = 'P0001';
+  end if;
+  delete from roster_slots where org_id = p_org;
+  insert into roster_slots (org_id, day_of_week, waktu, role, petugas_id)
+  select p_org, (x ->> 'day')::smallint, nullif(x ->> 'waktu', ''), x ->> 'role', (x ->> 'petugasId')::uuid
+    from jsonb_array_elements(p_slots) x;
+  get diagnostics n = row_count;
+  perform public.bump_org_version(p_org);
+  return n;
+end $$;
+
 -- ---------------------------------------------------------------------
 -- 7. RPC functions — TV pairing & sync (callable by anon)
 -- ---------------------------------------------------------------------
@@ -729,6 +910,33 @@ begin
   return v_screen;
 end $$;
 
+-- Bundle helpers (0012), called from screen_bundle (SECURITY DEFINER). The TV computes countdowns
+-- and the roster from these; takwim window = 40 days back to 400 days ahead (Malaysia date).
+create or replace function public.bundle_islamic_events()
+returns jsonb language sql stable security definer set search_path = public as $$
+  select coalesce(jsonb_agg(jsonb_build_object(
+           'key', e.event_key, 'hijriYear', e.hijri_year, 'date', e.greg_date, 'status', e.status)
+           order by e.greg_date), '[]'::jsonb)
+    from islamic_events e
+   where e.greg_date >= (now() at time zone 'Asia/Kuala_Lumpur')::date - 40
+     and e.greg_date <= (now() at time zone 'Asia/Kuala_Lumpur')::date + 400;
+$$;
+
+create or replace function public.bundle_roster(p_org uuid)
+returns jsonb language sql stable security definer set search_path = public as $$
+  select jsonb_build_object(
+    'petugas', coalesce((
+      select jsonb_agg(jsonb_build_object('id', p.id, 'name', p.name, 'title', p.title, 'roles', to_jsonb(p.roles))
+                       order by p.sort_order, p.name)
+        from petugas p where p.org_id = p_org and p.active), '[]'::jsonb),
+    'slots', coalesce((
+      select jsonb_agg(jsonb_build_object('day', r.day_of_week, 'waktu', r.waktu, 'role', r.role, 'petugasId', r.petugas_id)
+                       order by r.day_of_week, r.waktu nulls first, r.role)
+        from roster_slots r join petugas p on p.id = r.petugas_id and p.active
+       where r.org_id = p_org), '[]'::jsonb));
+$$;
+
+-- Pre-0008 signature; the live version is 0012 §7 (4 args, usage telemetry, same 'ok' keys as here).
 create or replace function public.screen_bundle(p_secret text, p_since bigint default 0, p_app_version text default null)
 returns jsonb language plpgsql security definer set search_path = public, extensions as $$
 declare v_hash text := public.secret_hash(p_secret); s screens; o organisations; st org_settings;
@@ -776,7 +984,9 @@ begin
          and (sl.ends_at is null or sl.ends_at > now())
          and sl.starts_at < now() + interval '7 days'
          and (sl.screen_ids is null or s.id = any (sl.screen_ids))
-    ), '[]'::jsonb)
+    ), '[]'::jsonb),
+    'islamicEvents', public.bundle_islamic_events(),
+    'roster',        public.bundle_roster(o.id)
   );
 end $$;
 
@@ -866,6 +1076,7 @@ grant execute on function public.is_pentadbir(uuid)                     to authe
 grant execute on function public.is_active_org(uuid)                    to authenticated;
 grant execute on function public.send_feedback(uuid, text, text, text)  to authenticated;
 grant execute on function public.platform_feedback(int)                 to authenticated;
+grant execute on function public.roster_save(uuid, jsonb)               to authenticated;
 -- Note: trigger functions run as the table owner context; they need no grants.
 
 -- ---------------------------------------------------------------------

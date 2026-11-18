@@ -9,24 +9,31 @@ import en from "../i18n/en.json";
 import ms from "../i18n/ms.json";
 import { UnknownTemplate } from "./EditorView";
 
-/** The 10 keys from the single source of truth: the template_key check in _specs/11-schema.sql. */
+/** The 13 keys from the single source of truth: the template_key check in _specs/11-schema.sql. */
 function schemaKeys(): string[] {
   const sql = readFileSync(join(process.cwd(), "_specs", "11-schema.sql"), "utf8");
-  const m = /template_key\s+text\s+check\s*\(template_key\s+in\s*\(([^)]*)\)/i.exec(sql);
+  const m = /template_key\s+text\s+(?:constraint\s+\w+\s+)?check\s*\(template_key\s+in\s*\(([^)]*)\)/i.exec(sql);
   if (!m) throw new Error("template_key check not found in 11-schema.sql");
   return [...m[1].matchAll(/'([a-z_]+)'/g)].map((x) => x[1]);
 }
 
+/** Allowed by migration 0012 but not built yet (E3, _specs/61). Remove each key as its template lands. */
+const NOT_BUILT_YET = ["penangguhan", "hari_kebesaran", "jadual_petugas"];
+
 describe("template editor keys (/admin/templat/?key=)", () => {
   const keys = schemaKeys();
+  const built = keys.filter((k) => !NOT_BUILT_YET.includes(k));
 
-  it("the schema lists exactly the 10 keys, and the registry uses the same ids", () => {
-    expect(keys).toEqual(["pengumuman", "kuliah", "kematian", "program", "infaq", "mesyuarat", "imam_bilal", "kewangan", "ayat", "ucapan"]);
-    expect([...TEMPLATE_KEYS]).toEqual(keys);
-    expect(Object.keys(TEMPLATES).sort()).toEqual([...keys].sort());
+  it("the schema lists exactly the 13 keys, and the registry uses the same ids", () => {
+    expect(keys).toEqual([
+      "pengumuman", "kuliah", "kematian", "program", "infaq", "mesyuarat", "imam_bilal", "kewangan", "ayat", "ucapan",
+      "penangguhan", "hari_kebesaran", "jadual_petugas",
+    ]);
+    expect([...TEMPLATE_KEYS]).toEqual(built);
+    expect(Object.keys(TEMPLATES).sort()).toEqual([...built].sort());
   });
 
-  for (const k of schemaKeys()) {
+  for (const k of built) {
     it(`${k}: resolves to a template with a schema, form fields and sample data`, () => {
       const key = resolveTemplateKey(k);
       expect(key).toBe(k);

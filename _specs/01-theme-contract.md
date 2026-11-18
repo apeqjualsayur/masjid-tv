@@ -1,10 +1,12 @@
-# Theme Contract (v0.3 — adds 4 themes, the `poster` layout and iqamah time)
+# Theme Contract (v0.4 — adds templates penangguhan, hari_kebesaran, jadual_petugas, NoticeStamp and template `live` data)
 
 Every theme is a self-contained folder `src/themes/<id>/` that implements the interface below. The engine (time, modes, data, playlist) never contains theme styling; themes never contain prayer logic.
 
 Visual references: `_specs/designs/` (`A-*` = Alam, `D-*` = Serambi, `F-*` = Tenang, `G-*` = Falak, `I-*` = Garis Masa, `J-*` = Kerawang, `K-*` = Seterusnya). The `.dc.html` files are design-tool source (they do not run standalone): read the markup, inline styles and the data in each file's script block; values below are copied from them. **G/I/J/K mockups are 1280×720: every value below is already ×1.5 and raised to the §2 minimums (`40-PRD-themes-round2.md` D4).**
 
 v0.3 changes (2026-10-29): `LayoutKey` `poster`, `WaktuView.iqamah`, `posterArea` incl. `poster`, `screens.unavailable` (already in code), templates `area` prop, rules 14–19, sections 6–9 (Falak, Garis Masa, Kerawang, Seterusnya).
+
+v0.4 changes (2026-11-17, `60-PRD-enhancements.md`): 13 template keys, `TemplateLive`, `NoticeStamp`, rules 21–25, §10 rows.
 
 ---
 
@@ -73,8 +75,19 @@ export interface ThemeDefinition {
     unavailable: React.FC<{ u: UnavailableState }>; // "Data waktu tidak tersedia" (in code since v0.1)
   };
   fridayInfo: React.FC<{ s: DisplayState }>;   // the Friday strip (rule 12); render nothing if !s.friday
-  templates: Record<TemplateKey, React.FC<{ s: DisplayState; fields: any; area: 'bottom' | 'side' | 'poster' }>>; // all 10; `area` (rule 18)
+  templates: Record<TemplateKey, React.FC<{ s: DisplayState; fields: any; area: 'bottom' | 'side' | 'poster'; live?: TemplateLive }>>; // all 13; `area` (rule 18); `live` (rule 21)
   posterFrame: React.FC<{ s: DisplayState; imageUrl: string }>;
+}
+
+/** Computed in src/core from the bundle + clock; themes only render it. */
+export interface TemplateLive {
+  countdown?: { state: 'days' | 'tomorrow' | 'today' | 'minutes' | 'ongoing'; text: string; strong?: string }; // "Lagi 3 hari" / strong "3"; minutes: strong "42:15"
+  notice?: { kind: 'tangguh' | 'batal'; originalText: string; newText: string | null; reason: string | null };
+  islamicEvents?: { mode: 'greeting' | 'malamIni' | 'ramadan' | 'countdown'; title: string; big?: string; sub?: string;
+                    hijri?: string; gregorian?: string; jangkaan: boolean; more: { label: string; days: string; jangkaan: boolean }[] };
+  roster?: { view: 'minggu' | 'hari_ini'; title: string;
+             rows: { label: string; imam: string; bilal: string; today?: boolean; perWaktu?: boolean }[]; // "—" when empty
+             tomorrow?: string };                                                                   // hari_ini: "Esok: Imam … · Bilal …"
 }
 ```
 
@@ -106,6 +119,11 @@ export interface ThemeDefinition {
 18. Every template renders correctly in **all three** areas (12:5, 5:4, 16:9) and in the admin live preview. Layout adapts to `area`; text never clips; minimum sizes unchanged.
 19. **Unknown theme or layout** (e.g. an older TV app receiving a newer id) falls back to `tenang` / `full`: never a crash or a blank screen (PRD round 2 D7).
 20. **Ticker in every theme** (owner decision 2026-10-29): the `full` layout shows `s.ticker` whenever it has text, at least 26 px, labelled "PENGUMUMAN" or in a band of its own. Scrolling or one item at a time (`shared/ticker.ts`: every 12 s); `lite` = one item at a time, no animation. Make room for it (shrink the list or clock), never cover prayer times. Never in the `poster` layout (rule 15).
+21. **`live` data.** Templates never compute dates, countdowns, Hijri events or roster resolution; they render `live` as given. Missing `live` (admin preview without data, old cached bundle) renders the template without that part, never an error.
+22. **NoticeStamp** (`src/themes/shared/notice-stamp.tsx`) is the only way a notice is drawn. kuliah, program, mesyuarat render it when `live.notice` is set; `penangguhan` always does. Stamp word **DITANGGUHKAN** (amber family) / **DIBATALKAN** (red family), uppercase, ≥ 48 px at 12:5; original date/time struck through; new date emphasised or "Tarikh baru akan dimaklumkan"; reason line. The stamp draws its own opaque plate so contrast is WCAG AA on every theme surface; the theme passes only `{ink, muted, surface, tone, fontFamily, radius}`. `lite`: no shadow, blur or rotation effects. Kematian never.
+23. **Countdown line** (kuliah, program, mesyuarat): one line under the date/time, `live.countdown.text` with `strong` in weight ≥ 700; mm:ss uses tabular numerals. Hidden when `live.countdown` is unset. No animation besides the digits changing. With a prayer-relative time ("Selepas Maghrib") core only produces `days` / `tomorrow` / `today` (text e.g. "Hari ini · Selepas Maghrib"), never `minutes` or `ongoing` (PRD enhancements §4.2).
+24. **`hari_kebesaran`**: greeting → large centred greeting; countdown → big number (`big`) ≥ 160 px at 16:9 / ≥ 120 px at 12:5, "hari lagi", event name, Hijri + Gregorian date; up to 2 `more` rows ≥ 24 px. "jangkaan" is a small label (≥ 18 px) next to the date. Arabic only if shown, with rule 8.
+25. **`jadual_petugas`**: `minggu` = 7 rows Hari | Imam | Bilal, today's row = different fill *and* weight (as rule 2), "+ ikut waktu" marker ≥ 18 px; `hari_ini` = 5 rows (Zohor shows "Jumaat" on Friday) + the "Esok" line. Names shrink to fit down to 18 px, then ellipsis. Must fit 12:5 without scrolling.
 
 Round-2 themes follow rules 2, 3, 6, 7, 8, 12 and 13 exactly as written above; there is no exception for any of them. Their Arabic text (e.g. the `ayat` template) uses **Noto Naskh Arabic** 400–600 (already self-hosted).
 
@@ -333,3 +351,6 @@ In all four themes below, **Bottom** = poster area **1824×760 at 48,24** (rule 
 | pengumuman | F-Bottom |
 | kewangan | F-Side; also G/I/J/K-Side |
 | kematian, infaq, imam_bilal, mesyuarat, ucapan | No reference in launch themes yet: design within each theme's tokens following §2 rules (sober Kematian) |
+| penangguhan | No reference: NoticeStamp on the theme's template card (rule 22) |
+| hari_kebesaran | No reference: design within tokens (rule 24); not a festive style, calm like `ucapan` |
+| jadual_petugas | No reference: table like `kewangan` / old `imam_bilal` (rule 25) |

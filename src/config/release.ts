@@ -4,9 +4,13 @@
 // notice shows again), and update `update.whatsNew` in the admin i18n files.
 
 export const RELEASE = {
-  id: "2026-11-08-sound",
-  /** TVs built before this need an update: sound cues + D11 (_specs/50-PRD-sound.md), live 17:21. */
-  minTvBuild: "2026-11-08 17:21",
+  id: "2026-11-20-notices",
+  /**
+   * TVs built before this need an update: activity notices (Tangguh / Batal stamp), countdowns and the
+   * Penangguhan template (PRD enhancements D12: an old app would show a cancelled kuliah as a normal
+   * priority slide). Previous: 2026-11-08 17:21, sound cues.
+   */
+  minTvBuild: "2026-11-20 10:00",
 } as const;
 
 /**

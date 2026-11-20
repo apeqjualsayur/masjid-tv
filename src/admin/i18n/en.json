@@ -999,7 +999,7 @@
   },
   "update": {
     "title": "Update available",
-    "whatsNew": "New: sound on the TV at azan and iqamah. Switch it on in Screens → Manage screen → Sound, then press OK on the TV remote once.",
+    "whatsNew": "New: Postpone / Cancel notices for kuliah, programmes and meetings (Content → ⋯), and a countdown on those slides. Update every TV so notices show correctly.",
     "adminOutdated": "This page is an older version.",
     "reload": "Reload",
     "screensBehind": "{n} screen(s) not updated yet:",

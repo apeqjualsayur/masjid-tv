@@ -17,3 +17,4 @@ export * from "./islamic-events";
 export * from "./roster";
 export * from "./slide-empty";
 export * from "./template-live";
+export * from "./monogram";

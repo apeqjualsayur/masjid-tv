@@ -1,5 +1,6 @@
 "use client";
 import type { DisplayState } from "@/core";
+import { monogram } from "@/core";
 import { createContext, useContext, useState, type CSSProperties, type ReactNode } from "react";
 import { FONT, FONT_AR, TOKENS, type TenangTokens } from "./tokens";
 
@@ -49,7 +50,7 @@ export function Logo({ masjid, size, color }: { masjid: DisplayState["masjid"]; 
         flex: "none",
       }}
     >
-      {masjid.shortName}
+      {monogram(masjid.shortName, masjid.fullName)}
     </div>
   );
 }

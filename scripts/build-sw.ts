@@ -12,7 +12,8 @@ const SKIP = new Set(["sw.js", "_headers", "_redirects", "version.json", "sounds
 // The Android TV app download (apk/, published by .github/workflows/android-tv.yml): never precached
 // (a TV must not download a 2 MB APK it never uses) and not in the version hash (a new APK must not
 // make every TV update its service worker).
-const SKIP_DIRS = ["apk/"];
+// email/: pictures for announcement e-mails (linked from the e-mail, never used by a TV).
+const SKIP_DIRS = ["apk/", "email/"];
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {

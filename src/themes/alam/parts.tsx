@@ -1,5 +1,6 @@
 "use client";
 import type { DisplayState, WaktuKey, WaktuView } from "@/core";
+import { monogram } from "@/core";
 import { createContext, useContext, useState, type CSSProperties, type ReactNode } from "react";
 import { A, FONT, FONT_AR, glass } from "./tokens";
 
@@ -44,7 +45,7 @@ export function Logo({ masjid, size, lite }: { masjid: DisplayState["masjid"]; s
       </div>
     );
   }
-  return <div style={{ ...disc, fontSize: Math.round(size * 0.36), fontWeight: 800, color: A.green }}>{masjid.shortName}</div>;
+  return <div style={{ ...disc, fontSize: Math.round(size * 0.36), fontWeight: 800, color: A.green }}>{monogram(masjid.shortName, masjid.fullName)}</div>;
 }
 
 /** Line icons for each waktu (from designs/A-Full). */

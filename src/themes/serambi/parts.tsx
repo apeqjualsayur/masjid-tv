@@ -1,5 +1,6 @@
 "use client";
 import type { DisplayState, WaktuView } from "@/core";
+import { monogram } from "@/core";
 import { createContext, useContext, useState, type CSSProperties, type ReactNode } from "react";
 import { C, F, RING_NEXT, SKY, archRadius, ringCurrent } from "./tokens";
 
@@ -55,7 +56,7 @@ export function Logo({ masjid, size }: { masjid: DisplayState["masjid"]; size: n
         color: C.gold,
       }}
     >
-      {masjid.shortName}
+      {monogram(masjid.shortName, masjid.fullName)}
     </div>
   );
 }

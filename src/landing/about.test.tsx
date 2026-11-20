@@ -53,16 +53,23 @@ describe.each(["ms", "en"] as const)("%s about page", (lang) => {
     const footer = html.slice(html.indexOf("<footer"));
     expect(footer).toContain(`href="${lang === "en" ? "/en/tentang/" : "/tentang/"}"`);
     expect(footer).toContain(`>${copy(lang).footer.helpAbout}<`);
-    expect(html).not.toContain("facebook.com");
-    const before = site.youtubeUrl;
-    site.youtubeUrl = "https://www.youtube.com/@masjidview";
+    const before = { fb: site.facebookUrl, yt: site.youtubeUrl };
     try {
+      site.facebookUrl = "";
+      site.youtubeUrl = "";
+      const none = await about(lang);
+      expect(none).not.toContain("facebook.com");
+      expect(none).not.toContain("youtube.com");
+      site.youtubeUrl = "https://www.youtube.com/@example";
       const withYt = await about(lang);
-      expect(withYt.match(/href="https:\/\/www\.youtube\.com\/@masjidview"/g)?.length).toBe(2); // contact + footer
+      expect(withYt.match(/href="https:\/\/www\.youtube\.com\/@example"/g)?.length).toBe(2); // contact + footer
       expect(withYt).not.toContain("facebook.com");
     } finally {
-      site.youtubeUrl = before;
+      site.facebookUrl = before.fb;
+      site.youtubeUrl = before.yt;
     }
+    // The real Facebook page (site.ts) shows on the About page and in the footer.
+    if (site.facebookUrl) expect(html.split(`href="${site.facebookUrl}"`).length - 1).toBe(2);
   });
 
   it("JSON-LD: Organization, WebSite, AboutPage, BreadcrumbList (Utama/Home → Tentang)", () => {

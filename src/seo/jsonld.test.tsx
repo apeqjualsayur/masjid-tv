@@ -31,14 +31,22 @@ describe("builders", () => {
   });
 
   it("Organization.sameAs only lists the profiles that are set", () => {
-    expect((graph([organization()])["@graph"] as N[])[0]).not.toHaveProperty("sameAs");
-    const before = site.facebookUrl;
-    site.facebookUrl = "https://www.facebook.com/masjidview";
+    const before = { fb: site.facebookUrl, yt: site.youtubeUrl };
     try {
-      expect((graph([organization()])["@graph"] as N[])[0].sameAs).toEqual(["https://www.facebook.com/masjidview"]);
+      site.facebookUrl = "";
+      site.youtubeUrl = "";
+      expect((graph([organization()])["@graph"] as N[])[0]).not.toHaveProperty("sameAs");
+      site.facebookUrl = "https://www.facebook.com/example/";
+      expect((graph([organization()])["@graph"] as N[])[0].sameAs).toEqual(["https://www.facebook.com/example/"]);
     } finally {
-      site.facebookUrl = before;
+      site.facebookUrl = before.fb;
+      site.youtubeUrl = before.yt;
     }
+  });
+
+  it("the live site lists the Facebook page in sameAs", () => {
+    expect(site.facebookUrl.startsWith("https://www.facebook.com/")).toBe(true);
+    expect((graph([organization()])["@graph"] as N[])[0].sameAs).toContain(site.facebookUrl);
   });
 
   it("WebSite per language, published by the Organization", () => {

@@ -29,6 +29,8 @@ export const PAGES: readonly SeoPage[] = [
   { path: "/en/", lang: "en", pair: "/", titleKey: "meta.title", descriptionKey: "meta.description", updated: LANDING_UPDATED, type: "home" },
   { path: "/panduan/", lang: "ms", pair: "/en/panduan/", titleKey: "panduan.meta.title", descriptionKey: "panduan.meta.description", updated: LANDING_UPDATED, type: "guide" },
   { path: "/en/panduan/", lang: "en", pair: "/panduan/", titleKey: "panduan.meta.title", descriptionKey: "panduan.meta.description", updated: LANDING_UPDATED, type: "guide" },
+  { path: "/tentang/", lang: "ms", pair: "/en/tentang/", titleKey: "tentang.meta.title", descriptionKey: "tentang.meta.description", updated: LANDING_UPDATED, type: "about" },
+  { path: "/en/tentang/", lang: "en", pair: "/tentang/", titleKey: "tentang.meta.title", descriptionKey: "tentang.meta.description", updated: LANDING_UPDATED, type: "about" },
   { path: "/privasi/", lang: "ms", pair: "/en/privasi/", titleKey: "privasi.meta.title", descriptionKey: "privasi.meta.description", updated: PRIVACY_UPDATED, type: "legal" },
   { path: "/en/privasi/", lang: "en", pair: "/privasi/", titleKey: "privasi.meta.title", descriptionKey: "privasi.meta.description", updated: PRIVACY_UPDATED, type: "legal" },
 ];

@@ -481,7 +481,8 @@
     "contact": "Contact",
     "whatsapp": "WhatsApp",
     "support": "Support Masjid View",
-    "jakim": "Prayer times based on JAKIM e-Solat data."
+    "jakim": "Prayer times based on JAKIM e-Solat data.",
+    "helpAbout": "About"
   },
   "panduan": {
     "meta": {
@@ -653,6 +654,49 @@
     },
     "help": "Still stuck? E-mail us at",
     "back": "← Back to the home page"
+  },
+  "tentang": {
+    "meta": {
+      "title": "About Masjid View · Masjid View",
+      "description": "Masjid View is an independent, free project from Kuala Lumpur for masjid and surau prayer-time screens. Who we are, our data sources and how to reach us."
+    },
+    "title": "About Masjid View",
+    "intro": "Masjid View is a free prayer-time and announcement display for masjids and suraus in Malaysia. It turns an existing TV into the masjid’s notice board: prayer times, iqamah countdowns, AJK announcements, the imam and bilal roster and Islamic occasions, all managed from a phone. It works in a web browser or with the Android TV app.",
+    "sections": [
+      {
+        "id": "kenapa",
+        "heading": "Why Masjid View exists",
+        "body": "Many masjids and suraus already have a TV in the prayer hall that is rarely used, while paper notices tear and WhatsApp posters never reach every congregant. Masjid View was built so that every masjid and surau, large or small, can show accurate information without buying special hardware. It is free for all, with no registration fee or subscription."
+      },
+      {
+        "id": "siapa",
+        "heading": "Who builds it",
+        "body": "Masjid View is an independent, non-commercial project from Kuala Lumpur. Its builder has chosen not to be named and goes by Hamba Allah. New features are built from the feedback AJK members send through the Masjid View panel, and every update reaches the masjid TVs automatically."
+      },
+      {
+        "id": "biaya",
+        "heading": "How it is funded",
+        "body": "Server and development costs are paid by the builder. There are no ads, no fees, and masjid data is never sold to anyone."
+      },
+      {
+        "id": "waktu",
+        "heading": "Where prayer times come from",
+        "body": "Prayer times are based on JAKIM e-Solat data for your masjid’s zone, and are stored on the TV so the screen keeps working without internet. Islamic occasion dates are kept up to date by Masjid View; Ramadan and Syawal dates are expected until officially announced. Masjid View is an independent project, not an official government service."
+      },
+      {
+        "id": "privasi",
+        "heading": "Privacy",
+        "body": "We keep only the information needed to run your masjid’s display, and death notices are deleted automatically. Read the Privacy Notice for details."
+      }
+    ],
+    "contact": {
+      "heading": "Contact us",
+      "before": "Questions or suggestions? E-mail us at",
+      "after": ", or use Feedback in the AJK panel.",
+      "social": "Follow us:"
+    },
+    "facebook": "Facebook",
+    "youtube": "YouTube"
   },
   "privasi": {
     "meta": {

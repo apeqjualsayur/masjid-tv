@@ -1,9 +1,10 @@
 // Landing footer (PRD §4 row 16): white lockup, tagline, Produk / Bantuan / Hubungi, credit line.
 // Contact rows come from site.ts; an empty value hides its row (no placeholders).
 import type { ReactNode } from "react";
-import { copy, sectionHref, type Lang, type Page } from "./i18n";
+import { copy, pageHref, sectionHref, type Lang, type Page } from "./i18n";
 import { privacyHref } from "./PrivacyNotice";
 import { site } from "./site";
+import { SocialLinks } from "./social";
 
 export const DEMO_HREF = "/tv/?demo=1";
 export const guideHref = (lang: Lang) => (lang === "en" ? "/en/panduan/" : "/panduan/");
@@ -30,6 +31,7 @@ export function Footer({ lang, page = "home" }: { lang: Lang; page?: Page }) {
         <div className="flex flex-col gap-3">
           <img src="/brand/mv-lockup-white.svg" alt="Masjid View" width={141} height={32} className="h-8 w-auto self-start" />
           <p className="leading-[1.6]">{f.tagline}</p>
+          <SocialLinks lang={lang} className="flex flex-wrap gap-4" linkClass={`inline-flex min-h-11 items-center gap-2 ${link}`} />
         </div>
         <Column title={f.product}>
           <li><a className={link} href={sectionHref(lang, page, "ciri")}>{f.productFeatures}</a></li>
@@ -44,6 +46,7 @@ export function Footer({ lang, page = "home" }: { lang: Lang; page?: Page }) {
         <Column title={f.help}>
           <li><a className={link} href={guideHref(lang)}>{f.helpGuide}</a></li>
           <li><a className={link} href={sectionHref(lang, page, "soalan")}>{f.helpFaq}</a></li>
+          <li><a className={link} href={pageHref(lang, "tentang")}>{f.helpAbout}</a></li>
           <li><a className={link} href={privacyHref(lang)}>{f.helpPrivacy}</a></li>
           {site.supportUrl && (
             <li><a className={link} href={site.supportUrl} rel="noopener">{f.support}</a></li>

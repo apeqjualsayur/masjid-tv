@@ -481,7 +481,8 @@
     "contact": "Hubungi",
     "whatsapp": "WhatsApp",
     "support": "Sokong Masjid View",
-    "jakim": "Waktu solat berdasarkan data e-Solat JAKIM."
+    "jakim": "Waktu solat berdasarkan data e-Solat JAKIM.",
+    "helpAbout": "Tentang"
   },
   "panduan": {
     "meta": {
@@ -653,6 +654,49 @@
     },
     "help": "Masih tidak berjaya? E-mel kami di",
     "back": "← Kembali ke halaman utama"
+  },
+  "tentang": {
+    "meta": {
+      "title": "Tentang Masjid View · Masjid View",
+      "description": "Masjid View ialah projek bebas dan percuma dari Kuala Lumpur untuk skrin waktu solat masjid dan surau. Kenali kami, sumber data kami dan cara menghubungi."
+    },
+    "title": "Tentang Masjid View",
+    "intro": "Masjid View ialah sistem paparan waktu solat dan pengumuman percuma untuk masjid dan surau di Malaysia. Ia menjadikan TV sedia ada sebagai papan maklumat masjid: waktu solat, kiraan iqamah, pengumuman AJK, jadual imam dan bilal serta hari kebesaran Islam, semuanya diurus dari telefon. Ia berfungsi melalui pelayar web atau aplikasi Android TV.",
+    "sections": [
+      {
+        "id": "kenapa",
+        "heading": "Kenapa Masjid View wujud",
+        "body": "Banyak masjid dan surau sudah ada TV di dewan solat, tetapi jarang digunakan, manakala notis kertas mudah koyak dan poster WhatsApp tidak sampai kepada semua jemaah. Masjid View dibina supaya setiap masjid dan surau, besar atau kecil, boleh memaparkan maklumat yang tepat tanpa membeli perkakasan khas. Ia percuma untuk semua, tanpa yuran pendaftaran atau langganan."
+      },
+      {
+        "id": "siapa",
+        "heading": "Siapa yang membinanya",
+        "body": "Masjid View ialah projek bebas dan bukan komersial dari Kuala Lumpur. Pembangunnya memilih untuk tidak dinamakan dan menggunakan nama Hamba Allah. Ciri baharu dibina berdasarkan maklum balas yang dihantar oleh AJK melalui panel Masjid View, dan setiap kemas kini sampai ke TV masjid secara automatik."
+      },
+      {
+        "id": "biaya",
+        "heading": "Bagaimana ia dibiayai",
+        "body": "Kos pelayan dan pembangunan ditanggung sendiri oleh pembangun. Tiada iklan, tiada yuran, dan data masjid tidak dijual kepada sesiapa."
+      },
+      {
+        "id": "waktu",
+        "heading": "Dari mana waktu solat",
+        "body": "Waktu solat diambil berdasarkan data e-Solat JAKIM mengikut zon masjid anda, dan disimpan dalam TV supaya skrin terus berfungsi tanpa internet. Tarikh hari kebesaran Islam dikemas kini oleh Masjid View; tarikh Ramadan dan Syawal ialah jangkaan sehingga diumumkan secara rasmi. Masjid View ialah projek bebas, bukan perkhidmatan rasmi kerajaan."
+      },
+      {
+        "id": "privasi",
+        "heading": "Privasi",
+        "body": "Kami hanya menyimpan maklumat yang perlu untuk menguruskan paparan masjid anda, dan pengumuman kematian dipadam secara automatik. Baca Notis Privasi untuk butiran."
+      }
+    ],
+    "contact": {
+      "heading": "Hubungi kami",
+      "before": "Ada soalan atau cadangan? E-mel kami di",
+      "after": ", atau gunakan Maklum balas dalam panel AJK.",
+      "social": "Ikuti kami:"
+    },
+    "facebook": "Facebook",
+    "youtube": "YouTube"
   },
   "privasi": {
     "meta": {

@@ -89,8 +89,16 @@ jobs:
           aab=android-tv/app/build/outputs/bundle/playRelease/app-play-release.aab
           if [[ ! -f "$apk" ]]; then echo "::error::No signed APK (only an unsigned one?): check the 4 secrets"; ls -R android-tv/app/build/outputs; exit 1; fi
           bt=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
-          "$bt/apksigner" verify --print-certs "$apk" | grep -E 'Signer #1 certificate (DN|SHA-256 digest)'
-          jarsigner -verify "$aab" | grep -q "jar verified" || { echo "::error::The Play bundle is not signed"; exit 1; }
+          echo "apksigner from $bt"
+          # Keep the tool's whole output (stdout + stderr) so a failure says why.
+          if ! out=$("$bt/apksigner" verify --verbose --print-certs "$apk" 2>&1); then
+            printf '%s\n' "$out"; echo "::error::apksigner could not verify the APK"; exit 1
+          fi
+          if ! printf '%s\n' "$out" | grep -E 'Signer #1 certificate (DN|SHA-256 digest)'; then
+            printf '%s\n' "$out"; echo "::error::apksigner found no signer in the APK"; exit 1
+          fi
+          jv=$(jarsigner -verify "$aab" 2>&1) || true
+          printf '%s\n' "$jv" | grep -q "jar verified" || { printf '%s\n' "$jv"; echo "::error::The Play bundle is not signed"; exit 1; }
           rm -f "$RUNNER_TEMP/upload.jks"
 
       - name: Files, checksum and size

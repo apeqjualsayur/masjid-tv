@@ -14,7 +14,7 @@ import { OrgAvatar } from "./OrgAvatar";
 import { UpdateNotice } from "../update/UpdateNotice";
 
 export interface NavItem {
-  key: "home" | "content" | "screens" | "settings" | "members" | "feedback" | "platform";
+  key: "home" | "content" | "petugas" | "screens" | "settings" | "members" | "feedback" | "platform";
   route: AdminRoute;
   icon: string;
   /** shown in the phone bottom nav */
@@ -30,6 +30,7 @@ export function navItems(role: Membership["role"] | null, isPlatformAdmin: boole
   if (role) {
     items.push({ key: "home", route: ROUTES.home, icon: ICON.home, phone: true });
     items.push({ key: "content", route: ROUTES.content, icon: ICON.content, phone: true });
+    items.push({ key: "petugas", route: ROUTES.petugas, icon: ICON.petugas, phone: true });
     items.push({ key: "screens", route: ROUTES.screens, icon: ICON.screens, phone: true });
     items.push({ key: "settings", route: ROUTES.settings, icon: ICON.settings, phone: true });
     items.push({ key: "members", route: ROUTES.members, icon: ICON.members, phone: false });

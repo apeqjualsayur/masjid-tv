@@ -16,6 +16,8 @@ export const ICON = {
   feedback: "M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.5A8 8 0 1 1 21 12Z M8.5 12h.01 M12 12h.01 M15.5 12h.01",
   user: "M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8Z M4 21a8 8 0 0 1 16 0",
   check: "M5 12l5 5 9-10",
+  /** Petugas: a person with a calendar grid */
+  petugas: "M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z M2 20a6 6 0 0 1 9.5-4.9 M14 11h8v10h-8z M14 14.5h8 M17.5 11v10",
 } as const;
 
 export function Icon({ d, size = 24, strokeWidth = 2, className }: { d: string; size?: number; strokeWidth?: number; className?: string }) {

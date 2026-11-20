@@ -34,7 +34,8 @@
     "settings": "Settings",
     "members": "Members",
     "platform": "Platform",
-    "feedback": "Feedback"
+    "feedback": "Feedback",
+    "petugas": "Duty roster"
   },
   "account": {
     "menu": "Account",
@@ -1166,6 +1167,104 @@
       "load": "The slide could not be loaded: {message}",
       "save": "The notice could not be saved: {message}",
       "db": "The notice was rejected. Check the reason (100 characters at most) and try again."
+    }
+  },
+  "petugas": {
+    "title": "Duty roster",
+    "intro": "The masjid's imams and bilals, and their weekly roster. The roster is shown on the TV with the Imam & Bilal roster slide. Names only; do not enter phone numbers.",
+    "tab": {
+      "senarai": "People",
+      "jadual": "Roster"
+    },
+    "loadError": "Could not load: {message}",
+    "add": "+ Add person",
+    "addTitle": "Add person",
+    "editTitle": "Edit person",
+    "addButton": "Add",
+    "save": "Save",
+    "count": "{n} / {max} people",
+    "empty": "No one yet. Add the masjid's imams and bilals to build the roster.",
+    "dragHint": "Drag to reorder",
+    "drag": "Drag to reorder",
+    "moveUp": "Move {name} up",
+    "moveDown": "Move {name} down",
+    "reordered": "Order saved.",
+    "name": "Name",
+    "titleLabel": "Title (optional)",
+    "roles": "Roles",
+    "role": {
+      "imam": "Imam",
+      "bilal": "Bilal"
+    },
+    "active": "Active (shown in the roster)",
+    "activeOf": "{name} active",
+    "inactive": "Inactive",
+    "inactiveOption": "{name} (inactive)",
+    "activated": "{name} activated.",
+    "deactivated": "{name} deactivated: no longer shown on the TV.",
+    "roleRemoved": "The roster for this role will be cleared ({role}).",
+    "added": "{name} added.",
+    "saved": "{name} saved.",
+    "delete": "Delete",
+    "deleteTitle": "Delete {name}?",
+    "deleteBody": "This person will be removed. Their places in the roster will be cleared.",
+    "deleted": "{name} deleted.",
+    "needPetugas": "Add at least one imam or bilal first, then build the roster here.",
+    "goList": "Go to People",
+    "day": {
+      "1": "Monday",
+      "2": "Tuesday",
+      "3": "Wednesday",
+      "4": "Thursday",
+      "5": "Friday",
+      "6": "Saturday",
+      "7": "Sunday"
+    },
+    "waktu": {
+      "subuh": "Subuh",
+      "zohor": "Zohor",
+      "zohorJumaat": "Zohor / Jumaat",
+      "asar": "Asar",
+      "maghrib": "Maghrib",
+      "isyak": "Isyak"
+    },
+    "col": {
+      "day": "Day",
+      "actions": "Actions"
+    },
+    "byWaktu": "+ by prayer",
+    "setByWaktu": "Set by prayer time",
+    "waktuHint": "Blank = follows the whole-day person.",
+    "followsDay": "Follows the day",
+    "copyAll": "Copy to every day",
+    "copyWeekdays": "Copy to weekdays (Mon–Fri)",
+    "clearDay": "Clear day",
+    "unsaved": "Unsaved changes.",
+    "savedState": "All changes saved.",
+    "undo": "Undo changes",
+    "saveRoster": "Save roster",
+    "rosterSaved": "Roster saved. TVs update within about a minute.",
+    "unsavedTitle": "Leave without saving?",
+    "unsavedBody": "Your roster changes are not saved and will be lost.",
+    "stay": "Stay here",
+    "discard": "Discard changes",
+    "ctaText": "The roster is ready. Show it on the TV with the Imam & Bilal roster slide.",
+    "cta": "Show on TV",
+    "err": {
+      "name": {
+        "required": "Enter a name.",
+        "length": "The name must be 2 to 60 characters."
+      },
+      "title": "Title at most {max} characters.",
+      "roles": "Choose at least one role.",
+      "full": "The 40-person limit is reached. Delete someone or reuse an inactive person.",
+      "badPetugas": "Someone in the roster no longer has that role. Reload the page and choose again.",
+      "badSlots": "The roster is not valid. Reload the page and try again.",
+      "notAllowed": "You are not allowed to do that (the masjid must be active).",
+      "duplicate": "The roster has a repeated slot. Reload the page and try again.",
+      "invalid": "Invalid details. Check the name, title and roles.",
+      "network": "No internet connection. Try again.",
+      "generic": "Did not work: {message}"
     }
   }
 }

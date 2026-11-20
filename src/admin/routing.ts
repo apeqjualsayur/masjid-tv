@@ -29,6 +29,7 @@ export const ROUTES = {
   picker: "/admin/baru/",
   template: "/admin/templat/",
   poster: "/admin/poster/",
+  petugas: "/admin/petugas/",
   screens: "/admin/skrin/",
   settings: "/admin/tetapan/",
   members: "/admin/ahli/",

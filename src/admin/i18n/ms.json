@@ -34,7 +34,8 @@
     "settings": "Tetapan",
     "members": "Ahli",
     "platform": "Platform",
-    "feedback": "Maklum balas"
+    "feedback": "Maklum balas",
+    "petugas": "Petugas"
   },
   "account": {
     "menu": "Akaun",
@@ -1166,6 +1167,104 @@
       "load": "Slaid tidak dapat dimuatkan: {message}",
       "save": "Notis tidak dapat disimpan: {message}",
       "db": "Notis ditolak. Semak sebab (maksimum 100 aksara) dan cuba lagi."
+    }
+  },
+  "petugas": {
+    "title": "Petugas",
+    "intro": "Senarai imam dan bilal masjid, dan jadual mingguan mereka. Jadual dipaparkan di TV melalui slaid Jadual Imam & Bilal. Nama sahaja; jangan masukkan nombor telefon.",
+    "tab": {
+      "senarai": "Senarai",
+      "jadual": "Jadual"
+    },
+    "loadError": "Tidak dapat dimuatkan: {message}",
+    "add": "+ Tambah petugas",
+    "addTitle": "Tambah petugas",
+    "editTitle": "Ubah petugas",
+    "addButton": "Tambah",
+    "save": "Simpan",
+    "count": "{n} / {max} petugas",
+    "empty": "Belum ada petugas. Tambah imam dan bilal masjid untuk menyusun jadual.",
+    "dragHint": "Seret untuk menyusun semula",
+    "drag": "Seret untuk menyusun semula",
+    "moveUp": "Naikkan {name}",
+    "moveDown": "Turunkan {name}",
+    "reordered": "Susunan disimpan.",
+    "name": "Nama",
+    "titleLabel": "Gelaran (pilihan)",
+    "roles": "Peranan",
+    "role": {
+      "imam": "Imam",
+      "bilal": "Bilal"
+    },
+    "active": "Aktif (dipaparkan dalam jadual)",
+    "activeOf": "{name} aktif",
+    "inactive": "Tidak aktif",
+    "inactiveOption": "{name} (tidak aktif)",
+    "activated": "{name} diaktifkan.",
+    "deactivated": "{name} dinyahaktifkan: tidak lagi dipaparkan di TV.",
+    "roleRemoved": "Jadual untuk peranan ini akan dikosongkan ({role}).",
+    "added": "{name} ditambah.",
+    "saved": "{name} disimpan.",
+    "delete": "Padam",
+    "deleteTitle": "Padam {name}?",
+    "deleteBody": "Petugas ini akan dibuang. Tempatnya dalam jadual akan dikosongkan.",
+    "deleted": "{name} dipadam.",
+    "needPetugas": "Tambah sekurang-kurangnya seorang imam atau bilal dahulu, kemudian susun jadual di sini.",
+    "goList": "Pergi ke Senarai",
+    "day": {
+      "1": "Isnin",
+      "2": "Selasa",
+      "3": "Rabu",
+      "4": "Khamis",
+      "5": "Jumaat",
+      "6": "Sabtu",
+      "7": "Ahad"
+    },
+    "waktu": {
+      "subuh": "Subuh",
+      "zohor": "Zohor",
+      "zohorJumaat": "Zohor / Jumaat",
+      "asar": "Asar",
+      "maghrib": "Maghrib",
+      "isyak": "Isyak"
+    },
+    "col": {
+      "day": "Hari",
+      "actions": "Tindakan"
+    },
+    "byWaktu": "+ ikut waktu",
+    "setByWaktu": "Tetapkan ikut waktu",
+    "waktuHint": "Kosong = ikut petugas sepanjang hari.",
+    "followsDay": "Ikut hari",
+    "copyAll": "Salin ke semua hari",
+    "copyWeekdays": "Salin ke hari bekerja (Isnin–Jumaat)",
+    "clearDay": "Kosongkan hari",
+    "unsaved": "Ada perubahan belum disimpan.",
+    "savedState": "Semua perubahan disimpan.",
+    "undo": "Batal perubahan",
+    "saveRoster": "Simpan jadual",
+    "rosterSaved": "Jadual disimpan. TV dikemas kini dalam masa kira-kira 1 minit.",
+    "unsavedTitle": "Tinggalkan tanpa menyimpan?",
+    "unsavedBody": "Perubahan pada jadual belum disimpan dan akan hilang.",
+    "stay": "Kekal di sini",
+    "discard": "Buang perubahan",
+    "ctaText": "Jadual sudah sedia. Paparkannya di TV dengan slaid Jadual Imam & Bilal.",
+    "cta": "Papar di TV",
+    "err": {
+      "name": {
+        "required": "Masukkan nama.",
+        "length": "Nama mesti 2 hingga 60 aksara."
+      },
+      "title": "Gelaran maksimum {max} aksara.",
+      "roles": "Pilih sekurang-kurangnya satu peranan.",
+      "full": "Had 40 petugas sudah dicapai. Padam atau gunakan semula petugas yang tidak aktif.",
+      "badPetugas": "Seorang petugas dalam jadual tidak lagi mempunyai peranan itu. Muat semula halaman dan pilih semula.",
+      "badSlots": "Jadual tidak sah. Muat semula halaman dan cuba lagi.",
+      "notAllowed": "Anda tidak dibenarkan berbuat demikian (masjid mesti aktif).",
+      "duplicate": "Ada slot berulang dalam jadual. Muat semula halaman dan cuba lagi.",
+      "invalid": "Maklumat tidak sah. Semak nama, gelaran dan peranan.",
+      "network": "Tiada sambungan internet. Cuba lagi.",
+      "generic": "Tidak berjaya: {message}"
     }
   }
 }

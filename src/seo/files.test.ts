@@ -94,8 +94,11 @@ describe("llms.txt", () => {
     }
   });
 
-  it("an Artikel list only once there are articles", () => {
-    expect(txt).not.toContain("## Artikel");
+  it("an Artikel list exactly when articles are published", () => {
+    const published = PAGES.filter((p) => p.type === "article");
+    if (published.length) for (const p of published) expect(txt).toContain(`(https://masjidview.my${p.path})`);
+    expect(txt.includes("## Artikel")).toBe(published.length > 0);
+    expect(llmsTxt(PAGES.filter((p) => p.type !== "article"))).not.toContain("## Artikel");
     const art: SeoPage = { path: "/artikel/x/", lang: "ms", pair: null, titleKey: "meta.title", descriptionKey: "meta.description", updated: "2026-12-01", type: "article" };
     expect(llmsTxt([...PAGES, art])).toContain("## Artikel\n\n- [");
   });

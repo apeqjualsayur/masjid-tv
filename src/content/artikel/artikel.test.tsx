@@ -80,6 +80,31 @@ describe("every published article", () => {
   });
 });
 
+describe("wording rules (PRD 70 §2.3, S9): every real article, drafts included", () => {
+  const real = ARTICLES.filter((a) => a.slug !== "contoh-artikel");
+  /** Every piece of prose in an article: summary, description and blocks (tables separately). */
+  const prose = (a: Article) => [a.title, a.description, a.summary, ...a.blocks.flatMap((b) => ("text" in b ? [b.text] : b.type === "list" || b.type === "ordered" ? b.items : b.type === "faq" ? b.items.flatMap((i) => [i.q, i.a]) : []))].map(plain);
+  const sentences = (s: string) => s.split(/(?<=[.!?])\s+/);
+  const RAMADAN_SEASON_DATE = /\b\d{1,2}(?:[–-]\d{1,2})? (?:Februari|Mac)\b/;
+
+  it("there are real articles to check", () => expect(real.length).toBeGreaterThanOrEqual(3));
+
+  for (const a of real) {
+    it(`${a.slug}: JAKIM only as "data e-Solat JAKIM" / "zon JAKIM"`, () => {
+      const all = [...prose(a), ...a.blocks.flatMap((b) => (b.type === "table" ? [...b.head, ...b.rows.flat(), b.caption ?? ""] : []))].join(" ");
+      expect(all.replace(/data e-Solat JAKIM|zon JAKIM/g, "").includes("JAKIM")).toBe(false);
+    });
+
+    it(`${a.slug}: every Ramadan-season date is labelled jangkaan / dijangka`, () => {
+      for (const s of prose(a).flatMap(sentences)) if (RAMADAN_SEASON_DATE.test(s)) expect(s, s).toMatch(/jangka/i);
+      for (const b of a.blocks) {
+        if (b.type !== "table" || !b.rows.flat().some((c) => RAMADAN_SEASON_DATE.test(c))) continue;
+        expect([...b.head, b.caption ?? ""].join(" "), "table header").toMatch(/jangkaan/i);
+      }
+    });
+  }
+});
+
 describe("a published article in the registry, feed and JSON-LD", () => {
   it("registry entry: path, lang ms, no pair, own title and description, lastmod = dateModified", () => {
     const [p] = articlePages([live]);

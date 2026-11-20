@@ -1,12 +1,18 @@
 // Every article module, drafts included (scripts/new-article.ts adds the import and the list entry).
 // Pages, the SEO registry, the sitemap, llms.txt and the RSS feed use publishedArticles() only.
 import contohArtikel from "./contoh-artikel";
+import ramadan2027TarikhJangkaan from "./ramadan-2027-tarikh-jangkaan";
+import senaraiSemakRamadanAjkMasjid from "./senarai-semak-ramadan-ajk-masjid";
+import caraPasangSkrinWaktuSolatTvMasjid from "./cara-pasang-skrin-waktu-solat-tv-masjid";
 import type { Article } from "./types";
 
 export type { Article, ArticleBlock } from "./types";
 
 export const ARTICLES: readonly Article[] = [
   contohArtikel,
+  ramadan2027TarikhJangkaan,
+  senaraiSemakRamadanAjkMasjid,
+  caraPasangSkrinWaktuSolatTvMasjid,
 ];
 
 export const articlePath = (slug: string) => `/artikel/${slug}/`;

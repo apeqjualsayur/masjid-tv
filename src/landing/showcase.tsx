@@ -81,7 +81,12 @@ export function TemplatesSection({ lang }: { lang: Lang }) {
               {k.title}
             </h2>
           </div>
-          <p className="m-0 max-w-[380px] text-[16px] leading-[1.6] text-lb-muted">{k.body}</p>
+          <div className="flex max-w-[380px] flex-col gap-2">
+            <p className="m-0 text-[16px] leading-[1.6] text-lb-muted">{k.body}</p>
+            <a href="/templat/" className="self-start rounded text-[16px] font-semibold text-lb-deep underline underline-offset-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lb-deep">
+              {k.viewAll} →
+            </a>
+          </div>
         </div>
         {/* 12 templates: min 260 px gives 4 / 3 / 2 / 1 columns, so every row is full. */}
         <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))] gap-3.5">

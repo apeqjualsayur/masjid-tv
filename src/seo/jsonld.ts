@@ -5,6 +5,7 @@
 import { copy, homeHref, pageHref, type Lang } from "@/landing/i18n";
 import { articleBySlug } from "@/content/artikel";
 import { fill } from "@/landing/counts";
+import { TEMPLATES } from "@/templates/schema";
 import { plain } from "@/content/artikel/text";
 import { guideSections } from "@/landing/guide-content";
 import { site } from "@/landing/site";
@@ -169,6 +170,12 @@ export function pageJsonLd(path: string): Node {
       if (faqs.length) nodes.push(faqPage(a.lang, faqs.map((f) => ({ q: f.q, a: plain(f.a) }))));
       break;
     }
+    case "gallery":
+      nodes.push(breadcrumbList([home, { name: c.templat.breadcrumb, path: p.path }]));
+      break;
+    case "template":
+      nodes.push(breadcrumbList([home, { name: c.templat.breadcrumb, path: "/templat/" }, { name: TEMPLATES[p.templateKey!].name.ms, path: p.path }]));
+      break;
     case "about":
       nodes.push(aboutPage(p), breadcrumbList([home, { name: pageText(p).title.replace(/ · .*$/, ""), path: p.path }]));
       break;

@@ -36,6 +36,7 @@ export function Footer({ lang, page = "home" }: { lang: Lang; page?: Page }) {
         <Column title={f.product}>
           <li><a className={link} href={sectionHref(lang, page, "ciri")}>{f.productFeatures}</a></li>
           <li><a className={link} href={sectionHref(lang, page, "panel")}>{f.productPanel}</a></li>
+          <li><a className={link} href="/templat/">{f.productTemplates}</a></li>
           <li>
             <a className={link} href={DEMO_HREF} target="_blank" rel="noopener">
               {f.productDemo}

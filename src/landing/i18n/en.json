@@ -279,7 +279,8 @@
   "templates": {
     "eyebrow": "{n} READY-MADE TEMPLATES",
     "title": "Fill in a form, press Publish. No poster design needed.",
-    "body": "Every template follows your screen's theme automatically."
+    "body": "Every template follows your screen's theme automatically.",
+    "viewAll": "See all templates"
   },
   "try": {
     "eyebrow": "TRY IT NOW",
@@ -484,7 +485,8 @@
     "support": "Support Masjid View",
     "jakim": "Prayer times based on JAKIM e-Solat data.",
     "helpAbout": "About",
-    "helpArticles": "Articles (BM)"
+    "helpArticles": "Articles (BM)",
+    "productTemplates": "Templates (BM)"
   },
   "panduan": {
     "meta": {
@@ -724,6 +726,27 @@
       "demo": "See the demo",
       "signup": "Sign up free"
     }
+  },
+  "templat": {
+    "meta": {
+      "title": "Announcement templates for masjid screens · Masjid View",
+      "description": "Free announcement templates for masjid and surau TVs: talks, death notices, imam and bilal roster, Islamic occasions, infaq collections and more."
+    },
+    "title": "Announcement templates for masjid screens",
+    "intro": "Pick a template, fill in the form and press Publish: Masjid View lays out the announcement in your screen's theme. Each example below is drawn as on a real TV.",
+    "breadcrumb": "Templates",
+    "whenTitle": "When to use it",
+    "displayTitle": "How it shows",
+    "fieldsTitle": "What the AJK fills in",
+    "tipsTitle": "Tips",
+    "relatedTitle": "Related templates",
+    "articlesTitle": "Related reading",
+    "cta": "Use this template",
+    "ctaBody": "Free for every masjid and surau. Sign in, choose this template and publish in minutes.",
+    "renderPoster": "Announcements only · 16:9",
+    "renderBottom": "Prayer times at the bottom · 12:5",
+    "renderNote": "Example in the Tenang theme; names and details are examples.",
+    "ayatNote": "Layout example. Verse and hadith text shows once the list has been reviewed."
   },
   "privasi": {
     "meta": {

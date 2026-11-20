@@ -4,9 +4,11 @@
 // Not here: /tv, /admin, /apk (never indexed).
 import { articlePath, publishedArticles, type Article } from "@/content/artikel";
 import { UPDATED as PRIVACY_UPDATED } from "@/content/privasi";
+import { templatePages, templatePath } from "@/content/templat";
+import type { PickerKey } from "@/templates";
 import type { Lang } from "@/landing/i18n";
 
-export type PageType = "home" | "guide" | "about" | "hub" | "article" | "template" | "legal";
+export type PageType = "home" | "guide" | "about" | "hub" | "article" | "gallery" | "template" | "legal";
 
 export interface SeoPage {
   /** Served path with the trailing slash (static export). */
@@ -22,6 +24,8 @@ export interface SeoPage {
   description?: string;
   /** The article slug (type "article"). */
   slug?: string;
+  /** The template (type "template"). */
+  templateKey?: PickerKey;
   /** YYYY-MM-DD the page content last changed (from its content where it has one). */
   updated: string;
   type: PageType;
@@ -29,6 +33,8 @@ export interface SeoPage {
 
 /** The landing pages and the guide were last refreshed in this round. */
 const LANDING_UPDATED = "2026-11-20";
+/** The template gallery (/templat and its pages) was written in this round. */
+const GALLERY_UPDATED = "2026-11-20";
 
 /** Article <title>: the SEO title, with " · Masjid View" when it still fits in 60 characters. */
 export function articleTitle(a: Pick<Article, "seoTitle">): string {
@@ -59,6 +65,8 @@ export const PAGES: readonly SeoPage[] = [
   ...STATIC_PAGES,
   { path: "/artikel/", lang: "ms", pair: null, titleKey: "artikel.meta.title", descriptionKey: "artikel.meta.description", updated: hubUpdated(), type: "hub" },
   ...articlePages(),
+  { path: "/templat/", lang: "ms", pair: null, titleKey: "templat.meta.title", descriptionKey: "templat.meta.description", updated: GALLERY_UPDATED, type: "gallery" },
+  ...templatePages().map((t) => ({ path: templatePath(t.slug), lang: "ms" as const, pair: null, title: t.title, description: t.description, updated: GALLERY_UPDATED, type: "template" as const, templateKey: t.key })),
 ];
 
 /** The registry entry for a path; a public page that is not registered is a bug, so this throws. */

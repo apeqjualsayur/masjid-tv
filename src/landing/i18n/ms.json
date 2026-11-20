@@ -279,7 +279,8 @@
   "templates": {
     "eyebrow": "{n} TEMPLAT SIAP GUNA",
     "title": "Isi borang, tekan Terbit. Tiada reka poster.",
-    "body": "Setiap templat mengikut tema skrin anda secara automatik."
+    "body": "Setiap templat mengikut tema skrin anda secara automatik.",
+    "viewAll": "Lihat semua templat"
   },
   "try": {
     "eyebrow": "CUBA SEKARANG",
@@ -484,7 +485,8 @@
     "support": "Sokong Masjid View",
     "jakim": "Waktu solat berdasarkan data e-Solat JAKIM.",
     "helpAbout": "Tentang",
-    "helpArticles": "Artikel"
+    "helpArticles": "Artikel",
+    "productTemplates": "Templat"
   },
   "panduan": {
     "meta": {
@@ -724,6 +726,27 @@
       "demo": "Lihat demo",
       "signup": "Daftar percuma"
     }
+  },
+  "templat": {
+    "meta": {
+      "title": "Templat pengumuman untuk skrin masjid · Masjid View",
+      "description": "Templat pengumuman percuma untuk TV masjid dan surau: kuliah, notis kematian, jadual imam dan bilal, hari kebesaran Islam, kutipan infaq dan banyak lagi."
+    },
+    "title": "Templat pengumuman untuk skrin masjid",
+    "intro": "Pilih templat, isi borang dan tekan Terbit: Masjid View menyusun pengumuman mengikut tema skrin masjid anda. Setiap contoh di bawah dilukis seperti di TV sebenar.",
+    "breadcrumb": "Templat",
+    "whenTitle": "Bila menggunakannya",
+    "displayTitle": "Bagaimana ia dipaparkan",
+    "fieldsTitle": "Apa yang AJK isi",
+    "tipsTitle": "Tip",
+    "relatedTitle": "Templat berkaitan",
+    "articlesTitle": "Bacaan berkaitan",
+    "cta": "Guna templat ini",
+    "ctaBody": "Percuma untuk semua masjid dan surau. Log masuk, pilih templat ini dan terbitkan dalam beberapa minit.",
+    "renderPoster": "Pengumuman sahaja · 16:9",
+    "renderBottom": "Waktu solat di bawah · 12:5",
+    "renderNote": "Contoh paparan dalam tema Tenang; nama dan butiran ialah contoh.",
+    "ayatNote": "Contoh susun atur. Teks ayat dan hadith dipaparkan selepas senarai selesai disemak."
   },
   "privasi": {
     "meta": {

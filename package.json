@@ -6,6 +6,8 @@
     "dev": "tsx scripts/build-seo.ts && next dev -p 3100",
     "build": "tsx scripts/build-seo.ts && next build && tsx scripts/build-sw.ts",
     "seo-files": "tsx scripts/build-seo.ts",
+    "new-article": "tsx scripts/new-article.ts",
+    "publish-article": "tsx scripts/publish-article.ts",
     "start": "npx serve out",
     "lint": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",

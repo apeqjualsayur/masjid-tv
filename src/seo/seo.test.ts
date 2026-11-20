@@ -60,7 +60,8 @@ describe("titles and descriptions", () => {
       expect(len(title), `${p.path}: "${title}"`).toBeLessThanOrEqual(TITLE_MAX);
       expect(len(description), `${p.path}: "${description}"`).toBeGreaterThanOrEqual(DESCRIPTION_MIN);
       expect(len(description), `${p.path}: "${description}"`).toBeLessThanOrEqual(DESCRIPTION_MAX);
-      expect(title.endsWith(` · ${SITE.brand}`), p.path).toBe(true);
+      // Articles keep the brand only when it fits (articleTitle); every other page ends with it.
+      if (p.type !== "article") expect(title.endsWith(` · ${SITE.brand}`), p.path).toBe(true);
     }
   });
 

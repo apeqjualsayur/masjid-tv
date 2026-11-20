@@ -45,6 +45,7 @@ export function Footer({ lang, page = "home" }: { lang: Lang; page?: Page }) {
         </Column>
         <Column title={f.help}>
           <li><a className={link} href={guideHref(lang)}>{f.helpGuide}</a></li>
+          <li><a className={link} href="/artikel/">{f.helpArticles}</a></li>
           <li><a className={link} href={sectionHref(lang, page, "soalan")}>{f.helpFaq}</a></li>
           <li><a className={link} href={pageHref(lang, "tentang")}>{f.helpAbout}</a></li>
           <li><a className={link} href={privacyHref(lang)}>{f.helpPrivacy}</a></li>

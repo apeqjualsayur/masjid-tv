@@ -10,7 +10,7 @@ const OUT = join(process.cwd(), "out");
 // folder's README is a note for the owner, not an app file. Everything else in out/sounds/ is precached.
 // robots.txt, sitemap.xml, llms.txt: for crawlers only, never used by a TV (and a new sitemap date must
 // not make every TV update its service worker).
-const SKIP = new Set(["sw.js", "_headers", "_redirects", "version.json", "sounds/README.md", "robots.txt", "sitemap.xml", "llms.txt"]);
+const SKIP = new Set(["sw.js", "_headers", "_redirects", "version.json", "sounds/README.md", "robots.txt", "sitemap.xml", "llms.txt", "artikel/feed.xml"]);
 // The Android TV app download (apk/, published by .github/workflows/android-tv.yml): never precached
 // (a TV must not download a 2 MB APK it never uses) and not in the version hash (a new APK must not
 // make every TV update its service worker).

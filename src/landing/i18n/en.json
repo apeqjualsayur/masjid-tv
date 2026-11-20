@@ -33,7 +33,8 @@
     "login": "Sign in",
     "signup": "Sign up free",
     "langMs": "BM",
-    "langEn": "EN"
+    "langEn": "EN",
+    "articles": "Articles"
   },
   "hero": {
     "chip": "Free for every masjid and surau",
@@ -482,7 +483,8 @@
     "whatsapp": "WhatsApp",
     "support": "Support Masjid View",
     "jakim": "Prayer times based on JAKIM e-Solat data.",
-    "helpAbout": "About"
+    "helpAbout": "About",
+    "helpArticles": "Articles (BM)"
   },
   "panduan": {
     "meta": {
@@ -697,6 +699,31 @@
     },
     "facebook": "Facebook",
     "youtube": "YouTube"
+  },
+  "artikel": {
+    "meta": {
+      "title": "Articles · Masjid View",
+      "description": "Guides and tips for masjid and surau committees: Ramadan preparation, prayer-time screens, announcements and imam rosters. By the Masjid View team."
+    },
+    "title": "Articles",
+    "intro": "Short guides for masjid and surau committees on prayer-time screens, announcements and key seasons.",
+    "empty": "No articles yet. The first article will be published soon.",
+    "breadcrumb": "Articles",
+    "published": "Published",
+    "updated": "Updated",
+    "author": "Pasukan Masjid View",
+    "by": "By",
+    "summary": "Short answer",
+    "faq": "Frequently asked questions",
+    "related": "Related reading",
+    "readMore": "Read the article",
+    "feed": "Subscribe to the RSS feed",
+    "cta": {
+      "title": "Try Masjid View on your masjid TV",
+      "body": "Free for every masjid and surau. See the demo, then register in a few minutes.",
+      "demo": "See the demo",
+      "signup": "Sign up free"
+    }
   },
   "privasi": {
     "meta": {

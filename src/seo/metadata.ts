@@ -4,11 +4,11 @@
 import type { Metadata } from "next";
 import { t } from "@/landing/i18n";
 import { languageVersions, seoPage, type SeoPage } from "./routes";
-import { SITE } from "./site";
+import { FEED_PATH, SITE } from "./site";
 
 /** The page's title and description in its own language. */
 export function pageText(p: SeoPage): { title: string; description: string } {
-  return { title: t(p.lang, p.titleKey), description: t(p.lang, p.descriptionKey) };
+  return { title: p.title ?? t(p.lang, p.titleKey ?? ""), description: p.description ?? t(p.lang, p.descriptionKey ?? "") };
 }
 
 /** hreflang alternates for a page with a translation, or undefined. */
@@ -28,9 +28,14 @@ export function buildMetadata(path: string): Metadata {
     metadataBase: new URL(SITE.url),
     title: { absolute: title },
     description,
-    alternates: { canonical: p.path, ...(languages ? { languages } : {}) },
+    alternates: {
+      canonical: p.path,
+      ...(languages ? { languages } : {}),
+      // The articles feed is announced on the hub (PRD §3.B "Feed").
+      ...(p.type === "hub" ? { types: { "application/rss+xml": [{ url: FEED_PATH, title: `${SITE.brand} · Artikel` }] } } : {}),
+    },
     openGraph: {
-      type: "website",
+      type: p.type === "article" ? "article" : "website",
       siteName: SITE.brand,
       url: p.path,
       title,

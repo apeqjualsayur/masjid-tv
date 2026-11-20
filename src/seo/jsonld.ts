@@ -3,7 +3,9 @@
 // list on the page), so the markup can never say something the page does not. No ratings, user counts
 // or reviews (PRD §2.3). Empty values are dropped, never emitted.
 import { copy, homeHref, pageHref, type Lang } from "@/landing/i18n";
+import { articleBySlug } from "@/content/artikel";
 import { fill } from "@/landing/counts";
+import { plain } from "@/content/artikel/text";
 import { guideSections } from "@/landing/guide-content";
 import { site } from "@/landing/site";
 import { seoPage, type SeoPage } from "./routes";
@@ -153,6 +155,20 @@ export function pageJsonLd(path: string): Node {
         breadcrumbList([home, { name: c.panduan.title, path: pageHref(p.lang, "panduan") }]),
       );
       break;
+    case "hub":
+      nodes.push(breadcrumbList([home, { name: c.artikel.breadcrumb, path: p.path }]));
+      break;
+    case "article": {
+      const a = articleBySlug(p.slug ?? "");
+      if (!a) throw new Error(`No article for ${p.path}`);
+      nodes.push(
+        article({ path: p.path, lang: a.lang, headline: a.title, description: a.description, datePublished: a.datePublished, dateModified: a.dateModified, image: a.image }),
+        breadcrumbList([home, { name: c.artikel.breadcrumb, path: "/artikel/" }, { name: a.title, path: p.path }]),
+      );
+      const faqs = a.blocks.flatMap((b) => (b.type === "faq" ? b.items : []));
+      if (faqs.length) nodes.push(faqPage(a.lang, faqs.map((f) => ({ q: f.q, a: plain(f.a) }))));
+      break;
+    }
     case "about":
       nodes.push(aboutPage(p), breadcrumbList([home, { name: pageText(p).title.replace(/ · .*$/, ""), path: p.path }]));
       break;

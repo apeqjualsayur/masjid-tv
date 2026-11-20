@@ -19,7 +19,8 @@ export function t(lang: Lang, key: string): string {
 /** Page addresses per language (static export, trailing slashes). */
 export const homeHref = (lang: Lang) => (lang === "en" ? "/en/" : "/");
 
-export type Page = "home" | "panduan" | "tentang";
-export const pageHref = (lang: Lang, page: Page) => homeHref(lang) + (page === "home" ? "" : `${page}/`);
+/** "artikel" = the articles hub and articles: BM only (PRD 70 D3), so its English link is the English home. */
+export type Page = "home" | "panduan" | "tentang" | "artikel";
+export const pageHref = (lang: Lang, page: Page) => (page === "artikel" && lang === "en" ? homeHref("en") : homeHref(lang) + (page === "home" ? "" : `${page}/`));
 /** A home-page section anchor from any page: "#ciri" on the home page, "/en/#ciri" elsewhere. */
 export const sectionHref = (lang: Lang, page: Page, id: string) => (page === "home" ? `#${id}` : `${homeHref(lang)}#${id}`);

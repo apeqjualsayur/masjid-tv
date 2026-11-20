@@ -5,6 +5,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { copy, homeHref, pageHref, sectionHref, type Lang, type Page } from "./i18n";
 
 export const ADMIN_HREF = "/admin/";
+/** The articles hub (BM only). */
+export const ARTIKEL_HREF = "/artikel/";
 
 /** Section anchors in the header, in design order. */
 export const NAV = [
@@ -123,6 +125,9 @@ export function Header({ lang, page = "home" }: { lang: Lang; page?: Page }) {
                 {c.nav[n.key]}
               </a>
             ))}
+            <a href={ARTIKEL_HREF} aria-current={page === "artikel" ? "page" : undefined} className={`rounded ${page === "artikel" ? "text-lb-ink" : "text-lb-muted"} hover:text-lb-ink ${focusRing}`}>
+              {c.nav.articles}
+            </a>
           </nav>
           <div className="ml-auto flex items-center gap-2 min-[400px]:gap-3">
             <LangSwitch lang={lang} page={page} className="hidden min-[900px]:flex" />
@@ -174,6 +179,9 @@ export function Header({ lang, page = "home" }: { lang: Lang; page?: Page }) {
                   {c.nav[n.key]}
                 </a>
               ))}
+              <a href={ARTIKEL_HREF} onClick={close} className={`flex h-12 items-center border-b border-lb-hair text-[17px] font-semibold ${focusRing}`}>
+                {c.nav.articles}
+              </a>
             </nav>
             <div className="mt-4 flex items-center justify-between gap-3">
               <LangSwitch lang={lang} page={page} className="flex" />

@@ -3,8 +3,9 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev -p 3100",
-    "build": "next build && tsx scripts/build-sw.ts",
+    "dev": "tsx scripts/build-seo.ts && next dev -p 3100",
+    "build": "tsx scripts/build-seo.ts && next build && tsx scripts/build-sw.ts",
+    "seo-files": "tsx scripts/build-seo.ts",
     "start": "npx serve out",
     "lint": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",

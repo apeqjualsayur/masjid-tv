@@ -4,7 +4,8 @@
     "description": "A free prayer-time and announcement screen for masjids and suraus, based on JAKIM e-Solat data. Use any TV browser or the Android TV app. Sign up free."
   },
   "seo": {
-    "breadcrumbHome": "Home"
+    "breadcrumbHome": "Home",
+    "summary": "Free prayer-time and announcement screens for masjid and surau TVs in Malaysia."
   },
   "a11y": {
     "skip": "Skip to content",
@@ -55,6 +56,10 @@
       ],
       "new": "+ New announcement"
     }
+  },
+  "whatIs": {
+    "title": "What is Masjid View?",
+    "body": ""
   },
   "numbers": {
     "title": "One screen, everything your masjid needs to share",

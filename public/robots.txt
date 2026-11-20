@@ -1,7 +1,0 @@
-# masjidview.my
-User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /tv
-
-Sitemap: https://masjidview.my/sitemap.xml

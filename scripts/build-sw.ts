@@ -8,7 +8,9 @@ const OUT = join(process.cwd(), "out");
 // Not app files: the worker itself and Cloudflare Pages control files. version.json must always come
 // from the network (it says whether a newer version is live), so it is not precached. The sounds
 // folder's README is a note for the owner, not an app file. Everything else in out/sounds/ is precached.
-const SKIP = new Set(["sw.js", "_headers", "_redirects", "version.json", "sounds/README.md"]);
+// robots.txt, sitemap.xml, llms.txt: for crawlers only, never used by a TV (and a new sitemap date must
+// not make every TV update its service worker).
+const SKIP = new Set(["sw.js", "_headers", "_redirects", "version.json", "sounds/README.md", "robots.txt", "sitemap.xml", "llms.txt"]);
 // The Android TV app download (apk/, published by .github/workflows/android-tv.yml): never precached
 // (a TV must not download a 2 MB APK it never uses) and not in the version hash (a new APK must not
 // make every TV update its service worker).

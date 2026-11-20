@@ -15,6 +15,10 @@ designs/landing/qa/
 
 # written by next.config.ts at build time
 public/version.json
+# Generated from src/seo by scripts/build-seo.ts (one source; never edit by hand)
+public/robots.txt
+public/sitemap.xml
+public/llms.txt
 
 # Android TV app (android-tv/): build output, machine settings, and the signing key — NEVER commit a key
 android-tv/.gradle/

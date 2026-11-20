@@ -4,7 +4,8 @@
     "description": "Skrin waktu solat dan pengumuman percuma untuk masjid dan surau, berdasarkan data e-Solat JAKIM. Guna pelayar TV atau app Android TV. Daftar percuma."
   },
   "seo": {
-    "breadcrumbHome": "Utama"
+    "breadcrumbHome": "Utama",
+    "summary": "Skrin waktu solat dan pengumuman percuma untuk TV masjid dan surau di Malaysia."
   },
   "a11y": {
     "skip": "Langkau ke kandungan",
@@ -55,6 +56,10 @@
       ],
       "new": "+ Pengumuman baharu"
     }
+  },
+  "whatIs": {
+    "title": "Apakah Masjid View?",
+    "body": ""
   },
   "numbers": {
     "title": "Satu skrin, semua maklumat masjid",

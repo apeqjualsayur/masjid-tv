@@ -6,7 +6,7 @@ import { DndContext, KeyboardSensor, PointerSensor, TouchSensor, closestCenter, 
 import { SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useEffect, useMemo, useState, type ReactNode } from "react";
 import type { PrayerKey } from "@/core";
 import { getSupabase } from "@/lib/supabase";
 import { resolveTemplateKey } from "@/templates";
@@ -19,37 +19,16 @@ import { useToasts, type ToastKind } from "../shell/Toast";
 import { useIsDesktop } from "../shell/useIsDesktop";
 import {
   DAYS, JUMAAT, MAX_PETUGAS, NAME_MAX, ROLES, TITLE_MAX, TITLE_SUGGESTIONS, WAKTU, WEEKDAYS,
-  byOrder, clearDay, copyDay, displayName, emptyGrid, gridFromSlots, gridToSlots, gridsEqual, hasExceptions, optionsFor, petugasErrorKey, petugasPayload, removedRoles, reorderUpdates, setSlot, validatePetugas,
+  clearDay, copyDay, displayName, emptyGrid, gridFromSlots, gridToSlots, gridsEqual, hasExceptions, optionsFor, petugasErrorKey, petugasPayload, removedRoles, reorderUpdates, setSlot, validatePetugas,
   type Grid, type Petugas, type PetugasErrors, type PetugasForm, type Role, type SlotRow,
 } from "./logic";
+import { usePetugasData } from "./usePetugasData";
 
 const card = "rounded-[16px] bg-adm-card shadow-[0_1px_3px_rgba(18,38,30,0.08)]";
 const input = "h-12 w-full min-w-0 rounded-xl border bg-white px-3 text-[16px] text-adm-ink focus-visible:outline-2 focus-visible:outline-adm-green";
 const GRIP = "M9 6h.01 M15 6h.01 M9 12h.01 M15 12h.01 M9 18h.01 M15 18h.01";
 type Tab = "senarai" | "jadual";
 type Toast = (kind: ToastKind, text: string) => void;
-
-function usePetugasData(orgId: string) {
-  const [list, setList] = useState<Petugas[] | null>(null);
-  const [slots, setSlots] = useState<SlotRow[] | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const load = useCallback(async () => {
-    const sb = getSupabase();
-    const [p, s] = await Promise.all([
-      sb.from("petugas").select("id, name, title, roles, active, sort_order").eq("org_id", orgId),
-      sb.from("roster_slots").select("day_of_week, waktu, role, petugas_id").eq("org_id", orgId),
-    ]);
-    const e = p.error ?? s.error;
-    if (e) return setError(e.message);
-    setError(null);
-    setList(((p.data ?? []) as Petugas[]).sort(byOrder));
-    setSlots((s.data ?? []) as SlotRow[]);
-  }, [orgId]);
-  useEffect(() => {
-    load();
-  }, [load]);
-  return { list, slots, error, reload: load, setList };
-}
 
 /** `tabParam` = ?tab= (senarai | jadual). */
 export function PetugasView({ tabParam }: { tabParam: string | null }) {

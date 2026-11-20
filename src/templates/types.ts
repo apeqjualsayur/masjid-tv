@@ -26,10 +26,10 @@ export const TEMPLATE_KEYS: readonly TemplateKey[] = [
 ];
 
 /**
- * Not offered in the admin template picker (they still render and stay editable). jadual_petugas:
- * until its editor (live roster preview) ships in E15, when imam_bilal is hidden instead (PRD D9).
+ * Not offered in the admin template picker (they still render and stay editable): imam_bilal, replaced
+ * by jadual_petugas (the roster from the Petugas page) since E15 (PRD D9).
  */
-export const PICKER_HIDDEN: readonly TemplateKey[] = ["jadual_petugas"];
+export const PICKER_HIDDEN: readonly TemplateKey[] = ["imam_bilal"];
 
 /** A ?key= value (or a slides.template_key) as one of the template keys, or null when it is not one. */
 export function resolveTemplateKey(k: string | null | undefined): TemplateKey | null {

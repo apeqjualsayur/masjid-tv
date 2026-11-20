@@ -152,6 +152,7 @@ const CHIP: Partial<Record<TemplateKey | "poster", { code: string; bg: string; f
   program: { code: "PRG", bg: "#E6EEF8", fg: "#1F4E8A" },
   mesyuarat: { code: "MSY", bg: "#EEE9F8", fg: "#4B3A8A" },
   imam_bilal: { code: "IMB", bg: "#E3F1EA", fg: "#146C4A" },
+  jadual_petugas: { code: "J&B", bg: "#EEE8F7", fg: "#5B3D8F" },
   kewangan: { code: "KEW", bg: "#FFF1D6", fg: "#8A5300" },
   ayat: { code: "AYT", bg: "#E3F1EA", fg: "#146C4A" },
   ucapan: { code: "UCP", bg: "#FCE8EE", fg: "#8A2347" },

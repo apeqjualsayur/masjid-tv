@@ -730,7 +730,19 @@
       "err": {
         "events": "Pilih sekurang-kurangnya satu acara."
       }
-    }
+    },
+    "petugas": {
+      "source": "Nama diambil daripada halaman Petugas. TV memaparkan jadual terkini secara automatik.",
+      "manage": "Urus petugas",
+      "weekHint": "Paparan mingguan menunjukkan petugas harian. Pilih 'Hari ini' untuk papar ikut waktu.",
+      "emptyNoPeople": "Belum ada petugas. Slaid ini tidak dipaparkan di TV sehingga nama dan jadual diisi.",
+      "emptyNoSlots": "Jadual petugas masih kosong. Slaid ini tidak dipaparkan di TV sehingga jadual diisi.",
+      "addPeople": "Tambah petugas",
+      "fillRoster": "Isi jadual",
+      "loadError": "Petugas tidak dapat dimuatkan: {message}"
+    },
+    "legacyImamBilal": "Templat lama — gunakan Jadual Imam & Bilal untuk jadual ikut hari",
+    "legacyImamBilalCta": "Buat Jadual Imam & Bilal"
   },
   "content": {
     "title": "Kandungan",

@@ -1,6 +1,6 @@
 // Petugas page (PRD enhancements §6.1–6.2): the masjid's imam / bilal list and the weekly roster grid.
 // Pure: no React, no Supabase. Days use the database numbering: 1 = Isnin … 7 = Ahad.
-import type { PrayerKey } from "@/core";
+import type { PrayerKey, Roster } from "@/core";
 
 export type Role = "imam" | "bilal";
 export const ROLES: readonly Role[] = ["imam", "bilal"];
@@ -173,4 +173,19 @@ export function petugasErrorKey(e: { message?: string; code?: string } | null): 
   if (e.code === "23514") return "petugas.err.invalid";
   if (/failed to fetch|network|load failed/i.test(m)) return "petugas.err.network";
   return "petugas.err.generic";
+}
+
+// ------------------------------------------------------------------ editor preview
+
+/**
+ * The roster as the TV gets it in the bundle (§7.3): active petugas only, and the slots that point at
+ * one of them. The Jadual Imam & Bilal editor previews with this.
+ */
+export function rowsToRoster(list: Petugas[], slots: SlotRow[]): Roster {
+  const active = list.filter((p) => p.active).sort(byOrder);
+  const ids = new Set(active.map((p) => p.id));
+  return {
+    petugas: active.map((p) => ({ id: p.id, name: p.name, title: p.title, roles: p.roles })),
+    slots: slots.filter((x) => ids.has(x.petugas_id)).map((x) => ({ day: x.day_of_week, waktu: x.waktu, role: x.role, petugasId: x.petugas_id })),
+  };
 }

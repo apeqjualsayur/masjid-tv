@@ -730,7 +730,19 @@
       "err": {
         "events": "Choose at least one event."
       }
-    }
+    },
+    "petugas": {
+      "source": "Names come from the Petugas page. The TV shows the latest roster automatically.",
+      "manage": "Manage petugas",
+      "weekHint": "The weekly view shows who leads each day. Choose 'Hari ini' to show each prayer time.",
+      "emptyNoPeople": "No petugas yet. This slide is not shown on the TV until names and a roster are added.",
+      "emptyNoSlots": "The roster is empty. This slide is not shown on the TV until the roster is filled in.",
+      "addPeople": "Add petugas",
+      "fillRoster": "Fill in the roster",
+      "loadError": "Could not load petugas: {message}"
+    },
+    "legacyImamBilal": "Old template — use Jadual Imam & Bilal for a roster by day",
+    "legacyImamBilalCta": "Create Jadual Imam & Bilal"
   },
   "content": {
     "title": "Content",

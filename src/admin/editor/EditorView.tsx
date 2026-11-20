@@ -27,6 +27,9 @@ import { rowsToEvents, validateKebesaranEvents } from "../platform/takwim";
 import { useTakwim } from "../platform/useTakwim";
 import { ActivityExtrasFields } from "./ActivityExtras";
 import { KebesaranFields } from "./KebesaranFields";
+import { PetugasFields } from "./PetugasFields";
+import { rowsToRoster } from "../petugas/logic";
+import { usePetugasData } from "../petugas/usePetugasData";
 import { saveTemplateSlide, supabaseTemplateBackend } from "./save";
 import { PreviewStage } from "./PreviewStage";
 import { TemplateForm, type ImageState } from "./TemplateForm";
@@ -76,6 +79,23 @@ function previewFields(key: TemplateKey, f: Fields): Fields {
   return out;
 }
 
+/**
+ * On an old imam_bilal slide (hidden from the picker since E15): it still shows on the TV and stays
+ * editable; this points to the roster-based template. The old slide is not deleted. A full page load
+ * (not a client navigation) so the editor starts fresh for the new slide.
+ */
+export function LegacyImamBilalNotice() {
+  const { t } = useT();
+  return (
+    <div data-legacy-notice className="flex flex-col gap-2 rounded-xl bg-[#FFF4DF] px-3.5 py-3 text-[13px] leading-[1.5] text-[#6B4A12]">
+      <p>{t("editor.legacyImamBilal")}</p>
+      <a href={`${ROUTES.template}?key=jadual_petugas`} className="flex h-11 items-center self-start rounded-xl bg-adm-green px-4 text-[14px] font-bold text-white hover:bg-adm-green-dark">
+        {t("editor.legacyImamBilalCta")}
+      </a>
+    </div>
+  );
+}
+
 /** Shown for a ?key= that is not one of the 10 templates. */
 export function UnknownTemplate() {
   const { t } = useT();
@@ -123,7 +143,10 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
   const { day, loading: dayLoading } = usePrayerToday(org.zone, now);
   // Hari Kebesaran: the real platform takwim for the preview and the list of loaded dates.
   const takwim = useTakwim();
-  const templateData = useMemo(() => ({ islamicEvents: rowsToEvents(takwim.rows ?? []) }), [takwim.rows]);
+  // Jadual Imam & Bilal: the masjid's real roster (active petugas, as in the TV bundle).
+  const petugas = usePetugasData(org.orgId);
+  const roster = useMemo(() => (petugas.list && petugas.slots ? rowsToRoster(petugas.list, petugas.slots) : null), [petugas.list, petugas.slots]);
+  const templateData = useMemo(() => ({ islamicEvents: rowsToEvents(takwim.rows ?? []), roster: roster ?? undefined }), [takwim.rows, roster]);
 
   // (edit) the slide.
   useEffect(() => {
@@ -334,6 +357,7 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
   const notes = (
     <>
       {key === "kematian" && <p className="rounded-xl bg-[#F1F1F1] px-3.5 py-3 text-[13px] leading-[1.5] text-[#3A3A3A]">{t("editor.kematianNote")}</p>}
+      {key === "imam_bilal" && <LegacyImamBilalNotice />}
       {key === "ayat" && !AYAT_VERIFIED && <p className="rounded-xl bg-[#FFF4DF] px-3.5 py-3 text-[13px] leading-[1.5] text-[#6B4A12]">{t("editor.ayatNote")}</p>}
     </>
   );
@@ -344,6 +368,7 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
         {notes}
         <TemplateForm templateKey={key} fields={fields} onChange={setFields} errors={fieldErrors} images={images} onPickImage={pickImage} onRemoveImage={removeImage} />
         {supportsNotice(key) && <ActivityExtrasFields fields={fields} onChange={setFields} errors={fieldErrors} previewAt={previewAt} onPreviewAt={setPreviewAt} />}
+        {key === "jadual_petugas" && <PetugasFields fields={fields} roster={roster} error={petugas.error} />}
         {key === "hari_kebesaran" && <KebesaranFields fields={fields} onChange={setFields} errors={fieldErrors} takwim={takwim.rows} takwimError={takwim.error} />}
       </section>
       <div className="h-px bg-adm-hair" />

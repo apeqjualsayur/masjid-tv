@@ -7,7 +7,7 @@ Project rules for the coding agent (Antigravity / Gemini, Claude Code, Cursor, C
 - Phase 1 = TV display (no backend). Phase 2 = admin app + Supabase backend + TV sync.
 
 ## Source of truth
-- **Always read `_specs/` before changing behaviour.** `00-PRD.md` (display), `01-theme-contract.md` (theme interface + tokens), `10-PRD-phase2.md` (admin + backend), `11-schema.sql` (database), `40-PRD-themes-round2.md` (4 new themes + announcement-only screen), `50-PRD-sound.md` (sound cues at azan and iqamah), `60-PRD-enhancements.md` (activity notices + countdown, hari kebesaran, imam & bilal roster, Android TV app; SQL `62-enhancements-migration.sql`, build order `61-enhancements-prompts.md`), `02-*-prompts.md` / `12-phase2-prompts.md` / `41-themes-round2-prompts.md` (build order).
+- **Always read `_specs/` before changing behaviour.** `00-PRD.md` (display), `01-theme-contract.md` (theme interface + tokens), `10-PRD-phase2.md` (admin + backend), `11-schema.sql` (database), `40-PRD-themes-round2.md` (4 new themes + announcement-only screen), `50-PRD-sound.md` (sound cues at azan and iqamah), `60-PRD-enhancements.md` (activity notices + countdown, hari kebesaran, imam & bilal roster, Android TV app; SQL `62-enhancements-migration.sql`, build order `61-enhancements-prompts.md`), `70-PRD-seo.md` (public pages, SEO/GEO/AEO; build order `71-seo-prompts.md`, article copy `72-articles-content.md`), `02-*-prompts.md` / `12-phase2-prompts.md` / `41-themes-round2-prompts.md` (build order).
 - If code and spec disagree, the spec wins. If the spec is unclear or contradicts itself, STOP and ask — do not guess.
 - `_specs/designs/*.dc.html` (TV: `A-*` alam, `D-*` serambi, `F-*` tenang, `G-*` falak, `I-*` garis, `J-*` kerawang, `K-*` seterusnya; G–K are 1280×720 mockups, scale ×1.5) and `_specs/designs/admin/*.dc.html` (admin) are design-tool source. They do NOT run in a browser. Read markup, inline styles and the script data block. If `designs/ref/*.png` or `designs/admin/ref/*.png` exist, they are screenshots for visual comparison.
 
@@ -25,6 +25,8 @@ Project rules for the coding agent (Antigravity / Gemini, Claude Code, Cursor, C
 - `src/themes/<id>/` — styling only. **No prayer logic, no Supabase calls.** Themes receive a `DisplayState` and render it. Themes never play sound or draw the sound icon.
 - `src/themes/shared/` — render-only pieces every theme uses (Friday strip, ticker, cross-fade, `NoticeStamp`). They take theme tokens as props; no logic, no formatting of times or dates.
 - `src/templates/` — template field schemas, validation, sample data, `ayat-sources.json`, per-template `isEmpty` (skip) rules. 13 template keys: `pengumuman, kuliah, kematian, program, infaq, mesyuarat, imam_bilal, kewangan, ayat, ucapan, penangguhan, hari_kebesaran, jadual_petugas`. The picker hides `imam_bilal` (still renderable and editable).
+- `src/content/` — public page content as typed TypeScript modules (no markdown library): `artikel/<slug>.ts` (typed blocks: heading, paragraph, list, table, faq, callout, cta; `published` / `updated` dates), `/tentang` and `/templat/<slug>` copy. Content only: no React, no styling.
+- `src/seo/` — the single source for public-page discovery: the route registry (path, language pair, `updated` date), metadata helpers (title, description, canonical, hreflang, Open Graph), JSON-LD builders, and the generators for `sitemap.xml`, `robots.txt`, `llms.txt` and `/artikel/feed.xml` (run at build time). Pure TypeScript, unit-tested.
 - `src/app/(ms)/tv/` — the display page that wires engine → theme.
 - `src/app/(ms)/admin/**` (+ `src/app/(en)/en/**`) — admin pages (client components). `src/admin/` — admin components, hooks, `i18n/ms.json` + `en.json`.
 - `src/lib/supabase.ts` — the single Supabase browser client.
@@ -56,6 +58,13 @@ Project rules for the coding agent (Antigravity / Gemini, Claude Code, Cursor, C
 - No hard-coded UI text in admin components: use `ms.json` / `en.json` (BM default).
 - Mobile-first and responsive: phone designs at 390 px (`designs/admin/*.dc.html`), computer designs at 1440 px (`designs/admin/D-*.dc.html`); one component tree, breakpoints < 768 / 768–1023 / ≥ 1024 px (PRD §5.1). Tap targets ≥ 44 px; real `<button>`, `<a>`, `<label>` elements; visible focus rings.
 - Images are compressed in the browser to WebP before upload (posters ≤ 1920 px long edge, logos ≤ 512 px).
+
+## Non-negotiables (public pages, SEO)
+- Titles, descriptions, FAQ, JSON-LD, sitemap, robots.txt, llms.txt and the RSS feed are **generated from one source** (`src/seo/` + the landing i18n files + `src/content/`). Never type the same fact (a URL, a date, a count, a question) in two places; counts such as the number of templates are read from `src/templates`.
+- Every public route lives in the `src/seo/` route registry; a route folder without a registry entry (or the reverse) fails the tests.
+- Article and template routes are one small folder per page, created by `npm run new-article <slug>` (no `[slug]` segments; see the static-export rule).
+- **Never claim or imply JAKIM endorsement.** Say "berdasarkan data e-Solat JAKIM" / "zon JAKIM" only. No invented user counts, ratings or testimonials.
+- Ramadan, Syawal and Zulhijjah dates are **jangkaan** (expected) until officially announced, and must be labelled so in copy and schema.
 
 ## How to work (every task)
 1. Read the relevant spec sections first. Produce a short plan listing files you will create/change. Wait for approval if the task touches more than one folder above or adds a migration.

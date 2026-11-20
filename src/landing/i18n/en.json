@@ -486,18 +486,32 @@
   "panduan": {
     "meta": {
       "title": "TV setup guide for masjid & surau screens · Masjid View",
-      "description": "Set up Masjid View on an Android smart TV, an Android TV box or a laptop, then pair it with a 6-digit code. Ready in about 30 minutes."
+      "description": "Set up Masjid View on an Android TV with the Masjid View TV app or a browser, on a TV box or a laptop, then pair it with a 6-digit code."
     },
     "eyebrow": "GUIDE",
     "title": "TV setup guide",
     "intro": "Set up the Masjid View screen in about 30 minutes. Choose the way that suits your TV, then pair the screen with a 6-digit code from the AJK panel.",
+    "updated": "Updated",
     "before": "Before you start: connect the TV to the masjid WiFi that stays on all day (not a phone hotspot), and make sure the date, time and Kuala Lumpur time zone (GMT+8) are correct.",
     "toc": "In this guide",
     "imgMissing": "Picture coming later.",
+    "app": {
+      "id": "aplikasi",
+      "title": "Masjid View TV app (Android TV)",
+      "steps": [
+        "In the AJK panel (phone or computer), open Screens, press Add screen and enter that code. See also Pair the screen below.",
+        "App settings: press Menu on the remote (or hold OK for 3 seconds). Switch on “Buka automatik semasa TV dihidupkan” (open automatically when the TV is switched on); on Android 10 or later, also allow “Paparan di atas apl lain” (display over other apps)."
+      ],
+      "img": {
+        "file": "app-tv.png",
+        "alt": "The Masjid View TV app on an Android TV showing the 6-digit pairing code"
+      }
+    },
     "sections": [
       {
         "id": "android",
-        "title": "Android smart TV / Google TV",
+        "title": "Android smart TV / Google TV (web browser)",
+        "lead": "Use this if you prefer a web browser on an Android TV or Google TV instead of the app.",
         "steps": [
           "On the TV, open Google Play. Search for and install a web browser app.",
           "Open the browser and type the address https://masjidview.my/tv",
@@ -513,6 +527,7 @@
       {
         "id": "kotak",
         "title": "Ordinary TV + Android TV box",
+        "lead": "For an ordinary TV without Android: an Android TV box turns it into a smart TV for Masjid View.",
         "steps": [
           "Plug the Android TV box into the TV's HDMI port and connect the box to WiFi.",
           "Choose the right HDMI input with the TV remote.",
@@ -527,6 +542,7 @@
       {
         "id": "laptop",
         "title": "Laptop over HDMI",
+        "lead": "No smart TV or box? A laptop connected over HDMI can be the masjid screen too.",
         "steps": [
           "Connect the laptop to the TV with an HDMI cable and choose the HDMI input on the TV.",
           "Open a web browser and go to https://masjidview.my/tv",
@@ -542,6 +558,7 @@
       {
         "id": "pasang",
         "title": "Pair the screen with the 6-digit code",
+        "lead": "This step links the TV to your masjid; do it once for each screen.",
         "steps": [
           "Once masjidview.my/tv is open, the TV shows a 6-digit code and a QR code.",
           "On your phone, sign in at masjidview.my/admin and open Screens, then Add screen.",
@@ -557,9 +574,10 @@
       {
         "id": "skrin-penuh",
         "title": "Full screen",
+        "lead": "Full screen hides the browser bars so only the masjid display shows; the Masjid View TV app is already full screen.",
         "steps": [
           "Easiest (any TV): when the TV shows “Tekan OK untuk skrin penuh” (press OK for full screen), press OK on the remote. Do it again after the TV has been switched off and on.",
-          "Best for Android TV / Google TV: install the Fully Kiosk Browser app. Look for it in Google Play on the TV. If it isn't there, install the Downloader app and download Fully Kiosk Browser from fully-kiosk.com.",
+          "For Android TV / Google TV without the Masjid View TV app: install the Fully Kiosk Browser app. Look for it in Google Play on the TV. If it isn't there, install the Downloader app and download Fully Kiosk Browser from fully-kiosk.com.",
           "In Fully Kiosk Browser's settings, set the Start URL to https://masjidview.my/tv/, then turn on Launch on Boot (opens by itself when the TV is switched on) and Keep Screen On.",
           "Under the display settings (Toolbars & Appearance), turn off the status bar and navigation bar so the page fills the screen. Setting names may differ slightly between app versions.",
           "Laptop: make a shortcut with the target \"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" --kiosk https://masjidview.my/tv/ and put it in the Startup folder (press Win+R, type shell:startup). Chrome then opens full screen every time the computer starts. Press Alt+F4 to leave.",
@@ -573,11 +591,12 @@
       {
         "id": "bunyi",
         "title": "Sound at azan and iqamah",
+        "lead": "This turns on a short sound on the TV at azan and when the iqamah countdown ends.",
         "steps": [
           "Sound is off at first for every screen. To switch it on: in the AJK panel open Screens, press Manage screen, then in the Sound part switch on “Sound on the TV”, choose the sounds for azan and iqamah, and press Save. The change reaches the TV in about 70 seconds.",
           "Press Try to hear each sound on your phone first.",
           "Make sure the TV is not muted and its volume is up. The sound plays through the TV's speakers.",
-          "After the TV is switched on, press OK on the remote once. Until then a crossed-out speaker icon shows in the bottom-right corner and no sound plays: browsers only allow sound after a button press.",
+          "In a web browser, after the TV is switched on, press OK on the remote once. Until then a crossed-out speaker icon shows in the bottom-right corner and no sound plays: browsers only allow sound after a button press. The Masjid View TV app does not need this step.",
           "The sound plays when the azan starts and when the iqamah countdown ends. No sound for Imsak and Syuruk, and no iqamah sound on Friday (khutbah). A “Pengumuman sahaja” (announcements only) screen never plays sound.",
           "Once OK has been pressed, the TV is not reloaded at 3:00 am, so the sound keeps working. When a new version is needed, the TV shows “Versi baharu tersedia” (see Updating a TV).",
           "If the azan is already called over the masjid's speakers, choose a soft sound (Chime) or None for azan, so they don't overlap."
@@ -590,10 +609,12 @@
       {
         "id": "kemas-kini",
         "title": "Updating a TV",
+        "lead": "TVs usually update themselves; this explains when you need to press a button.",
         "steps": [
           "Usually you don't need to do anything: the TV loads the latest version by itself every morning at 3:00.",
           "A TV made full screen with the OK button, or whose sound was allowed with the OK button, is not reloaded at night, so it stays full screen and the sound keeps working. When a new version is needed, the TV shows “Versi baharu tersedia” (new version available): press OK to update, then OK again for full screen.",
           "A TV with Fully Kiosk Browser updates itself at 3:00 am and stays full screen, except when sound is switched on: then it also shows “Versi baharu tersedia”.",
+          "Masjid View TV app: when a new app version is available, the TV shows “Versi baharu tersedia” (new version available); press Kemas kini (update). To check now, open Tetapan (Menu button) and press “Semak kemas kini” (check for updates).",
           "Quickest way for any TV: switch the TV off and on again, or close and reopen the browser.",
           "The AJK panel shows a notice at the top when one of your masjid's screens is not updated yet, with the steps for each screen."
         ],
@@ -606,6 +627,7 @@
     "trouble": {
       "id": "masalah",
       "title": "If something goes wrong",
+      "lead": "Quick fixes for the most common problems.",
       "items": [
         {
           "q": "The WiFi drops",

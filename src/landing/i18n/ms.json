@@ -486,18 +486,32 @@
   "panduan": {
     "meta": {
       "title": "Panduan pemasangan skrin TV masjid · Masjid View",
-      "description": "Pasang Masjid View pada TV pintar Android, kotak Android TV atau komputer riba, kemudian pautkan dengan kod 6 digit. Siap dalam kira-kira 30 minit."
+      "description": "Pasang Masjid View pada TV Android dengan aplikasi Masjid View TV atau pelayar, kotak Android TV atau komputer riba, dan pautkan dengan kod 6 digit."
     },
     "eyebrow": "PANDUAN",
     "title": "Panduan pemasangan TV",
     "intro": "Pasang skrin Masjid View dalam kira-kira 30 minit. Pilih cara yang sesuai dengan TV anda, kemudian pasangkan skrin dengan kod 6 digit dari panel AJK.",
+    "updated": "Dikemas kini",
     "before": "Sebelum mula: sambungkan TV ke WiFi masjid yang hidup sepanjang hari (bukan hotspot telefon), dan pastikan tarikh, masa dan zon waktu Kuala Lumpur (GMT+8) betul.",
     "toc": "Dalam panduan ini",
     "imgMissing": "Gambar akan ditambah kemudian.",
+    "app": {
+      "id": "aplikasi",
+      "title": "Aplikasi Masjid View TV (Android TV)",
+      "steps": [
+        "Di panel AJK (telefon atau komputer), buka Skrin, tekan Tambah skrin dan masukkan kod itu. Lihat juga bahagian Pasangkan skrin di bawah.",
+        "Tetapan app: tekan butang Menu pada alat kawalan (atau tahan OK selama 3 saat). Hidupkan “Buka automatik semasa TV dihidupkan”; pada Android 10 dan lebih baharu, benarkan juga “Paparan di atas apl lain”."
+      ],
+      "img": {
+        "file": "app-tv.png",
+        "alt": "Aplikasi Masjid View TV pada TV Android memaparkan kod pemasangan 6 digit"
+      }
+    },
     "sections": [
       {
         "id": "android",
-        "title": "TV pintar Android / Google TV",
+        "title": "TV pintar Android / Google TV (pelayar web)",
+        "lead": "Gunakan cara ini jika anda memilih pelayar web pada TV Android atau Google TV dan bukan aplikasi.",
         "steps": [
           "Pada TV, buka Google Play. Cari dan pasang aplikasi pelayar web (browser).",
           "Buka pelayar itu dan taip alamat https://masjidview.my/tv",
@@ -513,6 +527,7 @@
       {
         "id": "kotak",
         "title": "TV biasa + kotak Android TV",
+        "lead": "Untuk TV biasa tanpa Android: kotak Android TV menjadikannya TV pintar untuk Masjid View.",
         "steps": [
           "Cucuk kotak Android TV ke port HDMI pada TV dan sambungkan kotak ke WiFi.",
           "Pilih input HDMI yang betul dengan alat kawalan TV.",
@@ -527,6 +542,7 @@
       {
         "id": "laptop",
         "title": "Komputer riba melalui HDMI",
+        "lead": "Tiada TV pintar atau kotak? Komputer riba yang disambung melalui HDMI juga boleh menjadi skrin masjid.",
         "steps": [
           "Sambungkan komputer riba ke TV dengan kabel HDMI dan pilih input HDMI pada TV.",
           "Buka pelayar web dan pergi ke https://masjidview.my/tv",
@@ -542,6 +558,7 @@
       {
         "id": "pasang",
         "title": "Pasangkan skrin dengan kod 6 digit",
+        "lead": "Langkah ini memautkan TV kepada masjid anda; lakukannya sekali bagi setiap skrin.",
         "steps": [
           "Selepas masjidview.my/tv dibuka, TV memaparkan kod 6 digit dan kod QR.",
           "Di telefon, log masuk ke masjidview.my/admin dan buka Skrin, kemudian Tambah skrin.",
@@ -557,9 +574,10 @@
       {
         "id": "skrin-penuh",
         "title": "Skrin penuh",
+        "lead": "Skrin penuh menyembunyikan bar pelayar supaya hanya paparan masjid kelihatan; aplikasi Masjid View TV sudah skrin penuh sendiri.",
         "steps": [
           "Cara paling mudah (semua TV): apabila TV memaparkan “Tekan OK untuk skrin penuh”, tekan butang OK pada alat kawalan. Ulang selepas TV dimatikan dan dihidupkan.",
-          "Cara terbaik untuk TV Android / Google TV: pasang aplikasi Fully Kiosk Browser. Cari di Google Play pada TV. Jika tiada, pasang aplikasi Downloader dan muat turun Fully Kiosk Browser dari laman fully-kiosk.com.",
+          "Untuk TV Android / Google TV tanpa aplikasi Masjid View TV: pasang aplikasi Fully Kiosk Browser. Cari di Google Play pada TV. Jika tiada, pasang aplikasi Downloader dan muat turun Fully Kiosk Browser dari laman fully-kiosk.com.",
           "Dalam tetapan Fully Kiosk Browser, tetapkan Start URL kepada https://masjidview.my/tv/, kemudian hidupkan Launch on Boot (dibuka sendiri apabila TV dihidupkan) dan Keep Screen On.",
           "Di bahagian paparan (Toolbars & Appearance), matikan bar status dan bar navigasi supaya halaman memenuhi skrin. Nama tetapan mungkin sedikit berbeza mengikut versi aplikasi.",
           "Komputer riba: buat pintasan (shortcut) dengan sasaran \"C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe\" --kiosk https://masjidview.my/tv/ dan letakkan dalam folder Startup (tekan Win+R, taip shell:startup). Chrome dibuka skrin penuh setiap kali komputer dihidupkan. Tekan Alt+F4 untuk keluar.",
@@ -573,11 +591,12 @@
       {
         "id": "bunyi",
         "title": "Bunyi semasa azan dan iqamah",
+        "lead": "Bahagian ini menghidupkan bunyi ringkas di TV semasa azan dan apabila kiraan iqamah tamat.",
         "steps": [
           "Bunyi dimatikan pada mulanya untuk setiap skrin. Untuk menghidupkannya: di panel AJK buka Skrin, tekan Urus skrin, kemudian di bahagian Bunyi hidupkan “Bunyi pada TV”, pilih bunyi untuk azan dan iqamah, dan tekan Simpan. Perubahan sampai ke TV dalam lebih kurang 70 saat.",
           "Tekan Cuba untuk mendengar setiap bunyi pada telefon anda dahulu.",
           "Pastikan TV tidak disenyapkan dan kelantangan TV dinaikkan. Bunyi dimainkan melalui pembesar suara TV.",
-          "Selepas TV dihidupkan, tekan butang OK pada alat kawalan sekali. Selagi belum ditekan, ikon pembesar suara bersilang dipaparkan di penjuru kanan bawah skrin dan bunyi tidak dimainkan: pelayar hanya membenarkan bunyi selepas butang ditekan.",
+          "Dalam pelayar web, selepas TV dihidupkan, tekan butang OK pada alat kawalan sekali. Selagi belum ditekan, ikon pembesar suara bersilang dipaparkan di penjuru kanan bawah skrin dan bunyi tidak dimainkan: pelayar hanya membenarkan bunyi selepas butang ditekan. Aplikasi Masjid View TV tidak memerlukan langkah ini.",
           "Bunyi dimainkan apabila azan bermula dan apabila kiraan iqamah tamat. Tiada bunyi untuk Imsak dan Syuruk, dan tiada bunyi iqamah pada hari Jumaat (khutbah). Skrin “Pengumuman sahaja” tidak memainkan bunyi.",
           "Selepas OK ditekan, TV tidak dimuat semula pada pukul 3:00 pagi supaya bunyi kekal berfungsi. Apabila versi baharu diperlukan, TV memaparkan “Versi baharu tersedia” (lihat Mengemas kini TV).",
           "Jika azan sudah dilaungkan melalui pembesar suara masjid, pilih bunyi yang lembut (Loceng) atau Tiada untuk azan, supaya tidak bertindih."
@@ -590,10 +609,12 @@
       {
         "id": "kemas-kini",
         "title": "Mengemas kini TV",
+        "lead": "TV biasanya mengemas kini dirinya sendiri; bahagian ini menerangkan bila anda perlu menekan butang.",
         "steps": [
           "Biasanya anda tidak perlu berbuat apa-apa: TV memuatkan versi terkini sendiri setiap pagi pukul 3:00.",
           "TV yang dijadikan skrin penuh dengan butang OK, atau yang bunyinya dibenarkan dengan butang OK, tidak dimuat semula pada waktu malam, supaya kekal skrin penuh dan bunyi terus berfungsi. Apabila versi baharu diperlukan, TV memaparkan “Versi baharu tersedia”: tekan OK untuk mengemas kini, kemudian OK sekali lagi untuk skrin penuh.",
           "TV dengan Fully Kiosk Browser dikemas kini sendiri pada pukul 3:00 pagi dan kekal skrin penuh, kecuali jika bunyi dihidupkan: ketika itu ia juga memaparkan “Versi baharu tersedia”.",
+          "Aplikasi Masjid View TV: apabila versi baharu aplikasi tersedia, TV memaparkan “Versi baharu tersedia”; tekan Kemas kini. Untuk menyemak sekarang, buka Tetapan (butang Menu) dan tekan “Semak kemas kini”.",
           "Cara segera untuk semua TV: matikan dan hidupkan semula TV, atau tutup dan buka semula pelayar.",
           "Panel AJK memaparkan notis di bahagian atas jika ada skrin masjid anda yang belum dikemas kini, bersama langkah untuk setiap skrin."
         ],
@@ -606,6 +627,7 @@
     "trouble": {
       "id": "masalah",
       "title": "Jika ada masalah",
+      "lead": "Penyelesaian ringkas untuk masalah yang paling kerap berlaku.",
       "items": [
         {
           "q": "WiFi terputus",

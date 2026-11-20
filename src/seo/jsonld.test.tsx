@@ -3,6 +3,7 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { copy } from "@/landing/i18n";
 import { fill } from "@/landing/counts";
+import { guideSections } from "@/landing/guide-content";
 import { site } from "@/landing/site";
 import { article, breadcrumbList, faqPage, graph, howTo, organization, pageJsonLd, softwareApplication, website } from "./jsonld";
 import { PAGES, seoPage } from "./routes";
@@ -104,7 +105,7 @@ describe("per page (PRD §3.B table)", () => {
 
   it("the guide's HowTo has the guide's own sections and steps; breadcrumb Utama → guide", () => {
     for (const path of ["/panduan/", "/en/panduan/"]) {
-      const g = copy(seoPage(path).lang).panduan;
+      const g = { sections: guideSections(seoPage(path).lang) };
       const [, , how, crumbs] = nodes(path);
       expect((how.step as N[]).map((s) => s.name)).toEqual(g.sections.map((s) => s.title));
       expect(((how.step as N[])[0].itemListElement as N[]).map((s) => s.text)).toEqual(g.sections[0].steps);

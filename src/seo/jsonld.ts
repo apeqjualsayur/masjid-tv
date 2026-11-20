@@ -4,6 +4,7 @@
 // or reviews (PRD §2.3). Empty values are dropped, never emitted.
 import { copy, homeHref, pageHref, type Lang } from "@/landing/i18n";
 import { fill } from "@/landing/counts";
+import { guideSections } from "@/landing/guide-content";
 import { site } from "@/landing/site";
 import { seoPage, type SeoPage } from "./routes";
 import { pageText } from "./metadata";
@@ -148,7 +149,7 @@ export function pageJsonLd(path: string): Node {
       break;
     case "guide":
       nodes.push(
-        howTo(p.lang, c.panduan.title, c.panduan.intro, c.panduan.sections),
+        howTo(p.lang, c.panduan.title, c.panduan.intro, guideSections(p.lang)),
         breadcrumbList([home, { name: c.panduan.title, path: pageHref(p.lang, "panduan") }]),
       );
       break;

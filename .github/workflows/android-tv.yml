@@ -94,7 +94,8 @@ jobs:
           if ! out=$("$bt/apksigner" verify --verbose --print-certs "$apk" 2>&1); then
             printf '%s\n' "$out"; echo "::error::apksigner could not verify the APK"; exit 1
           fi
-          if ! printf '%s\n' "$out" | grep -E 'Signer #1 certificate (DN|SHA-256 digest)'; then
+          # build-tools ≤ 36: "Signer #1 certificate DN: …"; 37+: "V2 Signer: certificate DN: …".
+          if ! printf '%s\n' "$out" | grep -E 'Signer( #1|:) certificate (DN|SHA-256 digest)'; then
             printf '%s\n' "$out"; echo "::error::apksigner found no signer in the APK"; exit 1
           fi
           jv=$(jarsigner -verify "$aab" 2>&1) || true

@@ -15,3 +15,14 @@ designs/landing/qa/
 
 # written by next.config.ts at build time
 public/version.json
+
+# Android TV app (android-tv/): build output, machine settings, and the signing key — NEVER commit a key
+android-tv/.gradle/
+android-tv/.kotlin/
+android-tv/build/
+android-tv/app/build/
+android-tv/local.properties
+android-tv/.idea/
+*.jks
+*.keystore
+keystore.properties

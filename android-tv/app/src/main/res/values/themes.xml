@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Black, no action bar, full screen: the web page draws everything. -->
+    <style name="Theme.MasjidView" parent="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@android:color/black</item>
+    </style>
+    <!-- Native Tetapan screen (dark, large controls for the TV remote). -->
+    <style name="Theme.MasjidView.Settings" parent="@android:style/Theme.DeviceDefault.NoActionBar.Fullscreen">
+        <item name="android:windowBackground">@color/settings_bg</item>
+    </style>
+</resources>

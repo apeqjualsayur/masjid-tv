@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Masjid View TV</string>
+
+    <!-- Main screen -->
+    <string name="exit_hint">Tekan sekali lagi untuk keluar</string>
+    <string name="offline_title">Tiada sambungan internet</string>
+    <string name="offline_body">Masjid View TV akan mencuba semula setiap 30 saat. Semak Wi-Fi atau kabel rangkaian TV.</string>
+    <string name="webview_title">Sila kemas kini Android System WebView</string>
+    <string name="webview_body">Paparan masjid memerlukan Android System WebView versi %1$d atau lebih baharu (TV ini: %2$s). Kemas kini melalui Play Store TV, kemudian buka semula app ini.</string>
+    <string name="webview_missing">tiada</string>
+    <string name="webview_try">Cuba juga</string>
+
+    <!-- Tetapan -->
+    <string name="settings_title">Tetapan</string>
+    <string name="settings_reload">Muat semula</string>
+    <string name="settings_autostart">Buka automatik semasa TV dihidupkan</string>
+    <string name="settings_overlay_why">Pada Android 10 dan lebih baharu, app hanya boleh dibuka sendiri selepas TV dihidupkan jika ia dibenarkan \"Paparan di atas apl lain\". Sesetengah TV tidak membenarkannya langsung.</string>
+    <string name="settings_overlay_button">Buka tetapan \"Paparan di atas apl lain\"</string>
+    <string name="settings_overlay_ok">\"Paparan di atas apl lain\": dibenarkan</string>
+    <string name="settings_overlay_missing">Tetapan ini tiada pada TV ini. Cuba Tetapan → Apl → Masjid View TV.</string>
+    <string name="settings_update">Semak kemas kini</string>
+    <string name="settings_close">Tutup</string>
+    <string name="settings_version_app">App: %1$s (%2$d) · %3$s</string>
+    <string name="settings_version_webview">Android System WebView: %1$s</string>
+    <string name="settings_version_web">Web: %1$s</string>
+    <string name="settings_version_web_loading">memuatkan…</string>
+    <string name="settings_version_web_none">tidak dapat dibaca (luar talian?)</string>
+
+    <!-- Self-update (sideload) -->
+    <string name="update_title">Versi baharu tersedia</string>
+    <string name="update_message">Masjid View TV %1$s tersedia (TV ini: %2$s). Kemas kini sekarang?</string>
+    <string name="update_yes">Kemas kini</string>
+    <string name="update_later">Nanti</string>
+    <string name="update_latest">Anda menggunakan versi terkini (%1$s).</string>
+    <string name="update_check_failed">Tidak dapat menyemak kemas kini. Semak sambungan internet.</string>
+    <string name="update_downloading">Memuat turun kemas kini…</string>
+    <string name="update_bad_file">Fail kemas kini rosak atau tidak lengkap. Cuba lagi kemudian.</string>
+    <string name="update_allow_title">Benarkan pemasangan</string>
+    <string name="update_allow_message">Untuk mengemas kini, benarkan \"Pasang apl tidak diketahui\" untuk Masjid View TV. Selepas itu kembali ke sini, buka Tetapan (butang Menu) dan tekan \"Semak kemas kini\".</string>
+    <string name="update_allow_open">Buka tetapan</string>
+    <string name="update_allow_missing">Tetapan ini tiada pada TV ini. Cuba Tetapan → Privasi / Keselamatan → Apl tidak diketahui.</string>
+</resources>

@@ -32,6 +32,7 @@ If code and spec disagree, the spec wins — or update the spec first, deliberat
 | `src/templates/` | Announcement template types + sample data (no styling); `schema.ts`: field metadata + validation the admin editor builds its form from; `ayat-sources.json`: the only allowed ayat/hadith (TO BE VERIFIED BY AN USTAZ) |
 | `src/app/tv/` | The display page: config + URL overrides → `DisplayState` → selected theme on a 1920×1080 stage. `pairing/`: Phase 2 pairing screen (device secret, pair_start/pair_status, QR). Without `?local=1` (and with Supabase configured) /tv shows pairing |
 | `scripts/` | Build-time scripts (e.g. `fetch-year.ts` for fallback data) |
+| `android-tv/` | Android TV app (Kotlin WebView shell, `_specs/60-PRD-enhancements.md` §8). **Not** part of the Next.js build; see its README. Never commit `*.jks` / `keystore.properties` |
 | `public/config/` | `screen.json` (Phase 1 config), logo, sample slides/posters |
 | `public/data/` | Bundled 12-month fallback prayer data: `{zone}-{year}.json` |
 

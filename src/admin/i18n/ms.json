@@ -112,7 +112,8 @@
     "kewangan": "Kewangan",
     "ayat": "Ayat",
     "ucapan": "Ucapan",
-    "poster": "Poster"
+    "poster": "Poster",
+    "penangguhan": "Penangguhan"
   },
   "placeholder": {
     "soon": "Halaman ini sedang dibina.",
@@ -635,6 +636,17 @@
       "option": "Pilih daripada senarai.",
       "rows": "Bilangan baris tidak sah.",
       "ayat": "Pilih semula daripada senarai."
+    },
+    "countdown": {
+      "legend": "Kiraan detik",
+      "show": "Papar kiraan detik",
+      "hint": "Pada slaid: \"Lagi 3 hari\", \"Esok · 8:45 malam\", \"Bermula dalam 42:15\".",
+      "needsDate": "Pilih tarikh di atas untuk memaparkan kiraan detik.",
+      "duration": "Tempoh aktiviti (minit, pilihan)",
+      "durationHint": "Berapa lama \"Sedang berlangsung\" dipaparkan selepas mula. Lalai 90 minit ({min}–{max}).",
+      "previewAt": "Pratonton pada…",
+      "previewBefore": "59 minit sebelum mula",
+      "previewNow": "Kembali ke masa sekarang"
     }
   },
   "content": {
@@ -1032,5 +1044,46 @@
     "empty": "Belum ada maklum balas.",
     "error": "Tidak dapat memuatkan maklum balas: {message}",
     "noOrg": "(tiada masjid)"
+  },
+  "notice": {
+    "postpone": "Tangguhkan…",
+    "cancelActivity": "Batalkan…",
+    "update": "Kemas kini notis",
+    "withdraw": "Tarik balik notis",
+    "titleTangguh": "Tangguhkan aktiviti",
+    "titleBatal": "Batalkan aktiviti",
+    "newDate": "Tarikh dan masa baru",
+    "newTime": "Masa baru",
+    "tba": "Tarikh baru akan dimaklumkan",
+    "reason": "Sebab (pilihan)",
+    "preview": "Pratonton di TV",
+    "endsAt": "Slaid dipaparkan hingga {date}.",
+    "endsNever": "Slaid ini tiada tarikh tamat.",
+    "shortenQ": "Tamatkan slaid selepas tarikh asal?",
+    "shortenYes": "Ya, tamatkan pada {date}",
+    "shortenNo": "Tidak, kekalkan tarikh tamat sekarang ({date})",
+    "shortenNoForever": "Tidak, kekalkan tanpa tarikh tamat",
+    "pausedHint": "Slaid ini dijeda — terbitkan untuk papar notis.",
+    "draftHint": "Slaid ini masih draf — terbitkan untuk papar notis.",
+    "confirm": "Sahkan",
+    "close": "Tutup",
+    "savedTangguh": "Notis penangguhan disimpan. TV dikemas kini dalam masa kira-kira 1 minit.",
+    "savedBatal": "Notis pembatalan disimpan. TV dikemas kini dalam masa kira-kira 1 minit.",
+    "withdrawn": "Notis ditarik balik. Semak tarikh tamat slaid.",
+    "badgeTangguh": "Ditangguhkan",
+    "badgeBatal": "Dibatalkan",
+    "err": {
+      "newAt": {
+        "required": "Pilih tarikh dan masa baru, atau tandakan \"Tarikh baru akan dimaklumkan\".",
+        "invalid": "Tarikh atau masa baru tidak sah.",
+        "past": "Tarikh baru mesti pada masa hadapan."
+      },
+      "reason": {
+        "tooLong": "Sebab terlalu panjang: {n} aksara. Maksimum {max}."
+      },
+      "load": "Slaid tidak dapat dimuatkan: {message}",
+      "save": "Notis tidak dapat disimpan: {message}",
+      "db": "Notis ditolak. Semak sebab (maksimum 100 aksara) dan cuba lagi."
+    }
   }
 }

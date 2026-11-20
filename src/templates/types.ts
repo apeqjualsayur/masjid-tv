@@ -23,11 +23,8 @@ export const TEMPLATE_KEYS: readonly TemplateKey[] = [
   "penangguhan",
 ];
 
-/**
- * Not offered in the admin template picker (they still render and stay editable). penangguhan: until
- * its editor and the Tangguh / Batal sheets ship in E5 (_specs/61). imam_bilal joins in E15 (PRD D9).
- */
-export const PICKER_HIDDEN: readonly TemplateKey[] = ["penangguhan"];
+/** Not offered in the admin template picker (they still render and stay editable). imam_bilal joins in E15 (PRD D9). */
+export const PICKER_HIDDEN: readonly TemplateKey[] = [];
 
 /** A ?key= value (or a slides.template_key) as one of the template keys, or null when it is not one. */
 export function resolveTemplateKey(k: string | null | undefined): TemplateKey | null {

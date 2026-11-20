@@ -3,11 +3,9 @@
 // /admin/templat/?key=kuliah (new) or ?id=<slide> (edit). Form from the schema, live preview with
 // the real theme, shared schedule, Simpan draf / Terbit, "Duplikasi untuk minggu depan".
 import Link from "next/link";
-import { Component, useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
-import type { LayoutKey, ThemeId } from "@/core";
-import { THEMES_ROUND2_VISIBLE } from "@/config/features";
+import { Component, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { getSupabase } from "@/lib/supabase";
-import { resolveTemplateKey, type SlideView, type TemplateKey } from "@/templates";
+import { cleanPenangguhan, penangguhanEndsAt, resolveTemplateKey, supportsNotice, validateActivityExtras, type NoticeKind, type SlideView, type TemplateKey } from "@/templates";
 import { AYAT_VERIFIED, IMAGE_FIELD_KEYS, TEMPLATES, defaultFields, getPath, setPath, shiftWeek, validateFields, type FieldErrors, type Fields, type ImageField } from "@/templates/schema";
 import { useClock } from "../home/useHomeData";
 import { usePrayerToday } from "../home/usePrayerToday";
@@ -16,18 +14,20 @@ import { compressImage } from "../poster/compress";
 import type { Encoded } from "../poster/encode";
 import { fileError } from "../poster/logic";
 import type { SlideStatus } from "../poster/save";
+import { NoticeButtons, NoticeSheet, useWithdrawNotice } from "../notice/NoticeSheet";
+import type { NoticeRow } from "@/templates";
 import { ROUTES } from "../routing";
-import { layoutChoices, themeChoices } from "../screens/logic";
 import { ScheduleFields } from "../schedule/ScheduleFields";
-import { defaultSchedule, scheduleFromRow, scheduleToRow, shiftSchedule, validateSchedule, type Schedule, type ScheduleErrors, type SlideScheduleRow } from "../schedule/logic";
+import { defaultSchedule, endFromEpoch, scheduleFromRow, scheduleToRow, shiftSchedule, validateSchedule, type Schedule, type ScheduleErrors, type SlideScheduleRow } from "../schedule/logic";
 import { useAdmin } from "../session";
-import { readDurations, readIqamah } from "../settings/logic";
 import { Dialog } from "../shell/Dialog";
 import { ICON, Icon } from "../shell/icons";
 import { useToasts } from "../shell/Toast";
+import { ActivityExtrasFields } from "./ActivityExtras";
 import { saveTemplateSlide, supabaseTemplateBackend } from "./save";
-import { PreviewStage, type PreviewContext, type PreviewTarget } from "./PreviewStage";
+import { PreviewStage } from "./PreviewStage";
 import { TemplateForm, type ImageState } from "./TemplateForm";
+import { usePreviewSetup } from "./usePreviewSetup";
 
 const card = "rounded-[18px] bg-adm-card shadow-[0_1px_3px_rgba(18,38,30,0.08)]";
 const sectionTitle = "text-[13px] font-extrabold tracking-[0.06em] text-adm-muted uppercase";
@@ -35,7 +35,6 @@ const btnPrimary = "h-11 rounded-xl bg-adm-green px-5 text-[14px] font-bold text
 const btnSecondary = "h-11 rounded-xl border-[1.5px] border-adm-green bg-white px-4 text-[14px] font-bold text-adm-green disabled:opacity-50";
 
 type Status = "new" | SlideStatus;
-interface Screen { id: string; name: string; theme: ThemeId; layout: LayoutKey }
 
 /** A broken half-typed value must never take the editor down: the preview just pauses. */
 class PreviewBoundary extends Component<{ children: ReactNode; resetKey: string }, { failed: boolean; key: string }> {
@@ -111,30 +110,20 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
   const [loadError, setLoadError] = useState<string | null>(null);
   const [loaded, setLoaded] = useState(!openedId);
   const [saving, setSaving] = useState<SlideStatus | null>(null);
-  const [screens, setScreens] = useState<Screen[]>([]);
-  const [ctx, setCtx] = useState<PreviewContext | null>(null);
+  const { screens, ctx, targets } = usePreviewSetup(org);
   const [targetKey, setTargetKey] = useState<string | null>(null);
   const [choosing, setChoosing] = useState(false);
+  /** "Pratonton pada…" (§4.3): the moment the preview's countdown shows; null = now. */
+  const [previewAt, setPreviewAt] = useState<number | null>(null);
+  const [noticeKind, setNoticeKind] = useState<NoticeKind | null>(null);
+  const [slideStatus, setSlideStatus] = useState<string>("draft");
   const { day, loading: dayLoading } = usePrayerToday(org.zone, now);
 
-  // Screens, settings for the preview, and (edit) the slide.
+  // (edit) the slide.
   useEffect(() => {
-    const sb = getSupabase();
-    sb.from("screens").select("id, name, theme, layout").eq("org_id", org.orgId).is("revoked_at", null).order("name").then(({ data }) => setScreens((data ?? []) as Screen[]));
-    sb.from("org_settings").select("iqamah_min, durations, clock_24h, show_arabic, ticker").eq("org_id", org.orgId).single().then(({ data }) => {
-      const logoUrl = org.logoPath ? sb.storage.from("media").getPublicUrl(org.logoPath).data.publicUrl : undefined;
-      setCtx({
-        masjid: { fullName: org.fullName, shortName: org.shortName, logoUrl },
-        clock24h: Boolean(data?.clock_24h),
-        showArabic: data?.show_arabic !== false,
-        ticker: (data?.ticker as string[] | null) ?? [],
-        iqamahMin: readIqamah(data?.iqamah_min),
-        durations: readDurations(data?.durations),
-      });
-    });
     const id = openedId;
     if (!id) return;
-    sb.from("slides").select("id, type, template_key, fields, status, starts_at, ends_at, duration_s, days_of_week, priority, screen_ids").eq("id", id).eq("org_id", org.orgId).maybeSingle().then(({ data, error }) => {
+    getSupabase().from("slides").select("id, type, template_key, fields, status, starts_at, ends_at, duration_s, days_of_week, priority, screen_ids").eq("id", id).eq("org_id", org.orgId).maybeSingle().then(({ data, error }) => {
       if (error) return setLoadError(error.message);
       const k = data?.type === "template" ? resolveTemplateKey(data.template_key) : null;
       if (!data || !k) return setLoadError(t("editor.notFound"));
@@ -143,19 +132,12 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
       setOriginal((data.fields as Fields) ?? {});
       setSchedule(scheduleFromRow(data as unknown as SlideScheduleRow, Date.now()));
       setStatus(data.status === "published" ? "published" : "draft");
+      setSlideStatus(String(data.status));
       setLoaded(true);
     });
-  }, [org.orgId, org.fullName, org.shortName, org.logoPath, openedId, t]);
+  }, [org.orgId, openedId, t]);
 
   const meta = key ? TEMPLATES[key] : null;
-  const targets = useMemo<PreviewTarget[]>(() => {
-    const fromScreens = screens.filter((s) => s.layout !== "full").map((s) => ({ key: s.id, theme: s.theme, layout: s.layout, label: t("editor.screenOption", { name: s.name, theme: t(`theme.${s.theme}`), layout: t(`layout.${s.layout}`) }) }));
-    // Every theme on offer × every layout that shows announcements (incl. "Pengumuman sahaja" with round 2).
-    const layouts = layoutChoices(THEMES_ROUND2_VISIBLE).filter((l) => l !== "full");
-    const themes = themeChoices(THEMES_ROUND2_VISIBLE).sort((x, y) => Number(y === "tenang") - Number(x === "tenang"));
-    const generic = themes.flatMap((th) => layouts.map((l) => ({ key: `${th}-${l}`, theme: th, layout: l, label: t("editor.themeOption", { theme: t(`theme.${th}`), layout: t(`layout.${l}`) }) })));
-    return [...fromScreens, ...generic];
-  }, [screens, t]);
   const target = targets.find((x) => x.key === targetKey) ?? targets[0];
 
   const images: Record<string, ImageState> = {};
@@ -204,9 +186,38 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
     setFields((f) => setPath(f, k, undefined));
   };
 
+  // New Penangguhan: the end follows the notice rule (§3.3, §3.5) until the admin changes it.
+  const autoEnd = useRef<string | null>(null);
+  useEffect(() => {
+    if (key !== "penangguhan" || slideId) return;
+    const e = endFromEpoch(penangguhanEndsAt(fields, Date.now()));
+    const sig = e.hasEnd ? `${e.endDate}|${e.endTime}` : "";
+    setSchedule((s) => {
+      const cur = s.hasEnd ? `${s.endDate}|${s.endTime}` : "";
+      if (autoEnd.current !== null && cur !== autoEnd.current) return s; // changed by hand: leave it
+      autoEnd.current = sig;
+      return cur === sig ? s : { ...s, ...e };
+    });
+  }, [key, slideId, fields]);
+
+  /** A notice was set, updated or withdrawn (saved already): mirror it in the form. */
+  const noticeApplied = (r: NoticeRow) => {
+    const merge = (f: Fields | null) => {
+      if (!f) return f;
+      const out = { ...f };
+      if (r.fields.notice) out.notice = r.fields.notice;
+      else delete out.notice;
+      return out;
+    };
+    setFields((f) => merge(f)!);
+    setOriginal((f) => merge(f));
+    setSchedule((s) => ({ ...s, priority: r.priority, ...endFromEpoch(r.endsAt) }));
+  };
+  const withdraw = useWithdrawNotice(toast, noticeApplied);
+
   const save = async (next: SlideStatus) => {
     if (!key || !meta) return;
-    const fe = validateFields(key, fields);
+    const fe = { ...validateFields(key, fields), ...(supportsNotice(key) ? validateActivityExtras(fields) : {}) };
     const se = validateSchedule(schedule, meta.schedule);
     setFieldErrors(fe);
     setSchedErrors(se);
@@ -219,7 +230,7 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
     try {
       const r = await saveTemplateSlide(
         supabaseTemplateBackend(getSupabase(), a.session!.user.id, org.orgId),
-        { orgId: org.orgId, templateKey: key, fields, pending: Object.fromEntries(Object.entries(pending).map(([k, v]) => [k, { encoded: v.encoded, kind: v.kind }])), original, imageKeys: IMAGE_FIELD_KEYS, schedule: scheduleToRow(schedule), status: next, slideId },
+        { orgId: org.orgId, templateKey: key, fields: key === "penangguhan" ? cleanPenangguhan(fields) : fields, pending: Object.fromEntries(Object.entries(pending).map(([k, v]) => [k, { encoded: v.encoded, kind: v.kind }])), original, imageKeys: IMAGE_FIELD_KEYS, schedule: scheduleToRow(schedule), status: next, slideId },
         () => crypto.randomUUID(),
       );
       // Fields as saved: new image paths come back through a reload of the row.
@@ -231,6 +242,7 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
       setOriginal(saved);
       setSlideId(r.slideId);
       setStatus(next);
+      setSlideStatus(next);
       window.history.replaceState(null, "", `${ROUTES.template}?id=${r.slideId}`);
       clearToasts();
       toast(r.oldRemoved ? "ok" : "warn", !r.oldRemoved ? t("editor.oldKept") : slideId ? t("editor.updated") : next === "published" ? t("editor.published") : t("editor.savedDraft"));
@@ -290,6 +302,8 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
       </button>
     </>
   );
+  // Tangguhkan… / Batalkan… (or Kemas kini / Tarik balik): only on a saved kuliah / program / mesyuarat.
+  const noticeButtons = supportsNotice(key) && slideId && <NoticeButtons fields={fields} onOpen={setNoticeKind} onWithdraw={() => withdraw(slideId)} />;
   const dupButton = meta.weekly && slideId && (
     <button type="button" onClick={duplicate} className="flex h-11 items-center gap-1.5 rounded-xl px-3 text-[14px] font-bold text-adm-green hover:bg-adm-soft">
       <Icon d="M8 8h11v11H8z M5 16V5h11" size={18} />
@@ -301,7 +315,7 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
     <p className="rounded-xl bg-adm-ground px-4 py-6 text-center text-[13px] text-adm-muted">{t("editor.loadingPreview")}</p>
   ) : day && day.status === "ok" && slide && target ? (
     <PreviewBoundary resetKey={JSON.stringify(debounced).length + target.key}>
-      <PreviewStage slide={slide} target={target} day={day} now={now} ctx={ctx} label={t("editor.preview")} />
+      <PreviewStage slide={slide} target={target} day={day} now={now} ctx={ctx} label={t("editor.preview")} liveAt={previewAt ?? undefined} />
     </PreviewBoundary>
   ) : (
     <p className="rounded-xl bg-[#FFF4DF] px-4 py-3 text-[13px] text-[#6B4A12]">{t("editor.noTimes")}</p>
@@ -319,6 +333,7 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
         <h2 id="ed-details" className={sectionTitle}>{t("editor.details")}</h2>
         {notes}
         <TemplateForm templateKey={key} fields={fields} onChange={setFields} errors={fieldErrors} images={images} onPickImage={pickImage} onRemoveImage={removeImage} />
+        {supportsNotice(key) && <ActivityExtrasFields fields={fields} onChange={setFields} errors={fieldErrors} previewAt={previewAt} onPreviewAt={setPreviewAt} />}
       </section>
       <div className="h-px bg-adm-hair" />
       <section aria-labelledby="ed-sched" className="flex flex-col gap-4">
@@ -338,10 +353,12 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
         <h1 className="min-w-0 truncate text-[20px] font-extrabold">{meta.name[lang]}</h1>
         {statusBadge}
         <div className="ml-auto hidden items-center gap-2.5 lg:flex">
+          {noticeButtons}
           {dupButton}
           {buttons}
         </div>
       </div>
+      {noticeButtons && <div className="mt-2 flex flex-wrap gap-2 lg:hidden">{noticeButtons}</div>}
 
       <div className="mt-4 grid grid-cols-1 lg:mt-0 lg:grid-cols-[440px_minmax(0,1fr)]">
         {/* Phone: preview first */}
@@ -398,6 +415,9 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
           ))}
         </div>
       </Dialog>
+      {slideId && noticeKind && (
+        <NoticeSheet kind={noticeKind} slideId={slideId} templateKey={key} fields={fields} status={slideStatus} onClose={() => setNoticeKind(null)} onApplied={noticeApplied} toast={toast} />
+      )}
       {toasts}
     </div>
   );

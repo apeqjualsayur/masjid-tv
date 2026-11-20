@@ -139,6 +139,11 @@ export function targetsShowNoSlides(screenIds: string[] | null, screens: TargetS
   return chosen.length > 0 && chosen.every((s) => s.layout === "full");
 }
 
+/** An ends_at (epoch ms; null = no end) as the schedule's end fields. */
+export function endFromEpoch(ms: number | null): { hasEnd: boolean } & Partial<Pick<Schedule, "endDate" | "endTime">> {
+  return ms === null ? { hasEnd: false } : { hasEnd: true, endDate: dateOf(ms), endTime: timeOf(ms) };
+}
+
 /** Same schedule a number of days later ("Duplikasi untuk minggu depan"). */
 export function shiftSchedule(s: Schedule, days: number): Schedule {
   const add = (date: string) => {

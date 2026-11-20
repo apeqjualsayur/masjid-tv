@@ -12,7 +12,6 @@ import {
   localDateKey,
   playlistAt,
   setDebugTime,
-  templateLive,
   upcomingPrayer,
   type DisplayState,
   type ForcedModeInput,
@@ -31,7 +30,7 @@ import {
   type PrayerData,
   type SyncStatus,
 } from "@/data";
-import { SAMPLE_POSTER, SAMPLE_POSTER_LANDSCAPE, sampleSlide, type SlideView } from "@/templates";
+import { SAMPLE_POSTER, SAMPLE_POSTER_LANDSCAPE, sampleSlide, withLive, type SlideView } from "@/templates";
 import { useTheme } from "@/themes";
 import { ThemeView, UnavailableView } from "@/themes/ThemeView";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -198,17 +197,9 @@ function pickSlide(layout: LayoutKey, preview: UrlOverrides["slide"], slides: Pl
   if (!now) return { layout: layout === "poster" ? "poster" : "full" };
   return { layout, slide: withLive(now.item.payload, at, clock24h), slideKey: now.item.id, counter: { position: now.position, total: now.total } };
 }
-
-/**
- * Countdown / notice for the slide on screen (contract rule 21), from its fields and this second's
- * time. Only the visible slide gets it, so a countdown ticks only while its slide is shown, and no
- * timer of its own runs (this render already happens once a second).
- */
-export function withLive(slide: SlideView, at: number, clock24h: boolean): SlideView {
-  if (slide.kind !== "template") return slide;
-  const live = templateLive(slide.template, slide.fields as unknown as Record<string, unknown>, at, clock24h);
-  return live ? ({ ...slide, live } as SlideView) : slide;
-}
+// withLive: countdown / notice for the slide on screen only (contract rule 21), from this second's
+// time. A countdown therefore ticks only while its slide is shown; no timer of its own runs (this
+// render already happens once a second).
 
 /** With ?debug=1 the F key toggles a forced Friday (same as &day=fri), for quick checks. */
 function useFridayKey(debug: boolean, initial: boolean): boolean {

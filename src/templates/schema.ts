@@ -20,7 +20,12 @@ interface Base {
   required?: boolean;
   hint?: L;
   placeholder?: L;
+  /** Shown (and validated) only while another field has this value (Penangguhan: new date for Tangguh). */
+  when?: { key: string; is: string };
 }
+
+/** False when a field's `when` condition does not hold for these values. */
+export const fieldShown = (d: { when?: { key: string; is: string } }, f: Record<string, unknown>): boolean => !d.when || getPath(f, d.when.key) === d.when.is;
 export interface TextField extends Base { type: "text" | "longtext"; max: number }
 /** Stored as a display string at `key` and the ISO date(s) at `${key}Iso` (to edit and to shift weeks). */
 export interface DateField extends Base { type: "date"; range?: boolean }
@@ -207,8 +212,8 @@ export const TEMPLATES: Record<TemplateKey, TemplateMeta> = {
       { key: "from", type: "text", label: T("Daripada", "From"), max: 60, placeholder: T("cth. AJK Masjid", "e.g. Masjid committee") },
     ],
   },
-  // PRD enhancements §3.5. Hidden from the picker until E5 (PICKER_HIDDEN); the Tangguh-only rule for
-  // the new date and the default ends_at (§3.3) come with the editor in E5.
+  // PRD enhancements §3.5. The new date/time show for Tangguh only (cleanPenangguhan drops them for
+  // Batal); a new slide's ends_at follows §3.3 (penangguhanEndsAt, applied by the editor).
   penangguhan: {
     key: "penangguhan", code: "TGH", name: T("Penangguhan / Pembatalan", "Postponed / cancelled"), desc: T("Aktiviti ditangguh atau dibatalkan", "Activity postponed or cancelled"), bg: "#FDF0D5", fg: "#8A4B00",
     fields: [
@@ -216,8 +221,8 @@ export const TEMPLATES: Record<TemplateKey, TemplateMeta> = {
       { key: "kind", type: "select", label: T("Jenis", "Type"), required: true, options: [{ value: "tangguh", label: T("Tangguh", "Postponed") }, { value: "batal", label: T("Batal", "Cancelled") }] },
       { key: "date", type: "date", label: T("Tarikh asal", "Original date"), required: true },
       { key: "time", type: "time-choice", label: T("Masa asal", "Original time"), required: true },
-      { key: "newDate", type: "date", label: T("Tarikh baru (pilihan, Tangguh sahaja)", "New date (optional, postponed only)") },
-      { key: "newTime", type: "time-choice", label: T("Masa baru (pilihan)", "New time (optional)") },
+      { key: "newDate", type: "date", label: T("Tarikh baru (pilihan)", "New date (optional)"), hint: T("Kosongkan jika tarikh baru belum diketahui: TV memaparkan \"Tarikh baru akan dimaklumkan\".", "Leave empty if the new date is not known yet: the TV shows \"Tarikh baru akan dimaklumkan\"."), when: { key: "kind", is: "tangguh" } },
+      { key: "newTime", type: "time-choice", label: T("Masa baru (pilihan)", "New time (optional)"), when: { key: "kind", is: "tangguh" } },
       { key: "person", type: "text", label: T("Penceramah / penganjur (pilihan)", "Speaker / organiser (optional)"), max: 60 },
       { key: "reason", type: "text", label: T("Sebab (pilihan)", "Reason (optional)"), max: 100, placeholder: T("cth. Penceramah uzur", "e.g. Speaker unwell") },
       { key: "note", type: "longtext", label: T("Nota (pilihan)", "Note (optional)"), max: 140 },
@@ -276,6 +281,7 @@ const len = (v: unknown) => (typeof v === "string" ? [...v.trim()].length : 0);
 export function validateFields(key: TemplateKey, f: Fields): FieldErrors {
   const e: FieldErrors = {};
   for (const d of TEMPLATES[key].fields) {
+    if (!fieldShown(d, f)) continue;
     const v = getPath(f, d.key);
     if (d.type === "table") {
       const rows = Array.isArray(v) ? (v as Fields[]) : [];

@@ -112,7 +112,8 @@
     "kewangan": "Finance",
     "ayat": "Verse",
     "ucapan": "Greeting",
-    "poster": "Poster"
+    "poster": "Poster",
+    "penangguhan": "Postponement"
   },
   "placeholder": {
     "soon": "This page is being built.",
@@ -635,6 +636,17 @@
       "option": "Choose from the list.",
       "rows": "Invalid number of rows.",
       "ayat": "Choose again from the list."
+    },
+    "countdown": {
+      "legend": "Countdown",
+      "show": "Show countdown",
+      "hint": "On the slide: \"Lagi 3 hari\", \"Esok · 8:45 malam\", \"Bermula dalam 42:15\".",
+      "needsDate": "Choose a date above to show a countdown.",
+      "duration": "Activity length (minutes, optional)",
+      "durationHint": "How long \"Sedang berlangsung\" (in progress) shows after the start. Default 90 minutes ({min}–{max}).",
+      "previewAt": "Preview at…",
+      "previewBefore": "59 minutes before the start",
+      "previewNow": "Back to now"
     }
   },
   "content": {
@@ -1032,5 +1044,46 @@
     "empty": "No feedback yet.",
     "error": "Could not load feedback: {message}",
     "noOrg": "(no masjid)"
+  },
+  "notice": {
+    "postpone": "Postpone…",
+    "cancelActivity": "Cancel activity…",
+    "update": "Update notice",
+    "withdraw": "Withdraw notice",
+    "titleTangguh": "Postpone activity",
+    "titleBatal": "Cancel activity",
+    "newDate": "New date and time",
+    "newTime": "New time",
+    "tba": "New date to be announced",
+    "reason": "Reason (optional)",
+    "preview": "Preview on the TV",
+    "endsAt": "The slide shows until {date}.",
+    "endsNever": "This slide has no end date.",
+    "shortenQ": "End the slide after the original date?",
+    "shortenYes": "Yes, end on {date}",
+    "shortenNo": "No, keep the current end ({date})",
+    "shortenNoForever": "No, keep it without an end date",
+    "pausedHint": "This slide is paused — publish it to show the notice.",
+    "draftHint": "This slide is still a draft — publish it to show the notice.",
+    "confirm": "Confirm",
+    "close": "Close",
+    "savedTangguh": "Postponement saved. TVs update within about a minute.",
+    "savedBatal": "Cancellation saved. TVs update within about a minute.",
+    "withdrawn": "Notice withdrawn. Check the slide's end date.",
+    "badgeTangguh": "Postponed",
+    "badgeBatal": "Cancelled",
+    "err": {
+      "newAt": {
+        "required": "Choose the new date and time, or tick \"New date to be announced\".",
+        "invalid": "The new date or time is not valid.",
+        "past": "The new date must be in the future."
+      },
+      "reason": {
+        "tooLong": "Reason too long: {n} characters. Maximum {max}."
+      },
+      "load": "The slide could not be loaded: {message}",
+      "save": "The notice could not be saved: {message}",
+      "db": "The notice was rejected. Check the reason (100 characters at most) and try again."
+    }
   }
 }

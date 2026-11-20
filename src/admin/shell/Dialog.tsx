@@ -9,18 +9,22 @@ export function Dialog({ open, onClose, title, children }: { open: boolean; onCl
   const { t } = useT();
   const desktop = useIsDesktop();
   const panel = useRef<HTMLDivElement>(null);
+  // Callers often pass a new onClose each render; keep the latest in a ref so focus is moved only when
+  // the dialog opens (re-running on every render would pull focus out of a field while typing).
+  const close = useRef(onClose);
+  close.current = onClose;
 
   useEffect(() => {
     if (!open) return;
     const previous = document.activeElement as HTMLElement | null;
     panel.current?.focus();
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && close.current();
     window.addEventListener("keydown", onKey);
     return () => {
       window.removeEventListener("keydown", onKey);
       previous?.focus?.();
     };
-  }, [open, onClose]);
+  }, [open]);
 
   if (!open) return null;
   return (

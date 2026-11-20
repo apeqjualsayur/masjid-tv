@@ -3,7 +3,7 @@
 // Values follow the template types the TV renders (display strings for dates and times).
 import { useRef } from "react";
 import {
-  AYAT_SOURCES, TEMPLATES, TIME_CHOICES, applyAyat, fixedRowLabel, formatClockBm, formatDateBm, formatRangeBm, getPath, parseClockBm, setPath,
+  AYAT_SOURCES, TEMPLATES, TIME_CHOICES, applyAyat, fieldShown, fixedRowLabel, formatClockBm, formatDateBm, formatRangeBm, getPath, parseClockBm, setPath,
   type FieldDef, type FieldErrors, type Fields, type SelectField, type TableField,
 } from "@/templates/schema";
 import type { TemplateKey } from "@/templates";
@@ -49,7 +49,7 @@ export function TemplateForm({ templateKey, fields, onChange, errors, images, on
   const set = (path: string, value: unknown) => onChange(setPath(fields, path, value));
   return (
     <div className="flex flex-col gap-4">
-      {meta.fields.map((d) => (
+      {meta.fields.filter((d) => fieldShown(d, fields)).map((d) => (
         <FieldInput key={d.key} d={d} fields={fields} set={set} onChange={onChange} errors={errors} lang={lang} image={images[d.key]} onPickImage={onPickImage} onRemoveImage={onRemoveImage} />
       ))}
     </div>
@@ -138,6 +138,7 @@ function FieldInput({ d, fields, set, onChange, errors, lang, image, onPickImage
             className={`${box} ${bd} h-12`}
           />
           {typeof v === "string" && v && <span className="text-[12px] text-adm-muted">{v}</span>}
+          {d.hint && <span className="text-[12px] leading-[1.4] text-adm-muted">{d.hint[lang]}</span>}
           <ErrorText e={err} />
         </div>
       );

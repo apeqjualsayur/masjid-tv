@@ -8,8 +8,10 @@ import { CSS } from "@dnd-kit/utilities";
 import Link from "next/link";
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from "react";
 import { getSupabase } from "@/lib/supabase";
+import { noticeOf, supportsNotice, type NoticeKind } from "@/templates";
 import { IMAGE_FIELD_KEYS, TEMPLATES } from "@/templates/schema";
 import { supabaseTemplateBackend } from "../editor/save";
+import { NoticeSheet, useWithdrawNotice } from "../notice/NoticeSheet";
 import { useClock } from "../home/useHomeData";
 import { useT } from "../i18n";
 import { ROUTES } from "../routing";
@@ -67,6 +69,8 @@ export function ContentView() {
   const [confirmDelete, setConfirmDelete] = useState<ContentRow | null>(null);
   const [busy, setBusy] = useState(false);
   const [live, setLive] = useState("");
+  const [noticeFor, setNoticeFor] = useState<{ row: ContentRow; kind: NoticeKind } | null>(null);
+  const withdraw = useWithdrawNotice(toast, () => reload());
 
   const typeName = useCallback((r: ContentRow) => (r.type === "poster" ? t("template.poster") : t(`template.${r.template_key}`)), [t]);
   const all = rows ?? [];
@@ -179,6 +183,8 @@ export function ContentView() {
 
   const badges = (r: ContentRow) => (
     <>
+      {noticeOf(r.fields)?.kind === "tangguh" && <span className="flex-none rounded-md bg-[#FFF1D6] px-1.5 py-0.5 text-[11px] font-extrabold text-[#8A3F06]">{t("notice.badgeTangguh")}</span>}
+      {noticeOf(r.fields)?.kind === "batal" && <span className="flex-none rounded-md bg-[#FDE7E7] px-1.5 py-0.5 text-[11px] font-extrabold text-[#991B1B]">{t("notice.badgeBatal")}</span>}
       {r.priority && <span className="flex-none rounded-md bg-[#FDE7E2] px-1.5 py-0.5 text-[11px] font-extrabold text-[#9B2C14]">{t("content.priority")}</span>}
       {r.status === "draft" && <span className="flex-none rounded-md bg-[#E3ECE7] px-1.5 py-0.5 text-[11px] font-extrabold text-[#3A4E45]">{t("content.draft")}</span>}
       {r.status === "paused" && tab !== "tamat" && <span className="flex-none rounded-md bg-[#FFF1D6] px-1.5 py-0.5 text-[11px] font-extrabold text-[#7A4700]">{t("content.paused")}</span>}
@@ -333,6 +339,7 @@ export function ContentView() {
             <button type="button" onClick={() => duplicate(menuFor)} className="flex h-12 items-center gap-3 rounded-xl px-3 text-left text-[15px] font-bold hover:bg-adm-ground">
               <Icon d="M8 8h11v11H8z M5 16V5h11" size={20} /> {t("content.duplicate")}
             </button>
+            {supportsNotice(menuFor.template_key) && tab !== "tamat" && <NoticeMenuItems row={menuFor} onOpen={(kind) => { setNoticeFor({ row: menuFor, kind }); setMenuFor(null); }} onWithdraw={() => { withdraw(menuFor.id); setMenuFor(null); }} />}
             <button
               type="button"
               onClick={() => {
@@ -358,11 +365,52 @@ export function ContentView() {
           </button>
         </div>
       </Dialog>
+      {noticeFor && noticeFor.row.template_key && (
+        <NoticeSheet
+          kind={noticeFor.kind}
+          slideId={noticeFor.row.id}
+          templateKey={noticeFor.row.template_key}
+          fields={noticeFor.row.fields}
+          status={noticeFor.row.status}
+          onClose={() => setNoticeFor(null)}
+          onApplied={() => reload()}
+          toast={toast}
+        />
+      )}
       {toasts}
     </>
   );
+}
 
-
+/** Notice actions in a row's menu (PRD enhancements §3.2). */
+function NoticeMenuItems({ row, onOpen, onWithdraw }: { row: ContentRow; onOpen: (k: NoticeKind) => void; onWithdraw: () => void }) {
+  const { t } = useT();
+  const n = noticeOf(row.fields);
+  const item = "flex h-12 items-center gap-3 rounded-xl px-3 text-left text-[15px] font-bold hover:bg-adm-ground";
+  const ICON_PAUSE = "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z M12 7v5l3 2";
+  const ICON_X = "M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18Z M9 9l6 6 M15 9l-6 6";
+  if (n) {
+    return (
+      <>
+        <button type="button" onClick={() => onOpen(n.kind)} className={`${item} text-[#8A3F06]`}>
+          <Icon d={n.kind === "tangguh" ? ICON_PAUSE : ICON_X} size={20} /> {t("notice.update")}
+        </button>
+        <button type="button" onClick={onWithdraw} className={item}>
+          <Icon d="M4 12a8 8 0 1 0 2.3-5.6 M4 4v4h4" size={20} /> {t("notice.withdraw")}
+        </button>
+      </>
+    );
+  }
+  return (
+    <>
+      <button type="button" onClick={() => onOpen("tangguh")} className={`${item} text-[#8A3F06]`}>
+        <Icon d={ICON_PAUSE} size={20} /> {t("notice.postpone")}
+      </button>
+      <button type="button" onClick={() => onOpen("batal")} className={`${item} text-[#991B1B]`}>
+        <Icon d={ICON_X} size={20} /> {t("notice.cancelActivity")}
+      </button>
+    </>
+  );
 }
 
 /** Desktop header actions (AdminShell). */

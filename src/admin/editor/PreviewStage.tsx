@@ -5,7 +5,7 @@
 import { useEffect, useRef, useState } from "react";
 import { buildDisplayState, type LayoutKey, type ThemeId } from "@/core";
 import type { DayResult } from "@/data";
-import type { SlideView } from "@/templates";
+import { withLive, type SlideView } from "@/templates";
 import { getTheme } from "@/themes/registry";
 import type { Durations, IqamahMin } from "../settings/logic";
 
@@ -25,7 +25,11 @@ export interface PreviewContext {
   durations: Durations;
 }
 
-export function PreviewStage({ slide, target, day, now, ctx, label }: { slide: SlideView; target: PreviewTarget; day: DayResult & { status: "ok" }; now: number; ctx: PreviewContext; label: string }) {
+/**
+ * `liveAt`: the moment the slide's countdown / notice is shown for ("Pratonton pada…", PRD
+ * enhancements §4.3); the prayer area keeps the real time. Defaults to `now`.
+ */
+export function PreviewStage({ slide, target, day, now, ctx, label, liveAt }: { slide: SlideView; target: PreviewTarget; day: DayResult & { status: "ok" }; now: number; ctx: PreviewContext; label: string; liveAt?: number }) {
   const box = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(0);
   useEffect(() => {
@@ -54,7 +58,7 @@ export function PreviewStage({ slide, target, day, now, ctx, label }: { slide: S
     <div ref={box} role="img" aria-label={label} className="relative w-full overflow-hidden rounded-[10px] bg-black ring-[6px] ring-[#1B1B1B]" style={{ height: Math.round(1080 * scale) || undefined, aspectRatio: w ? undefined : "16 / 9" }}>
       {w > 0 && (
         <div aria-hidden="true" style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transform: `scale(${scale})`, transformOrigin: "0 0", pointerEvents: "none" }}>
-          <Layout s={s} slide={slide} slideKey="preview" />
+          <Layout s={s} slide={withLive(slide, liveAt ?? now, ctx.clock24h)} slideKey="preview" />
         </div>
       )}
     </div>

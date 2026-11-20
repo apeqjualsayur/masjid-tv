@@ -81,6 +81,18 @@ export const SAMPLE_FIELDS: TemplateFields = {
     message: "[Maaf zahir dan batin]",
     from: "[AJK Masjid]",
   },
+  penangguhan: {
+    title: "[Kuliah Maghrib: Tajuk kuliah]",
+    kind: "tangguh",
+    date: "[Sabtu, 28 November 2026]",
+    time: "8:45 malam",
+    newDate: "[Sabtu, 5 Disember 2026]",
+    newDateIso: "2026-12-05",
+    newTime: "8:45 malam",
+    person: "[Nama penceramah]",
+    reason: "[Penceramah uzur]",
+    note: "[Kami mohon maaf atas sebarang kesulitan.]",
+  },
 };
 
 export function sampleSlide(key: TemplateKey): SlideView {

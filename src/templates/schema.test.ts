@@ -21,6 +21,10 @@ const FILLED: Record<TemplateKey, Fields> = {
   kewangan: { weekRange: "20 – 26 Oktober 2026", weekRangeIso: ["2026-10-20", "2026-10-26"], income: [{ label: "Tabung Jumaat", amount: 3250 }], expense: [{ label: "Elektrik", amount: 610 }], balance: 15230.4 },
   ayat: applyAyat({}, "baqarah-153"),
   ucapan: { occasion: "aidilfitri", message: "Maaf zahir dan batin", from: "AJK" },
+  penangguhan: {
+    title: "Kuliah Maghrib: Adab", kind: "tangguh", date: "Selasa, 20 Oktober 2026", dateIso: "2026-10-20", time: "Selepas Maghrib",
+    newDate: "Selasa, 27 Oktober 2026", newDateIso: "2026-10-27", newTime: "Selepas Maghrib", person: "Ustaz Ahmad", reason: "Penceramah uzur", note: "",
+  },
 };
 
 describe("template schemas", () => {

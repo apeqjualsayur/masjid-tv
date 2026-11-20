@@ -1,6 +1,8 @@
 // Announcement template field schemas (PRD section 7). Templates render as HTML on the TV,
 // never as images. Dates and times are display strings entered by the AJK.
-import type { PrayerKey } from "@/core";
+import type { PrayerKey, TemplateLive } from "@/core";
+
+export type { TemplateLive };
 
 export type TemplateKey =
   | "pengumuman"
@@ -12,14 +14,22 @@ export type TemplateKey =
   | "imam_bilal"
   | "kewangan"
   | "ayat"
-  | "ucapan";
+  | "ucapan"
+  | "penangguhan";
 
 export const TEMPLATE_KEYS: readonly TemplateKey[] = [
   "pengumuman", "kuliah", "kematian", "program", "infaq",
   "mesyuarat", "imam_bilal", "kewangan", "ayat", "ucapan",
+  "penangguhan",
 ];
 
-/** A ?key= value (or a slides.template_key) as one of the 10 keys, or null when it is not one. */
+/**
+ * Not offered in the admin template picker (they still render and stay editable). penangguhan: until
+ * its editor and the Tangguh / Batal sheets ship in E5 (_specs/61). imam_bilal joins in E15 (PRD D9).
+ */
+export const PICKER_HIDDEN: readonly TemplateKey[] = ["penangguhan"];
+
+/** A ?key= value (or a slides.template_key) as one of the template keys, or null when it is not one. */
 export function resolveTemplateKey(k: string | null | undefined): TemplateKey | null {
   return k && (TEMPLATE_KEYS as readonly string[]).includes(k) ? (k as TemplateKey) : null;
 }
@@ -126,20 +136,66 @@ export interface UcapanFields {
   from: string;
 }
 
+/** fields.notice on kuliah / program / mesyuarat (PRD enhancements §3.1). */
+export interface ActivityNoticeFields {
+  kind: "tangguh" | "batal";
+  /** "2026-11-28T20:45" (Malaysia time); null = "Tarikh baru akan dimaklumkan". Tangguh only. */
+  newAt?: string | null;
+  reason?: string | null;
+  setAt?: string;
+  prevPriority?: boolean;
+}
+
+/** Event time fields shared by kuliah / program / mesyuarat (PRD enhancements §4.1). */
+export interface ActivityExtras {
+  /** "YYYY-MM-DD", written by the editor next to the display `date`. */
+  dateIso?: string;
+  /** Missing counts as on. */
+  showCountdown?: boolean;
+  /** How long "Sedang berlangsung" shows; default 90. */
+  durationMin?: number;
+  notice?: ActivityNoticeFields;
+}
+
+/** Standalone notice for an activity that was never a slide (PRD enhancements §3.5). */
+export interface PenangguhanFields {
+  /** Tajuk aktiviti, ≤ 80 */
+  title: string;
+  kind: "tangguh" | "batal";
+  /** Original date (display + ISO) and time */
+  date: string;
+  dateIso?: string;
+  time: string;
+  /** New date and time (Tangguh only, optional) */
+  newDate?: string;
+  newDateIso?: string;
+  newTime?: string;
+  /** Penceramah / penganjur, ≤ 60 */
+  person?: string;
+  /** ≤ 100 */
+  reason?: string;
+  /** ≤ 140 */
+  note?: string;
+}
+
 export interface TemplateFields {
   pengumuman: PengumumanFields;
-  kuliah: KuliahFields;
+  kuliah: KuliahFields & ActivityExtras;
   kematian: KematianFields;
-  program: ProgramFields;
+  program: ProgramFields & ActivityExtras;
   infaq: InfaqFields;
-  mesyuarat: MesyuaratFields;
+  mesyuarat: MesyuaratFields & ActivityExtras;
   imam_bilal: ImamBilalFields;
   kewangan: KewanganFields;
   ayat: AyatFields;
   ucapan: UcapanFields;
+  penangguhan: PenangguhanFields;
 }
 
-/** What goes in the poster/announcement area of the bottom and side layouts. */
+/**
+ * What goes in the poster/announcement area of the bottom and side layouts. `live` (contract rule 21)
+ * is attached by the TV for the slide on screen, at that second.
+ */
 export type SlideView =
   | { kind: "poster"; imageUrl: string }
-  | { [K in TemplateKey]: { kind: "template"; template: K; fields: TemplateFields[K] } }[TemplateKey];
+  | { [K in TemplateKey]: { kind: "template"; template: K; fields: TemplateFields[K]; live?: TemplateLive } }[TemplateKey];

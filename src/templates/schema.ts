@@ -207,6 +207,22 @@ export const TEMPLATES: Record<TemplateKey, TemplateMeta> = {
       { key: "from", type: "text", label: T("Daripada", "From"), max: 60, placeholder: T("cth. AJK Masjid", "e.g. Masjid committee") },
     ],
   },
+  // PRD enhancements §3.5. Hidden from the picker until E5 (PICKER_HIDDEN); the Tangguh-only rule for
+  // the new date and the default ends_at (§3.3) come with the editor in E5.
+  penangguhan: {
+    key: "penangguhan", code: "TGH", name: T("Penangguhan / Pembatalan", "Postponed / cancelled"), desc: T("Aktiviti ditangguh atau dibatalkan", "Activity postponed or cancelled"), bg: "#FDF0D5", fg: "#8A4B00",
+    fields: [
+      { key: "title", type: "text", label: T("Tajuk aktiviti", "Activity title"), required: true, max: 80, placeholder: T("cth. Kuliah Maghrib: Adab Bertetangga", "e.g. Maghrib lecture: Being a good neighbour") },
+      { key: "kind", type: "select", label: T("Jenis", "Type"), required: true, options: [{ value: "tangguh", label: T("Tangguh", "Postponed") }, { value: "batal", label: T("Batal", "Cancelled") }] },
+      { key: "date", type: "date", label: T("Tarikh asal", "Original date"), required: true },
+      { key: "time", type: "time-choice", label: T("Masa asal", "Original time"), required: true },
+      { key: "newDate", type: "date", label: T("Tarikh baru (pilihan, Tangguh sahaja)", "New date (optional, postponed only)") },
+      { key: "newTime", type: "time-choice", label: T("Masa baru (pilihan)", "New time (optional)") },
+      { key: "person", type: "text", label: T("Penceramah / penganjur (pilihan)", "Speaker / organiser (optional)"), max: 60 },
+      { key: "reason", type: "text", label: T("Sebab (pilihan)", "Reason (optional)"), max: 100, placeholder: T("cth. Penceramah uzur", "e.g. Speaker unwell") },
+      { key: "note", type: "longtext", label: T("Nota (pilihan)", "Note (optional)"), max: 140 },
+    ],
+  },
 };
 
 /** Row label of a fixed table row (Imam & Bilal: the prayer name, BM as on the TV). */

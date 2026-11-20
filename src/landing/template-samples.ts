@@ -20,7 +20,7 @@ export const MOCK_TEXT = {
   bilal: "Bilal",
 } as const;
 
-export const LANDING_SAMPLES: Omit<TemplateFields, "kematian" | "ayat"> = {
+export const LANDING_SAMPLES: Omit<TemplateFields, "kematian" | "ayat" | "penangguhan"> = {
   pengumuman: {
     title: "Gotong-royong perdana",
     body: "Semua ahli kariah dijemput membersihkan kawasan masjid. Sarapan disediakan untuk peserta.",

@@ -7,7 +7,7 @@ import type { CSSProperties, FC } from "react";
 import { CrossFade } from "../shared/crossfade";
 import { CHIP_MARGIN, EMPTY_TEXT, FitBox, templateAreaOf } from "../shared/poster";
 import { TICKER_LABEL, tickerNow } from "../shared/ticker";
-import type { LayoutProps, SlideView, TemplateArea } from "../types";
+import type { AnyTemplate, LayoutProps, SlideView, TemplateArea } from "../types";
 import { FridayStrip } from "./friday";
 import { ArchPanel, AreaContext, Logo, Page, RowPanel, Status, bgOf, nextLine, num, serif, type Area, type ArchSize } from "./parts";
 import { AwanBand } from "./patterns";
@@ -37,12 +37,12 @@ function cardStyle(sober: boolean): CSSProperties {
 export function SlideBody({ s, slide, area }: { s: DisplayState; slide?: SlideView; area: Area }) {
   if (slide?.kind === "poster") return <KerawangPoster s={s} imageUrl={slide.imageUrl} />;
   if (slide?.kind !== "template") return null;
-  const T = kerawangTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>;
+  const T = kerawangTemplates[slide.template] as AnyTemplate;
   const sober = isKematian(slide);
   return (
     <div data-card={sober ? "sober" : "framed"} style={{ height: "100%", boxSizing: "border-box", borderRadius: 21, padding: CARD_PAD[area], ...cardStyle(sober) }}>
       <AreaContext.Provider value={area}>
-        <T s={s} fields={slide.fields} area={templateAreaOf(area)} />
+        <T s={s} fields={slide.fields} area={templateAreaOf(area)} live={slide.live} />
       </AreaContext.Provider>
     </div>
   );
@@ -185,13 +185,13 @@ const POSTER_CONTENT = { w: 1185 - 2 * (FRAME + 72), h: 948 - 2 * (FRAME + 60) }
 
 function PosterSlide({ s, slide }: { s: DisplayState; slide: SlideView }) {
   if (slide.kind === "poster") return <KerawangPoster s={s} imageUrl={slide.imageUrl} />;
-  const T = kerawangTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>;
+  const T = kerawangTemplates[slide.template] as AnyTemplate;
   const sober = isKematian(slide);
   return (
     <div data-card={sober ? "sober" : "framed"} style={{ position: "absolute", inset: 0, boxSizing: "border-box", ...cardStyle(sober) }}>
       <FitBox w={POSTER_CONTENT.w} h={POSTER_CONTENT.h}>
         <AreaContext.Provider value="tall">
-          <T s={s} fields={slide.fields} area="poster" />
+          <T s={s} fields={slide.fields} area="poster" live={slide.live} />
         </AreaContext.Provider>
       </FitBox>
     </div>

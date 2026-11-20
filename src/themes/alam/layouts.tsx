@@ -2,7 +2,7 @@
 // Alam layouts: full (designs/A-Full), bottom (A-Bottom), side (A-Side), all over the landscape.
 import type { DisplayState } from "@/core";
 import type { CSSProperties, FC } from "react";
-import type { LayoutProps, SlideView, TemplateArea } from "../types";
+import type { AnyTemplate, LayoutProps, SlideView, TemplateArea } from "../types";
 import { Landscape } from "./landscape";
 import { AreaContext, Arabic, Logo, Page, StateChip, Star8, WaktuIcon, cardLook, countdownLine, num, type Area } from "./parts";
 import { CrossFade } from "../shared/crossfade";
@@ -22,12 +22,12 @@ function SlideLayer({ s, slide, area }: { s: DisplayState; slide?: SlideView; ar
     );
   }
   const sober = slide?.kind === "template" && slide.template === "kematian";
-  const T = slide?.kind === "template" ? (alamTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>) : null;
+  const T = slide?.kind === "template" ? (alamTemplates[slide.template] as AnyTemplate) : null;
   return (
     <div style={{ position: "absolute", inset: 0, background: A.card, color: A.cardFg }}>
       {!sober && <Star8 size={560} color={A.green} opacity={0.08} circle style={{ top: -140, right: -140 }} />}
       <div style={{ position: "relative", height: "100%", boxSizing: "border-box", padding: "72px 80px" }}>
-        <AreaContext.Provider value={area}>{T && slide?.kind === "template" ? <T s={s} fields={slide.fields} area={templateAreaOf(area)} /> : null}</AreaContext.Provider>
+        <AreaContext.Provider value={area}>{T && slide?.kind === "template" ? <T s={s} fields={slide.fields} area={templateAreaOf(area)} live={slide.live} /> : null}</AreaContext.Provider>
       </div>
     </div>
   );
@@ -263,13 +263,13 @@ function PosterSlide({ s, slide }: { s: DisplayState; slide: SlideView }) {
       </div>
     );
   }
-  const T = alamTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>;
+  const T = alamTemplates[slide.template] as AnyTemplate;
   // Light card edge-to-edge; no star decoration around the slide (rule 14).
   return (
     <div style={{ position: "absolute", inset: 0, background: A.card, color: A.cardFg }}>
       <FitBox w={POSTER_CONTENT.w} h={POSTER_CONTENT.h}>
         <AreaContext.Provider value="tall">
-          <T s={s} fields={slide.fields} area="poster" />
+          <T s={s} fields={slide.fields} area="poster" live={slide.live} />
         </AreaContext.Provider>
       </FitBox>
     </div>

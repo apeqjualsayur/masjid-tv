@@ -1,7 +1,7 @@
 "use client";
 // Kandungan baru (designs/admin/Picker): poster upload, or one of the 10 templates.
 import Link from "next/link";
-import { TEMPLATE_KEYS } from "@/templates";
+import { PICKER_HIDDEN, TEMPLATE_KEYS } from "@/templates";
 import { TEMPLATES } from "@/templates/schema";
 import { useT } from "../i18n";
 import { ROUTES } from "../routing";
@@ -28,7 +28,7 @@ export function PickerView() {
       </Link>
       <h2 className="text-[12px] font-extrabold tracking-[0.08em] text-adm-muted uppercase">{t("picker.orTemplate")}</h2>
       <ul className="grid grid-cols-2 gap-2.5 sm:grid-cols-3 lg:grid-cols-5 lg:gap-3">
-        {TEMPLATE_KEYS.map((k) => {
+        {TEMPLATE_KEYS.filter((k) => !PICKER_HIDDEN.includes(k)).map((k) => {
           const m = TEMPLATES[k];
           return (
             <li key={k}>

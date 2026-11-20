@@ -3,7 +3,6 @@
 // scrolls near the viewport and is drawn once at a fixed time on Thursday 22 Oct 2026 in WLY01
 // (a Thursday, so no Friday rules), from the bundled year file.
 import type { ThemeId } from "@/core";
-import { TEMPLATE_KEYS } from "@/templates";
 import { TOKENS as TENANG } from "@/themes/tenang/tokens";
 import { ThemeView } from "@/themes/ThemeView";
 import { TvFrame } from "./frames";
@@ -11,7 +10,7 @@ import { copy, type Lang } from "./i18n";
 import { InView, useSnapshot } from "./lazy";
 import { SectionHead, h2Class, Eyebrow, sectionPad } from "./sections";
 import { landingThemes } from "./themes-list";
-import { TemplateMockup } from "./template-mockups";
+import { LANDING_TEMPLATE_KEYS, TemplateMockup } from "./template-mockups";
 
 export const SHOWCASE_DATE = "2026-10-22";
 const MIN = 60_000;
@@ -85,7 +84,7 @@ export function TemplatesSection({ lang }: { lang: Lang }) {
         <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-3.5">
           {k.items.map((it, i) => (
             <li key={it.n} className="overflow-hidden rounded-2xl border border-lb-line bg-white">
-              <TemplateMockup k={TEMPLATE_KEYS[i]} />
+              <TemplateMockup k={LANDING_TEMPLATE_KEYS[i]} />
               <div className="flex flex-col gap-[3px] px-3.5 py-3">
                 <h3 className="m-0 text-[15px] font-bold">{it.n}</h3>
                 <p className="m-0 text-[13px] text-lb-muted">{it.d}</p>

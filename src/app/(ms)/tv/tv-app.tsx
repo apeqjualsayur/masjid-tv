@@ -12,6 +12,7 @@ import {
   localDateKey,
   playlistAt,
   setDebugTime,
+  templateLive,
   upcomingPrayer,
   type DisplayState,
   type ForcedModeInput,
@@ -188,14 +189,25 @@ interface SlidePick {
  * With no eligible slide the bottom/side layouts fall back to full rather than show an empty card.
  * A `poster` screen never falls back to prayer times: it keeps its own (empty-state) layout (rule 17).
  */
-function pickSlide(layout: LayoutKey, preview: UrlOverrides["slide"], slides: PlaylistItem<SlideView>[], at: number): SlidePick {
+function pickSlide(layout: LayoutKey, preview: UrlOverrides["slide"], slides: PlaylistItem<SlideView>[], at: number, clock24h: boolean): SlidePick {
   if (layout === "full") return { layout };
   if (preview === "poster") return { layout, slide: SAMPLE_POSTER, slideKey: "preview-poster" };
   if (preview === "poster-landscape") return { layout, slide: SAMPLE_POSTER_LANDSCAPE, slideKey: "preview-poster-landscape" };
-  if (preview) return { layout, slide: sampleSlide(preview), slideKey: `preview-${preview}` };
+  if (preview) return { layout, slide: withLive(sampleSlide(preview), at, clock24h), slideKey: `preview-${preview}` };
   const now = playlistAt(slides, at);
   if (!now) return { layout: layout === "poster" ? "poster" : "full" };
-  return { layout, slide: now.item.payload, slideKey: now.item.id, counter: { position: now.position, total: now.total } };
+  return { layout, slide: withLive(now.item.payload, at, clock24h), slideKey: now.item.id, counter: { position: now.position, total: now.total } };
+}
+
+/**
+ * Countdown / notice for the slide on screen (contract rule 21), from its fields and this second's
+ * time. Only the visible slide gets it, so a countdown ticks only while its slide is shown, and no
+ * timer of its own runs (this render already happens once a second).
+ */
+export function withLive(slide: SlideView, at: number, clock24h: boolean): SlideView {
+  if (slide.kind !== "template") return slide;
+  const live = templateLive(slide.template, slide.fields as unknown as Record<string, unknown>, at, clock24h);
+  return live ? ({ ...slide, live } as SlideView) : slide;
 }
 
 /** With ?debug=1 the F key toggles a forced Friday (same as &day=fri), for quick checks. */
@@ -239,7 +251,7 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
 
   const { theme, warning: themeWarning } = useTheme(overrides.theme ?? config.theme);
   const configuredLayout = overrides.layout ?? config.layout;
-  const pick = pickSlide(configuredLayout, overrides.slide, boot.slides, at);
+  const pick = pickSlide(configuredLayout, overrides.slide, boot.slides, at, config.clock24h);
   const layout = pick.layout;
   const masjid = { fullName: config.masjid.fullName, shortName: config.masjid.shortName, logoUrl: config.masjid.logo };
 

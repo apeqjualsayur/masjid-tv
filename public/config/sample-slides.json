@@ -213,6 +213,25 @@
     "ends_at": "2027-12-31"
   },
   {
+    "id": "penangguhan-1",
+    "type": "template",
+    "template_key": "penangguhan",
+    "fields": {
+      "title": "[Kuliah Maghrib: Tajuk kuliah]",
+      "kind": "tangguh",
+      "date": "[Sabtu, 28 November 2026]",
+      "time": "8:45 malam",
+      "newDate": "[Sabtu, 5 Disember 2026]",
+      "newDateIso": "2026-12-05",
+      "newTime": "8:45 malam",
+      "person": "[Nama penceramah]",
+      "reason": "[Penceramah uzur]",
+      "note": "[Kami mohon maaf atas sebarang kesulitan.]"
+    },
+    "sort_order": 130,
+    "status": "active"
+  },
+  {
     "id": "pengumuman-lama",
     "type": "template",
     "template_key": "pengumuman",

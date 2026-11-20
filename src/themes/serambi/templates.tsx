@@ -12,11 +12,38 @@ import {
   type TemplateFields,
 } from "@/templates";
 import type { CSSProperties, ReactNode } from "react";
-import type { TemplateComponents } from "../types";
+import { CountdownLine, NoticeStamp } from "../shared/notice-stamp";
+import type { TemplateComponents, TemplateLive } from "../types";
 import { Amiri, Caps, GoldRule, numStyle, useArea } from "./parts";
 import { C, F, archRadius } from "./tokens";
 
-type P<K extends keyof TemplateFields> = { s: DisplayState; fields: TemplateFields[K] };
+type P<K extends keyof TemplateFields> = { s: DisplayState; fields: TemplateFields[K]; live?: TemplateLive };
+
+/** Notice stamp (rule 22) on the dark panel / arch; centred inside the tall arch. */
+function Stamp({ live }: { live?: TemplateLive }) {
+  const tall = useArea() === "tall";
+  return live?.notice ? <NoticeStamp notice={live.notice} tone="dark" layout={tall ? "column" : "row"} radius={18} align={tall ? "center" : "start"} /> : null;
+}
+
+/** Countdown line (rule 23): white text, gold strong part. */
+const Countdown = ({ live }: { live?: TemplateLive }) => <CountdownLine countdown={live?.countdown} color={C.white} strongColor={C.gold} />;
+
+/** Date and time items, dropped when a notice shows them (struck through) in the stamp. */
+const when = (live: TemplateLive | undefined, items: [string, ReactNode][]) => (live?.notice ? [] : items);
+
+/** With a notice the details shrink to one quiet line under the stamp ("Tempat Dewan · Anjuran Biro"). */
+function Facts({ live, items }: { live?: TemplateLive; items: [string, ReactNode][] }) {
+  if (!live?.notice) return <Details items={items} />;
+  return (
+    <div style={{ display: "flex", flexWrap: "wrap", justifyContent: useArea() === "tall" ? "center" : "flex-start", columnGap: 40, rowGap: 8, fontSize: 28, color: C.muted }}>
+      {items.map(([k, v]) => (
+        <div key={k}>
+          {k} <span style={{ color: C.white, fontWeight: 600 }}>{v}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 /** Content column; centred inside the tall arch, left-aligned in the wide panel. */
 function Col({ children, gap = 28, style }: { children: ReactNode; gap?: number; style?: CSSProperties }) {
@@ -88,18 +115,32 @@ function Line({ left, right, color }: { left: ReactNode; right: ReactNode; color
   );
 }
 
-function Program({ fields: f }: P<"program">) {
+function Program({ fields: f, live }: P<"program">) {
   const tall = useArea() === "tall";
   if (tall) {
     return (
-      <Col>
+      <Col gap={live?.notice ? 22 : 28}>
         <Tag>Program</Tag>
         <Title>{f.title}</Title>
         <Body>{f.description}</Body>
-        <Details items={[["Tarikh", f.date], ["Masa", f.time], ["Tempat", f.venue], ["Anjuran", f.organiser]]} />
+        <Stamp live={live} />
+        <Facts live={live} items={[...when(live, [["Tarikh", f.date], ["Masa", f.time]]), ["Tempat", f.venue], ["Anjuran", f.organiser]]} />
         <div style={{ fontSize: 24, color: C.muted }}>
           Hubungi <span style={{ color: C.white, fontWeight: 600 }}>{f.contact}</span>
         </div>
+        <Countdown live={live} />
+      </Col>
+    );
+  }
+  // Wide with a notice: the stamp replaces the date arch (it shows the date struck through).
+  if (live?.notice) {
+    return (
+      <Col gap={22}>
+        <Tag>Program</Tag>
+        <Title>{f.title}</Title>
+        <Stamp live={live} />
+        <Facts live={live} items={[["Tempat", f.venue], ["Anjuran", f.organiser], ["Hubungi", f.contact]]} />
+        <Countdown live={live} />
       </Col>
     );
   }
@@ -132,6 +173,7 @@ function Program({ fields: f }: P<"program">) {
         <Title>{f.title}</Title>
         <Body>{f.description}</Body>
         <Details items={[["Tempat", f.venue], ["Anjuran", f.organiser], ["Hubungi", f.contact]]} />
+        <Countdown live={live} />
       </Col>
     </div>
   );
@@ -162,10 +204,10 @@ function Pengumuman({ fields: f }: P<"pengumuman">) {
   );
 }
 
-function Kuliah({ fields: f }: P<"kuliah">) {
+function Kuliah({ fields: f, live }: P<"kuliah">) {
   const tall = useArea() === "tall";
   return (
-    <Col>
+    <Col gap={live?.notice ? 22 : 28}>
       <Tag>{f.series}</Tag>
       <Title>{f.topic}</Title>
       <div style={{ display: "flex", alignItems: "center", gap: 20, justifyContent: tall ? "center" : "flex-start" }}>
@@ -178,7 +220,9 @@ function Kuliah({ fields: f }: P<"kuliah">) {
           {f.speaker}
         </div>
       </div>
-      <Details items={[["Tarikh", f.date], ["Masa", f.time], ["Tempat", f.venue]]} />
+      <Stamp live={live} />
+      <Facts live={live} items={[...when(live, [["Tarikh", f.date], ["Masa", f.time]]), ["Tempat", f.venue]]} />
+      <Countdown live={live} />
     </Col>
   );
 }
@@ -242,16 +286,33 @@ function Infaq({ fields: f }: P<"infaq">) {
   );
 }
 
-function Mesyuarat({ fields: f }: P<"mesyuarat">) {
+function Mesyuarat({ fields: f, live }: P<"mesyuarat">) {
+  const wide = useArea() === "wide";
   return (
-    <Col>
+    <Col gap={live?.notice ? 22 : 28}>
       <Tag>Mesyuarat</Tag>
       <Title>{f.title}</Title>
-      <Body>{f.invitation}</Body>
-      <Details items={[["Tarikh", f.date], ["Masa", f.time], ["Tempat", f.venue]]} />
+      {!(wide && live?.notice) && <Body>{f.invitation}</Body>}
+      <Stamp live={live} />
+      <Facts live={live} items={[...when(live, [["Tarikh", f.date], ["Masa", f.time]]), ["Tempat", f.venue]]} />
       <div style={{ fontSize: 24, color: C.muted }}>
         Daripada <span style={{ color: C.white, fontWeight: 600 }}>{f.issuedBy}</span>
       </div>
+      <Countdown live={live} />
+    </Col>
+  );
+}
+
+/** Standalone notice (PRD enhancements §3.5): title, who, the stamp, an optional note. */
+function Penangguhan({ fields: f, live }: P<"penangguhan">) {
+  const wide = useArea() === "wide";
+  return (
+    <Col gap={wide ? 22 : 26}>
+      <Tag>Makluman aktiviti</Tag>
+      <Title size={wide ? 76 : 58}>{f.title}</Title>
+      {f.person && <div style={{ fontSize: 34, fontWeight: 500, color: C.soft }}>{f.person}</div>}
+      <Stamp live={live} />
+      {f.note && <Body>{f.note}</Body>}
     </Col>
   );
 }
@@ -338,4 +399,5 @@ export const serambiTemplates: TemplateComponents = {
   kewangan: Kewangan,
   ayat: Ayat,
   ucapan: Ucapan,
+  penangguhan: Penangguhan,
 };

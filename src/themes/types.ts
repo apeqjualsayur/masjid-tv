@@ -2,9 +2,9 @@
 // (src/core) computes everything they show.
 import type { FC } from "react";
 import type { DisplayState, LayoutKey, ThemeId } from "@/core";
-import type { SlideView, TemplateFields, TemplateKey } from "@/templates";
+import type { SlideView, TemplateFields, TemplateKey, TemplateLive } from "@/templates";
 
-export type { SlideView };
+export type { SlideView, TemplateLive };
 
 export interface LayoutProps {
   s: DisplayState;
@@ -31,9 +31,15 @@ export interface UnavailableState {
 /** Where a template is drawn: bottom = 12:5, side = 5:4, poster = 16:9 full stage (contract rules 10, 18). */
 export type TemplateArea = "bottom" | "side" | "poster";
 
+/** Props of one template. `live` (contract rule 21): countdown / notice, computed in core; may be missing. */
+export type TemplateProps<K extends TemplateKey> = { s: DisplayState; fields: TemplateFields[K]; area: TemplateArea; live?: TemplateLive };
+
 export type TemplateComponents = {
-  [K in TemplateKey]: FC<{ s: DisplayState; fields: TemplateFields[K]; area: TemplateArea }>;
+  [K in TemplateKey]: FC<TemplateProps<K>>;
 };
+
+/** Renders a template slide's component with its fields and `live` (used by every theme's slide body). */
+export type AnyTemplate = FC<{ s: DisplayState; fields: unknown; area: TemplateArea; live?: TemplateLive }>;
 
 /** A poster box inside the 1920×1080 stage. */
 export interface PosterRect {
@@ -60,7 +66,7 @@ export interface ThemeDefinition {
     khutbah: FC<{ s: DisplayState }>;
     unavailable: FC<{ u: UnavailableState }>;
   };
-  /** all 10 */
+  /** every template key */
   templates: TemplateComponents;
   posterFrame: FC<{ s: DisplayState; imageUrl: string }>;
   /** Friday strip (contract rule 12), one-line pill; renders nothing when s.friday is unset. */

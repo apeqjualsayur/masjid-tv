@@ -2,7 +2,7 @@
 // Serambi layouts: full (designs/D-Full), bottom (D-Bottom), side (D-Side).
 import type { DisplayState } from "@/core";
 import type { CSSProperties, FC } from "react";
-import type { LayoutProps, SlideView, TemplateArea } from "../types";
+import type { AnyTemplate, LayoutProps, SlideView, TemplateArea } from "../types";
 import { CHIP_MARGIN, EMPTY_TEXT, FitBox, templateAreaOf } from "../shared/poster";
 import {
   AreaContext,
@@ -37,8 +37,8 @@ function Ambient({ s }: { s: DisplayState }) {
 }
 
 function TemplateBody({ s, slide, area }: { s: DisplayState; slide: Extract<SlideView, { kind: "template" }>; area: TemplateArea }) {
-  const T = serambiTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>;
-  return <T s={s} fields={slide.fields} area={area} />;
+  const T = serambiTemplates[slide.template] as AnyTemplate;
+  return <T s={s} fields={slide.fields} area={area} live={slide.live} />;
 }
 
 /** One slide's full layer. Wide: emerald panel. Tall: big gold arch frame. Kematian: plain and sober in both. */

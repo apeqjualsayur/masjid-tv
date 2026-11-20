@@ -1,9 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { parseSlides } from "@/data";
-import { TEMPLATE_KEYS } from "@/templates";
 import { renderToStaticMarkup } from "react-dom/server";
 import { createElement } from "react";
-import { TemplateMockup } from "./template-mockups";
+import { LANDING_TEMPLATE_KEYS, TemplateMockup } from "./template-mockups";
 import { LANDING_SAMPLES, MOCK_TEXT } from "./template-samples";
 import ms from "./i18n/ms.json";
 import en from "./i18n/en.json";
@@ -14,7 +13,7 @@ const PLACEHOLDER = /\[[^\]]*\]/;
 
 describe("landing template thumbnails", () => {
   it("every template has a mockup with readable text (no 1920 stage) and no [ … ] placeholders", () => {
-    for (const k of TEMPLATE_KEYS) {
+    for (const k of LANDING_TEMPLATE_KEYS) {
       const html = renderToStaticMarkup(createElement(TemplateMockup, { k }));
       expect(html, k).toContain("aspect-[4/3]");
       expect(html, k).not.toContain("1920");

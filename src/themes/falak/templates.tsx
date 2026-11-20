@@ -5,11 +5,27 @@
 import { waktuName, type DisplayState } from "@/core";
 import { APPROVED_TRANSLATION_SOURCES, OCCASION_LABEL, formatRinggit, infaqProgress, kewanganTotals, type TemplateFields } from "@/templates";
 import type { CSSProperties, ReactNode } from "react";
-import type { TemplateArea, TemplateComponents } from "../types";
+import { CountdownLine, NoticeStamp } from "../shared/notice-stamp";
+import type { TemplateArea, TemplateComponents, TemplateLive } from "../types";
 import { Arabic, serif, useArea } from "./parts";
 import { F } from "./tokens";
 
-type P<K extends keyof TemplateFields> = { s: DisplayState; fields: TemplateFields[K]; area: TemplateArea };
+type P<K extends keyof TemplateFields> = { s: DisplayState; fields: TemplateFields[K]; area: TemplateArea; live?: TemplateLive };
+
+/** Foot of an activity card: notice stamp (rule 22), the details, then the countdown line (rule 23). */
+function ActivityFoot({ live, children }: { live?: TemplateLive; children?: ReactNode }) {
+  const wide = useArea() === "wide";
+  return (
+    <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: wide ? 20 : 24 }}>
+      {live?.notice && <NoticeStamp notice={live.notice} tone="light" layout={wide ? "row" : "column"} radius={27} />}
+      {children}
+      <CountdownLine countdown={live?.countdown} color={F.cardBody} strongColor={F.cardAccent} />
+    </div>
+  );
+}
+
+/** Date and time items, dropped when a notice shows them (struck through) in the stamp. */
+const when = (live: TemplateLive | undefined, items: [string, ReactNode][]) => (live?.notice ? [] : items);
 
 const Col = ({ children, gap = 30, style }: { children: ReactNode; gap?: number; style?: CSSProperties }) => (
   <div style={{ display: "flex", flexDirection: "column", gap, height: "100%", minHeight: 0, color: F.cardInk, ...style }}>{children}</div>
@@ -121,7 +137,7 @@ function Kewangan({ fields: f }: P<"kewangan">) {
   );
 }
 
-function Kuliah({ fields: f }: P<"kuliah">) {
+function Kuliah({ fields: f, live }: P<"kuliah">) {
   return (
     <Col>
       <Label>{f.series}</Label>
@@ -135,7 +151,9 @@ function Kuliah({ fields: f }: P<"kuliah">) {
           Bersama <span style={{ color: F.cardInk, fontWeight: 700 }}>{f.speaker}</span>
         </div>
       </div>
-      <Meta items={[["Tarikh", f.date], ["Masa", f.time], ["Tempat", f.venue]]} />
+      <ActivityFoot live={live}>
+        <Meta items={[...when(live, [["Tarikh", f.date], ["Masa", f.time]]), ["Tempat", f.venue]]} />
+      </ActivityFoot>
     </Col>
   );
 }
@@ -158,7 +176,7 @@ function Kematian({ s, fields: f }: P<"kematian">) {
   );
 }
 
-function Program({ fields: f }: P<"program">) {
+function Program({ fields: f, live }: P<"program">) {
   const wide = useArea() === "wide";
   const item = (k: string, v: ReactNode) => (
     <div style={{ minWidth: 0 }}>
@@ -170,16 +188,19 @@ function Program({ fields: f }: P<"program">) {
     <Col>
       <Label>Program</Label>
       <Title>{f.title}</Title>
-      <Body>{f.description}</Body>
-      <div style={{ marginTop: "auto", display: "grid", gridTemplateColumns: `repeat(${wide ? 4 : 2}, minmax(0, 1fr))`, gap: 30 }}>
-        {item("Tarikh", f.date)}
-        {item("Masa", f.time)}
-        {item("Tempat", f.venue)}
-        {item("Penganjur", f.organiser)}
-      </div>
-      <div style={{ fontSize: 28, fontWeight: 500, color: F.cardMuted }}>
-        Hubungi <span style={{ color: F.cardInk, fontWeight: 700 }}>{f.contact}</span>
-      </div>
+      {/* 12:5 with a notice: the stamp takes the description's room. */}
+      {!(wide && live?.notice) && <Body>{f.description}</Body>}
+      <ActivityFoot live={live}>
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${wide ? 4 : 2}, minmax(0, 1fr))`, gap: 30 }}>
+          {!live?.notice && item("Tarikh", f.date)}
+          {!live?.notice && item("Masa", f.time)}
+          {item("Tempat", f.venue)}
+          {item("Penganjur", f.organiser)}
+        </div>
+        <div style={{ fontSize: 28, fontWeight: 500, color: F.cardMuted }}>
+          Hubungi <span style={{ color: F.cardInk, fontWeight: 700 }}>{f.contact}</span>
+        </div>
+      </ActivityFoot>
     </Col>
   );
 }
@@ -217,13 +238,31 @@ function Infaq({ fields: f }: P<"infaq">) {
   );
 }
 
-function Mesyuarat({ fields: f }: P<"mesyuarat">) {
+function Mesyuarat({ fields: f, live }: P<"mesyuarat">) {
+  const wide = useArea() === "wide";
   return (
     <Col>
       <Label>Mesyuarat</Label>
       <Title>{f.title}</Title>
-      <Body>{f.invitation}</Body>
-      <Meta items={[["Tarikh", f.date], ["Masa", f.time], ["Tempat", f.venue], ["Daripada", f.issuedBy]]} />
+      {!(wide && live?.notice) && <Body>{f.invitation}</Body>}
+      <ActivityFoot live={live}>
+        <Meta items={[...when(live, [["Tarikh", f.date], ["Masa", f.time]]), ["Tempat", f.venue], ["Daripada", f.issuedBy]]} />
+      </ActivityFoot>
+    </Col>
+  );
+}
+
+/** Standalone notice (PRD enhancements §3.5): title, who, the stamp, an optional note. */
+function Penangguhan({ fields: f, live }: P<"penangguhan">) {
+  const wide = useArea() === "wide";
+  return (
+    <Col gap={wide ? 24 : 30}>
+      <Label>Makluman aktiviti</Label>
+      <Title size={wide ? 76 : 64}>{f.title}</Title>
+      {f.person && <div style={{ fontSize: 36, fontWeight: 500, color: F.cardMuted }}>{f.person}</div>}
+      <ActivityFoot live={live}>
+        {f.note && <div style={{ fontSize: 28, fontWeight: 500, lineHeight: 1.4, color: F.cardMuted }}>{f.note}</div>}
+      </ActivityFoot>
     </Col>
   );
 }
@@ -288,4 +327,5 @@ export const falakTemplates: TemplateComponents = {
   kewangan: Kewangan,
   ayat: Ayat,
   ucapan: Ucapan,
+  penangguhan: Penangguhan,
 };

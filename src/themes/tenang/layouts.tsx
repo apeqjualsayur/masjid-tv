@@ -2,7 +2,7 @@
 // Tenang layouts: full (designs/F-Full), bottom (F-Bottom), side (F-Side).
 import type { DisplayState, WaktuView } from "@/core";
 import type { CSSProperties, FC } from "react";
-import type { LayoutProps, SlideView, TemplateArea } from "../types";
+import type { AnyTemplate, LayoutProps, SlideView } from "../types";
 import { CrossFade } from "../shared/crossfade";
 import { CHIP_MARGIN, EMPTY_TEXT, FitBox, templateAreaOf } from "../shared/poster";
 import { AreaContext, Arabic, Dot, Logo, Page, tickerItem, tokensOf, type Area } from "./parts";
@@ -32,11 +32,11 @@ function pill(t: TenangTokens, w: WaktuView, lite: boolean) {
 export function SlideBody({ s, slide, area }: { s: DisplayState; slide?: SlideView; area: Area }) {
   if (slide?.kind === "poster") return <TenangPoster s={s} imageUrl={slide.imageUrl} />;
   if (slide?.kind !== "template") return null;
-  const T = tenangTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>;
+  const T = tenangTemplates[slide.template] as AnyTemplate;
   return (
     <div style={{ height: "100%", boxSizing: "border-box", background: tokensOf(s).card, padding: area === "wide" ? "88px 110px" : "80px 90px" }}>
       <AreaContext.Provider value={area}>
-        <T s={s} fields={slide.fields} area={templateAreaOf(area)} />
+        <T s={s} fields={slide.fields} area={templateAreaOf(area)} live={slide.live} />
       </AreaContext.Provider>
     </div>
   );
@@ -225,11 +225,11 @@ const POSTER_CONTENT = { w: 1020, h: 808 };
 
 function PosterSlide({ s, slide }: { s: DisplayState; slide: SlideView }) {
   if (slide.kind === "poster") return <TenangPoster s={s} imageUrl={slide.imageUrl} />;
-  const T = tenangTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>;
+  const T = tenangTemplates[slide.template] as AnyTemplate;
   return (
     <FitBox w={POSTER_CONTENT.w} h={POSTER_CONTENT.h}>
       <AreaContext.Provider value="tall">
-        <T s={s} fields={slide.fields} area="poster" />
+        <T s={s} fields={slide.fields} area="poster" live={slide.live} />
       </AreaContext.Provider>
     </FitBox>
   );

@@ -7,7 +7,7 @@ import type { CSSProperties, FC } from "react";
 import { CrossFade } from "../shared/crossfade";
 import { CHIP_MARGIN, EMPTY_TEXT, FitBox, templateAreaOf } from "../shared/poster";
 import { TICKER_LABEL, tickerNow } from "../shared/ticker";
-import type { LayoutProps, SlideView, TemplateArea } from "../types";
+import type { AnyTemplate, LayoutProps, SlideView, TemplateArea } from "../types";
 import { FridayStrip } from "./friday";
 import { AreaContext, Caps, Logo, Page, Ring, WaktuCell, bgOf, cellLook, num, secondTime, type Area, type CellSize } from "./parts";
 import { SeterusnyaPoster } from "./poster";
@@ -25,11 +25,11 @@ const CARD_PAD = { wide: "72px 84px", tall: "66px 78px" } as const;
 export function SlideBody({ s, slide, area }: { s: DisplayState; slide?: SlideView; area: Area }) {
   if (slide?.kind === "poster") return <SeterusnyaPoster s={s} imageUrl={slide.imageUrl} />;
   if (slide?.kind !== "template") return null;
-  const T = seterusnyaTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>;
+  const T = seterusnyaTemplates[slide.template] as AnyTemplate;
   return (
     <div style={{ height: "100%", boxSizing: "border-box", background: S.card, color: S.cardInk, padding: CARD_PAD[area] }}>
       <AreaContext.Provider value={area}>
-        <T s={s} fields={slide.fields} area={templateAreaOf(area)} />
+        <T s={s} fields={slide.fields} area={templateAreaOf(area)} live={slide.live} />
       </AreaContext.Provider>
     </div>
   );
@@ -244,12 +244,12 @@ const POSTER_CONTENT = { w: 1044, h: 828 };
 
 function PosterSlide({ s, slide }: { s: DisplayState; slide: SlideView }) {
   if (slide.kind === "poster") return <SeterusnyaPoster s={s} imageUrl={slide.imageUrl} />;
-  const T = seterusnyaTemplates[slide.template] as FC<{ s: DisplayState; fields: unknown; area: TemplateArea }>;
+  const T = seterusnyaTemplates[slide.template] as AnyTemplate;
   return (
     <div style={{ position: "absolute", inset: 0, background: S.card, color: S.cardInk }}>
       <FitBox w={POSTER_CONTENT.w} h={POSTER_CONTENT.h}>
         <AreaContext.Provider value="tall">
-          <T s={s} fields={slide.fields} area="poster" />
+          <T s={s} fields={slide.fields} area="poster" live={slide.live} />
         </AreaContext.Provider>
       </FitBox>
     </div>

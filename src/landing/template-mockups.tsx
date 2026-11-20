@@ -432,7 +432,14 @@ function Ucapan() {
   );
 }
 
-const MOCKUPS: Record<TemplateKey, () => ReactNode> = {
+/**
+ * The templates the landing page shows, in the order of the copy's `templates.items`. Fixed on
+ * purpose: a new TV template (e.g. penangguhan) joins the page only with its own mockup and copy.
+ */
+export const LANDING_TEMPLATE_KEYS = ["pengumuman", "kuliah", "kematian", "program", "infaq", "mesyuarat", "imam_bilal", "kewangan", "ayat", "ucapan"] as const satisfies readonly TemplateKey[];
+export type LandingTemplateKey = (typeof LANDING_TEMPLATE_KEYS)[number];
+
+const MOCKUPS: Record<LandingTemplateKey, () => ReactNode> = {
   pengumuman: Pengumuman,
   kuliah: Kuliah,
   kematian: Kematian,
@@ -445,7 +452,7 @@ const MOCKUPS: Record<TemplateKey, () => ReactNode> = {
   ucapan: Ucapan,
 };
 
-export function TemplateMockup({ k }: { k: TemplateKey }) {
+export function TemplateMockup({ k }: { k: LandingTemplateKey }) {
   const M = MOCKUPS[k];
   return <M />;
 }

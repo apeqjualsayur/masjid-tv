@@ -11,11 +11,21 @@ import {
   type TemplateFields,
 } from "@/templates";
 import type { CSSProperties, ReactNode } from "react";
-import type { TemplateComponents } from "../types";
+import { CountdownLine, NoticeStamp } from "../shared/notice-stamp";
+import type { TemplateComponents, TemplateLive } from "../types";
 import { Arabic, Icon, num, useArea } from "./parts";
 import { A } from "./tokens";
 
-type P<K extends keyof TemplateFields> = { s: DisplayState; fields: TemplateFields[K] };
+type P<K extends keyof TemplateFields> = { s: DisplayState; fields: TemplateFields[K]; live?: TemplateLive };
+
+/** Notice stamp (rule 22) above the details; the light card is "light" in every phase. */
+function Stamp({ live }: { live?: TemplateLive }) {
+  const wide = useArea() === "wide";
+  return live?.notice ? <NoticeStamp notice={live.notice} tone="light" layout={wide ? "row" : "column"} radius={24} /> : null;
+}
+
+/** Countdown line (rule 23) under the details. */
+const Countdown = ({ live }: { live?: TemplateLive }) => <CountdownLine countdown={live?.countdown} color={A.cardFg} strongColor={A.green} />;
 
 const ICON = {
   calendar: "M3 5h18v16H3z M3 10h18 M8 3v4 M16 3v4",
@@ -83,22 +93,25 @@ function InfoGrid({ children, cols }: { children: ReactNode; cols?: number }) {
   return <div style={{ display: "grid", gridTemplateColumns: `repeat(${n}, minmax(0, 1fr))`, gap: 28 }}>{children}</div>;
 }
 
-function Kuliah({ fields: f }: P<"kuliah">) {
+function Kuliah({ fields: f, live }: P<"kuliah">) {
   const wide = useArea() === "wide";
+  const n = !!live?.notice;
   const content = (
-    <Col>
+    <Col gap={n ? 22 : 28}>
       <Tag>{f.series}</Tag>
       <Title>{f.topic}</Title>
       <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
         <div style={{ fontSize: 24, fontWeight: 500, color: A.cardMuted }}>bersama</div>
         <div style={{ fontSize: 42, fontWeight: 700 }}>{f.speaker}</div>
       </div>
-      <Divider />
+      <Stamp live={live} />
+      {!n && <Divider />}
       <InfoGrid>
-        <Info icon="calendar" label="Tarikh" value={f.date} />
-        <Info icon="clock" label="Masa" value={f.time} />
+        {!n && <Info icon="calendar" label="Tarikh" value={f.date} />}
+        {!n && <Info icon="clock" label="Masa" value={f.time} />}
         <Info icon="pin" label="Tempat" value={f.venue} />
       </InfoGrid>
+      <Countdown live={live} />
     </Col>
   );
   if (!f.speakerPhoto) return content;
@@ -126,39 +139,62 @@ function Pengumuman({ fields: f }: P<"pengumuman">) {
   );
 }
 
-function Program({ fields: f }: P<"program">) {
+function Program({ fields: f, live }: P<"program">) {
+  const wide = useArea() === "wide";
+  const n = !!live?.notice;
   return (
-    <Col gap={24}>
+    <Col gap={n ? 20 : 24}>
       <Tag>Program</Tag>
       <Title>{f.title}</Title>
-      <Body>{f.description}</Body>
-      <Divider />
+      {/* 12:5 with a notice: the stamp takes the description's room. */}
+      {!(wide && n) && <Body>{f.description}</Body>}
+      <Stamp live={live} />
+      {!n && <Divider />}
       <InfoGrid>
-        <Info icon="calendar" label="Tarikh" value={f.date} />
-        <Info icon="clock" label="Masa" value={f.time} />
+        {!n && <Info icon="calendar" label="Tarikh" value={f.date} />}
+        {!n && <Info icon="clock" label="Masa" value={f.time} />}
         <Info icon="pin" label="Tempat" value={f.venue} />
         <Info icon="people" label="Penganjur" value={f.organiser} />
         <Info icon="phone" label="Hubungi" value={f.contact} />
       </InfoGrid>
+      <Countdown live={live} />
     </Col>
   );
 }
 
-function Mesyuarat({ fields: f }: P<"mesyuarat">) {
+function Mesyuarat({ fields: f, live }: P<"mesyuarat">) {
+  const wide = useArea() === "wide";
+  const n = !!live?.notice;
   return (
-    <Col>
+    <Col gap={n ? 22 : 28}>
       <Tag>Mesyuarat</Tag>
       <Title>{f.title}</Title>
-      <Body>{f.invitation}</Body>
-      <Divider />
+      {!(wide && n) && <Body>{f.invitation}</Body>}
+      <Stamp live={live} />
+      {!n && <Divider />}
       <InfoGrid>
-        <Info icon="calendar" label="Tarikh" value={f.date} />
-        <Info icon="clock" label="Masa" value={f.time} />
+        {!n && <Info icon="calendar" label="Tarikh" value={f.date} />}
+        {!n && <Info icon="clock" label="Masa" value={f.time} />}
         <Info icon="pin" label="Tempat" value={f.venue} />
       </InfoGrid>
       <div style={{ fontSize: 24, fontWeight: 500, color: A.cardMuted }}>
         Daripada <b style={{ color: A.cardFg }}>{f.issuedBy}</b>
       </div>
+      <Countdown live={live} />
+    </Col>
+  );
+}
+
+/** Standalone notice (PRD enhancements §3.5): title, who, the stamp, an optional note. */
+function Penangguhan({ fields: f, live }: P<"penangguhan">) {
+  const wide = useArea() === "wide";
+  return (
+    <Col gap={wide ? 22 : 28}>
+      <Tag>Makluman aktiviti</Tag>
+      <Title size={wide ? 72 : 64}>{f.title}</Title>
+      {f.person && <div style={{ fontSize: 36, fontWeight: 700 }}>{f.person}</div>}
+      <Stamp live={live} />
+      {f.note && <Body>{f.note}</Body>}
     </Col>
   );
 }
@@ -325,4 +361,5 @@ export const alamTemplates: TemplateComponents = {
   kewangan: Kewangan,
   ayat: Ayat,
   ucapan: Ucapan,
+  penangguhan: Penangguhan,
 };

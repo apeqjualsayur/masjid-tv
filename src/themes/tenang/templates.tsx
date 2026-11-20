@@ -11,11 +11,42 @@ import {
   type TemplateFields,
 } from "@/templates";
 import type { CSSProperties, ReactNode } from "react";
-import type { TemplateComponents } from "../types";
+import { CountdownLine, NoticeStamp } from "../shared/notice-stamp";
+import type { TemplateComponents, TemplateLive } from "../types";
 import { Arabic, Eyebrow, tokensOf, useArea } from "./parts";
 import type { TenangTokens } from "./tokens";
 
-type P<K extends keyof TemplateFields> = { s: DisplayState; fields: TemplateFields[K] };
+type P<K extends keyof TemplateFields> = { s: DisplayState; fields: TemplateFields[K]; live?: TemplateLive };
+
+/** Isyak is the only phase with a dark card. */
+const toneOf = (s: DisplayState) => (s.phase === "isyak" ? "dark" : "light");
+
+/** Foot of an activity card: notice stamp (rule 22), the details, then the countdown line (rule 23). */
+function ActivityFoot({ s, live, children }: { s: DisplayState; live?: TemplateLive; children?: ReactNode }) {
+  const t = tokensOf(s);
+  const wide = useArea() === "wide";
+  const countdown = <CountdownLine countdown={live?.countdown} color={t.fg} strongColor={t.accent} />;
+  return (
+    <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", gap: wide ? 20 : 24 }}>
+      {live?.notice && <NoticeStamp notice={live.notice} tone={toneOf(s)} layout={wide ? "row" : "column"} radius={24} />}
+      {/* 12:5: the countdown sits at the right of the details row (Tenang's card padding is generous). */}
+      {wide ? (
+        <div style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", gap: 48 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 20, minWidth: 0, flex: 1 }}>{children}</div>
+          {countdown}
+        </div>
+      ) : (
+        <>
+          {children}
+          {countdown}
+        </>
+      )}
+    </div>
+  );
+}
+
+/** Date and time items, dropped when a notice shows them (struck through) in the stamp. */
+const when = (live: TemplateLive | undefined, items: [string, ReactNode][]) => (live?.notice ? [] : items);
 
 const Col = ({ children, gap = 32, style }: { children: ReactNode; gap?: number; style?: CSSProperties }) => (
   <div style={{ display: "flex", flexDirection: "column", gap, height: "100%", minHeight: 0, ...style }}>{children}</div>
@@ -116,7 +147,7 @@ function Kewangan({ s, fields: f }: P<"kewangan">) {
   );
 }
 
-function Kuliah({ s, fields: f }: P<"kuliah">) {
+function Kuliah({ s, fields: f, live }: P<"kuliah">) {
   const t = tokensOf(s);
   return (
     <Col>
@@ -132,7 +163,9 @@ function Kuliah({ s, fields: f }: P<"kuliah">) {
           {f.speaker}
         </div>
       </div>
-      <Meta t={t} items={[["Tarikh", f.date], ["Masa", f.time], ["Tempat", f.venue]]} />
+      <ActivityFoot s={s} live={live}>
+        <Meta t={t} items={[...when(live, [["Tarikh", f.date], ["Masa", f.time]]), ["Tempat", f.venue]]} />
+      </ActivityFoot>
     </Col>
   );
 }
@@ -159,23 +192,26 @@ function Kematian({ s, fields: f }: P<"kematian">) {
   );
 }
 
-function Program({ s, fields: f }: P<"program">) {
+function Program({ s, fields: f, live }: P<"program">) {
   const t = tokensOf(s);
   const wide = useArea() === "wide";
+  const items = [...when(live, [["Tarikh", f.date], ["Masa", f.time]]), ["Tempat", f.venue], ["Penganjur", f.organiser]] as [string, ReactNode][];
   return (
     <Col>
       <Eyebrow t={t}>Program</Eyebrow>
       <Title>{f.title}</Title>
-      <Body t={t}>{f.description}</Body>
-      <div style={{ marginTop: "auto", display: "grid", gridTemplateColumns: `repeat(${wide ? 4 : 2}, minmax(0, 1fr))`, gap: 32 }}>
-        <Field t={t} label="Tarikh" value={f.date} />
-        <Field t={t} label="Masa" value={f.time} />
-        <Field t={t} label="Tempat" value={f.venue} />
-        <Field t={t} label="Penganjur" value={f.organiser} />
-      </div>
-      <div style={{ fontSize: 24, fontWeight: 500, color: t.muted }}>
-        Hubungi <span style={{ color: t.fg, fontWeight: 600 }}>{f.contact}</span>
-      </div>
+      {/* 12:5 with a notice: the stamp takes the description's room. */}
+      {!(wide && live?.notice) && <Body t={t}>{f.description}</Body>}
+      <ActivityFoot s={s} live={live}>
+        <div style={{ display: "grid", gridTemplateColumns: `repeat(${wide ? 4 : 2}, minmax(0, 1fr))`, gap: 32 }}>
+          {items.map(([k, v]) => (
+            <Field key={k} t={t} label={k} value={v} />
+          ))}
+        </div>
+        <div style={{ fontSize: 24, fontWeight: 500, color: t.muted }}>
+          Hubungi <span style={{ color: t.fg, fontWeight: 600 }}>{f.contact}</span>
+        </div>
+      </ActivityFoot>
     </Col>
   );
 }
@@ -214,14 +250,33 @@ function Infaq({ s, fields: f }: P<"infaq">) {
   );
 }
 
-function Mesyuarat({ s, fields: f }: P<"mesyuarat">) {
+function Mesyuarat({ s, fields: f, live }: P<"mesyuarat">) {
   const t = tokensOf(s);
+  const wide = useArea() === "wide";
   return (
     <Col>
       <Eyebrow t={t}>Mesyuarat</Eyebrow>
       <Title>{f.title}</Title>
-      <Body t={t}>{f.invitation}</Body>
-      <Meta t={t} items={[["Tarikh", f.date], ["Masa", f.time], ["Tempat", f.venue], ["Daripada", f.issuedBy]]} />
+      {!(wide && live?.notice) && <Body t={t}>{f.invitation}</Body>}
+      <ActivityFoot s={s} live={live}>
+        <Meta t={t} items={[...when(live, [["Tarikh", f.date], ["Masa", f.time]]), ["Tempat", f.venue], ["Daripada", f.issuedBy]]} />
+      </ActivityFoot>
+    </Col>
+  );
+}
+
+/** Standalone notice (PRD enhancements §3.5): title, who, the stamp, an optional note. */
+function Penangguhan({ s, fields: f, live }: P<"penangguhan">) {
+  const t = tokensOf(s);
+  const wide = useArea() === "wide";
+  return (
+    <Col gap={wide ? 24 : 32}>
+      <Eyebrow t={t}>Makluman aktiviti</Eyebrow>
+      <Title size={wide ? 76 : 64}>{f.title}</Title>
+      {f.person && <div style={{ fontSize: 36, fontWeight: 500, color: t.muted }}>{f.person}</div>}
+      <ActivityFoot s={s} live={live}>
+        {f.note && <div style={{ fontSize: 28, fontWeight: 500, lineHeight: 1.4, color: t.muted }}>{f.note}</div>}
+      </ActivityFoot>
     </Col>
   );
 }
@@ -286,4 +341,5 @@ export const tenangTemplates: TemplateComponents = {
   kewangan: Kewangan,
   ayat: Ayat,
   ucapan: Ucapan,
+  penangguhan: Penangguhan,
 };

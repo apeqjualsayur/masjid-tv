@@ -10,6 +10,8 @@ import { copy, type Lang } from "./i18n";
 import { InView, useSnapshot } from "./lazy";
 import { SectionHead, h2Class, Eyebrow, sectionPad } from "./sections";
 import { landingThemes } from "./themes-list";
+import { TEMPLATES } from "@/templates/schema";
+import { fill } from "./counts";
 import { LANDING_TEMPLATE_KEYS, TemplateMockup } from "./template-mockups";
 
 export const SHOWCASE_DATE = "2026-10-22";
@@ -74,20 +76,21 @@ export function TemplatesSection({ lang }: { lang: Lang }) {
       <div className="mx-auto flex max-w-[1200px] flex-col gap-9 px-5">
         <div className="flex flex-wrap items-end justify-between gap-5">
           <div className="flex max-w-[640px] flex-col gap-3">
-            <Eyebrow>{k.eyebrow}</Eyebrow>
+            <Eyebrow>{fill(k.eyebrow)}</Eyebrow>
             <h2 id="templat-title" className={h2Class}>
               {k.title}
             </h2>
           </div>
           <p className="m-0 max-w-[380px] text-[16px] leading-[1.6] text-lb-muted">{k.body}</p>
         </div>
-        <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(200px,100%),1fr))] gap-3.5">
-          {k.items.map((it, i) => (
-            <li key={it.n} className="overflow-hidden rounded-2xl border border-lb-line bg-white">
-              <TemplateMockup k={LANDING_TEMPLATE_KEYS[i]} />
+        {/* 12 templates: min 260 px gives 4 / 3 / 2 / 1 columns, so every row is full. */}
+        <ul className="grid grid-cols-[repeat(auto-fit,minmax(min(260px,100%),1fr))] gap-3.5">
+          {LANDING_TEMPLATE_KEYS.map((key) => (
+            <li key={key} className="overflow-hidden rounded-2xl border border-lb-line bg-white">
+              <TemplateMockup k={key} />
               <div className="flex flex-col gap-[3px] px-3.5 py-3">
-                <h3 className="m-0 text-[15px] font-bold">{it.n}</h3>
-                <p className="m-0 text-[13px] text-lb-muted">{it.d}</p>
+                <h3 className="m-0 text-[15px] font-bold">{TEMPLATES[key].name[lang]}</h3>
+                <p className="m-0 text-[13px] text-lb-muted">{TEMPLATES[key].desc[lang]}</p>
               </div>
             </li>
           ))}

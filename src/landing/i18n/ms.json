@@ -38,9 +38,9 @@
   "hero": {
     "chip": "Percuma untuk semua masjid dan surau",
     "title": "Skrin waktu solat masjid anda, terus dari pelayar TV.",
-    "bodyBefore": "Tiada aplikasi khas, tiada kotak mahal. Buka ",
+    "bodyBefore": "Tiada kotak mahal. Buka ",
     "bodyUrl": "masjidview.my/tv",
-    "bodyAfter": " pada mana-mana TV yang ada pelayar web. AJK urus pengumuman dari telefon atau komputer, dan skrin berubah dalam seminit.",
+    "bodyAfter": " pada mana-mana TV yang ada pelayar web, atau pasang aplikasi Android TV. AJK urus pengumuman dari telefon atau komputer, dan skrin berubah dalam seminit.",
     "signup": "Daftar masjid percuma",
     "demo": "Lihat demo langsung",
     "worksOn": "Berfungsi pada:",
@@ -59,7 +59,8 @@
   },
   "whatIs": {
     "title": "Apakah Masjid View?",
-    "body": ""
+    "linkText": "e-Solat JAKIM",
+    "body": "Masjid View ialah sistem paparan waktu solat dan pengumuman percuma untuk masjid dan surau di Malaysia. Ia memaparkan waktu solat berdasarkan data e-Solat JAKIM, kiraan iqamah dan pengumuman AJK pada TV sedia ada, melalui pelayar web atau aplikasi Android TV. AJK mengurusnya dari telefon, dan skrin terus berfungsi walaupun internet terputus."
   },
   "numbers": {
     "title": "Satu skrin, semua maklumat masjid",
@@ -71,9 +72,9 @@
         "id": ""
       },
       {
-        "v": "10",
-        "l": "Templat pengumuman",
-        "id": ""
+        "id": "templates",
+        "v": "{n}",
+        "l": "Templat pengumuman"
       },
       {
         "id": "themes",
@@ -123,24 +124,40 @@
         "d": "Skrin bertukar secara automatik semasa khutbah dan solat Jumaat."
       },
       {
-        "t": "10 templat siap",
-        "d": "Kuliah, kematian, program, infaq, mesyuarat dan banyak lagi. Isi borang, tekan Terbit."
+        "t": "Tanpa internet pun jalan",
+        "d": "Waktu setahun disimpan dalam TV. Menyegerak semula bila talian pulih."
+      },
+      {
+        "t": "{n} templat siap",
+        "d": "Kuliah, kematian, program, infaq, jadual imam & bilal dan banyak lagi. Isi borang, tekan Terbit."
       },
       {
         "t": "Poster saiz tepat",
         "d": "Saiz terbaik ditunjukkan semasa muat naik. Gambar dimampatkan automatik."
       },
       {
-        "t": "Logo dan nama masjid",
-        "d": "Logo dan nama masjid anda di setiap skrin."
+        "t": "Notis Tangguh / Batal",
+        "d": "Kuliah atau program berubah? Tekan Tangguhkan atau Batalkan; skrin terus memaparkan cop dengan tarikh baharu."
       },
       {
-        "t": "Beberapa skrin",
-        "d": "Dewan utama, ruang wanita, pintu masuk: tema dan susun atur berbeza."
+        "t": "Kiraan detik aktiviti",
+        "d": "Slaid kuliah dan program menunjukkan berapa hari atau minit lagi sebelum bermula."
       },
       {
-        "t": "Tanpa internet pun jalan",
-        "d": "Waktu setahun disimpan dalam TV. Menyegerak semula bila talian pulih."
+        "t": "Hari Kebesaran Islam",
+        "d": "Kiraan hari ke Ramadan, Aidilfitri, Israk dan Mikraj dan lain-lain. Tarikh dikemas kini untuk anda; Ramadan dan Syawal ditanda jangkaan."
+      },
+      {
+        "t": "Jadual Imam & Bilal",
+        "d": "Isi nama petugas sekali. Skrin menyerlahkan siapa bertugas hari ini, atau ikut waktu solat."
+      },
+      {
+        "t": "Aplikasi Android TV (pilihan)",
+        "d": "Pasang dari masjidview.my/apk: skrin penuh sendiri, dibuka bila TV dihidupkan, kemas kini automatik. Pelayar web pun boleh."
+      },
+      {
+        "t": "Beberapa skrin, logo anda",
+        "d": "Logo dan nama masjid di setiap skrin. Dewan utama, ruang wanita, pintu masuk: tema dan susun atur berbeza."
       }
     ],
     "dual": {
@@ -234,7 +251,7 @@
         "Program",
         "Infaq",
         "Mesyuarat",
-        "Imam & Bilal"
+        "Jadual Imam & Bilal"
       ],
       "upload": "Muat naik poster · 1920×800",
       "caption": "Telefon · kemas kini segera"
@@ -259,51 +276,9 @@
     ]
   },
   "templates": {
-    "eyebrow": "10 TEMPLAT SIAP GUNA",
+    "eyebrow": "{n} TEMPLAT SIAP GUNA",
     "title": "Isi borang, tekan Terbit. Tiada reka poster.",
-    "body": "Setiap templat mengikut tema skrin anda secara automatik.",
-    "items": [
-      {
-        "n": "Pengumuman Am",
-        "d": "Tajuk dan teks ringkas"
-      },
-      {
-        "n": "Kuliah / Ceramah",
-        "d": "Tajuk, penceramah, masa"
-      },
-      {
-        "n": "Kematian",
-        "d": "Solat jenazah, tamat automatik"
-      },
-      {
-        "n": "Program",
-        "d": "Tarikh, tempat, hubungi"
-      },
-      {
-        "n": "Kutipan / Infaq",
-        "d": "Sasaran, kemajuan, QR"
-      },
-      {
-        "n": "Mesyuarat",
-        "d": "Notis rasmi AJK"
-      },
-      {
-        "n": "Imam & Bilal",
-        "d": "Jadual mingguan"
-      },
-      {
-        "n": "Penyata Kewangan",
-        "d": "Kutipan, belanja, baki"
-      },
-      {
-        "n": "Ayat / Hadith",
-        "d": "Daripada sumber sahih"
-      },
-      {
-        "n": "Ucapan Perayaan",
-        "d": "Aidilfitri, Aidiladha dan lain-lain"
-      }
-    ]
+    "body": "Setiap templat mengikut tema skrin anda secara automatik."
   },
   "try": {
     "eyebrow": "CUBA SEKARANG",
@@ -330,7 +305,7 @@
       {
         "s": "Smart TV",
         "t": "TV pintar Android / Google TV",
-        "d": "Muat turun dan buka aplikasi pelayar web, masukkan alamat, siap."
+        "d": "Buka pelayar web dan masukkan alamat, atau pasang aplikasi Masjid View TV dari masjidview.my/apk."
       },
       {
         "s": "Kotak TV",
@@ -412,7 +387,7 @@
       },
       {
         "t": "Pasang TV",
-        "d": "Buka masjidview.my/tv pada TV. Masukkan kod 6 digit di telefon anda."
+        "d": "Buka masjidview.my/tv pada TV, atau aplikasi Masjid View TV. Masukkan kod 6 digit di telefon anda."
       },
       {
         "t": "Terbit pengumuman",
@@ -439,7 +414,23 @@
       },
       {
         "q": "Perlukah saya muat turun aplikasi?",
-        "a": "Tiada aplikasi Masjid View untuk dipasang. Masjid View berjalan dalam pelayar web: muat turun dan buka mana-mana aplikasi pelayar web pada TV, kemudian buka masjidview.my/tv."
+        "a": "Tidak wajib. Masjid View berjalan dalam mana-mana pelayar web pada TV: buka masjidview.my/tv. Untuk TV Android atau Google TV, aplikasi Masjid View TV ialah pilihan yang disyorkan kerana ia kekal skrin penuh, dibuka sendiri apabila TV dihidupkan dan dikemas kini secara automatik."
+      },
+      {
+        "q": "Ada aplikasi untuk Android TV?",
+        "a": "Ya. Aplikasi Masjid View TV boleh dipasang pada TV Android, Google TV dan kotak Android TV (Android 7.0 ke atas). Pasang aplikasi Downloader dari Play Store, taip masjidview.my/apk, pasang, kemudian pasangkan skrin dengan kod 6 digit seperti biasa."
+      },
+      {
+        "q": "Boleh paparkan jadual imam dan bilal?",
+        "a": "Boleh. Masukkan nama imam dan bilal di halaman Petugas, susun jadual mengikut hari (dan ikut waktu solat jika perlu), kemudian terbitkan slaid Jadual Imam & Bilal. Skrin menyerlahkan petugas hari ini dan dikemas kini sendiri apabila jadual berubah."
+      },
+      {
+        "q": "Bagaimana umumkan kuliah yang ditangguhkan?",
+        "a": "Buka slaid kuliah atau program itu dan tekan Tangguhkan atau Batalkan. Isi tarikh baharu dan sebab jika ada. Skrin terus memaparkan cop DITANGGUHKAN atau DIBATALKAN pada slaid yang sama, tanpa perlu membuat poster baharu."
+      },
+      {
+        "q": "Boleh paparkan kiraan hari ke Ramadan?",
+        "a": "Boleh. Slaid Hari Kebesaran Islam mengira hari ke Ramadan, Aidilfitri, Aidiladha dan hari kebesaran lain, kemudian memaparkan “Ramadan · Hari ke-…” sepanjang Ramadan. Tarikh dikemas kini oleh Masjid View; tarikh Ramadan dan Syawal ditanda jangkaan sehingga diumumkan secara rasmi."
       },
       {
         "q": "Dari mana waktu solat diambil?",

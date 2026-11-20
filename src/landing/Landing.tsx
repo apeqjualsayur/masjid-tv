@@ -2,7 +2,7 @@
 // order (row 13 "Kenapa percuma" was removed from the PRD).
 import { Hero } from "./Hero";
 import { Numbers } from "./Numbers";
-import { Compare, CtaBand, Faq, Features, Steps } from "./sections";
+import { Compare, CtaBand, Faq, Features, Steps, WhatIs } from "./sections";
 import { JsonLd } from "./jsonld";
 import { DaySection, TemplatesSection, ThemesSection } from "./showcase";
 import { DevicesSection, PanelSection } from "./illustrations";
@@ -11,13 +11,14 @@ import { LandingShell } from "./LandingShell";
 import { homeHref, type Lang } from "./i18n";
 
 /** Section ids in page order. The ids in PRD §4 are the nav targets; the others name the rest. */
-export const SECTIONS = ["hero", "angka", "banding", "ciri", "sehari", "panel", "templat", "cuba", "peranti", "tema", "cara", "soalan", "daftar"] as const;
+export const SECTIONS = ["hero", "apakah", "angka", "banding", "ciri", "sehari", "panel", "templat", "cuba", "peranti", "tema", "cara", "soalan", "daftar"] as const;
 
 export function Landing({ lang }: { lang: Lang }) {
   return (
     <LandingShell lang={lang} page="home">
       <JsonLd path={homeHref(lang)} />
       <Hero lang={lang} />
+      <WhatIs lang={lang} />
       <Numbers lang={lang} />
       <Compare lang={lang} />
       <Features lang={lang} />

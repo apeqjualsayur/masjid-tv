@@ -3,6 +3,7 @@
 // list on the page), so the markup can never say something the page does not. No ratings, user counts
 // or reviews (PRD §2.3). Empty values are dropped, never emitted.
 import { copy, homeHref, pageHref, type Lang } from "@/landing/i18n";
+import { fill } from "@/landing/counts";
 import { site } from "@/landing/site";
 import { seoPage, type SeoPage } from "./routes";
 import { pageText } from "./metadata";
@@ -62,7 +63,7 @@ export function softwareApplication(lang: Lang): Node {
     operatingSystem: "Web browser, Android TV",
     offers: { "@type": "Offer", price: "0", priceCurrency: "MYR" },
     downloadUrl: abs("/apk"),
-    featureList: c.features.items.map((f) => f.t),
+    featureList: c.features.items.map((f) => fill(f.t)),
     screenshot: abs(SITE.ogImage.url),
     publisher: { "@id": ORG_ID },
   };

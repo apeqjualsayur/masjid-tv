@@ -38,9 +38,9 @@
   "hero": {
     "chip": "Free for every masjid and surau",
     "title": "Your masjid's prayer-time screen, straight from the TV browser.",
-    "bodyBefore": "No special app, no expensive box. Open ",
+    "bodyBefore": "No expensive box. Open ",
     "bodyUrl": "masjidview.my/tv",
-    "bodyAfter": " on any TV with a web browser. The AJK manages announcements from a phone or computer, and the screen updates within a minute.",
+    "bodyAfter": " on any TV with a web browser, or install the Android TV app. The AJK manages announcements from a phone or computer, and the screen updates within a minute.",
     "signup": "Register your masjid free",
     "demo": "See the live demo",
     "worksOn": "Works on:",
@@ -59,7 +59,8 @@
   },
   "whatIs": {
     "title": "What is Masjid View?",
-    "body": ""
+    "linkText": "JAKIM e-Solat",
+    "body": "Masjid View is a free prayer-time and announcement display for masjids and suraus in Malaysia. It shows prayer times based on JAKIM e-Solat data, iqamah countdowns and AJK announcements on an existing TV, through a web browser or the Android TV app. The AJK manages it from a phone, and the screen keeps working when the internet drops."
   },
   "numbers": {
     "title": "One screen, everything your masjid needs to share",
@@ -71,9 +72,9 @@
         "id": ""
       },
       {
-        "v": "10",
-        "l": "Announcement templates",
-        "id": ""
+        "id": "templates",
+        "v": "{n}",
+        "l": "Announcement templates"
       },
       {
         "id": "themes",
@@ -123,24 +124,40 @@
         "d": "The screen switches automatically during the Friday khutbah and solat."
       },
       {
-        "t": "10 ready-made templates",
-        "d": "Talks, death notices, programmes, infaq, meetings and more. Fill in the form and press Publish."
+        "t": "Works without internet",
+        "d": "A whole year of prayer times is stored on the TV. It syncs again when the connection is back."
+      },
+      {
+        "t": "{n} ready-made templates",
+        "d": "Talks, death notices, programmes, infaq, the imam & bilal roster and more. Fill in the form and press Publish."
       },
       {
         "t": "Posters at the right size",
         "d": "The best size is shown while you upload. Pictures are compressed automatically."
       },
       {
-        "t": "Your masjid's logo and name",
-        "d": "Your masjid's logo and name on every screen."
+        "t": "Postpone / cancel notices",
+        "d": "Talk or programme changed? Press Postpone or Cancel activity; the screen shows a stamp with the new date at once."
       },
       {
-        "t": "Several screens",
-        "d": "Main hall, women's section, entrance: each with its own theme and layout."
+        "t": "Activity countdown",
+        "d": "Talk and programme slides show how many days or minutes are left before they start."
       },
       {
-        "t": "Works without internet",
-        "d": "A whole year of prayer times is stored on the TV. It syncs again when the connection is back."
+        "t": "Islamic occasions",
+        "d": "Countdown to Ramadan, Aidilfitri, Israk and Mikraj and more. Dates are kept up to date for you; Ramadan and Syawal are marked expected."
+      },
+      {
+        "t": "Imam & Bilal roster",
+        "d": "Enter your imams and bilals once. The screen highlights who is on duty today, or by prayer time."
+      },
+      {
+        "t": "Android TV app (optional)",
+        "d": "Install from masjidview.my/apk: full screen by itself, opens when the TV is switched on, updates automatically. A web browser works too."
+      },
+      {
+        "t": "Several screens, your logo",
+        "d": "Your masjid’s logo and name on every screen. Main hall, women’s area, entrance: different themes and layouts."
       }
     ],
     "dual": {
@@ -234,7 +251,7 @@
         "Programme",
         "Infaq",
         "Meeting",
-        "Imam & Bilal"
+        "Imam & Bilal roster"
       ],
       "upload": "Upload poster · 1920×800",
       "caption": "Phone · quick updates"
@@ -259,51 +276,9 @@
     ]
   },
   "templates": {
-    "eyebrow": "10 READY-MADE TEMPLATES",
+    "eyebrow": "{n} READY-MADE TEMPLATES",
     "title": "Fill in a form, press Publish. No poster design needed.",
-    "body": "Every template follows your screen's theme automatically.",
-    "items": [
-      {
-        "n": "General announcement",
-        "d": "Title and short text"
-      },
-      {
-        "n": "Talk / Lecture",
-        "d": "Title, speaker, time"
-      },
-      {
-        "n": "Death notice",
-        "d": "Funeral prayer, ends automatically"
-      },
-      {
-        "n": "Programme",
-        "d": "Date, place, contact"
-      },
-      {
-        "n": "Collection / Infaq",
-        "d": "Target, progress, QR"
-      },
-      {
-        "n": "Meeting",
-        "d": "Official AJK notice"
-      },
-      {
-        "n": "Imam & Bilal",
-        "d": "Weekly roster"
-      },
-      {
-        "n": "Financial statement",
-        "d": "Collections, spending, balance"
-      },
-      {
-        "n": "Verse / Hadith",
-        "d": "From authentic sources"
-      },
-      {
-        "n": "Festive greetings",
-        "d": "Aidilfitri, Aidiladha and more"
-      }
-    ]
+    "body": "Every template follows your screen's theme automatically."
   },
   "try": {
     "eyebrow": "TRY IT NOW",
@@ -330,7 +305,7 @@
       {
         "s": "Smart TV",
         "t": "Android smart TV / Google TV",
-        "d": "Download and open a web browser app, enter the address, done."
+        "d": "Open a web browser and enter the address, or install the Masjid View TV app from masjidview.my/apk."
       },
       {
         "s": "TV box",
@@ -412,7 +387,7 @@
       },
       {
         "t": "Set up the TV",
-        "d": "Open masjidview.my/tv on the TV. Enter the 6-digit code on your phone."
+        "d": "Open masjidview.my/tv on the TV, or the Masjid View TV app. Enter the 6-digit code on your phone."
       },
       {
         "t": "Publish announcements",
@@ -439,7 +414,23 @@
       },
       {
         "q": "Do I need to download an app?",
-        "a": "There is no Masjid View app to install. Masjid View runs in a web browser: download and open any web browser app on the TV, then go to masjidview.my/tv."
+        "a": "Not necessarily. Masjid View runs in any web browser on the TV: open masjidview.my/tv. On an Android TV or Google TV, the Masjid View TV app is the recommended option because it stays full screen, opens by itself when the TV is switched on and updates automatically."
+      },
+      {
+        "q": "Is there an app for Android TV?",
+        "a": "Yes. The Masjid View TV app installs on Android TV, Google TV and Android TV boxes (Android 7.0 or later). Install the Downloader app from the Play Store, type masjidview.my/apk, install it, then pair the screen with the 6-digit code as usual."
+      },
+      {
+        "q": "Can it show the imam and bilal roster?",
+        "a": "Yes. Add your imams and bilals on the Petugas page, set the roster by day (and by prayer time if needed), then publish the Imam & Bilal roster slide. The screen highlights today’s duty and updates itself when the roster changes."
+      },
+      {
+        "q": "How do I announce a postponed talk?",
+        "a": "Open that talk or programme slide and press Postpone… or Cancel activity…. Add the new date and a reason if there is one. The TV shows a DITANGGUHKAN (postponed) or DIBATALKAN (cancelled) stamp on the same slide, with no new poster to make."
+      },
+      {
+        "q": "Can it show a countdown to Ramadan?",
+        "a": "Yes. The Islamic occasions slide counts the days to Ramadan, Aidilfitri, Aidiladha and other occasions, then shows “Ramadan · Hari ke-…” throughout Ramadan. Masjid View keeps the dates up to date; Ramadan and Syawal dates are marked expected until officially announced."
       },
       {
         "q": "Where do the prayer times come from?",

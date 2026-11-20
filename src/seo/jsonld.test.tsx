@@ -2,6 +2,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { describe, expect, it, vi } from "vitest";
 import { copy } from "@/landing/i18n";
+import { fill } from "@/landing/counts";
 import { site } from "@/landing/site";
 import { article, breadcrumbList, faqPage, graph, howTo, organization, pageJsonLd, softwareApplication, website } from "./jsonld";
 import { PAGES, seoPage } from "./routes";
@@ -51,7 +52,7 @@ describe("builders", () => {
         applicationCategory: "LifestyleApplication",
         offers: { "@type": "Offer", price: "0", priceCurrency: "MYR" },
         downloadUrl: "https://masjidview.my/apk",
-        featureList: copy(lang).features.items.map((f) => f.t),
+        featureList: copy(lang).features.items.map((f) => fill(f.t)),
         screenshot: "https://masjidview.my/og.png",
         description: copy(lang).meta.description,
       });

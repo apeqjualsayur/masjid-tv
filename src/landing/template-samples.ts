@@ -18,9 +18,33 @@ export const MOCK_TEXT = {
   waktu: "Waktu",
   imam: "Imam",
   bilal: "Bilal",
+  hari: "Hari",
+  hariIni: "Hari ini",
+  // Penangguhan (the stamp word the TV shows: src/themes/shared/notice-stamp.tsx)
+  ditangguhkan: "DITANGGUHKAN",
+  tangguhSeries: "Kuliah Dhuha",
+  tangguhTopic: "Adab Bertetangga",
+  tangguhOld: "Sabtu ini · 10:45 pagi",
+  tangguhNew: "Tarikh baru: Sabtu depan",
+  tangguhReason: "Sebab: Penceramah uzur",
+  // Hari Kebesaran Islam (a generic count; Ramadan dates are always "jangkaan")
+  kebesaran: "Hari Kebesaran Islam",
+  kebesaranDays: "27",
+  hariLagi: "hari lagi",
+  kebesaranEvent: "Awal Ramadan",
+  jangkaan: "jangkaan",
 } as const;
 
-export const LANDING_SAMPLES: Omit<TemplateFields, "kematian" | "ayat" | "penangguhan" | "hari_kebesaran" | "jadual_petugas"> = {
+/** Jadual Imam & Bilal mockup: a few days of the week, today (Rabu) highlighted. Generic names. */
+export const LANDING_ROSTER = [
+  { hari: "Isnin", imam: "Imam A", bilal: "Bilal A", today: false },
+  { hari: "Selasa", imam: "Imam B", bilal: "Bilal B", today: false },
+  { hari: "Rabu", imam: "Imam A", bilal: "Bilal C", today: true },
+  { hari: "Khamis", imam: "Imam C", bilal: "Bilal A", today: false },
+  { hari: "Jumaat", imam: "Imam B", bilal: "Bilal B", today: false },
+] as const;
+
+export const LANDING_SAMPLES: Omit<TemplateFields, "kematian" | "ayat" | "imam_bilal" | "penangguhan" | "hari_kebesaran" | "jadual_petugas"> = {
   pengumuman: {
     title: "Gotong-royong perdana",
     body: "Semua ahli kariah dijemput membersihkan kawasan masjid. Sarapan disediakan untuk peserta.",
@@ -59,16 +83,6 @@ export const LANDING_SAMPLES: Omit<TemplateFields, "kematian" | "ayat" | "penang
     time: "10:00 pagi",
     venue: "Bilik mesyuarat",
     issuedBy: "Setiausaha AJK",
-  },
-  imam_bilal: {
-    weekRange: "Jadual minggu ini",
-    table: [
-      { waktu: "subuh", imam: "Imam A", bilal: "Bilal A" },
-      { waktu: "zohor", imam: "Imam B", bilal: "Bilal B" },
-      { waktu: "asar", imam: "Imam B", bilal: "Bilal C" },
-      { waktu: "maghrib", imam: "Imam A", bilal: "Bilal A" },
-      { waktu: "isyak", imam: "Imam C", bilal: "Bilal C" },
-    ],
   },
   kewangan: {
     weekRange: "Minggu lepas",

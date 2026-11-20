@@ -50,7 +50,7 @@ export function sitemapXml(pages: readonly SeoPage[] = PAGES): string {
  * S5 adds the "Apakah Masjid View?" text (whatIs.body). Until then llms.txt uses each language's meta
  * description; S5 sets this to true, and from then on an empty whatIs.body fails the build.
  */
-export const LLMS_REQUIRE_WHAT_IS = false;
+export const LLMS_REQUIRE_WHAT_IS = true;
 
 /** The "what is Masjid View" paragraph for one language. */
 export function whatIs(lang: Lang, requireWhatIs = LLMS_REQUIRE_WHAT_IS): string {

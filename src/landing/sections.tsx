@@ -7,7 +7,8 @@ import { privacyHref } from "./PrivacyNotice";
 import { ADMIN_HREF } from "./Header";
 import { copy, type Lang } from "./i18n";
 import { DualScreens } from "./dual";
-import { FEATURE_ICONS, LineIcon } from "./icons";
+import { fill } from "./counts";
+import { DUAL_ICON, FEATURE_ICONS, LineIcon } from "./icons";
 import { showDualScreens } from "./themes-list";
 
 export const focusRing = "focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-lb-deep";
@@ -28,6 +29,41 @@ export function SectionHead({ id, eyebrow, title, body }: { id: string; eyebrow?
       </h2>
       {body && <p className="m-0 max-w-[620px] text-[17px] leading-[1.6] text-lb-muted">{body}</p>}
     </div>
+  );
+}
+
+export const ESOLAT_URL = "https://www.e-solat.gov.my";
+
+/** Text with the first mention of `phrase` linked to e-Solat (PRD 70 §3.C: nofollow, new tab). */
+function LinkFirst({ text, phrase, lang }: { text: string; phrase: string; lang: Lang }) {
+  const at = text.indexOf(phrase);
+  if (at < 0) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, at)}
+      <a href={ESOLAT_URL} target="_blank" rel="nofollow noopener" className={`rounded font-semibold text-lb-deep underline underline-offset-2 ${focusRing}`}>
+        {phrase}
+        <span className="sr-only"> {copy(lang).a11y.newTab}</span>
+      </a>
+      {text.slice(at + phrase.length)}
+    </>
+  );
+}
+
+/** "Apakah Masjid View?" (PRD 70 §3.C): a 40–60 word definition right under the hero. */
+export function WhatIs({ lang }: { lang: Lang }) {
+  const k = copy(lang).whatIs;
+  return (
+    <section id="apakah" aria-labelledby="apakah-title" className="pt-[clamp(40px,5vw,64px)]">
+      <div className="mx-auto flex max-w-[760px] flex-col items-center gap-3 px-5 text-center">
+        <h2 id="apakah-title" className={h2Class}>
+          {k.title}
+        </h2>
+        <p className="m-0 text-[18px] leading-[1.65] text-lb-muted">
+          <LinkFirst text={k.body} phrase={k.linkText} lang={lang} />
+        </p>
+      </div>
+    </section>
   );
 }
 
@@ -95,7 +131,7 @@ export function Features({ lang }: { lang: Lang }) {
                 <LineIcon d={FEATURE_ICONS[i]} />
               </span>
               <div className="flex flex-col gap-1.5">
-                <h3 className="m-0 text-[17px] font-bold">{it.t}</h3>
+                <h3 className="m-0 text-[17px] font-bold">{fill(it.t)}</h3>
                 <p className="m-0 text-[14px] leading-[1.6] text-lb-muted">{it.d}</p>
               </div>
             </li>
@@ -104,7 +140,7 @@ export function Features({ lang }: { lang: Lang }) {
             <li className="col-span-full flex flex-col gap-4 rounded-[18px] border border-lb-hair bg-lb-card p-[22px]">
               <div className="flex gap-3.5">
                 <span className="flex h-10 w-10 flex-none items-center justify-center rounded-xl bg-lb-soft text-lb-deep">
-                  <LineIcon d={FEATURE_ICONS[6]} />
+                  <LineIcon d={DUAL_ICON} />
                 </span>
                 <div className="flex flex-col gap-1.5">
                   <h3 className="m-0 text-[17px] font-bold">{f.dual.t}</h3>

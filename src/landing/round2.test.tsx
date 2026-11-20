@@ -29,7 +29,7 @@ describe("landing with round 2 on", () => {
     expect(tema).toContain(copy(lang).themes.titleAll);
     const feat = renderToStaticMarkup(<Features lang={lang} />);
     expect(feat).toContain(copy(lang).features.dual.t);
-    expect(feat.match(/<li /g)).toHaveLength(9);
+    expect(feat.match(/<li /g)).toHaveLength(copy(lang).features.items.length + 1); // the cards + the dual card
   });
 
   it("every theme has BM and EN copy", async () => {

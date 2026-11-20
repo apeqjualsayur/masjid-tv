@@ -231,7 +231,7 @@ export const TEMPLATES: Record<TemplateKey, TemplateMeta> = {
   // PRD enhancements §5.3. The event checklist and the list of loaded dates are drawn by the editor
   // (admin/editor/KebesaranFields); the dates come from the platform takwim, never from the slide.
   hari_kebesaran: {
-    key: "hari_kebesaran", code: "HKI", name: T("Hari Kebesaran Islam", "Islamic occasions"), desc: T("Kiraan detik dari takwim JAKIM", "Countdown from the JAKIM calendar"), bg: "#E5F0EC", fg: "#0F5A3F",
+    key: "hari_kebesaran", code: "HKI", name: T("Hari Kebesaran Islam", "Islamic occasions"), desc: T("Kiraan detik ke Ramadan, Hari Raya…", "Countdown to Ramadan, Eid…"), bg: "#E5F0EC", fg: "#0F5A3F",
     fields: [
       { key: "leadDays", type: "number", label: T("Mula papar (hari sebelum)", "Start showing (days before)"), min: 7, max: 365, hint: T("Lalai 60 hari.", "Default 60 days.") },
       { key: "showMore", type: "number", label: T("Acara seterusnya dipaparkan", "Next events shown"), min: 0, max: 2, hint: T("0 hingga 2. Lalai 2.", "0 to 2. Default 2.") },

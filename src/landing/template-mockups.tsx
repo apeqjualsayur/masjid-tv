@@ -3,15 +3,15 @@
 // shows at once without loading a theme, and the text stays legible. Colours are the Tenang theme's
 // soft tints; Kematian is grey only (theme contract rule 7: no accent, no decoration).
 import type { ReactNode } from "react";
-import { waktuName } from "@/core";
 import {
   OCCASION_LABEL,
   formatRinggit,
   infaqProgress,
   kewanganTotals,
-  type TemplateKey,
+  PICKER_KEYS,
+  type PickerKey,
 } from "@/templates";
-import { LANDING_SAMPLES as S, MOCK_TEXT as M } from "./template-samples";
+import { LANDING_ROSTER, LANDING_SAMPLES as S, MOCK_TEXT as M } from "./template-samples";
 
 const INK = "#14303D";
 const MUTED = "#56707E";
@@ -318,29 +318,60 @@ function Mesyuarat() {
   );
 }
 
-function ImamBilal() {
-  const f = S.imam_bilal;
-  const cell = "border-t border-[#D5E3EA] py-[2px]";
+/** A kuliah with the postponement stamp the TV draws (same word, same strike-through). */
+function Penangguhan() {
   return (
-    <Box tint="#EAF3F8" className="gap-1">
-      <Label color="#23709A">Imam &amp; Bilal</Label>
+    <Box tint="#FFF6E5">
+      <Label color="#A9612A">{M.tangguhSeries}</Label>
+      <Title size={14}>{M.tangguhTopic}</Title>
+      <span className="self-start rounded-[6px] bg-[#F59E0B] px-2 py-0.5 text-[11px] font-extrabold tracking-[0.08em] text-[#2A1A00]">
+        {M.ditangguhkan}
+      </span>
+      <Small className="line-through">{M.tangguhOld}</Small>
+      <span className="text-[11.5px] font-bold" style={{ color: INK }}>
+        {M.tangguhNew}
+      </span>
+      <Small className="mt-auto">{M.tangguhReason}</Small>
+    </Box>
+  );
+}
+
+/** Countdown to an Islamic occasion; Ramadan carries the "jangkaan" label, as on the TV. */
+function HariKebesaran() {
+  return (
+    <Box tint="#E5F0EC">
+      <Label color="#0F5A3F">{M.kebesaran}</Label>
+      <div className="flex items-baseline gap-1.5">
+        <span className="text-[38px] leading-none font-extrabold text-[#0F5A3F]">{M.kebesaranDays}</span>
+        <Small className="font-semibold">{M.hariLagi}</Small>
+      </div>
+      <Title size={15}>{M.kebesaranEvent}</Title>
+      <span className="mt-auto self-start rounded-full border border-[#9CC3B3] px-2 py-0.5 text-[10px] font-semibold text-[#0F5A3F]">
+        {M.jangkaan}
+      </span>
+    </Box>
+  );
+}
+
+/** The week roster: Hari | Imam | Bilal, today with fill and weight (not colour alone). */
+function JadualPetugas() {
+  const cell = "border-t border-[#D5E3EA] py-[2px] px-1";
+  return (
+    <Box tint="#EEE8F7" className="gap-1">
+      <Label color="#5B3D8F">Jadual Imam &amp; Bilal</Label>
       <div className="grid grid-cols-[1fr_1fr_1fr] text-[10.5px]">
-        {[M.waktu, M.imam, M.bilal].map((h) => (
-          <span
-            key={h}
-            className="pb-0.5 text-[9px] font-bold tracking-[0.08em] uppercase"
-            style={{ color: MUTED }}
-          >
+        {[M.hari, M.imam, M.bilal].map((h) => (
+          <span key={h} className="px-1 pb-0.5 text-[9px] font-bold tracking-[0.08em] uppercase" style={{ color: MUTED }}>
             {h}
           </span>
         ))}
-        {f.table.map((r) => (
-          <span key={r.waktu} className="contents">
-            <span className={`${cell} font-semibold`}>
-              {waktuName(r.waktu, false).label}
-            </span>
-            <span className={cell}>{r.imam}</span>
-            <span className={cell}>{r.bilal}</span>
+        {LANDING_ROSTER.map((r) => (
+          <span key={r.hari} className="contents">
+            {[r.hari, r.imam, r.bilal].map((v, i) => (
+              <span key={i} className={`${cell} ${r.today ? "bg-white font-extrabold" : i === 0 ? "font-semibold" : ""}`} style={r.today && i === 0 ? { boxShadow: "inset 3px 0 0 #5B3D8F" } : undefined}>
+                {v}
+              </span>
+            ))}
           </span>
         ))}
       </div>
@@ -434,24 +465,24 @@ function Ucapan() {
   );
 }
 
-/**
- * The templates the landing page shows, in the order of the copy's `templates.items`. Fixed on
- * purpose: a new TV template (e.g. penangguhan) joins the page only with its own mockup and copy.
- */
-export const LANDING_TEMPLATE_KEYS = ["pengumuman", "kuliah", "kematian", "program", "infaq", "mesyuarat", "imam_bilal", "kewangan", "ayat", "ucapan"] as const satisfies readonly TemplateKey[];
-export type LandingTemplateKey = (typeof LANDING_TEMPLATE_KEYS)[number];
+/** The templates the landing page shows: the ones the admin picker offers, in picker order (src/templates). */
+export const LANDING_TEMPLATE_KEYS: readonly PickerKey[] = PICKER_KEYS;
+export type LandingTemplateKey = PickerKey;
 
-const MOCKUPS: Record<LandingTemplateKey, () => ReactNode> = {
+/** One mockup per offered template: a template added to the picker must get its mockup here (type error otherwise). */
+const MOCKUPS: Record<PickerKey, () => ReactNode> = {
   pengumuman: Pengumuman,
   kuliah: Kuliah,
   kematian: Kematian,
   program: Program,
   infaq: Infaq,
   mesyuarat: Mesyuarat,
-  imam_bilal: ImamBilal,
   kewangan: Kewangan,
   ayat: Ayat,
   ucapan: Ucapan,
+  penangguhan: Penangguhan,
+  hari_kebesaran: HariKebesaran,
+  jadual_petugas: JadualPetugas,
 };
 
 export function TemplateMockup({ k }: { k: LandingTemplateKey }) {

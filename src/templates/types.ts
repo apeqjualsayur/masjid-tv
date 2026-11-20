@@ -31,6 +31,11 @@ export const TEMPLATE_KEYS: readonly TemplateKey[] = [
  */
 export const PICKER_HIDDEN: readonly TemplateKey[] = ["imam_bilal"];
 
+/** A template the admin picker offers (and the landing page shows). */
+export type PickerKey = Exclude<TemplateKey, "imam_bilal">;
+/** The templates on offer, in picker order: what "N templat" counts everywhere. */
+export const PICKER_KEYS = TEMPLATE_KEYS.filter((k) => !PICKER_HIDDEN.includes(k)) as PickerKey[];
+
 /** A ?key= value (or a slides.template_key) as one of the template keys, or null when it is not one. */
 export function resolveTemplateKey(k: string | null | undefined): TemplateKey | null {
   return k && (TEMPLATE_KEYS as readonly string[]).includes(k) ? (k as TemplateKey) : null;

@@ -6,12 +6,15 @@
 // The mode is reported to the server on every sync (screens.view_mode, migration 0010).
 import { useEffect, useState, useSyncExternalStore } from "react";
 import { VERSION_URL, isOutdated, parseLiveVersion } from "@/config/release";
+import { currentShell } from "./shell";
 import { APP_VERSION } from "./status";
 
 export type ViewMode = "app" | "tab" | "window";
 
 export function viewMode(): ViewMode {
   if (typeof document === "undefined") return "window";
+  // The Android TV app always shows the page full screen (immersive WebView).
+  if (currentShell()) return "app";
   if (document.fullscreenElement) return "tab";
   const mm = (q: string) => typeof matchMedia !== "undefined" && matchMedia(q).matches;
   if (mm("(display-mode: fullscreen)") || mm("(display-mode: standalone)")) return "app";

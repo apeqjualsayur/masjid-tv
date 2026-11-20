@@ -4,6 +4,7 @@
 // rename / theme / layout / sound (Bunyi, _specs/50-PRD-sound.md D9) / revoke / delete.
 import { useCallback, useEffect, useRef, useState, type ClipboardEvent, type KeyboardEvent } from "react";
 import { THEMES_ROUND2_VISIBLE } from "@/config/features";
+import { apkBehind, parseAppVersion, type LatestApk } from "@/config/app-shell";
 import { RELEASE, isOutdated } from "@/config/release";
 import { player } from "@/audio";
 import type { SoundKind, SoundSettings } from "@/core";
@@ -16,6 +17,7 @@ import { Dialog } from "../shell/Dialog";
 import { ICON, Icon } from "../shell/icons";
 import { useToasts } from "../shell/Toast";
 import { NAME_MAX, PENDING_PAIR_KEY, POSTER_TIP_KEY, SOUND_CHOICES, VOLUME_STEP, claimErrorKey, codeFromPaste, codeFromQuery, layoutChoices, nameError, onlyDigits, screenStatus, screenUpdate, sortScreens, soundError, soundOf, soundSectionVisible, suggestPosterLayout, themeChoices, type Layout, type Screen, type Theme } from "./logic";
+import { InstallAppCard, useLatestApk } from "./InstallAppCard";
 import { ThemeThumb } from "./ThemeThumb";
 
 const card = "rounded-[18px] bg-adm-card shadow-[0_1px_3px_rgba(18,38,30,0.08)]";
@@ -39,6 +41,8 @@ export function ScreensView() {
   const [managing, setManaging] = useState<Screen | null>(null);
   /** The database has screens.sound (migration 0011): only then the sheet shows Bunyi. */
   const [soundAvailable, setSoundAvailable] = useState(false);
+  /** The published Android TV app (masjidview.my/apk/latest.json), null until loaded / when absent. */
+  const { latest: latestApk, published: apkPublished } = useLatestApk();
 
   const load = useCallback(async () => {
     const sb = getSupabase();
@@ -92,6 +96,7 @@ export function ScreensView() {
         )}
       </div>
       {loadError && <p role="alert" className="rounded-xl bg-[#FDECE8] px-4 py-3 text-[14px] text-adm-danger">{t("screens.loadError", { message: loadError })}</p>}
+      {apkPublished && <InstallAppCard latest={latestApk} remember />}
 
       {!screens && !loadError ? (
         <p className={`${card} p-5 text-[14px] text-adm-muted`}>{t("app.loading")}</p>
@@ -100,7 +105,7 @@ export function ScreensView() {
       ) : (
         <ul className="grid grid-cols-1 gap-3 lg:grid-cols-2 lg:gap-4">
           {(screens ?? []).map((s) => (
-            <ScreenCard key={s.id} s={s} now={now} canEdit={canEdit} onManage={() => setManaging(s)} />
+            <ScreenCard key={s.id} s={s} now={now} canEdit={canEdit} latestApk={latestApk} onManage={() => setManaging(s)} />
           ))}
         </ul>
       )}
@@ -108,6 +113,8 @@ export function ScreensView() {
         <AddSheet
           orgId={orgId}
           screens={screens}
+          latestApk={latestApk}
+          apkPublished={apkPublished}
           initialCode={adding.code}
           onClose={closeAdd}
           onDone={(name) => {
@@ -152,13 +159,16 @@ export function AddScreenAction() {
 /** Guide section on full screen (landing /panduan). */
 const fullscreenGuide = (lang: string) => `${lang === "en" ? "/en/panduan/" : "/panduan/"}#skrin-penuh`;
 
-function ScreenCard({ s, now, canEdit, onManage }: { s: Screen; now: number; canEdit: boolean; onManage: () => void }) {
+function ScreenCard({ s, now, canEdit, latestApk, onManage }: { s: Screen; now: number; canEdit: boolean; latestApk: LatestApk | null; onManage: () => void }) {
   const { t, lang } = useT();
   const dur = useDuration();
   const st = screenStatus(s, now);
   const live = st.kind === "online" || st.kind === "offline";
   const behind = live && isOutdated(s.app_version, RELEASE.minTvBuild);
   const notFull = live && s.view_mode === "window";
+  // "App TV 1.0.0" (Android TV app) or "Pelayar" (a browser / kiosk), and whether a newer app is out (§8.3).
+  const apk = parseAppVersion(s.app_version).apk;
+  const appBehind = live && apkBehind(s.app_version, latestApk);
   const status =
     st.kind === "online" ? (
       <span className="flex items-center gap-1.5 text-[13px] font-bold text-adm-ok"><span className="h-2 w-2 rounded-full bg-[#1E9E62]" />{t("screens.online")}</span>
@@ -177,11 +187,13 @@ function ScreenCard({ s, now, canEdit, onManage }: { s: Screen; now: number; can
           <span className="truncate text-[16px] font-extrabold">{s.name}</span>
           {status}
           <span className="text-[12px] text-adm-muted">{t(`theme.${s.theme}`)} · {t(`layout.${s.layout}`)}</span>
+          {live && s.app_version && <span className="text-[12px] text-adm-muted">{apk ? t("screens.appVersion", { version: apk }) : t("screens.browser")}</span>}
         </div>
       </div>
-      {(behind || notFull) && (
+      {(behind || notFull || appBehind) && (
         <div className="flex flex-wrap gap-1.5">
           {behind && <span className="rounded-full bg-[#FFF1D6] px-2.5 py-1 text-[12px] font-extrabold text-[#7A4700]">{t("screens.needsUpdate")}</span>}
+          {appBehind && latestApk && <span className="rounded-full bg-[#FFF1D6] px-2.5 py-1 text-[12px] font-extrabold text-[#7A4700]">{t("screens.appUpdate", { version: latestApk.versionName })}</span>}
           {notFull && (
             <a href={fullscreenGuide(lang)} target="_blank" rel="noopener" className="rounded-full bg-[#E3ECE7] px-2.5 py-1 text-[12px] font-extrabold text-[#3A4E45] underline-offset-2 hover:underline">
               {t("screens.notFullscreen")}
@@ -350,7 +362,7 @@ function PosterTip({ screens, layout, onUse }: { screens: Screen[] | null; layou
   );
 }
 
-function AddSheet({ orgId, screens, initialCode, onClose, onDone }: { orgId: string; screens: Screen[] | null; initialCode: string; onClose: () => void; onDone: (name: string) => void }) {
+function AddSheet({ orgId, screens, latestApk, apkPublished, initialCode, onClose, onDone }: { orgId: string; screens: Screen[] | null; latestApk: LatestApk | null; apkPublished: boolean; initialCode: string; onClose: () => void; onDone: (name: string) => void }) {
   const { t } = useT();
   const [code, setCode] = useState(initialCode);
   const [name, setName] = useState("");
@@ -389,6 +401,7 @@ function AddSheet({ orgId, screens, initialCode, onClose, onDone }: { orgId: str
         className="flex flex-col gap-4"
       >
         <p className="text-[14px] leading-[1.5] text-adm-muted">{t("screens.addIntro", { host: host() })}</p>
+        {apkPublished && <InstallAppCard latest={latestApk} />}
         <div className="flex flex-col gap-2">
           <span className={fieldLabel}>{t("screens.code")}</span>
           <CodeBoxes

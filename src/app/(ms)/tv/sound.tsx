@@ -10,6 +10,7 @@
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { cueKey, cueToleranceMs, soundCue, type CueTick, type DisplayState, type LayoutKey, type SoundSettings } from "@/core";
 import { player } from "@/audio";
+import { currentShell } from "./shell";
 
 const UNLOCK_EVENTS = ["keydown", "pointerdown", "touchstart"] as const;
 
@@ -26,6 +27,10 @@ export function SoundLayer({ s, at, layout, sound, speed, forced }: { s: Display
   useEffect(() => {
     if (!active) return;
     player.prime();
+    // The Android TV app allows sound without a key press (mediaPlaybackRequiresUserGesture = false):
+    // try to start audio at once. The speaker-off icon hides only if audio really is running
+    // (PRD enhancements §8.2); in a browser this stays locked until a key press, as before.
+    if (currentShell()) void player.unlock();
     if (sound.azan === "hayya" || sound.iqamah === "hayya") void player.preloadHayya();
   }, [active, sound.azan, sound.iqamah]);
   useEffect(() => {

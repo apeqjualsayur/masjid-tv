@@ -446,6 +446,29 @@
         "invalid": "Tetapan bunyi tidak sah. Pilih semula pilihan bunyi.",
         "volume": "Kelantangan mesti antara 0 dan 100."
       }
+    },
+    "appVersion": "App TV {version}",
+    "browser": "Pelayar",
+    "appUpdate": "Kemas kini app tersedia ({version})",
+    "app": {
+      "title": "Pasang app di TV",
+      "sheetTitle": "Belum ada app di TV? Pasang dahulu",
+      "subtitle": "App Masjid View TV untuk TV Android dan Google TV",
+      "version": "Versi {version} · {size} · {date}",
+      "why": "Cara paling mudah untuk TV Android / Google TV: skrin penuh sendiri, bunyi azan tanpa menekan butang, dan kemas kini automatik.",
+      "linkLabel": "Pautan untuk ditaip di TV",
+      "copy": "Salin pautan",
+      "copied": "Pautan disalin",
+      "download": "Muat turun APK",
+      "downloadHint": "Muat turun APK jika anda mahu memasangnya melalui pemacu USB.",
+      "noInfo": "Maklumat versi tidak dapat dimuatkan. Langkah di bawah masih sama.",
+      "stepsTitle": "Langkah pada TV",
+      "step1": "Pada TV, buka Play Store dan pasang app \"Downloader\".",
+      "step2": "Benarkan Downloader memasang app tidak diketahui: Tetapan → Privasi / Keselamatan → Apl tidak diketahui → Downloader. Perkataannya berbeza mengikut TV; Downloader biasanya membuka tetapan ini sendiri.",
+      "step3": "Buka Downloader, taip {link}, tekan Pergi, kemudian Pasang.",
+      "step4": "Buka \"Masjid View TV\". Kod pasangan 6 digit dipaparkan.",
+      "step5": "Di sini, tekan \"Tambah skrin\" dan masukkan kod itu seperti biasa.",
+      "kiosk": "Fully Kiosk Browser masih boleh digunakan; app ini pilihan yang disyorkan."
     }
   },
   "poster": {

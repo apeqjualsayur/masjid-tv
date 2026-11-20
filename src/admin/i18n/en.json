@@ -446,6 +446,29 @@
         "invalid": "The sound settings are not valid. Choose the sounds again.",
         "volume": "Volume must be between 0 and 100."
       }
+    },
+    "appVersion": "TV app {version}",
+    "browser": "Browser",
+    "appUpdate": "App update available ({version})",
+    "app": {
+      "title": "Install the app on the TV",
+      "sheetTitle": "No app on the TV yet? Install it first",
+      "subtitle": "The Masjid View TV app for Android TV and Google TV",
+      "version": "Version {version} · {size} · {date}",
+      "why": "The easiest way on an Android TV / Google TV: full screen by itself, azan sound without pressing a button, and automatic updates.",
+      "linkLabel": "Link to type on the TV",
+      "copy": "Copy link",
+      "copied": "Link copied",
+      "download": "Download APK",
+      "downloadHint": "Download the APK if you want to install it from a USB drive.",
+      "noInfo": "Version details could not be loaded. The steps below are the same.",
+      "stepsTitle": "Steps on the TV",
+      "step1": "On the TV, open the Play Store and install the \"Downloader\" app.",
+      "step2": "Allow Downloader to install unknown apps: Settings → Privacy / Security → Unknown apps → Downloader. The wording varies by TV; Downloader usually opens this setting itself.",
+      "step3": "Open Downloader, type {link}, press Go, then Install.",
+      "step4": "Open \"Masjid View TV\". A 6-digit pairing code appears.",
+      "step5": "Here, press \"Add screen\" and enter that code as usual.",
+      "kiosk": "Fully Kiosk Browser still works; this app is the recommended option."
     }
   },
   "poster": {

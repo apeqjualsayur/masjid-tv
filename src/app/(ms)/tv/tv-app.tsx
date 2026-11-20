@@ -45,7 +45,8 @@ import { ScreenHint } from "./ScreenHint";
 import { setTvQuiet } from "./screen-mode";
 import { SoundLayer } from "./sound";
 import { Stage } from "./stage";
-import { APP_VERSION, useOnline, useServiceWorker } from "./status";
+import { tvAppVersion, useShellHeartbeat } from "./shell";
+import { useOnline, useServiceWorker } from "./status";
 import { PairingFlow } from "./pairing/PairingFlow";
 import { supabaseConfigured } from "@/lib/supabase";
 
@@ -89,6 +90,8 @@ export function TvRoot() {
   const [generation, setGeneration] = useState(0);
   useEffect(() => setMode(tvMode(window.location.search, supabaseConfigured())), []);
   useDailyReload(() => setGeneration((g) => g + 1));
+  // Inside the Android TV app: "still alive" every 30 s (no beat for 3 min → the app reloads the page).
+  useShellHeartbeat();
   const screen = mode === "demo" ? <DemoApp /> : mode === "local" ? <TvApp /> : mode === "paired" ? <PairingFlow /> : <div className="h-full bg-black" />;
   return (
     <ErrorBoundary>
@@ -258,7 +261,7 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
     lastDataSync: boot.status.lastDataSync ?? (day?.status === "ok" && day.source !== "fallback" ? (day.fetchedAt ?? null) : null),
     sim: overrides.simStartMs !== undefined || overrides.speed ? `${overrides.simStartMs !== undefined ? "dari sim" : "masa sebenar"} × ${overrides.speed ?? 1}` : null,
     liteReason: overrides.lite !== undefined ? `${lite ? "on" : "off"} (?lite=)` : `${lite ? "on" : "off"} (auto)`,
-    appVersion: APP_VERSION,
+    appVersion: tvAppVersion(),
     swState: sw.state,
     swVersion: sw.version,
     online,

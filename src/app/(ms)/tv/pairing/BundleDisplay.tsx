@@ -6,7 +6,7 @@ import { nowMs } from "@/core";
 import { bundleIntervalAt, bundleSlides, createFallbackLoader, createPrayerData, idbBundleStore, idbMonthStore, referencedMedia, startBundleSync, type BundleState } from "@/data";
 import { getTvSupabase } from "@/lib/supabase";
 import { bundleToScreenConfig } from "../bundle-config";
-import { APP_VERSION } from "../status";
+import { tvAppVersion } from "../shell";
 import { viewMode } from "../screen-mode";
 import { DisplayHost, type DisplaySource } from "../tv-app";
 import { PairedView, SuspendedView } from "./frame";
@@ -32,7 +32,8 @@ export function BundleDisplay({ secret, onRevoked }: { secret: string; onRevoked
     let withViewMode = true;
     const sync = startBundleSync({
       call: async (since) => {
-        const args = { p_secret: secret, p_since: since, p_app_version: APP_VERSION };
+        // "<web>+apk<x.y.z>" inside the Android TV app, so the admin can show "App TV x.y.z" (§8.3).
+        const args = { p_secret: secret, p_since: since, p_app_version: tvAppVersion() };
         let res = await sb.rpc("screen_bundle", withViewMode ? { ...args, p_view_mode: viewMode() } : args);
         if (withViewMode && res.error && (res.error.code === "PGRST202" || /p_view_mode/.test(res.error.message))) {
           withViewMode = false;

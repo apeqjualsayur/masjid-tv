@@ -11,7 +11,8 @@ import { OrgAvatar } from "../shell/OrgAvatar";
 import { useIsDesktop } from "../shell/useIsDesktop";
 import { UsageView } from "../usage/UsageView";
 import { PlatformFeedback } from "../feedback/PlatformFeedback";
-import { REASON_MAX, TAB_QUERY, VIEW_TABS, actionsFor, countByTab, filterOrgs, formatBytes, needsReason, reasonError, tabFromQuery, totals, type PlatformOrg, type PlatformTab, type ReviewAction, type ViewTab } from "./logic";
+import { TakwimView } from "./TakwimView";
+import { REASON_MAX, TAB_QUERY, VIEW_TABS, actionsFor, isToolTab, countByTab, filterOrgs, formatBytes, needsReason, reasonError, tabFromQuery, totals, type PlatformOrg, type PlatformTab, type ReviewAction, type ViewTab } from "./logic";
 
 const card = "rounded-[18px] bg-adm-card shadow-[0_1px_3px_rgba(18,38,30,0.08)]";
 const badge: Record<PlatformOrg["status"], string> = {
@@ -51,8 +52,8 @@ export function PlatformView({ tabParam }: { tabParam: string | null }) {
   const { orgs, error, loading, reload } = usePlatformOrgs();
   const [view, setView] = useState<ViewTab>(() => tabFromQuery(tabParam));
   useEffect(() => setView(tabFromQuery(tabParam)), [tabParam]);
-  /** Penggunaan and Maklum balas replace the masjid list. */
-  const usage = view === "usage" || view === "feedback";
+  /** Penggunaan, Maklum balas and Takwim replace the masjid list. */
+  const usage = isToolTab(view);
   const tab: PlatformTab = usage ? "pending" : view;
   const choose = (k: ViewTab) => {
     setView(k);
@@ -133,7 +134,7 @@ export function PlatformView({ tabParam }: { tabParam: string | null }) {
       )}
 
       <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
-        <div role="tablist" aria-label={t("platform.tabs")} className="grid grid-cols-2 gap-1 rounded-[14px] bg-[#E3ECE7] p-1 min-[480px]:grid-cols-5 min-[480px]:gap-0 lg:w-[780px]">
+        <div role="tablist" aria-label={t("platform.tabs")} className="grid grid-cols-2 gap-1 rounded-[14px] bg-[#E3ECE7] p-1 min-[480px]:grid-cols-3 min-[720px]:grid-cols-6 min-[720px]:gap-0 lg:w-[900px]">
           {VIEW_TABS.map((k) => {
             const on = view === k;
             return (
@@ -145,7 +146,7 @@ export function PlatformView({ tabParam }: { tabParam: string | null }) {
                 onClick={() => choose(k)}
                 className={`h-11 rounded-[11px] px-1 text-[14px] font-bold focus-visible:outline-2 focus-visible:outline-adm-green ${on ? "bg-white text-adm-ink shadow-[0_1px_3px_rgba(18,38,30,0.12)]" : "text-adm-muted"}`}
               >
-                {k === "usage" || k === "feedback" ? t(`platform.tab.${k}`) : t("platform.tabCount", { label: t(`platform.tab.${k}`), n: counts[k] })}
+                {isToolTab(k) ? t(`platform.tab.${k}`) : t("platform.tabCount", { label: t(`platform.tab.${k}`), n: counts[k as keyof typeof counts] })}
               </button>
             );
           })}
@@ -171,6 +172,8 @@ export function PlatformView({ tabParam }: { tabParam: string | null }) {
         <UsageView />
       ) : view === "feedback" ? (
         <PlatformFeedback />
+      ) : view === "takwim" ? (
+        <TakwimView />
       ) : (
       <>
       {notice && (

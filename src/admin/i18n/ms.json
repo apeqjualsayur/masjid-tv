@@ -113,7 +113,8 @@
     "ayat": "Ayat",
     "ucapan": "Ucapan",
     "poster": "Poster",
-    "penangguhan": "Penangguhan"
+    "penangguhan": "Penangguhan",
+    "hari_kebesaran": "Hari Kebesaran"
   },
   "placeholder": {
     "soon": "Halaman ini sedang dibina.",
@@ -245,7 +246,8 @@
       "active": "Aktif",
       "suspended": "Digantung",
       "usage": "Penggunaan",
-      "feedback": "Maklum balas"
+      "feedback": "Maklum balas",
+      "takwim": "Takwim"
     },
     "tabCount": "{label} ({n})",
     "tabs": "Status masjid",
@@ -300,6 +302,51 @@
       "screens": "Skrin",
       "storage": "Storan",
       "actions": "Tindakan"
+    },
+    "takwim": {
+      "intro": "Tarikh 9 hari kebesaran Islam daripada takwim JAKIM, untuk slaid Hari Kebesaran di semua masjid. Tandakan Ramadan dan Syawal sebagai Jangkaan sehingga pengumuman rasmi, kemudian tekan Sahkan. Setiap perubahan sampai ke TV dalam masa kira-kira 1 minit.",
+      "warnIncomplete": "Hanya {n} daripada 9 acara bertarikh dalam 365 hari akan datang. Lengkapkan takwim tahun hadapan.",
+      "next": "3 acara seterusnya",
+      "years": "Tahun Hijrah",
+      "addYear": "Tambah tahun",
+      "addYearLabel": "Tahun Hijrah baru",
+      "empty": "Belum ada tahun. Tambah tahun Hijrah untuk mula memasukkan tarikh.",
+      "caption": "Takwim {year}H",
+      "col": {
+        "event": "Acara",
+        "date": "Tarikh (Masihi)",
+        "status": "Status",
+        "note": "Nota",
+        "actions": "Tindakan"
+      },
+      "status": {
+        "jangkaan": "Jangkaan",
+        "rasmi": "Rasmi"
+      },
+      "soon": "Akan datang",
+      "dateOf": "Tarikh {event}",
+      "statusOf": "Status {event}",
+      "noteOf": "Nota {event}",
+      "deleteOf": "Padam {event}",
+      "notePlaceholder": "cth. Ikut pengumuman Penyimpan Mohor Besar Raja-Raja",
+      "save": "Simpan",
+      "confirm": "Sahkan",
+      "delete": "Padam",
+      "deleteTitle": "Padam tarikh ini?",
+      "deleteBody": "{event} {year}H akan dibuang daripada takwim. Slaid Hari Kebesaran di semua masjid tidak lagi memaparkannya.",
+      "saved": "{event} {year}H disimpan.",
+      "confirmed": "{event} {year}H disahkan (Rasmi).",
+      "deleted": "{event} {year}H dipadam.",
+      "err": {
+        "load": "Takwim tidak dapat dimuatkan: {message}",
+        "save": "Tidak dapat disimpan: {message}",
+        "year": "Tahun Hijrah mesti antara {min} dan {max}.",
+        "note": "Nota maksimum {max} aksara.",
+        "date": {
+          "required": "Pilih tarikh untuk menyimpan.",
+          "invalid": "Tarikh tidak sah."
+        }
+      }
     }
   },
   "settings": {
@@ -670,6 +717,18 @@
       "previewAt": "Pratonton pada…",
       "previewBefore": "59 minit sebelum mula",
       "previewNow": "Kembali ke masa sekarang"
+    },
+    "kebesaran": {
+      "events": "Acara yang dipaparkan",
+      "all": "Pilih semua",
+      "none": "Kosongkan",
+      "datesTitle": "Tarikh dalam takwim (12 bulan akan datang)",
+      "noDates": "Tarikh belum dimuat naik. Slaid ini tidak dipaparkan di TV sehingga tarikh dimasukkan oleh Masjid View.",
+      "source": "Tarikh daripada takwim JAKIM, dikemas kini oleh Masjid View.",
+      "loadError": "Takwim tidak dapat dimuatkan: {message}",
+      "err": {
+        "events": "Pilih sekurang-kurangnya satu acara."
+      }
     }
   },
   "content": {

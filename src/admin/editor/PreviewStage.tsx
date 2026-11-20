@@ -3,7 +3,7 @@
 // the available width, with a DisplayState built from today's real prayer times for the org's zone.
 // The layout is rendered directly, so the preview always shows the slide (never an azan screen).
 import { useEffect, useRef, useState } from "react";
-import { buildDisplayState, type LayoutKey, type ThemeId } from "@/core";
+import { buildDisplayState, type LayoutKey, type TemplateContext, type ThemeId } from "@/core";
 import type { DayResult } from "@/data";
 import { withLive, type SlideView } from "@/templates";
 import { getTheme } from "@/themes/registry";
@@ -29,7 +29,11 @@ export interface PreviewContext {
  * `liveAt`: the moment the slide's countdown / notice is shown for ("Pratonton pada…", PRD
  * enhancements §4.3); the prayer area keeps the real time. Defaults to `now`.
  */
-export function PreviewStage({ slide, target, day, now, ctx, label, liveAt }: { slide: SlideView; target: PreviewTarget; day: DayResult & { status: "ok" }; now: number; ctx: PreviewContext; label: string; liveAt?: number }) {
+export function PreviewStage({ slide, target, day, now, ctx, label, liveAt, templateData }: {
+  slide: SlideView; target: PreviewTarget; day: DayResult & { status: "ok" }; now: number; ctx: PreviewContext; label: string; liveAt?: number;
+  /** The real takwim (Hari Kebesaran) for the preview; today's Maghrib is added here. */
+  templateData?: Pick<TemplateContext, "islamicEvents" | "roster">;
+}) {
   const box = useRef<HTMLDivElement>(null);
   const [w, setW] = useState(0);
   useEffect(() => {
@@ -58,7 +62,7 @@ export function PreviewStage({ slide, target, day, now, ctx, label, liveAt }: { 
     <div ref={box} role="img" aria-label={label} className="relative w-full overflow-hidden rounded-[10px] bg-black ring-[6px] ring-[#1B1B1B]" style={{ height: Math.round(1080 * scale) || undefined, aspectRatio: w ? undefined : "16 / 9" }}>
       {w > 0 && (
         <div aria-hidden="true" style={{ position: "absolute", left: 0, top: 0, width: 1920, height: 1080, transform: `scale(${scale})`, transformOrigin: "0 0", pointerEvents: "none" }}>
-          <Layout s={s} slide={withLive(slide, liveAt ?? now, ctx.clock24h)} slideKey="preview" />
+          <Layout s={s} slide={withLive(slide, liveAt ?? now, ctx.clock24h, { ...templateData, maghribTodayMs: day.today.times.maghrib })} slideKey="preview" />
         </div>
       )}
     </div>

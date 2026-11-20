@@ -113,7 +113,8 @@
     "ayat": "Verse",
     "ucapan": "Greeting",
     "poster": "Poster",
-    "penangguhan": "Postponement"
+    "penangguhan": "Postponement",
+    "hari_kebesaran": "Islamic occasions"
   },
   "placeholder": {
     "soon": "This page is being built.",
@@ -245,7 +246,8 @@
       "active": "Active",
       "suspended": "Suspended",
       "usage": "Usage",
-      "feedback": "Feedback"
+      "feedback": "Feedback",
+      "takwim": "Calendar"
     },
     "tabCount": "{label} ({n})",
     "tabs": "Masjid status",
@@ -300,6 +302,51 @@
       "screens": "Screens",
       "storage": "Storage",
       "actions": "Actions"
+    },
+    "takwim": {
+      "intro": "Dates of the 9 Islamic occasions from JAKIM's calendar, for the Islamic occasions slide in every masjid. Mark Ramadan and Syawal as Expected until the official announcement, then press Confirm. Every change reaches the TVs within about a minute.",
+      "warnIncomplete": "Only {n} of the 9 events are dated in the next 365 days. Complete next year's calendar.",
+      "next": "Next 3 events",
+      "years": "Hijri years",
+      "addYear": "Add year",
+      "addYearLabel": "New Hijri year",
+      "empty": "No years yet. Add a Hijri year to start entering dates.",
+      "caption": "Calendar {year}H",
+      "col": {
+        "event": "Event",
+        "date": "Date (Gregorian)",
+        "status": "Status",
+        "note": "Note",
+        "actions": "Actions"
+      },
+      "status": {
+        "jangkaan": "Expected",
+        "rasmi": "Official"
+      },
+      "soon": "Coming up",
+      "dateOf": "Date of {event}",
+      "statusOf": "Status of {event}",
+      "noteOf": "Note for {event}",
+      "deleteOf": "Delete {event}",
+      "notePlaceholder": "e.g. As announced by the Keeper of the Rulers' Seal",
+      "save": "Save",
+      "confirm": "Confirm",
+      "delete": "Delete",
+      "deleteTitle": "Delete this date?",
+      "deleteBody": "{event} {year}H will be removed from the calendar. The Islamic occasions slide in every masjid will no longer show it.",
+      "saved": "{event} {year}H saved.",
+      "confirmed": "{event} {year}H confirmed (Official).",
+      "deleted": "{event} {year}H deleted.",
+      "err": {
+        "load": "The calendar could not be loaded: {message}",
+        "save": "Could not save: {message}",
+        "year": "The Hijri year must be between {min} and {max}.",
+        "note": "Note at most {max} characters.",
+        "date": {
+          "required": "Choose a date to save.",
+          "invalid": "The date is not valid."
+        }
+      }
     }
   },
   "settings": {
@@ -670,6 +717,18 @@
       "previewAt": "Preview at…",
       "previewBefore": "59 minutes before the start",
       "previewNow": "Back to now"
+    },
+    "kebesaran": {
+      "events": "Events to show",
+      "all": "Select all",
+      "none": "Clear",
+      "datesTitle": "Dates in the calendar (next 12 months)",
+      "noDates": "No dates loaded yet. This slide is not shown on the TV until Masjid View enters the dates.",
+      "source": "Dates from JAKIM's calendar, kept up to date by Masjid View.",
+      "loadError": "The calendar could not be loaded: {message}",
+      "err": {
+        "events": "Choose at least one event."
+      }
     }
   },
   "content": {

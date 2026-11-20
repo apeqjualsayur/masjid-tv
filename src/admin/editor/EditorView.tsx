@@ -23,7 +23,10 @@ import { useAdmin } from "../session";
 import { Dialog } from "../shell/Dialog";
 import { ICON, Icon } from "../shell/icons";
 import { useToasts } from "../shell/Toast";
+import { rowsToEvents, validateKebesaranEvents } from "../platform/takwim";
+import { useTakwim } from "../platform/useTakwim";
 import { ActivityExtrasFields } from "./ActivityExtras";
+import { KebesaranFields } from "./KebesaranFields";
 import { saveTemplateSlide, supabaseTemplateBackend } from "./save";
 import { PreviewStage } from "./PreviewStage";
 import { TemplateForm, type ImageState } from "./TemplateForm";
@@ -118,6 +121,9 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
   const [noticeKind, setNoticeKind] = useState<NoticeKind | null>(null);
   const [slideStatus, setSlideStatus] = useState<string>("draft");
   const { day, loading: dayLoading } = usePrayerToday(org.zone, now);
+  // Hari Kebesaran: the real platform takwim for the preview and the list of loaded dates.
+  const takwim = useTakwim();
+  const templateData = useMemo(() => ({ islamicEvents: rowsToEvents(takwim.rows ?? []) }), [takwim.rows]);
 
   // (edit) the slide.
   useEffect(() => {
@@ -217,7 +223,11 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
 
   const save = async (next: SlideStatus) => {
     if (!key || !meta) return;
-    const fe = { ...validateFields(key, fields), ...(supportsNotice(key) ? validateActivityExtras(fields) : {}) };
+    const fe = {
+      ...validateFields(key, fields),
+      ...(supportsNotice(key) ? validateActivityExtras(fields) : {}),
+      ...(key === "hari_kebesaran" ? validateKebesaranEvents(fields) : {}),
+    };
     const se = validateSchedule(schedule, meta.schedule);
     setFieldErrors(fe);
     setSchedErrors(se);
@@ -315,7 +325,7 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
     <p className="rounded-xl bg-adm-ground px-4 py-6 text-center text-[13px] text-adm-muted">{t("editor.loadingPreview")}</p>
   ) : day && day.status === "ok" && slide && target ? (
     <PreviewBoundary resetKey={JSON.stringify(debounced).length + target.key}>
-      <PreviewStage slide={slide} target={target} day={day} now={now} ctx={ctx} label={t("editor.preview")} liveAt={previewAt ?? undefined} />
+      <PreviewStage slide={slide} target={target} day={day} now={now} ctx={ctx} label={t("editor.preview")} liveAt={previewAt ?? undefined} templateData={templateData} />
     </PreviewBoundary>
   ) : (
     <p className="rounded-xl bg-[#FFF4DF] px-4 py-3 text-[13px] text-[#6B4A12]">{t("editor.noTimes")}</p>
@@ -334,6 +344,7 @@ export function EditorView({ templateKey, slideIdParam }: { templateKey: string 
         {notes}
         <TemplateForm templateKey={key} fields={fields} onChange={setFields} errors={fieldErrors} images={images} onPickImage={pickImage} onRemoveImage={removeImage} />
         {supportsNotice(key) && <ActivityExtrasFields fields={fields} onChange={setFields} errors={fieldErrors} previewAt={previewAt} onPreviewAt={setPreviewAt} />}
+        {key === "hari_kebesaran" && <KebesaranFields fields={fields} onChange={setFields} errors={fieldErrors} takwim={takwim.rows} takwimError={takwim.error} />}
       </section>
       <div className="h-px bg-adm-hair" />
       <section aria-labelledby="ed-sched" className="flex flex-col gap-4">

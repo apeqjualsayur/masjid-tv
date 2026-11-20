@@ -228,8 +228,8 @@ export const TEMPLATES: Record<TemplateKey, TemplateMeta> = {
       { key: "note", type: "longtext", label: T("Nota (pilihan)", "Note (optional)"), max: 140 },
     ],
   },
-  // PRD enhancements §5.3. Hidden from the picker until E11 adds the event checklist and the live
-  // takwim preview; the dates themselves come from the platform takwim, never from the slide.
+  // PRD enhancements §5.3. The event checklist and the list of loaded dates are drawn by the editor
+  // (admin/editor/KebesaranFields); the dates come from the platform takwim, never from the slide.
   hari_kebesaran: {
     key: "hari_kebesaran", code: "HKI", name: T("Hari Kebesaran Islam", "Islamic occasions"), desc: T("Kiraan detik dari takwim JAKIM", "Countdown from the JAKIM calendar"), bg: "#E5F0EC", fg: "#0F5A3F",
     fields: [

@@ -24,11 +24,8 @@ export const TEMPLATE_KEYS: readonly TemplateKey[] = [
   "penangguhan", "hari_kebesaran",
 ];
 
-/**
- * Not offered in the admin template picker (they still render and stay editable). hari_kebesaran:
- * until its editor (event checklist, live takwim preview) ships in E11. imam_bilal joins in E15 (PRD D9).
- */
-export const PICKER_HIDDEN: readonly TemplateKey[] = ["hari_kebesaran"];
+/** Not offered in the admin template picker (they still render and stay editable). imam_bilal joins in E15 (PRD D9). */
+export const PICKER_HIDDEN: readonly TemplateKey[] = [];
 
 /** A ?key= value (or a slides.template_key) as one of the template keys, or null when it is not one. */
 export function resolveTemplateKey(k: string | null | undefined): TemplateKey | null {

@@ -37,6 +37,8 @@ function answer(over: Record<string, unknown> = {}) {
       },
       { id: "s-bad", type: "template", templateKey: "kuliah", fields: { topic: "tiada penceramah" }, startsAt: "2026-10-20T00:00:00+00:00", endsAt: null, durationS: 15, daysOfWeek: null, priority: false, sortOrder: 3, media: null },
     ],
+    islamicEvents: [],
+    roster: { petugas: [], slots: [] },
     ...over,
   };
 }
@@ -290,5 +292,110 @@ describe("screen.sound (migration 0011, _specs/50-PRD-sound.md D8)", () => {
     const got = await store.get();
     expect(got?.bundle.screen.name).toBe("Dewan Solat Utama");
     expect(got?.bundle.screen.sound).toEqual(OFF);
+  });
+});
+
+describe("islamicEvents + roster (migration 0012, PRD enhancements §7.3)", () => {
+  const P1 = "p-1", P2 = "p-2";
+  const roster = {
+    petugas: [
+      { id: P1, name: " Ahmad Zaki ", title: "Ust.", roles: ["imam", "bilal"] },
+      { id: P2, name: "Rahim", title: null, roles: ["bilal"] },
+      { id: "p-noname", name: "  ", title: null, roles: ["imam"] },
+      { id: "p-norole", name: "Ali", title: null, roles: ["khatib"] },
+      { id: P1, name: "Duplicate id", title: null, roles: ["imam"] },
+      "not an object",
+    ],
+    slots: [
+      { day: 1, waktu: null, role: "imam", petugasId: P1 },
+      { day: 1, waktu: "maghrib", role: "bilal", petugasId: P2 },
+      { day: 1, waktu: null, role: "imam", petugasId: P1 }, // duplicate slot
+      { day: 0, waktu: null, role: "imam", petugasId: P1 }, // day out of range
+      { day: 8, waktu: null, role: "imam", petugasId: P1 },
+      { day: 2.5, waktu: null, role: "imam", petugasId: P1 },
+      { day: 2, waktu: "syuruk", role: "imam", petugasId: P1 }, // not a prayer
+      { day: 2, waktu: null, role: "khatib", petugasId: P1 },
+      { day: 2, waktu: null, role: "imam", petugasId: "missing" },
+      { day: 2, waktu: null, role: "imam", petugasId: P2 }, // P2 is bilal only
+      { day: 3, role: "bilal", petugasId: P2 }, // waktu missing = all-day
+    ],
+  };
+  const events = [
+    { key: "awal_ramadan", hijriYear: 1448, date: "2027-02-08", status: "jangkaan" },
+    { key: "aidilfitri", hijriYear: 1448, date: "2027-03-10", status: "rasmi" },
+    { key: "hari_raya_haji", hijriYear: 1448, date: "2027-05-17", status: "rasmi" }, // unknown key
+    { key: "nuzul_quran", hijriYear: 1448, date: "2027-02-31", status: "rasmi" }, // not a real date
+    { key: "nuzul_quran", hijriYear: 1448, date: "24-02-2027", status: "rasmi" },
+    { key: "aidiladha", hijriYear: 1448, date: "2027-05-17", status: "official" }, // bad status
+    { key: "aidiladha", hijriYear: 1300, date: "2027-05-17", status: "rasmi" }, // bad year
+    { key: "aidiladha", hijriYear: "1448", date: "2027-05-17", status: "rasmi" },
+    null,
+  ];
+
+  it("valid entries are kept; invalid ones are dropped without failing the bundle", () => {
+    const b = okBundle({ islamicEvents: events, roster });
+    expect(b.islamicEvents).toEqual([
+      { key: "awal_ramadan", hijriYear: 1448, date: "2027-02-08", status: "jangkaan" },
+      { key: "aidilfitri", hijriYear: 1448, date: "2027-03-10", status: "rasmi" },
+    ]);
+    expect(b.roster.petugas).toEqual([
+      { id: P1, name: "Ahmad Zaki", title: "Ust.", roles: ["imam", "bilal"] },
+      { id: P2, name: "Rahim", title: null, roles: ["bilal"] },
+    ]);
+    expect(b.roster.slots).toEqual([
+      { day: 1, waktu: null, role: "imam", petugasId: P1 },
+      { day: 1, waktu: "maghrib", role: "bilal", petugasId: P2 },
+      { day: 3, waktu: null, role: "bilal", petugasId: P2 },
+    ]);
+    expect(b.lacksEnhancements).toBeUndefined();
+  });
+
+  it("wrong types become empty, never an error", () => {
+    const b = okBundle({ islamicEvents: "x", roster: [1, 2] });
+    expect(b.islamicEvents).toEqual([]);
+    expect(b.roster).toEqual({ petugas: [], slots: [] });
+    expect(okBundle({ roster: { petugas: "x", slots: null } }).roster).toEqual({ petugas: [], slots: [] });
+  });
+
+  it("a bundle without the keys = empty arrays, flagged so the sync asks once in full", () => {
+    const a = answer();
+    delete (a as Record<string, unknown>).islamicEvents;
+    delete (a as Record<string, unknown>).roster;
+    const r = parseBundleAnswer(a);
+    expect(r).toMatchObject({ kind: "ok", bundle: { islamicEvents: [], roster: { petugas: [], slots: [] }, lacksEnhancements: true } });
+  });
+
+  it("kept in the stored bundle (IndexedDB)", async () => {
+    const store = idbBundleStore(new IDBFactory());
+    const b = okBundle({ islamicEvents: events, roster });
+    await store.put({ bundle: b, savedAt: 1, suspended: false });
+    const got = await store.get();
+    expect(got?.bundle.islamicEvents).toEqual(b.islamicEvents);
+    expect(got?.bundle.roster).toEqual(b.roster);
+    expect(got?.bundle.lacksEnhancements).toBeUndefined();
+  });
+
+  it("an older stored bundle (no keys): the first call asks with since = 0, later calls with the version", async () => {
+    const old = answer();
+    delete (old as Record<string, unknown>).islamicEvents;
+    delete (old as Record<string, unknown>).roster;
+    const oldParsed = parseBundleAnswer(old);
+    if (oldParsed.kind !== "ok") throw new Error("fixture");
+    const l = loop([() => ({ data: answer({ roster }) }), () => ({ data: { status: "unchanged", version: 7 } })], { bundle: oldParsed.bundle, savedAt: 5, suspended: false });
+    await l.sync.ready;
+    expect(l.last().bundle?.roster.slots).toHaveLength(3);
+    await l.next();
+    expect(l.sinces).toEqual([0, 7]);
+  });
+
+  it("asks in full only once per run, even if the server still sends no keys", async () => {
+    const old = answer();
+    delete (old as Record<string, unknown>).islamicEvents;
+    delete (old as Record<string, unknown>).roster;
+    const l = loop([() => ({ data: old })]);
+    await l.sync.ready;
+    await l.next();
+    await l.next();
+    expect(l.sinces).toEqual([0, 7, 7]); // the first call was already a full one
   });
 });

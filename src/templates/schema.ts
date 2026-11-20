@@ -83,14 +83,8 @@ export function formatRangeBm(a: string, b: string): string {
 
 export const TIME_CHOICES = ["Selepas Subuh", "Selepas Zohor", "Selepas Asar", "Selepas Maghrib", "Selepas Isyak", "Selepas Solat Jumaat"] as const;
 
-/** "20:30" → "8:30 malam" (Malaysian usage). */
-export function formatClockBm(hhmm: string): string {
-  const m = /^(\d{2}):(\d{2})$/.exec(hhmm);
-  if (!m) return "";
-  const h = Number(m[1]);
-  const part = h < 12 ? "pagi" : h < 14 ? "tengah hari" : h < 19 ? "petang" : "malam";
-  return `${h % 12 || 12}:${m[2]} ${part}`;
-}
+/** "20:30" → "8:30 malam" and back. Live in src/core (the TV countdown reads the same text). */
+export { formatClockBm, parseClockBm } from "@/core";
 
 export function addDaysIso(iso: string, days: number): string {
   const p = isoParts(iso);
@@ -335,13 +329,3 @@ export function shiftWeek(key: TemplateKey, f: Fields, days = 7): Fields {
 
 /** Field keys holding image paths (for the TV URL mapping and media pruning). */
 export const IMAGE_FIELD_KEYS: readonly string[] = [...new Set(Object.values(TEMPLATES).flatMap((t) => t.fields.filter((d) => d.type === "image").map((d) => d.key)))];
-/** "8:30 malam" → "20:30" (to edit a time this app wrote); null for anything else. */
-export function parseClockBm(text: string): string | null {
-  const m = /^(\d{1,2}):(\d{2}) (pagi|tengah hari|petang|malam)$/.exec(text.trim());
-  if (!m) return null;
-  let h = Number(m[1]) % 12;
-  if (m[3] !== "pagi") h += 12;
-  if (m[3] === "tengah hari" && Number(m[1]) === 12) h = 12;
-  if (m[3] === "pagi" && Number(m[1]) === 12) h = 0;
-  return `${String(h).padStart(2, "0")}:${m[2]}`;
-}

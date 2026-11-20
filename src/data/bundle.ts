@@ -2,7 +2,10 @@
 // 'ok' → validate, store in IndexedDB, apply; 'unchanged' → nothing; 'revoked' → wipe;
 // 'suspended' → calm screen. Boot starts from the stored bundle, so a network error never blanks
 // the screen. Pure parts are exported for tests; I/O is injected.
-import { DEFAULT_SOUND, FALLBACK_LAYOUT, FALLBACK_THEME_ID, isLayoutKey, isSoundKind, isThemeId, type LayoutKey, type PlaylistItem, type SoundSettings, type ThemeId } from "@/core";
+import {
+  DEFAULT_SOUND, FALLBACK_LAYOUT, FALLBACK_THEME_ID, PRAYER_KEYS, isDateKey, isIslamicEventKey, isLayoutKey, isSoundKind, isThemeId,
+  type IslamicEvent, type LayoutKey, type Petugas, type PlaylistItem, type PrayerKey, type Roster, type RosterRole, type RosterSlot, type SoundSettings, type ThemeId,
+} from "@/core";
 import type { SlideView } from "@/templates";
 import { IMAGE_FIELD_KEYS } from "@/templates/schema";
 import { parseSlides, type RawSlide } from "./slides";
@@ -74,6 +77,66 @@ export interface Bundle {
   org: BundleOrg;
   settings: BundleSettings;
   slides: BundleSlide[];
+  /** Platform takwim (migration 0012, PRD enhancements §7.3). Invalid entries dropped. */
+  islamicEvents: IslamicEvent[];
+  /** Active petugas + their slots (§7.3). Invalid entries dropped. */
+  roster: Roster;
+  /**
+   * The answer had no islamicEvents/roster keys: a bundle stored by an older app (or a server before
+   * 0012). The sync asks once with since = 0 so it does not wait for the next content change.
+   */
+  lacksEnhancements?: true;
+}
+
+const ISLAMIC_STATUS = new Set(["jangkaan", "rasmi"]);
+
+/** islamicEvents (§7.3): known keys, real dates, Hijri year 1440–1600, status jangkaan|rasmi. Never throws. */
+export function bundleIslamicEvents(v: unknown): IslamicEvent[] {
+  if (!Array.isArray(v)) return [];
+  const out: IslamicEvent[] = [];
+  for (const x of v) {
+    if (!isObj(x) || !isIslamicEventKey(x.key) || !isDateKey(x.date) || typeof x.status !== "string" || !ISLAMIC_STATUS.has(x.status)) continue;
+    if (typeof x.hijriYear !== "number" || !Number.isInteger(x.hijriYear) || x.hijriYear < 1440 || x.hijriYear > 1600) continue;
+    out.push({ key: x.key, hijriYear: x.hijriYear, date: x.date, status: x.status as IslamicEvent["status"] });
+  }
+  return out;
+}
+
+const isRole = (v: unknown): v is RosterRole => v === "imam" || v === "bilal";
+
+/**
+ * roster (§7.3): petugas with id, name, optional title and roles ⊆ {imam, bilal}; slots with day 1–7,
+ * waktu null or one of the 5 prayers, a role, and a petugasId that exists and has that role.
+ * Duplicates (same day, waktu, role) keep the first. Never throws.
+ */
+export function bundleRoster(v: unknown): Roster {
+  if (!isObj(v)) return { petugas: [], slots: [] };
+  const petugas: Petugas[] = [];
+  const ids = new Set<string>();
+  for (const p of Array.isArray(v.petugas) ? v.petugas : []) {
+    if (!isObj(p) || !s(p.id) || ids.has(p.id as string)) continue;
+    const name = typeof p.name === "string" ? p.name.trim() : "";
+    const roles = Array.isArray(p.roles) ? ([...new Set(p.roles.filter(isRole))] as RosterRole[]) : [];
+    if (!name || roles.length === 0) continue;
+    const title = typeof p.title === "string" && p.title.trim() ? p.title.trim() : null;
+    ids.add(p.id as string);
+    petugas.push({ id: p.id as string, name, title, roles });
+  }
+  const slots: RosterSlot[] = [];
+  const seen = new Set<string>();
+  for (const x of Array.isArray(v.slots) ? v.slots : []) {
+    if (!isObj(x) || typeof x.day !== "number" || !Number.isInteger(x.day) || x.day < 1 || x.day > 7) continue;
+    const waktu = x.waktu ?? null;
+    if (waktu !== null && !(PRAYER_KEYS as readonly unknown[]).includes(waktu)) continue;
+    if (!isRole(x.role) || !s(x.petugasId)) continue;
+    const p = petugas.find((q) => q.id === x.petugasId);
+    if (!p || !p.roles.includes(x.role)) continue;
+    const k = `${x.day}|${waktu ?? "*"}|${x.role}`;
+    if (seen.has(k)) continue;
+    seen.add(k);
+    slots.push({ day: x.day, waktu: waktu as PrayerKey | null, role: x.role, petugasId: p.id });
+  }
+  return { petugas, slots };
 }
 
 export type BundleAnswer =
@@ -148,6 +211,9 @@ export function parseBundleAnswer(raw: unknown): BundleAnswer {
         sortOrder: typeof x.sortOrder === "number" ? x.sortOrder : 0,
         media: isObj(x.media) && s(x.media.path) ? { path: s(x.media.path)!, width: Number(x.media.width) || 0, height: Number(x.media.height) || 0 } : null,
       })),
+      islamicEvents: bundleIslamicEvents(raw.islamicEvents),
+      roster: bundleRoster(raw.roster),
+      ...("islamicEvents" in raw && "roster" in raw ? {} : { lacksEnhancements: true as const }),
     },
   };
 }
@@ -322,6 +388,8 @@ export function startBundleSync(d: BundleSyncDeps): { ready: Promise<void>; sync
   let stopped = false;
   let timer: unknown = null;
   let busy = false;
+  /** A bundle without islamicEvents/roster was re-asked in full once this run (see Bundle.lacksEnhancements). */
+  let refetchedFull = false;
 
   const emit = (patch: Partial<BundleState>) => {
     state = { ...state, ...patch };
@@ -345,7 +413,12 @@ export function startBundleSync(d: BundleSyncDeps): { ready: Promise<void>; sync
     try {
       let res: { data: unknown; error: { message: string } | null };
       try {
-        res = await d.call(state.bundle?.version ?? 0);
+        // An older stored bundle lacks the 0012 keys; 'unchanged' would keep it until the next content
+        // change, so ask for the full bundle once.
+        let since = state.bundle?.version ?? 0;
+        if (state.bundle?.lacksEnhancements && !refetchedFull) since = 0;
+        if (since === 0) refetchedFull = true;
+        res = await d.call(since);
       } catch (e) {
         res = { data: null, error: { message: (e as Error)?.message ?? String(e) } };
       }

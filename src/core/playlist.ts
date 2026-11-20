@@ -104,9 +104,13 @@ export function buildCycle<T>(eligible: PlaylistItem<T>[]): PlaylistItem<T>[] {
 const durationMs = <T,>(x: PlaylistItem<T>) =>
   Math.max(1, x.durationS && Number.isFinite(x.durationS) ? x.durationS : DEFAULT_SLIDE_SECONDS) * 1000;
 
-/** The slide to show at `at`, or null when nothing is eligible. */
-export function playlistAt<T>(items: PlaylistItem<T>[], at: number): PlaylistState<T> | null {
-  const eligible = items.filter((x) => isEligible(x, at));
+/**
+ * The slide to show at `at`, or null when nothing is eligible. `skip` (PRD enhancements §7.2) drops
+ * slides that would be empty right now (e.g. hari_kebesaran with nothing in range); they are left
+ * out of the cycle and the "2 / 6" count. Everything skipped → null (the existing empty state).
+ */
+export function playlistAt<T>(items: PlaylistItem<T>[], at: number, skip?: (item: PlaylistItem<T>, at: number) => boolean): PlaylistState<T> | null {
+  const eligible = items.filter((x) => isEligible(x, at) && !skip?.(x, at));
   if (!eligible.length) return null;
   const cycle = buildCycle(eligible);
   const distinct = [...eligible].sort(byOrder);

@@ -18,6 +18,26 @@ describe("slide dates", () => {
   });
 });
 
+describe("skip rule (PRD enhancements §7.2)", () => {
+  const now = at("2026-10-17T10:00:00");
+  const list = [item("a", { sortOrder: 1 }), item("empty", { sortOrder: 2 }), item("c", { sortOrder: 3 })];
+  const skipEmpty = (x: PlaylistItem<string>) => x.id === "empty";
+
+  it("a skipped slide never shows and is not counted", () => {
+    for (let t = now; t < now + 120_000; t += 1000) expect(playlistAt(list, t, skipEmpty)!.item.id).not.toBe("empty");
+    expect(playlistAt(list, now, skipEmpty)!.total).toBe(2);
+    expect(playlistAt(list, now)!.total).toBe(3); // without the rule: unchanged
+  });
+  it("the rule sees the time, so a slide can come back", () => {
+    const skipBefore = (x: PlaylistItem<string>, t: number) => x.id === "empty" && t < now + 60_000;
+    expect(playlistAt(list, now, skipBefore)!.total).toBe(2);
+    expect(playlistAt(list, now + 60_000, skipBefore)!.total).toBe(3);
+  });
+  it("every slide skipped → null (the existing empty state)", () => {
+    expect(playlistAt(list, now, () => true)).toBeNull();
+  });
+});
+
 describe("eligibility", () => {
   const now = at("2026-10-17T10:00:00"); // Saturday
 

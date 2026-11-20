@@ -1,4 +1,5 @@
 // One sample per template, placeholder text in brackets (PRD section 7, Phase 1).
+import { localDateKey, type IslamicEvent } from "@/core";
 import type { SlideView, TemplateFields, TemplateKey } from "./types";
 
 export const SAMPLE_FIELDS: TemplateFields = {
@@ -93,7 +94,30 @@ export const SAMPLE_FIELDS: TemplateFields = {
     reason: "[Penceramah uzur]",
     note: "[Kami mohon maaf atas sebarang kesulitan.]",
   },
+  hari_kebesaran: { leadDays: 60, showMore: 2 },
 };
+
+/**
+ * SAMPLE takwim for the local display (?local=1, ?slide=hari_kebesaran) only: NOT the real takwim (a
+ * paired TV uses the platform table) and deliberately compressed, so every state is reachable with
+ * ?sim= within 6 weeks of today (scripts/qa-kebesaran.mjs): +3 Israk dan Mikraj (countdown), +5 the
+ * eve of Nisfu Syaaban (Esok / Malam ini), +9…+37 Ramadan, +38/+39 Aidilfitri, +41 Aidiladha.
+ */
+export const SAMPLE_TAKWIM_OFFSETS = { israk_mikraj: 3, nisfu_syaaban: 6, awal_ramadan: 9, nuzul_quran: 25, aidilfitri: 38, hari_arafah: 40, aidiladha: 41 } as const;
+
+export function sampleIslamicEvents(now: number): IslamicEvent[] {
+  const day = (n: number) => localDateKey(now + n * 86_400_000);
+  const o = SAMPLE_TAKWIM_OFFSETS;
+  return [
+    { key: "israk_mikraj", hijriYear: 1448, date: day(o.israk_mikraj), status: "rasmi" },
+    { key: "nisfu_syaaban", hijriYear: 1448, date: day(o.nisfu_syaaban), status: "rasmi" },
+    { key: "awal_ramadan", hijriYear: 1448, date: day(o.awal_ramadan), status: "jangkaan" },
+    { key: "nuzul_quran", hijriYear: 1448, date: day(o.nuzul_quran), status: "jangkaan" },
+    { key: "aidilfitri", hijriYear: 1448, date: day(o.aidilfitri), status: "jangkaan" },
+    { key: "hari_arafah", hijriYear: 1448, date: day(o.hari_arafah), status: "rasmi" },
+    { key: "aidiladha", hijriYear: 1448, date: day(o.aidiladha), status: "rasmi" },
+  ];
+}
 
 export function sampleSlide(key: TemplateKey): SlideView {
   return { kind: "template", template: key, fields: SAMPLE_FIELDS[key] } as SlideView;

@@ -12,6 +12,7 @@ import {
 } from "@/templates";
 import type { CSSProperties, ReactNode } from "react";
 import { CountdownLine, NoticeStamp } from "../shared/notice-stamp";
+import { KEBESARAN_EYEBROW, KebesaranBody } from "../shared/kebesaran";
 import type { TemplateComponents, TemplateLive } from "../types";
 import { Arabic, Eyebrow, tokensOf, useArea } from "./parts";
 import type { TenangTokens } from "./tokens";
@@ -330,6 +331,12 @@ function Ucapan({ s, fields: f }: P<"ucapan">) {
   );
 }
 
+/** Hari kebesaran Islam (PRD enhancements §5.4): the shared body in Tenang's colours. */
+function HariKebesaran({ s, live }: P<"hari_kebesaran">) {
+  const t = tokensOf(s);
+  return <KebesaranBody live={live?.islamicEvents} area={useArea()} eyebrow={<Eyebrow t={t}>{KEBESARAN_EYEBROW}</Eyebrow>} s={{ ink: t.fg, muted: t.muted, accent: t.accent, line: t.rule }} />;
+}
+
 export const tenangTemplates: TemplateComponents = {
   pengumuman: Pengumuman,
   kuliah: Kuliah,
@@ -342,4 +349,5 @@ export const tenangTemplates: TemplateComponents = {
   ayat: Ayat,
   ucapan: Ucapan,
   penangguhan: Penangguhan,
+  hari_kebesaran: HariKebesaran,
 };

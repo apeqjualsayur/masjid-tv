@@ -29,6 +29,7 @@ const slides: RawSlide[] = [
   t("ucapan-1", "ucapan", 110),
   t("kematian-1", "kematian", 120, { ends_at: "2027-12-31" }),
   t("penangguhan-1", "penangguhan", 130),
+  t("hari-kebesaran-1", "hari_kebesaran", 140),
   // Expired example: skipped by the playlist (ends_at is in the past).
   t("pengumuman-lama", "pengumuman", 5, { ends_at: "2026-01-01", fields: { ...SAMPLE_FIELDS.pengumuman, title: "[Pengumuman yang sudah tamat]" } }),
 ];

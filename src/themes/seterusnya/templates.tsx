@@ -6,6 +6,7 @@ import { waktuName, type DisplayState } from "@/core";
 import { APPROVED_TRANSLATION_SOURCES, OCCASION_LABEL, formatRinggit, infaqProgress, kewanganTotals, type TemplateFields } from "@/templates";
 import type { CSSProperties, ReactNode } from "react";
 import { CountdownLine, NoticeStamp } from "../shared/notice-stamp";
+import { KEBESARAN_EYEBROW, KebesaranBody } from "../shared/kebesaran";
 import type { TemplateArea, TemplateComponents, TemplateLive } from "../types";
 import { Arabic, useArea } from "./parts";
 import { S } from "./tokens";
@@ -316,6 +317,18 @@ function Ucapan({ fields: f }: P<"ucapan">) {
   );
 }
 
+/** Hari kebesaran Islam (PRD enhancements §5.4): the shared body on the card, with the theme's heading font. */
+function HariKebesaran({ live }: P<"hari_kebesaran">) {
+  return (
+    <KebesaranBody
+      live={live?.islamicEvents}
+      area={useArea()}
+      eyebrow={<Label>{KEBESARAN_EYEBROW}</Label>}
+      s={{ ink: S.cardInk, muted: S.cardLabel, accent: S.cardInk, line: S.cardLine }}
+    />
+  );
+}
+
 export const seterusnyaTemplates: TemplateComponents = {
   pengumuman: Pengumuman,
   kuliah: Kuliah,
@@ -328,4 +341,5 @@ export const seterusnyaTemplates: TemplateComponents = {
   ayat: Ayat,
   ucapan: Ucapan,
   penangguhan: Penangguhan,
+  hari_kebesaran: HariKebesaran,
 };

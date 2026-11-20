@@ -10,13 +10,16 @@ import {
   formatTime,
   getClockOffset,
   localDateKey,
+  nowMs,
   playlistAt,
+  slideIsEmpty,
   setDebugTime,
   upcomingPrayer,
   type DisplayState,
   type ForcedModeInput,
   type LayoutKey,
   type PlaylistItem,
+  type TemplateContext,
 } from "@/core";
 import {
   createFallbackLoader,
@@ -30,7 +33,7 @@ import {
   type PrayerData,
   type SyncStatus,
 } from "@/data";
-import { SAMPLE_POSTER, SAMPLE_POSTER_LANDSCAPE, sampleSlide, withLive, type SlideView } from "@/templates";
+import { SAMPLE_POSTER, SAMPLE_POSTER_LANDSCAPE, sampleIslamicEvents, sampleSlide, withLive, type SlideView } from "@/templates";
 import { useTheme } from "@/themes";
 import { ThemeView, UnavailableView } from "@/themes/ThemeView";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -70,6 +73,8 @@ export interface DisplaySource {
   bundle?: BundleMeta;
   /** Live demo (/tv?demo=1): shows the DEMO badge. */
   demo?: boolean;
+  /** Takwim + roster for hari_kebesaran / jadual_petugas (§7.3): the bundle's, or samples in local / demo mode. */
+  templateData?: Pick<TemplateContext, "islamicEvents" | "roster">;
 }
 
 interface Boot {
@@ -82,6 +87,7 @@ interface Boot {
   slides: PlaylistItem<SlideView>[];
   bundle?: BundleMeta;
   demo?: boolean;
+  templateData?: DisplaySource["templateData"];
 }
 
 export function TvRoot() {
@@ -109,7 +115,7 @@ function DemoApp() {
   const [bootError, setBootError] = useState<unknown>(null);
   useEffect(() => {
     let cancelled = false;
-    loadDemo().then((s) => !cancelled && setSource(s), (e) => !cancelled && setBootError(e));
+    loadDemo().then((s) => !cancelled && setSource({ ...s, templateData: sampleTemplateData() }), (e) => !cancelled && setBootError(e));
     return () => {
       cancelled = true;
     };
@@ -128,7 +134,7 @@ function TvApp() {
     let cancelled = false;
     (async () => {
       const [{ config, warnings, source: configSource }, slides] = await Promise.all([loadScreenConfig(), loadSlides()]);
-      if (!cancelled) setSource({ config, configSource, slides: slides.items, warnings: [...warnings, ...slides.warnings] });
+      if (!cancelled) setSource({ config, configSource, slides: slides.items, warnings: [...warnings, ...slides.warnings], templateData: sampleTemplateData() });
     })().catch((e) => !cancelled && setBootError(e));
     return () => {
       cancelled = true;
@@ -175,8 +181,14 @@ export function DisplayHost({ source }: { source: DisplaySource }) {
     slides: source.slides,
     bundle: source.bundle,
     demo: source.demo,
+    templateData: source.templateData,
   };
   return <Display boot={boot} dataVersion={dataVersion} />;
+}
+
+/** Local / demo mode: SAMPLE takwim dated around today (src/templates/samples.ts), no roster. */
+function sampleTemplateData(): DisplaySource["templateData"] {
+  return { islamicEvents: sampleIslamicEvents(nowMs()) };
 }
 
 interface SlidePick {
@@ -191,14 +203,15 @@ interface SlidePick {
  * With no eligible slide the bottom/side layouts fall back to full rather than show an empty card.
  * A `poster` screen never falls back to prayer times: it keeps its own (empty-state) layout (rule 17).
  */
-function pickSlide(layout: LayoutKey, preview: UrlOverrides["slide"], slides: PlaylistItem<SlideView>[], at: number, clock24h: boolean): SlidePick {
+function pickSlide(layout: LayoutKey, preview: UrlOverrides["slide"], slides: PlaylistItem<SlideView>[], at: number, clock24h: boolean, ctx: TemplateContext): SlidePick {
   if (layout === "full") return { layout };
   if (preview === "poster") return { layout, slide: SAMPLE_POSTER, slideKey: "preview-poster" };
   if (preview === "poster-landscape") return { layout, slide: SAMPLE_POSTER_LANDSCAPE, slideKey: "preview-poster-landscape" };
-  if (preview) return { layout, slide: withLive(sampleSlide(preview), at, clock24h), slideKey: `preview-${preview}` };
-  const now = playlistAt(slides, at);
+  if (preview) return { layout, slide: withLive(sampleSlide(preview), at, clock24h, ctx), slideKey: `preview-${preview}` };
+  // Slides with nothing to show right now (hari_kebesaran out of range, empty roster) are skipped (§7.2).
+  const now = playlistAt(slides, at, (x, t) => x.payload.kind === "template" && slideIsEmpty(x.payload.template, x.payload.fields as unknown as Record<string, unknown>, ctx, t));
   if (!now) return { layout: layout === "poster" ? "poster" : "full" };
-  return { layout, slide: withLive(now.item.payload, at, clock24h), slideKey: now.item.id, counter: { position: now.position, total: now.total } };
+  return { layout, slide: withLive(now.item.payload, at, clock24h, ctx), slideKey: now.item.id, counter: { position: now.position, total: now.total } };
 }
 // withLive: countdown / notice for the slide on screen only (contract rule 21), from this second's
 // time. A countdown therefore ticks only while its slide is shown; no timer of its own runs (this
@@ -245,7 +258,9 @@ function Display({ boot, dataVersion }: { boot: Boot; dataVersion: number }) {
 
   const { theme, warning: themeWarning } = useTheme(overrides.theme ?? config.theme);
   const configuredLayout = overrides.layout ?? config.layout;
-  const pick = pickSlide(configuredLayout, overrides.slide, boot.slides, at, config.clock24h);
+  // Today's Maghrib for the hari_kebesaran "Malam ini" state; the takwim / roster from the source.
+  const templateCtx: TemplateContext = { ...boot.templateData, maghribTodayMs: day?.status === "ok" ? day.today.times.maghrib : null };
+  const pick = pickSlide(configuredLayout, overrides.slide, boot.slides, at, config.clock24h, templateCtx);
   const layout = pick.layout;
   const masjid = { fullName: config.masjid.fullName, shortName: config.masjid.shortName, logoUrl: config.masjid.logo };
 

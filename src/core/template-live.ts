@@ -2,24 +2,88 @@
 // and the clock, rendered as given by the themes. Pure; BM text.
 import { activityNotice, formatClockBm, isDateKey, parseClockBm, slideActivityCountdown, type ActivityCountdown } from "./activity";
 import { formatTime } from "./format";
+import { islamicEventsView, type IslamicEvent, type IslamicEventView, type IslamicView } from "./islamic-events";
+import type { Roster } from "./roster";
 import { localParts, pad2, parseLocalDateTime, weekdayOfDateKey } from "./time";
 
-/** Contract §1 `TemplateLive` (the parts built so far: countdown and notice). */
+/** Contract §1 `TemplateLive`. */
 export interface TemplateLive {
   /** "Lagi 3 hari" (strong "3"), "Bermula dalam 42:15" (strong "42:15") … */
   countdown?: { state: "days" | "tomorrow" | "today" | "minutes" | "ongoing"; text: string; strong?: string };
   /** originalText is drawn struck through; newText null = "Tarikh baru akan dimaklumkan" (tangguh) / nothing (batal). */
   notice?: { kind: "tangguh" | "batal"; originalText: string; newText: string | null; reason: string | null };
+  /** hari_kebesaran (PRD enhancements §5.4, contract rule 24). */
+  islamicEvents?: IslamicLive;
+}
+
+export interface IslamicLive {
+  mode: "greeting" | "malamIni" | "ramadan" | "countdown";
+  /** Event name; the greeting; "Malam ini"; "Ramadan · Hari ke-12" */
+  title: string;
+  /** The big figure: "42", "Esok", "12" (Ramadan day) */
+  big?: string;
+  /** Next to the big figure: "hari lagi", "Ramadan" */
+  bigCaption?: string;
+  /** A second line: "Aidilfitri dalam 18 hari"; the event under "Malam ini" */
+  sub?: string;
+  /** "1 Ramadan 1448H" */
+  hijri?: string;
+  /** "Isnin, 8 Feb 2027" */
+  gregorian?: string;
+  /** Date not yet confirmed: show a small "jangkaan" label */
+  jangkaan: boolean;
+  /** Up to 2 next events: "Nuzul Al-Quran" · "59 hari" */
+  more: { label: string; days: string; jangkaan: boolean }[];
+}
+
+/** Bundle data some templates need (§7.3) and today's Maghrib (the "Malam ini" state). */
+export interface TemplateContext {
+  islamicEvents?: readonly IslamicEvent[];
+  roster?: Roster;
+  /** Epoch ms of today's Maghrib from the prayer engine; null when unknown. */
+  maghribTodayMs?: number | null;
 }
 
 const HARI = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
 const BULAN_PENDEK = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
 
-/** "2026-11-28" → "Sabtu, 28 Nov" */
-export function formatDateShortBm(dateKey: string): string {
+/** "2026-11-28" → "Sabtu, 28 Nov" (with `year`: "Sabtu, 28 Nov 2026") */
+export function formatDateShortBm(dateKey: string, year = false): string {
   if (!isDateKey(dateKey)) return "";
-  const [, m, d] = dateKey.split("-").map(Number);
-  return `${HARI[weekdayOfDateKey(dateKey)]}, ${d} ${BULAN_PENDEK[m - 1]}`;
+  const [y, m, d] = dateKey.split("-").map(Number);
+  return `${HARI[weekdayOfDateKey(dateKey)]}, ${d} ${BULAN_PENDEK[m - 1]}${year ? ` ${y}` : ""}`;
+}
+
+/** islamicEventsView → the text the hari_kebesaran template shows (§5.4); undefined when empty (skipped). */
+export function islamicLive(v: IslamicView): IslamicLive | undefined {
+  const more = v.more.map((m) => ({ label: m.event.label, days: m.days === 1 ? "Esok" : `${m.days} hari`, jangkaan: m.event.jangkaan }));
+  const dates = (e: IslamicEventView) => ({ hijri: e.hijri, gregorian: formatDateShortBm(e.date, true), jangkaan: e.jangkaan });
+  switch (v.kind) {
+    case "countdown":
+      return v.days === 1
+        ? { mode: "countdown", title: v.event.label, big: "Esok", ...dates(v.event), more }
+        : { mode: "countdown", title: v.event.label, big: String(v.days), bigCaption: "hari lagi", ...dates(v.event), more };
+    case "malamIni":
+      return { mode: "malamIni", title: "Malam ini", sub: v.event.label, ...dates(v.event), more };
+    case "greeting":
+      return { mode: "greeting", title: v.text, sub: v.text.includes(v.event.label) ? undefined : v.event.label, ...dates(v.event), more };
+    case "ramadan": {
+      const fitri = v.aidilfitriInDays === null ? undefined : v.aidilfitriInDays === 1 ? "Aidilfitri esok" : `Aidilfitri dalam ${v.aidilfitriInDays} hari`;
+      const year = /(\d+)H$/.exec(v.event.hijri)?.[1];
+      return {
+        mode: "ramadan",
+        title: `Ramadan · Hari ke-${v.day}`,
+        big: String(v.day),
+        bigCaption: "Ramadan",
+        sub: fitri,
+        hijri: year ? `${v.day} Ramadan ${year}H` : undefined,
+        jangkaan: v.event.jangkaan,
+        more,
+      };
+    }
+    default:
+      return undefined;
+  }
 }
 
 /** A clock text as entered ("8:45 malam") in the masjid's 12h/24h setting; other text unchanged. */
@@ -95,8 +159,12 @@ export function penangguhanLive(fields: Record<string, unknown>, clock24h = fals
 }
 
 /** `live` for a template slide at `now`, or undefined when the template has none. */
-export function templateLive(templateKey: string, fields: Record<string, unknown>, now: number, clock24h = false): TemplateLive | undefined {
+export function templateLive(templateKey: string, fields: Record<string, unknown>, now: number, clock24h = false, ctx: TemplateContext = {}): TemplateLive | undefined {
   if (templateKey === "kuliah" || templateKey === "program" || templateKey === "mesyuarat") return activityLive(fields, now, clock24h);
   if (templateKey === "penangguhan") return penangguhanLive(fields, clock24h);
+  if (templateKey === "hari_kebesaran") {
+    const ev = islamicLive(islamicEventsView(ctx.islamicEvents ?? [], fields, now, ctx.maghribTodayMs ?? null));
+    return ev ? { islamicEvents: ev } : undefined;
+  }
   return undefined;
 }

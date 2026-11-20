@@ -13,6 +13,7 @@ import {
 } from "@/templates";
 import type { CSSProperties, ReactNode } from "react";
 import { CountdownLine, NoticeStamp } from "../shared/notice-stamp";
+import { KEBESARAN_EYEBROW, KebesaranBody } from "../shared/kebesaran";
 import type { TemplateComponents, TemplateLive } from "../types";
 import { Amiri, Caps, GoldRule, numStyle, useArea } from "./parts";
 import { C, F, archRadius } from "./tokens";
@@ -388,6 +389,12 @@ function Ucapan({ fields: f }: P<"ucapan">) {
   );
 }
 
+/** Hari kebesaran Islam (PRD enhancements §5.4): white on emerald, gold figure; centred in the arch. */
+function HariKebesaran({ live }: P<"hari_kebesaran">) {
+  const area = useArea();
+  return <KebesaranBody live={live?.islamicEvents} area={area} eyebrow={<Tag>{KEBESARAN_EYEBROW}</Tag>} s={{ ink: C.white, muted: C.soft, accent: C.gold, line: C.divider, center: area === "tall" }} />;
+}
+
 export const serambiTemplates: TemplateComponents = {
   pengumuman: Pengumuman,
   kuliah: Kuliah,
@@ -400,4 +407,5 @@ export const serambiTemplates: TemplateComponents = {
   ayat: Ayat,
   ucapan: Ucapan,
   penangguhan: Penangguhan,
+  hari_kebesaran: HariKebesaran,
 };

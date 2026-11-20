@@ -80,9 +80,11 @@ export function hariKebesaranOptions(fields: Record<string, unknown>): HariKebes
   };
 }
 
-export function islamicEventView(e: IslamicEvent): IslamicEventView {
+/** `dayOffset` 1 = the day after the event (Aidilfitri day 2: "2 Syawal", that day's date). */
+export function islamicEventView(e: IslamicEvent, dayOffset = 0): IslamicEventView {
   const info = ISLAMIC_EVENT_INFO[e.key];
-  return { key: e.key, label: info.label, hijri: `${info.hijriDay} ${info.hijriMonth} ${e.hijriYear}H`, date: e.date, jangkaan: e.status === "jangkaan" };
+  const date = dayOffset ? nextDateKey(e.date) : e.date;
+  return { key: e.key, label: info.label, hijri: `${info.hijriDay + dayOffset} ${info.hijriMonth} ${e.hijriYear}H`, date, jangkaan: e.status === "jangkaan" };
 }
 
 /**
@@ -113,7 +115,7 @@ export function islamicEventsView(
   const greet = included.find((e) => e.date === today || (e.key === "aidilfitri" && nextDateKey(e.date) === today));
   if (greet) {
     const text = ISLAMIC_EVENT_INFO[greet.key].greeting.replace("{year}", String(greet.hijriYear));
-    return { kind: "greeting", event: islamicEventView(greet), text, more: moreAfter(null) };
+    return { kind: "greeting", event: islamicEventView(greet, greet.date === today ? 0 : 1), text, more: moreAfter(null) };
   }
 
   // 2. Malam ini: after Maghrib on the eve of a "night before" event.

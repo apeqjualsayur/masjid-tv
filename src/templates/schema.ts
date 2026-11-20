@@ -228,6 +228,15 @@ export const TEMPLATES: Record<TemplateKey, TemplateMeta> = {
       { key: "note", type: "longtext", label: T("Nota (pilihan)", "Note (optional)"), max: 140 },
     ],
   },
+  // PRD enhancements §5.3. Hidden from the picker until E11 adds the event checklist and the live
+  // takwim preview; the dates themselves come from the platform takwim, never from the slide.
+  hari_kebesaran: {
+    key: "hari_kebesaran", code: "HKI", name: T("Hari Kebesaran Islam", "Islamic occasions"), desc: T("Kiraan detik dari takwim JAKIM", "Countdown from the JAKIM calendar"), bg: "#E5F0EC", fg: "#0F5A3F",
+    fields: [
+      { key: "leadDays", type: "number", label: T("Mula papar (hari sebelum)", "Start showing (days before)"), min: 7, max: 365, hint: T("Lalai 60 hari.", "Default 60 days.") },
+      { key: "showMore", type: "number", label: T("Acara seterusnya dipaparkan", "Next events shown"), min: 0, max: 2, hint: T("0 hingga 2. Lalai 2.", "0 to 2. Default 2.") },
+    ],
+  },
 };
 
 /** Row label of a fixed table row (Imam & Bilal: the prayer name, BM as on the TV). */

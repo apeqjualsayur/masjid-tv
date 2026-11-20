@@ -45,6 +45,8 @@ const REQUIRED: Record<TemplateKey, (f: Record<string, unknown>) => boolean> = {
   ayat: (f) => str(f, "arabic") && str(f, "translation") && str(f, "reference") && typeof f.source === "string" && f.source in APPROVED_TRANSLATION_SOURCES,
   ucapan: (f) => typeof f.occasion === "string" && f.occasion in OCCASION_LABEL && str(f, "message"),
   penangguhan: (f) => str(f, "title") && (f.kind === "tangguh" || f.kind === "batal"),
+  // Every field is optional (defaults: all events, 60 days, 2 more); the dates come from the takwim.
+  hari_kebesaran: () => true,
 };
 
 export function parseSlides(raw: unknown): { items: PlaylistItem<SlideView>[]; warnings: string[] } {

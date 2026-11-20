@@ -83,6 +83,7 @@ export function BundleDisplay({ secret, onRevoked }: { secret: string; onRevoked
     slides: mapped.slides,
     warnings: mapped.warnings,
     bundle: { version: bundle.version, lastSync: st.lastSync, status: st.status, screenName: bundle.screen.name, from: st.from, intervalMs: st.intervalMs ?? null },
+    templateData: { islamicEvents: bundle.islamicEvents, roster: bundle.roster },
   };
   return <DisplayHost source={source} />;
 }

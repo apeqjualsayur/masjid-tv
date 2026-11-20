@@ -105,6 +105,7 @@ function FieldInput({ d, fields, set, onChange, errors, lang, image, onPickImage
             aria-invalid={Boolean(err)}
             className={`${box} ${bd} h-12`}
           />
+          {d.hint && <span className="text-[12px] leading-[1.4] text-adm-muted">{d.hint[lang]}</span>}
           <ErrorText e={err} />
         </div>
       );

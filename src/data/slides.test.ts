@@ -12,7 +12,7 @@ describe("public/config/sample-slides.json", () => {
 
   it("parses cleanly: one of each template, two posters, one expired example", () => {
     expect(warnings).toEqual([]);
-    expect(items).toHaveLength(14);
+    expect(items).toHaveLength(15);
     const templates = items.flatMap((x) => (x.payload.kind === "template" ? [x.payload.template] : []));
     for (const k of TEMPLATE_KEYS) expect(templates).toContain(k);
     const posters = items.filter((x) => x.payload.kind === "poster").map((x) => (x.payload as { imageUrl: string }).imageUrl);
@@ -30,11 +30,11 @@ describe("public/config/sample-slides.json", () => {
     expect(p.kind === "template" && (p.fields as { title: string }).title).toMatch(/^\[.*\]$/);
   });
 
-  it("13 slides rotate today; the expired one is skipped", () => {
+  it("14 slides rotate today; the expired one is skipped", () => {
     const now = parseLocalDateTime("2026-10-17T10:00:00")!;
     const seen = new Set<string>();
     for (let t = now; t < now + 30 * 60_000; t += 1000) seen.add(playlistAt(items, t)!.item.id);
-    expect(seen.size).toBe(13);
+    expect(seen.size).toBe(14);
     expect(seen.has("pengumuman-lama")).toBe(false);
   });
 });

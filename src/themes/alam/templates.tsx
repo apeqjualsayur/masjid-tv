@@ -12,6 +12,7 @@ import {
 } from "@/templates";
 import type { CSSProperties, ReactNode } from "react";
 import { CountdownLine, NoticeStamp } from "../shared/notice-stamp";
+import { KEBESARAN_EYEBROW, KebesaranBody } from "../shared/kebesaran";
 import type { TemplateComponents, TemplateLive } from "../types";
 import { Arabic, Icon, num, useArea } from "./parts";
 import { A } from "./tokens";
@@ -350,6 +351,11 @@ function Kematian({ s, fields: f }: P<"kematian">) {
   );
 }
 
+/** Hari kebesaran Islam (PRD enhancements §5.4): the shared body on Alam's light card. */
+function HariKebesaran({ live }: P<"hari_kebesaran">) {
+  return <KebesaranBody live={live?.islamicEvents} area={useArea()} eyebrow={<Tag>{KEBESARAN_EYEBROW}</Tag>} s={{ ink: A.cardFg, muted: A.cardMuted, accent: A.green, line: A.cardLine }} />;
+}
+
 export const alamTemplates: TemplateComponents = {
   pengumuman: Pengumuman,
   kuliah: Kuliah,
@@ -362,4 +368,5 @@ export const alamTemplates: TemplateComponents = {
   ayat: Ayat,
   ucapan: Ucapan,
   penangguhan: Penangguhan,
+  hari_kebesaran: HariKebesaran,
 };

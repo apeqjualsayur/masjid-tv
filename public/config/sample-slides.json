@@ -232,6 +232,17 @@
     "status": "active"
   },
   {
+    "id": "hari-kebesaran-1",
+    "type": "template",
+    "template_key": "hari_kebesaran",
+    "fields": {
+      "leadDays": 60,
+      "showMore": 2
+    },
+    "sort_order": 140,
+    "status": "active"
+  },
+  {
     "id": "pengumuman-lama",
     "type": "template",
     "template_key": "pengumuman",

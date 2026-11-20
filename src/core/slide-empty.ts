@@ -5,8 +5,8 @@ import { rosterIsEmpty, type Roster } from "./roster";
 
 /** The bundle data the rules read. A bundle without the keys = empty arrays (§7.3). */
 export interface SlideEmptyData {
-  islamicEvents: readonly IslamicEvent[];
-  roster: Roster;
+  islamicEvents?: readonly IslamicEvent[];
+  roster?: Roster;
 }
 
 /**
@@ -15,7 +15,7 @@ export interface SlideEmptyData {
  * "Malam ini" never decides emptiness: its event is tomorrow, so the countdown already applies.
  */
 export function slideIsEmpty(templateKey: string | null | undefined, fields: Record<string, unknown>, data: SlideEmptyData, at: number): boolean {
-  if (templateKey === "hari_kebesaran") return islamicEventsView(data.islamicEvents, fields, at, null).kind === "empty";
-  if (templateKey === "jadual_petugas") return rosterIsEmpty(data.roster);
+  if (templateKey === "hari_kebesaran") return islamicEventsView(data.islamicEvents ?? [], fields, at, null).kind === "empty";
+  if (templateKey === "jadual_petugas") return rosterIsEmpty(data.roster ?? { petugas: [], slots: [] });
   return false;
 }

@@ -25,6 +25,7 @@ const FILLED: Record<TemplateKey, Fields> = {
     title: "Kuliah Maghrib: Adab", kind: "tangguh", date: "Selasa, 20 Oktober 2026", dateIso: "2026-10-20", time: "Selepas Maghrib",
     newDate: "Selasa, 27 Oktober 2026", newDateIso: "2026-10-27", newTime: "Selepas Maghrib", person: "Ustaz Ahmad", reason: "Penceramah uzur", note: "",
   },
+  hari_kebesaran: { leadDays: 60, showMore: 2 },
 };
 
 describe("template schemas", () => {

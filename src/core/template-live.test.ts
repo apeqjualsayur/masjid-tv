@@ -64,6 +64,45 @@ describe("penangguhanLive", () => {
   });
 });
 
+describe("hari_kebesaran live text (§5.4)", () => {
+  // TEST DATES ONLY
+  const EV = [
+    { key: "nisfu_syaaban", hijriYear: 1448, date: "2027-01-24", status: "rasmi" },
+    { key: "awal_ramadan", hijriYear: 1448, date: "2027-02-08", status: "jangkaan" },
+    { key: "nuzul_quran", hijriYear: 1448, date: "2027-02-24", status: "jangkaan" },
+    { key: "aidilfitri", hijriYear: 1448, date: "2027-03-10", status: "jangkaan" },
+  ] as const;
+  const live = (when: string, maghrib: string | null = null) =>
+    templateLive("hari_kebesaran", {}, at(when), false, { islamicEvents: EV, maghribTodayMs: maghrib ? at(maghrib) : null })?.islamicEvents;
+
+  it("countdown: big number + 'hari lagi', event, Hijri and BM date, next events", () => {
+    expect(live("2026-12-10T10:00")).toEqual({
+      mode: "countdown", title: "Nisfu Syaaban", big: "45", bigCaption: "hari lagi", hijri: "15 Syaaban 1448H", gregorian: "Ahad, 24 Jan 2027", jangkaan: false,
+      more: [{ label: "Awal Ramadan", days: "60 hari", jangkaan: true }],
+    });
+  });
+  it("one day before: 'Esok' as the big figure, no caption", () => {
+    expect(live("2027-01-23T10:00")).toMatchObject({ mode: "countdown", big: "Esok", title: "Nisfu Syaaban" });
+    expect(live("2027-01-23T10:00")?.bigCaption).toBeUndefined();
+  });
+  it("Malam ini after Maghrib on the eve", () => {
+    expect(live("2027-01-23T19:30", "2027-01-23T19:20")).toMatchObject({ mode: "malamIni", title: "Malam ini", sub: "Nisfu Syaaban", hijri: "15 Syaaban 1448H" });
+  });
+  it("Ramadan: 'Ramadan · Hari ke-12', big 12, Aidilfitri count", () => {
+    expect(live("2027-02-19T10:00")).toMatchObject({ mode: "ramadan", title: "Ramadan · Hari ke-12", big: "12", bigCaption: "Ramadan", sub: "Aidilfitri dalam 19 hari", hijri: "12 Ramadan 1448H", jangkaan: true });
+    expect(live("2027-03-09T10:00")).toMatchObject({ big: "30", sub: "Aidilfitri esok" });
+  });
+  it("greeting: Aidilfitri day 1 and day 2 (with that day's Hijri and BM date)", () => {
+    expect(live("2027-03-10T08:00")).toMatchObject({ mode: "greeting", title: "Selamat Hari Raya Aidilfitri", hijri: "1 Syawal 1448H", gregorian: "Rabu, 10 Mac 2027" });
+    expect(live("2027-03-11T08:00")).toMatchObject({ mode: "greeting", hijri: "2 Syawal 1448H", gregorian: "Khamis, 11 Mac 2027" });
+    expect(live("2027-01-24T08:00")).toMatchObject({ title: "Malam Nisfu Syaaban", sub: undefined });
+  });
+  it("nothing in range → no live (the slide is skipped)", () => {
+    expect(live("2027-07-01T10:00")).toBeUndefined();
+    expect(templateLive("hari_kebesaran", {}, at("2027-01-01T10:00"))).toBeUndefined(); // no takwim
+  });
+});
+
 describe("templateLive", () => {
   it("only the activity templates and penangguhan have live data", () => {
     expect(templateLive("program", KULIAH, at("2026-11-25T10:00"))).toEqual({ countdown: { state: "days", text: "Lagi 3 hari", strong: "3" } });

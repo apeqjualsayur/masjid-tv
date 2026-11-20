@@ -15,16 +15,20 @@ export type TemplateKey =
   | "kewangan"
   | "ayat"
   | "ucapan"
-  | "penangguhan";
+  | "penangguhan"
+  | "hari_kebesaran";
 
 export const TEMPLATE_KEYS: readonly TemplateKey[] = [
   "pengumuman", "kuliah", "kematian", "program", "infaq",
   "mesyuarat", "imam_bilal", "kewangan", "ayat", "ucapan",
-  "penangguhan",
+  "penangguhan", "hari_kebesaran",
 ];
 
-/** Not offered in the admin template picker (they still render and stay editable). imam_bilal joins in E15 (PRD D9). */
-export const PICKER_HIDDEN: readonly TemplateKey[] = [];
+/**
+ * Not offered in the admin template picker (they still render and stay editable). hari_kebesaran:
+ * until its editor (event checklist, live takwim preview) ships in E11. imam_bilal joins in E15 (PRD D9).
+ */
+export const PICKER_HIDDEN: readonly TemplateKey[] = ["hari_kebesaran"];
 
 /** A ?key= value (or a slides.template_key) as one of the template keys, or null when it is not one. */
 export function resolveTemplateKey(k: string | null | undefined): TemplateKey | null {
@@ -175,6 +179,16 @@ export interface PenangguhanFields {
   note?: string;
 }
 
+/** Hari kebesaran Islam slide (PRD enhancements §5.3). Dates come from the platform takwim, never the slide. */
+export interface HariKebesaranFields {
+  /** Event keys to include; missing = all 9. */
+  events?: string[];
+  /** Start showing an event this many days before (7–365, default 60). */
+  leadDays?: number;
+  /** Following events shown small (0–2, default 2). */
+  showMore?: number;
+}
+
 export interface TemplateFields {
   pengumuman: PengumumanFields;
   kuliah: KuliahFields & ActivityExtras;
@@ -187,6 +201,7 @@ export interface TemplateFields {
   ayat: AyatFields;
   ucapan: UcapanFields;
   penangguhan: PenangguhanFields;
+  hari_kebesaran: HariKebesaranFields;
 }
 
 /**

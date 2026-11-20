@@ -3,6 +3,9 @@
     "title": "Skrin waktu solat untuk TV masjid & surau · Masjid View",
     "description": "Skrin waktu solat dan pengumuman percuma untuk masjid dan surau, berdasarkan data e-Solat JAKIM. Guna pelayar TV atau app Android TV. Daftar percuma."
   },
+  "seo": {
+    "breadcrumbHome": "Utama"
+  },
   "a11y": {
     "skip": "Langkau ke kandungan",
     "home": "Masjid View, halaman utama",

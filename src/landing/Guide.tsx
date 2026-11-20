@@ -4,7 +4,8 @@
 import { existsSync } from "node:fs";
 import { join } from "node:path";
 import { LandingShell } from "./LandingShell";
-import { copy, homeHref, type Lang } from "./i18n";
+import { copy, homeHref, pageHref, type Lang } from "./i18n";
+import { JsonLd } from "./jsonld";
 import { Eyebrow, focusRing, h2Class } from "./sections";
 import { site } from "./site";
 
@@ -15,6 +16,7 @@ export function Guide({ lang }: { lang: Lang }) {
   const all = [...g.sections.map((s) => ({ id: s.id, title: s.title })), { id: g.trouble.id, title: g.trouble.title }];
   return (
     <LandingShell lang={lang} page="panduan">
+      <JsonLd path={pageHref(lang, "panduan")} />
       <article className="mx-auto flex max-w-[860px] flex-col gap-10 px-5 py-[clamp(40px,6vw,72px)]">
         <header className="flex flex-col gap-4">
           <Eyebrow>{g.eyebrow}</Eyebrow>

@@ -5,4 +5,6 @@ export const site = {
   contactEmail: "hubungi@masjidview.my", // footer; mailto: link (forwards to the owner, Cloudflare Email Routing)
   whatsapp: "", // empty = footer WhatsApp row is hidden
   supportUrl: "", // empty = no support/donation link anywhere
+  facebookUrl: "", // Facebook page (PRD 70 D2); empty = left out of Organization.sameAs
+  youtubeUrl: "", // YouTube channel (PRD 70 D2); empty = left out of Organization.sameAs
 };

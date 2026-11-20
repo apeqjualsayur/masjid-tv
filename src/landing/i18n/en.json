@@ -3,6 +3,9 @@
     "title": "Prayer time screen for masjid & surau TVs · Masjid View",
     "description": "A free prayer-time and announcement screen for masjids and suraus, based on JAKIM e-Solat data. Use any TV browser or the Android TV app. Sign up free."
   },
+  "seo": {
+    "breadcrumbHome": "Home"
+  },
   "a11y": {
     "skip": "Skip to content",
     "home": "Masjid View, home page",

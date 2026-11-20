@@ -8,7 +8,7 @@ import { DaySection, TemplatesSection, ThemesSection } from "./showcase";
 import { DevicesSection, PanelSection } from "./illustrations";
 import { TrySection } from "./try";
 import { LandingShell } from "./LandingShell";
-import type { Lang } from "./i18n";
+import { homeHref, type Lang } from "./i18n";
 
 /** Section ids in page order. The ids in PRD §4 are the nav targets; the others name the rest. */
 export const SECTIONS = ["hero", "angka", "banding", "ciri", "sehari", "panel", "templat", "cuba", "peranti", "tema", "cara", "soalan", "daftar"] as const;
@@ -16,7 +16,7 @@ export const SECTIONS = ["hero", "angka", "banding", "ciri", "sehari", "panel", 
 export function Landing({ lang }: { lang: Lang }) {
   return (
     <LandingShell lang={lang} page="home">
-      <JsonLd lang={lang} />
+      <JsonLd path={homeHref(lang)} />
       <Hero lang={lang} />
       <Numbers lang={lang} />
       <Compare lang={lang} />

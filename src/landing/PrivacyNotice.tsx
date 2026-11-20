@@ -6,6 +6,7 @@ import { ROUTES } from "@/admin/routing";
 import { LogoMark } from "@/admin/shell/icons";
 import { PRIVACY, UPDATED } from "@/content/privasi";
 import type { Lang } from "./i18n";
+import { JsonLd } from "./jsonld";
 
 export const privacyHref = (lang: Lang) => (lang === "en" ? "/en/privasi/" : "/privasi/");
 
@@ -26,6 +27,7 @@ export function PrivacyNotice({ lang }: { lang: Lang }) {
   );
   return (
     <div className="fixed inset-0 overflow-y-auto bg-adm-ground font-jakarta text-adm-ink antialiased">
+      <JsonLd path={privacyHref(lang)} />
       <div className="mx-auto flex min-h-full w-full max-w-[680px] flex-col gap-5 px-5 pt-5 pb-12">
         <div className="flex items-center justify-between">
           <LogoMark size={40} />

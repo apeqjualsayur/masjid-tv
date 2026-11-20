@@ -2,3 +2,6 @@
 * text=auto eol=lf
 *.png binary
 *.woff2 binary
+# Windows batch files need CRLF; the Gradle wrapper jar is binary.
+*.bat text eol=crlf
+*.jar binary

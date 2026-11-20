@@ -17,7 +17,7 @@ const returnTo = () => `${window.location.origin}${ROUTES.signIn}`;
 
 export function SignIn() {
   const a = useAdmin();
-  const { t, locale } = useT();
+  const { t, locale, lang } = useT();
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [sent, setSent] = useState<string | null>(null);
@@ -210,7 +210,7 @@ export function SignIn() {
 
       <div className="mt-auto pt-10 text-center text-[13px] leading-relaxed text-adm-muted">
         {t("signin.legal")}{" "}
-        <Link href={ROUTES.privacy} className="font-bold text-adm-green underline-offset-2 hover:underline">
+        <Link href={lang === "en" ? ROUTES.privacyEn : ROUTES.privacy} className="font-bold text-adm-green underline-offset-2 hover:underline">
           {t("signin.privacy")}
         </Link>
         <div className="mt-2.5">

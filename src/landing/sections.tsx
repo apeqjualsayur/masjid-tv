@@ -2,7 +2,8 @@
 // real theme renders, ./dual), 12 Cara bermula.
 // All copy from the i18n json.
 import type { ReactNode } from "react";
-import { DEMO_HREF, PRIVACY_HREF } from "./Footer";
+import { DEMO_HREF } from "./Footer";
+import { privacyHref } from "./PrivacyNotice";
 import { ADMIN_HREF } from "./Header";
 import { copy, type Lang } from "./i18n";
 import { DualScreens } from "./dual";
@@ -130,7 +131,7 @@ export function Steps({ lang }: { lang: Lang }) {
             <li key={s.t} className="flex flex-col gap-3 rounded-[20px] border border-lb-line bg-white p-6">
               <span aria-hidden="true" className="flex h-10 w-10 items-center justify-center rounded-full bg-lb-deep text-[16px] font-bold text-white">
                 {i + 1}
-              </span>
+              </span>{" "}
               <h3 className="m-0 text-[18px] font-bold">{s.t}</h3>
               <p className="m-0 text-[14px] leading-[1.6] text-lb-muted">{s.d}</p>
             </li>
@@ -185,7 +186,7 @@ function PrivacyAnswer({ text, lang }: { text: string; lang: Lang }) {
   return (
     <>
       {text.slice(0, at)}
-      <a href={PRIVACY_HREF} className={`rounded font-semibold text-lb-deep underline underline-offset-2 ${focusRing}`}>
+      <a href={privacyHref(lang)} className={`rounded font-semibold text-lb-deep underline underline-offset-2 ${focusRing}`}>
         {phrase}
       </a>
       {text.slice(at + phrase.length)}

@@ -127,7 +127,7 @@ export function DevicesSection({ lang }: { lang: Lang }) {
           <div className="flex items-center gap-[18px]">
             <div aria-hidden="true" className="w-[150px] flex-none rounded-lg bg-lb-bezel p-[5px] [container-type:inline-size]">
               <div className="flex aspect-video flex-col items-center justify-center gap-[3cqw] rounded-[2px] bg-white">
-                <img src="/brand/mv-mark.svg" alt="" width={17} height={17} className="h-[12cqw] w-auto" />
+                <img src="/brand/mv-mark.svg" alt={copy(lang).a11y.pairMark} width={17} height={17} className="h-[12cqw] w-auto" />
                 <div className="text-[7cqw] text-lb-muted">{k.pairCode}</div>
                 <div className="font-manrope text-[17cqw] leading-none font-extrabold tracking-[2cqw] text-lb-ink">482 913</div>
               </div>

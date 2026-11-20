@@ -1,7 +1,8 @@
 import { Landing } from "@/landing/Landing";
-import { landingMetadata, landingViewport } from "@/landing/metadata";
+import { landingViewport } from "@/landing/metadata";
+import { buildMetadata } from "@/seo/metadata";
 
-export const metadata = landingMetadata("en");
+export const metadata = buildMetadata("/en/");
 export const viewport = landingViewport;
 
 export default function HomeEn() {

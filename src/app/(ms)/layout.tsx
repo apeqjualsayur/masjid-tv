@@ -3,7 +3,7 @@ import { fontVariables } from "../fonts";
 import "../globals.css";
 
 export const metadata: Metadata = {
-  title: "Masjid TV",
+  title: "Masjid View",
   description: "Paparan waktu solat untuk masjid dan surau",
   manifest: "/manifest.webmanifest",
   icons: {

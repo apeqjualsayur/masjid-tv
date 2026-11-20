@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Masjid View — Prayer times and announcements on your masjid or surau TV",
-    "description": "A free prayer-time and announcement screen for masjids and suraus. Open it in any TV browser, manage it from your phone. Based on JAKIM e-Solat data."
+    "title": "Prayer time screen for masjid & surau TVs · Masjid View",
+    "description": "A free prayer-time and announcement screen for masjids and suraus, based on JAKIM e-Solat data. Use any TV browser or the Android TV app. Sign up free."
   },
   "a11y": {
     "skip": "Skip to content",
@@ -16,7 +16,9 @@
     "laptopMock": "AJK panel on a laptop",
     "numbers": "Key numbers",
     "tryPreview": "Preview of your masjid screen",
-    "footerNav": "Footer links"
+    "footerNav": "Footer links",
+    "appIcon": "Masjid View app icon",
+    "pairMark": "Masjid View logo on the TV pairing code screen"
   },
   "nav": {
     "features": "Features",
@@ -484,8 +486,8 @@
   },
   "panduan": {
     "meta": {
-      "title": "TV setup guide — Masjid View",
-      "description": "How to set up the Masjid View screen on an Android smart TV, an Android TV box or a laptop, and pair it with a 6-digit code."
+      "title": "TV setup guide for masjid & surau screens · Masjid View",
+      "description": "Set up Masjid View on an Android smart TV, an Android TV box or a laptop, then pair it with a 6-digit code. Ready in about 30 minutes."
     },
     "eyebrow": "GUIDE",
     "title": "TV setup guide",
@@ -630,5 +632,11 @@
     },
     "help": "Still stuck? E-mail us at",
     "back": "← Back to the home page"
+  },
+  "privasi": {
+    "meta": {
+      "title": "Privacy Notice · Masjid View",
+      "description": "Masjid View privacy notice: what data we collect, why we use it, how long we keep it and your rights. Read it before registering your masjid or surau."
+    }
   }
 }

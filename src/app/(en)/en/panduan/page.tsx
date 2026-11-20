@@ -1,7 +1,8 @@
 import { Guide } from "@/landing/Guide";
-import { landingMetadata, landingViewport } from "@/landing/metadata";
+import { landingViewport } from "@/landing/metadata";
+import { buildMetadata } from "@/seo/metadata";
 
-export const metadata = landingMetadata("en", "panduan");
+export const metadata = buildMetadata("/en/panduan/");
 export const viewport = landingViewport;
 
 export default function PanduanEn() {

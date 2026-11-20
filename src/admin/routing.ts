@@ -36,6 +36,7 @@ export const ROUTES = {
   feedback: "/admin/maklum-balas/",
   platform: "/admin/platform/",
   privacy: "/privasi/",
+  privacyEn: "/en/privasi/",
 } as const;
 export type AdminRoute = (typeof ROUTES)[keyof typeof ROUTES];
 

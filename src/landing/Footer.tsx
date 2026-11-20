@@ -2,10 +2,10 @@
 // Contact rows come from site.ts; an empty value hides its row (no placeholders).
 import type { ReactNode } from "react";
 import { copy, sectionHref, type Lang, type Page } from "./i18n";
+import { privacyHref } from "./PrivacyNotice";
 import { site } from "./site";
 
 export const DEMO_HREF = "/tv/?demo=1";
-export const PRIVACY_HREF = "/privasi/";
 export const guideHref = (lang: Lang) => (lang === "en" ? "/en/panduan/" : "/panduan/");
 
 const link = "rounded hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
@@ -44,7 +44,7 @@ export function Footer({ lang, page = "home" }: { lang: Lang; page?: Page }) {
         <Column title={f.help}>
           <li><a className={link} href={guideHref(lang)}>{f.helpGuide}</a></li>
           <li><a className={link} href={sectionHref(lang, page, "soalan")}>{f.helpFaq}</a></li>
-          <li><a className={link} href={PRIVACY_HREF}>{f.helpPrivacy}</a></li>
+          <li><a className={link} href={privacyHref(lang)}>{f.helpPrivacy}</a></li>
           {site.supportUrl && (
             <li><a className={link} href={site.supportUrl} rel="noopener">{f.support}</a></li>
           )}

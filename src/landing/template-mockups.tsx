@@ -89,6 +89,7 @@ function Badge({
       style={{ width: size, height: size, background: bg, color: fg }}
     >
       <svg
+        aria-hidden="true"
         width={size * 0.55}
         height={size * 0.55}
         viewBox="0 0 24 24"
@@ -152,6 +153,7 @@ const QR_CELLS = (() => {
 function Qr({ size = 56 }: { size?: number }) {
   return (
     <svg
+      aria-hidden="true"
       width={size}
       height={size}
       viewBox={`-1 -1 ${QR_N + 2} ${QR_N + 2}`}

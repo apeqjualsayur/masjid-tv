@@ -1,7 +1,7 @@
 {
   "meta": {
-    "title": "Masjid View — Paparan waktu solat dan pengumuman untuk TV masjid dan surau",
-    "description": "Skrin waktu solat dan pengumuman percuma untuk masjid dan surau. Buka di pelayar mana-mana TV, urus dari telefon. Berdasarkan data e-Solat JAKIM."
+    "title": "Skrin waktu solat untuk TV masjid & surau · Masjid View",
+    "description": "Skrin waktu solat dan pengumuman percuma untuk masjid dan surau, berdasarkan data e-Solat JAKIM. Guna pelayar TV atau app Android TV. Daftar percuma."
   },
   "a11y": {
     "skip": "Langkau ke kandungan",
@@ -16,7 +16,9 @@
     "laptopMock": "Panel AJK di komputer riba",
     "numbers": "Angka utama",
     "tryPreview": "Pratonton skrin masjid anda",
-    "footerNav": "Pautan kaki halaman"
+    "footerNav": "Pautan kaki halaman",
+    "appIcon": "Ikon aplikasi Masjid View",
+    "pairMark": "Logo Masjid View pada skrin kod pemasangan TV"
   },
   "nav": {
     "features": "Ciri-ciri",
@@ -484,8 +486,8 @@
   },
   "panduan": {
     "meta": {
-      "title": "Panduan pemasangan TV — Masjid View",
-      "description": "Cara memasang skrin Masjid View pada TV pintar Android, kotak Android TV atau komputer riba, dan memasangkannya dengan kod 6 digit."
+      "title": "Panduan pemasangan skrin TV masjid · Masjid View",
+      "description": "Pasang Masjid View pada TV pintar Android, kotak Android TV atau komputer riba, kemudian pautkan dengan kod 6 digit. Siap dalam kira-kira 30 minit."
     },
     "eyebrow": "PANDUAN",
     "title": "Panduan pemasangan TV",
@@ -630,5 +632,11 @@
     },
     "help": "Masih tidak berjaya? E-mel kami di",
     "back": "← Kembali ke halaman utama"
+  },
+  "privasi": {
+    "meta": {
+      "title": "Notis Privasi · Masjid View",
+      "description": "Notis privasi Masjid View: data yang dikumpul, tujuan penggunaan, tempoh simpanan dan hak anda. Baca sebelum mendaftarkan masjid atau surau anda."
+    }
   }
 }

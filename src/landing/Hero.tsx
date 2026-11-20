@@ -45,7 +45,7 @@ export function Hero({ lang }: { lang: Lang }) {
     <section id="hero" aria-labelledby="hero-title" style={{ background: `radial-gradient(1200px 560px at 75% 30%, ${glow} 0%, #FFFFFF 70%)` }}>
       <div className="mx-auto flex max-w-[1200px] flex-wrap items-center gap-12 px-5 pt-[clamp(40px,6vw,84px)] pb-[clamp(40px,5vw,64px)]">
         <div className="flex min-w-0 flex-[1_1_400px] flex-col gap-[22px]">
-          <img src="/brand/mv-app-icon.svg" alt="" width={64} height={64} className="h-16 w-16 rounded-[18px] shadow-[0_14px_30px_rgba(20,108,74,0.3)]" />
+          <img src="/brand/mv-app-icon.svg" alt={c.a11y.appIcon} width={64} height={64} className="h-16 w-16 rounded-[18px] shadow-[0_14px_30px_rgba(20,108,74,0.3)]" />
           <div className="inline-flex items-center gap-2 self-start rounded-full border border-lb-line bg-white px-3.5 py-[7px] text-[14px] font-semibold text-lb-deep">
             <span aria-hidden="true" className="h-2 w-2 rounded-full bg-lb-primary" />
             {h.chip}

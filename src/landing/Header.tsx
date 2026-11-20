@@ -115,7 +115,7 @@ export function Header({ lang, page = "home" }: { lang: Lang; page?: Page }) {
       <header className="sticky top-0 z-30 border-b border-lb-hair bg-white/95 backdrop-blur-sm">
         <div className="mx-auto flex h-[70px] max-w-[1200px] items-center gap-3 px-4 min-[400px]:px-5 min-[900px]:gap-8">
           <a href={homeHref(lang)} aria-label={c.a11y.home} className={`flex flex-none items-center rounded-md ${focusRing}`}>
-            <img src="/brand/mv-lockup.svg" alt="" width={141} height={32} className="h-7 w-auto min-[380px]:h-8 min-[900px]:h-9" />
+            <img src="/brand/mv-lockup.svg" alt="Masjid View" width={141} height={32} className="h-7 w-auto min-[380px]:h-8 min-[900px]:h-9" />
           </a>
           <nav aria-label={c.a11y.mainNav} className="mx-auto hidden gap-7 text-[15px] font-medium min-[900px]:flex">
             {NAV.map((n) => (
@@ -161,7 +161,7 @@ export function Header({ lang, page = "home" }: { lang: Lang; page?: Page }) {
             className="absolute inset-x-0 top-0 flex flex-col gap-1 rounded-b-3xl bg-white px-5 pt-3 pb-6 shadow-[0_20px_40px_rgba(16,36,27,0.18)]"
           >
             <div className="flex h-[46px] items-center justify-between">
-              <img src="/brand/mv-lockup.svg" alt="" width={141} height={32} className="h-8 w-auto" />
+              <img src="/brand/mv-lockup.svg" alt="Masjid View" width={141} height={32} className="h-8 w-auto" />
               <button type="button" aria-label={c.a11y.closeMenu} onClick={close} className={`flex h-[42px] w-[42px] items-center justify-center rounded-xl border border-lb-line text-lb-ink ${focusRing}`}>
                 <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
                   <path d="M6 6l12 12 M18 6 6 18" />

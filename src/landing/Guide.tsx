@@ -40,7 +40,7 @@ export function Guide({ lang }: { lang: Lang }) {
         {g.sections.map((s, i) => (
           <section key={s.id} id={s.id} aria-labelledby={`${s.id}-title`} className="flex flex-col gap-4 border-t border-lb-hair pt-8">
             <h2 id={`${s.id}-title`} className={`${h2Class} flex items-baseline gap-3 text-[clamp(24px,2.6vw,30px)]`}>
-              <span aria-hidden="true" className="text-lb-primary">{i + 1}</span>
+              <span aria-hidden="true" className="text-lb-primary">{i + 1}{" "}</span>
               {s.title}
             </h2>
             <ol className="flex list-decimal flex-col gap-2.5 pl-6 text-[16px] leading-[1.65] marker:font-bold marker:text-lb-deep">
@@ -56,7 +56,7 @@ export function Guide({ lang }: { lang: Lang }) {
 
         <section id={g.trouble.id} aria-labelledby="masalah-title" className="flex flex-col gap-4 border-t border-lb-hair pt-8">
           <h2 id="masalah-title" className={`${h2Class} text-[clamp(24px,2.6vw,30px)]`}>
-            <span aria-hidden="true" className="mr-3 text-lb-primary">{all.length}</span>
+            <span aria-hidden="true" className="mr-3 text-lb-primary">{all.length}{" "}</span>
             {g.trouble.title}
           </h2>
           <dl className="flex flex-col gap-3">

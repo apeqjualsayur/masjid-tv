@@ -14,7 +14,8 @@ import {
 import { LANDING_ROSTER, LANDING_SAMPLES as S, MOCK_TEXT as M } from "./template-samples";
 
 const INK = "#14303D";
-const MUTED = "#56707E";
+// Darker than the Tenang muted tone so small text keeps >= 4.5:1 on every tint (Lighthouse, PRD 70 §6).
+const MUTED = "#4A6371";
 
 /** The mockup box: a tinted card, 190 px tall on a phone (one column), 4:3 from the sm breakpoint with the template's accent for labels. */
 function Box({
@@ -192,7 +193,7 @@ function Kuliah() {
   const f = S.kuliah;
   return (
     <Box tint="#EEF0FA">
-      <Label color="#4F58AE">{f.series}</Label>
+      <Label color="#3F4796">{f.series}</Label>
       <Title>{f.topic}</Title>
       <div className="flex items-center gap-2">
         <Badge
@@ -210,7 +211,7 @@ function Kuliah() {
           <span
             key={x}
             className="rounded-full bg-white px-2 py-0.5 text-[10.5px] font-semibold"
-            style={{ color: "#4F58AE" }}
+            style={{ color: "#3F4796" }}
           >
             {x}
           </span>
@@ -249,7 +250,7 @@ function Program() {
     <Box tint="#FFF4E5">
       <div className="flex items-start gap-2.5">
         <span className="flex w-[38px] flex-none flex-col overflow-hidden rounded-[7px] bg-white text-center shadow-[0_1px_2px_rgba(0,0,0,0.08)]">
-          <span className="bg-[#A9612A] py-[1px] text-[9px] font-bold text-white uppercase">
+          <span className="bg-[#8A4E1F] py-[1px] text-[9px] font-bold text-white uppercase">
             {f.date.split(" ")[0]}
           </span>
           <span className="py-0.5 text-[13px] font-bold">
@@ -257,7 +258,7 @@ function Program() {
           </span>
         </span>
         <div className="flex min-w-0 flex-col gap-0.5">
-          <Label color="#A9612A">Program</Label>
+          <Label color="#8A4E1F">Program</Label>
           <Title size={14}>{f.title}</Title>
         </div>
       </div>
@@ -322,7 +323,7 @@ function Mesyuarat() {
 function Penangguhan() {
   return (
     <Box tint="#FFF6E5">
-      <Label color="#A9612A">{M.tangguhSeries}</Label>
+      <Label color="#8A4E1F">{M.tangguhSeries}</Label>
       <Title size={14}>{M.tangguhTopic}</Title>
       <span className="self-start rounded-[6px] bg-[#F59E0B] px-2 py-0.5 text-[11px] font-extrabold tracking-[0.08em] text-[#2A1A00]">
         {M.ditangguhkan}
@@ -390,7 +391,7 @@ function Kewangan() {
   const bars = [0.55, 0.8, 0.45, 0.95, 0.7, 0.6, 0.85];
   return (
     <Box tint="#F8EFE6">
-      <Label color="#A9612A">Penyata kewangan</Label>
+      <Label color="#8A4E1F">Penyata kewangan</Label>
       <div className="grid grid-cols-3 gap-1.5">
         {boxes.map(([k, v, dark]) => (
           <span

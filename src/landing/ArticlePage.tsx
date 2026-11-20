@@ -123,7 +123,7 @@ export function ArticlePage({ article: a }: { article: Article }) {
           </p>
         </header>
         <aside aria-labelledby="jawapan-ringkas" className="rounded-2xl border-l-4 border-lb-deep bg-lb-soft px-5 py-4">
-          <h2 id="jawapan-ringkas" className="m-0 text-[14px] font-bold tracking-[0.1em] text-lb-deep uppercase">
+          <h2 id="jawapan-ringkas" className="m-0 text-[14px] font-bold tracking-[0.1em] text-lb-ink uppercase">
             {k.summary}
           </h2>
           <p className={`m-0 mt-1.5 ${measure}`}>{a.summary}</p>
@@ -151,7 +151,7 @@ export function ArticlePage({ article: a }: { article: Article }) {
         )}
         <section aria-labelledby="cuba-mv" className="flex flex-col gap-3 rounded-3xl bg-lb-deep px-6 py-7 text-white">
           <h2 id="cuba-mv" className="m-0 text-[24px] font-bold">{k.cta.title}</h2>
-          <p className="m-0 text-[17px] text-white/85">{k.cta.body}</p>
+          <p className="m-0 text-[17px] text-white">{k.cta.body}</p>
           <p className="m-0 flex flex-wrap gap-3">
             <a href={DEMO_HREF} className="flex min-h-11 items-center rounded-full bg-white px-5 font-semibold text-lb-deep focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">{k.cta.demo}</a>
             <a href={ADMIN_HREF} className="flex min-h-11 items-center rounded-full border border-white/60 px-5 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">{k.cta.signup}</a>

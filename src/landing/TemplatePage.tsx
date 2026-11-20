@@ -84,7 +84,7 @@ export function TemplatePage({ page: p }: { page: Page }) {
         </section>
         <section aria-labelledby="guna" className={`flex flex-col gap-3 rounded-3xl px-6 py-7 ${sober ? "bg-[#F1F1F1] text-[#2A2A2A]" : "bg-lb-deep text-white"}`}>
           <h2 id="guna" className="m-0 text-[24px] font-bold">{k.cta}</h2>
-          <p className={`m-0 text-[17px] ${sober ? "text-[#555]" : "text-white/85"}`}>{k.ctaBody}</p>
+          <p className={`m-0 text-[17px] ${sober ? "text-[#555]" : "text-white"}`}>{k.ctaBody}</p>
           <a href={ADMIN_HREF} className={`flex min-h-11 items-center self-start rounded-full px-5 font-semibold focus-visible:outline-2 focus-visible:outline-offset-2 ${sober ? "bg-[#3A3A3A] text-white focus-visible:outline-[#3A3A3A]" : "bg-white text-lb-deep focus-visible:outline-white"}`}>
             {k.cta}
           </a>

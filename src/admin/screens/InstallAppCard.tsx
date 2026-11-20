@@ -5,6 +5,7 @@
 import { useEffect, useState } from "react";
 import { APK_LATEST_URL, APK_SHORT_LINK, APK_URL, formatMegabytes, parseLatestApk, type LatestApk } from "@/config/app-shell";
 import { useT } from "../i18n";
+import { ROUTES } from "../routing";
 import { ICON, Icon } from "../shell/icons";
 
 /**
@@ -47,7 +48,7 @@ function readOpen(): boolean | null {
  * "Tambah skrin" sheet it starts closed and is not remembered.
  */
 export function InstallAppCard({ latest, remember = false }: { latest: LatestApk | null; remember?: boolean }) {
-  const { t, locale } = useT();
+  const { t, locale, lang } = useT();
   const [open, setOpen] = useState(!remember ? false : true);
   const [copied, setCopied] = useState(false);
   useEffect(() => {
@@ -129,6 +130,9 @@ export function InstallAppCard({ latest, remember = false }: { latest: LatestApk
           </div>
 
           <p className="rounded-xl bg-adm-ground px-3 py-2.5 text-[13px] leading-[1.45] text-adm-muted">{t("screens.app.kiosk")}</p>
+          <a href={lang === "en" ? ROUTES.guideEn : ROUTES.guide} target="_blank" rel="noopener" className="flex min-h-11 items-center self-start text-[14px] font-bold text-adm-green underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-adm-green">
+            {t("screens.app.guideLink")} →<span className="sr-only"> {t("nav.newTab")}</span>
+          </a>
         </div>
       )}
     </section>

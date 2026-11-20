@@ -35,7 +35,9 @@
     "members": "Members",
     "platform": "Platform",
     "feedback": "Feedback",
-    "petugas": "Duty roster"
+    "petugas": "Duty roster",
+    "guide": "TV guide",
+    "newTab": "(opens in a new tab)"
   },
   "account": {
     "menu": "Account",
@@ -516,7 +518,8 @@
       "step3": "Open Downloader, type {link}, press Go, then Install.",
       "step4": "Open \"Masjid View TV\". A 6-digit pairing code appears.",
       "step5": "Here, press \"Add screen\" and enter that code as usual.",
-      "kiosk": "Fully Kiosk Browser still works; this app is the recommended option."
+      "kiosk": "Fully Kiosk Browser still works; this app is the recommended option.",
+      "guideLink": "Full TV setup guide"
     }
   },
   "poster": {

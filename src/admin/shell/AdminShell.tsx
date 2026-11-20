@@ -72,7 +72,19 @@ function OrgLine({ org }: { org: Membership }) {
   );
 }
 
-/** Phone/tablet account sheet: user, language, feedback, platform, sign out. */
+/** The public TV setup guide (/panduan) in the admin's language, in a new tab (the admin keeps its place). */
+export function GuideLink({ className, onClick }: { className: string; onClick?: () => void }) {
+  const { t, lang } = useT();
+  return (
+    <a href={lang === "en" ? ROUTES.guideEn : ROUTES.guide} target="_blank" rel="noopener" onClick={onClick} className={className}>
+      <Icon d={ICON.guide} size={20} />
+      {t("nav.guide")}
+      <span className="sr-only"> {t("nav.newTab")}</span>
+    </a>
+  );
+}
+
+/** Phone/tablet account sheet: user, language, guide, feedback, platform, sign out. */
 function AccountSheet({ open, onClose }: { open: boolean; onClose: () => void }) {
   const a = useAdmin();
   const { t } = useT();
@@ -91,6 +103,7 @@ function AccountSheet({ open, onClose }: { open: boolean; onClose: () => void })
             {t("nav.feedback")}
           </Link>
         )}
+        <GuideLink onClick={onClose} className="flex h-12 items-center gap-3 rounded-[14px] border border-adm-line px-4 text-[15px] font-bold" />
         {a.isPlatformAdmin && (
           <Link href={ROUTES.platform} onClick={onClose} className="flex h-12 items-center rounded-[14px] border border-adm-line px-4 text-[15px] font-bold">
             {t("nav.platform")}
@@ -150,6 +163,7 @@ function Sidebar({ items, path }: { items: NavItem[]; path: string | null }) {
           );
         })}
       </nav>
+      <GuideLink className="flex h-11 items-center gap-3 rounded-xl px-3 text-[15px] font-semibold text-[#3A4E45] hover:bg-adm-ground focus-visible:outline-2 focus-visible:outline-adm-green" />
       <div className="mt-auto flex flex-col gap-2.5 border-t border-adm-hair p-3">
         <div className="truncate text-[13px] font-bold">{a.displayName ?? a.email}</div>
         <div className="flex items-center justify-between gap-2">

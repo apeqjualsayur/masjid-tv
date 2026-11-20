@@ -35,7 +35,9 @@
     "members": "Ahli",
     "platform": "Platform",
     "feedback": "Maklum balas",
-    "petugas": "Petugas"
+    "petugas": "Petugas",
+    "guide": "Panduan TV",
+    "newTab": "(dibuka dalam tab baharu)"
   },
   "account": {
     "menu": "Akaun",
@@ -516,7 +518,8 @@
       "step3": "Buka Downloader, taip {link}, tekan Pergi, kemudian Pasang.",
       "step4": "Buka \"Masjid View TV\". Kod pasangan 6 digit dipaparkan.",
       "step5": "Di sini, tekan \"Tambah skrin\" dan masukkan kod itu seperti biasa.",
-      "kiosk": "Fully Kiosk Browser masih boleh digunakan; app ini pilihan yang disyorkan."
+      "kiosk": "Fully Kiosk Browser masih boleh digunakan; app ini pilihan yang disyorkan.",
+      "guideLink": "Panduan penuh pemasangan TV"
     }
   },
   "poster": {

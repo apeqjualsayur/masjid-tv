@@ -37,6 +37,9 @@ export const ROUTES = {
   platform: "/admin/platform/",
   privacy: "/privasi/",
   privacyEn: "/en/privasi/",
+  /** The public TV setup guide (/panduan), in the admin's language. */
+  guide: "/panduan/",
+  guideEn: "/en/panduan/",
 } as const;
 export type AdminRoute = (typeof ROUTES)[keyof typeof ROUTES];
 

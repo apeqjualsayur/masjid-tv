@@ -18,6 +18,7 @@ export const ICON = {
   check: "M5 12l5 5 9-10",
   /** Petugas: a person with a calendar grid */
   petugas: "M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z M2 20a6 6 0 0 1 9.5-4.9 M14 11h8v10h-8z M14 14.5h8 M17.5 11v10",
+  guide: "M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2Z M4 19V5 M9 7h6 M9 11h6",
 } as const;
 
 export function Icon({ d, size = 24, strokeWidth = 2, className }: { d: string; size?: number; strokeWidth?: number; className?: string }) {

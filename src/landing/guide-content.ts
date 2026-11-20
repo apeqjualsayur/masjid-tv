@@ -4,10 +4,11 @@
 // settings steps (the card's last step says "here", which only makes sense inside the admin app).
 import adminEn from "@/admin/i18n/en.json";
 import adminMs from "@/admin/i18n/ms.json";
+import { APK_SHORT_LINK } from "@/config/app-shell";
 import { copy, type Lang } from "./i18n";
 
-/** What the TV owner types into Downloader (the admin card shows the same link). */
-export const APK_LINK = "masjidview.my/apk";
+/** What the TV owner types into Downloader: the same constant the admin card fills in. */
+export const APK_LINK = APK_SHORT_LINK;
 
 export interface GuideSection {
   id: string;

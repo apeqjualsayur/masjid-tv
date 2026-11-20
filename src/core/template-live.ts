@@ -3,8 +3,8 @@
 import { activityNotice, formatClockBm, isDateKey, parseClockBm, slideActivityCountdown, type ActivityCountdown } from "./activity";
 import { formatTime } from "./format";
 import { islamicEventsView, type IslamicEvent, type IslamicEventView, type IslamicView } from "./islamic-events";
-import type { Roster } from "./roster";
-import { localParts, pad2, parseLocalDateTime, weekdayOfDateKey } from "./time";
+import { HARI_ISNIN_FIRST, dayRoster, rosterDayOf, rosterIsEmpty, weekRoster, type Roster } from "./roster";
+import { localDateKey, localParts, pad2, parseLocalDateTime, weekdayOfDateKey } from "./time";
 
 /** Contract §1 `TemplateLive`. */
 export interface TemplateLive {
@@ -14,6 +14,20 @@ export interface TemplateLive {
   notice?: { kind: "tangguh" | "batal"; originalText: string; newText: string | null; reason: string | null };
   /** hari_kebesaran (PRD enhancements §5.4, contract rule 24). */
   islamicEvents?: IslamicLive;
+  /** jadual_petugas (PRD enhancements §6.4, contract rule 25). */
+  roster?: RosterLive;
+}
+
+export interface RosterLive {
+  view: "minggu" | "hari_ini";
+  /** "Jadual Imam & Bilal" (the slide's own title) */
+  title: string;
+  /** hari_ini: "Hari ini · Jumaat" */
+  subtitle?: string;
+  /** minggu: Isnin … Ahad (all-day names); hari_ini: Subuh … Isyak (Zohor → "Jumaat" on Friday). "—" when empty. */
+  rows: { label: string; imam: string; bilal: string; today?: boolean; perWaktu?: boolean }[];
+  /** hari_ini: "Esok: Imam … · Bilal …" */
+  tomorrow?: string;
 }
 
 export interface IslamicLive {
@@ -158,6 +172,34 @@ export function penangguhanLive(fields: Record<string, unknown>, clock24h = fals
   return { notice: { kind, originalText: originalText(fields, clock24h), newText, reason: str(fields.reason) || null } };
 }
 
+export const ROSTER_TITLE_DEFAULT = "Jadual Imam & Bilal";
+const dash = (p: { display: string } | null) => p?.display ?? "—";
+
+/**
+ * jadual_petugas (§6.3–6.4) at `now`: the week with today marked, or today's 5 waktu + tomorrow.
+ * undefined when the roster has no usable slot (the slide is skipped).
+ */
+export function rosterLive(fields: Record<string, unknown>, roster: Roster | undefined, now: number): RosterLive | undefined {
+  if (!roster || rosterIsEmpty(roster)) return undefined;
+  const title = typeof fields.title === "string" && fields.title.trim() ? fields.title.trim() : ROSTER_TITLE_DEFAULT;
+  const today = localDateKey(now);
+  if (fields.view === "hari_ini") {
+    const d = dayRoster(roster, today);
+    return {
+      view: "hari_ini",
+      title,
+      subtitle: `Hari ini · ${HARI_ISNIN_FIRST[rosterDayOf(today) - 1]}`,
+      rows: d.rows.map((r) => ({ label: r.label, imam: dash(r.imam), bilal: dash(r.bilal) })),
+      tomorrow: `Esok: Imam ${dash(d.tomorrow.imam)} · Bilal ${dash(d.tomorrow.bilal)}`,
+    };
+  }
+  return {
+    view: "minggu",
+    title,
+    rows: weekRoster(roster, today).map((r) => ({ label: r.label, imam: dash(r.imam), bilal: dash(r.bilal), today: r.isToday, perWaktu: r.hasWaktuExceptions })),
+  };
+}
+
 /** `live` for a template slide at `now`, or undefined when the template has none. */
 export function templateLive(templateKey: string, fields: Record<string, unknown>, now: number, clock24h = false, ctx: TemplateContext = {}): TemplateLive | undefined {
   if (templateKey === "kuliah" || templateKey === "program" || templateKey === "mesyuarat") return activityLive(fields, now, clock24h);
@@ -165,6 +207,10 @@ export function templateLive(templateKey: string, fields: Record<string, unknown
   if (templateKey === "hari_kebesaran") {
     const ev = islamicLive(islamicEventsView(ctx.islamicEvents ?? [], fields, now, ctx.maghribTodayMs ?? null));
     return ev ? { islamicEvents: ev } : undefined;
+  }
+  if (templateKey === "jadual_petugas") {
+    const r = rosterLive(fields, ctx.roster, now);
+    return r ? { roster: r } : undefined;
   }
   return undefined;
 }

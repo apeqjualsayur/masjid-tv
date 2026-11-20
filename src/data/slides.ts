@@ -47,6 +47,8 @@ const REQUIRED: Record<TemplateKey, (f: Record<string, unknown>) => boolean> = {
   penangguhan: (f) => str(f, "title") && (f.kind === "tangguh" || f.kind === "batal"),
   // Every field is optional (defaults: all events, 60 days, 2 more); the dates come from the takwim.
   hari_kebesaran: () => true,
+  // Optional view and title; the names come from the roster in the bundle.
+  jadual_petugas: () => true,
 };
 
 export function parseSlides(raw: unknown): { items: PlaylistItem<SlideView>[]; warnings: string[] } {

@@ -243,6 +243,17 @@
     "status": "active"
   },
   {
+    "id": "jadual-petugas-1",
+    "type": "template",
+    "template_key": "jadual_petugas",
+    "fields": {
+      "view": "minggu",
+      "title": "Jadual Imam & Bilal"
+    },
+    "sort_order": 150,
+    "status": "active"
+  },
+  {
     "id": "pengumuman-lama",
     "type": "template",
     "template_key": "pengumuman",

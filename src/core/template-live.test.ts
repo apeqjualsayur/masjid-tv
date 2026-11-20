@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { activityLive, clockText, countdownLive, formatDateShortBm, penangguhanLive, templateLive } from "./template-live";
+import { ROSTER_TITLE_DEFAULT, activityLive, clockText, countdownLive, formatDateShortBm, penangguhanLive, rosterLive, templateLive } from "./template-live";
 import { parseLocalDateTime } from "./time";
 
 const at = (s: string) => parseLocalDateTime(s)!;
@@ -108,5 +108,53 @@ describe("templateLive", () => {
     expect(templateLive("program", KULIAH, at("2026-11-25T10:00"))).toEqual({ countdown: { state: "days", text: "Lagi 3 hari", strong: "3" } });
     expect(templateLive("penangguhan", { title: "X", kind: "batal", date: "", time: "" }, 0)?.notice?.kind).toBe("batal");
     for (const k of ["kematian", "pengumuman", "infaq", "ucapan"]) expect(templateLive(k, KULIAH, at("2026-11-28T20:00")), k).toBeUndefined();
+  });
+});
+
+describe("jadual_petugas (rosterLive)", () => {
+  // 2026-11-20 is a Friday (Jumaat, day 5).
+  const P = (id: string, name: string, title: string | null = null) => ({ id, name, title, roles: ["imam", "bilal"] as ("imam" | "bilal")[] });
+  const ROSTER = {
+    petugas: [P("a", "Ahmad", "Ust."), P("b", "Badrul"), P("c", "Hafiz", "Ust.")],
+    slots: [
+      { day: 5, waktu: null, role: "imam" as const, petugasId: "a" },
+      { day: 5, waktu: null, role: "bilal" as const, petugasId: "b" },
+      { day: 5, waktu: "zohor" as const, role: "imam" as const, petugasId: "c" },
+      { day: 6, waktu: null, role: "imam" as const, petugasId: "c" },
+    ],
+  };
+
+  it("minggu: Isnin → Ahad, today marked, per-waktu flag, dash when empty", () => {
+    const r = rosterLive({ view: "minggu" }, ROSTER, at("2026-11-20T10:00"))!;
+    expect(r.title).toBe(ROSTER_TITLE_DEFAULT);
+    expect(r.rows.map((x) => x.label)).toEqual(["Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu", "Ahad"]);
+    expect(r.rows.filter((x) => x.today).map((x) => x.label)).toEqual(["Jumaat"]);
+    expect(r.rows[4]).toMatchObject({ imam: "Ust. Ahmad", bilal: "Badrul", perWaktu: true });
+    expect(r.rows[5]).toMatchObject({ imam: "Ust. Hafiz", bilal: "—" });
+    expect(r.rows[0]).toMatchObject({ imam: "—", bilal: "—" });
+    expect(r.tomorrow).toBeUndefined();
+  });
+
+  it("hari_ini: 5 waktu, Zohor shows Jumaat on Friday, the exception wins, tomorrow line", () => {
+    const r = rosterLive({ view: "hari_ini", title: "  Petugas  " }, ROSTER, at("2026-11-20T10:00"))!;
+    expect(r.title).toBe("Petugas");
+    expect(r.subtitle).toBe("Hari ini · Jumaat");
+    expect(r.rows).toHaveLength(5);
+    expect(r.rows[1]).toMatchObject({ label: "Jumaat", imam: "Ust. Hafiz", bilal: "Badrul" });
+    expect(r.rows[0]).toMatchObject({ imam: "Ust. Ahmad" });
+    expect(r.tomorrow).toBe("Esok: Imam Ust. Hafiz · Bilal —");
+  });
+
+  it("the day changes at local midnight", () => {
+    const before = rosterLive({ view: "minggu" }, ROSTER, at("2026-11-20T23:59:59"))!;
+    const after = rosterLive({ view: "minggu" }, ROSTER, at("2026-11-21T00:00:00"))!;
+    expect(before.rows.find((x) => x.today)!.label).toBe("Jumaat");
+    expect(after.rows.find((x) => x.today)!.label).toBe("Sabtu");
+  });
+
+  it("an empty roster gives nothing (the slide is skipped)", () => {
+    expect(rosterLive({ view: "minggu" }, { petugas: [], slots: [] }, at("2026-11-20T10:00"))).toBeUndefined();
+    expect(templateLive("jadual_petugas", { view: "minggu" }, at("2026-11-20T10:00"))).toBeUndefined();
+    expect(templateLive("jadual_petugas", { view: "minggu" }, at("2026-11-20T10:00"), false, { roster: ROSTER })?.roster?.view).toBe("minggu");
   });
 });

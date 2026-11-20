@@ -7,6 +7,7 @@ import { APPROVED_TRANSLATION_SOURCES, OCCASION_LABEL, formatRinggit, infaqProgr
 import type { CSSProperties, ReactNode } from "react";
 import { CountdownLine, NoticeStamp } from "../shared/notice-stamp";
 import { KEBESARAN_EYEBROW, KebesaranBody } from "../shared/kebesaran";
+import { ROSTER_EYEBROW, RosterBody } from "../shared/roster";
 import type { TemplateArea, TemplateComponents, TemplateLive } from "../types";
 import { Arabic, serif, useArea } from "./parts";
 import { K } from "./tokens";
@@ -331,6 +332,11 @@ function HariKebesaran({ live }: P<"hari_kebesaran">) {
   );
 }
 
+/** Jadual Imam & Bilal (PRD enhancements §6.4, contract rule 25): the shared roster body on the card. */
+function JadualPetugas({ live }: P<"jadual_petugas">) {
+  return <RosterBody live={live?.roster} area={useArea()} eyebrow={<Label>{ROSTER_EYEBROW}</Label>} s={{ ink: K.cardInk, muted: K.cardLabel, accent: K.cardInk, line: K.cardLine, todayFill: "rgba(46,27,15,0.08)", titleFont: serif.fontFamily }} />;
+}
+
 export const kerawangTemplates: TemplateComponents = {
   pengumuman: Pengumuman,
   kuliah: Kuliah,
@@ -344,4 +350,5 @@ export const kerawangTemplates: TemplateComponents = {
   ucapan: Ucapan,
   penangguhan: Penangguhan,
   hari_kebesaran: HariKebesaran,
+  jadual_petugas: JadualPetugas,
 };

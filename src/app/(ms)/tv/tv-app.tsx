@@ -33,7 +33,7 @@ import {
   type PrayerData,
   type SyncStatus,
 } from "@/data";
-import { SAMPLE_POSTER, SAMPLE_POSTER_LANDSCAPE, sampleIslamicEvents, sampleSlide, withLive, type SlideView } from "@/templates";
+import { SAMPLE_POSTER, SAMPLE_POSTER_LANDSCAPE, SAMPLE_ROSTER, sampleIslamicEvents, sampleSlide, withLive, type SlideView } from "@/templates";
 import { useTheme } from "@/themes";
 import { ThemeView, UnavailableView } from "@/themes/ThemeView";
 import { Fragment, useEffect, useRef, useState } from "react";
@@ -186,9 +186,9 @@ export function DisplayHost({ source }: { source: DisplaySource }) {
   return <Display boot={boot} dataVersion={dataVersion} />;
 }
 
-/** Local / demo mode: SAMPLE takwim dated around today (src/templates/samples.ts), no roster. */
+/** Local / demo mode: SAMPLE takwim dated around today and the SAMPLE roster (src/templates/samples.ts). */
 function sampleTemplateData(): DisplaySource["templateData"] {
-  return { islamicEvents: sampleIslamicEvents(nowMs()) };
+  return { islamicEvents: sampleIslamicEvents(nowMs()), roster: SAMPLE_ROSTER };
 }
 
 interface SlidePick {

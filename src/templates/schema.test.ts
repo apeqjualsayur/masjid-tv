@@ -26,6 +26,7 @@ const FILLED: Record<TemplateKey, Fields> = {
     newDate: "Selasa, 27 Oktober 2026", newDateIso: "2026-10-27", newTime: "Selepas Maghrib", person: "Ustaz Ahmad", reason: "Penceramah uzur", note: "",
   },
   hari_kebesaran: { leadDays: 60, showMore: 2 },
+  jadual_petugas: { view: "minggu", title: "Jadual Imam & Bilal" },
 };
 
 describe("template schemas", () => {

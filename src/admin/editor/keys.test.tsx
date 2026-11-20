@@ -18,7 +18,7 @@ function schemaKeys(): string[] {
 }
 
 /** Allowed by migration 0012 but not built yet (E3, _specs/61). Remove each key as its template lands. */
-const NOT_BUILT_YET = ["jadual_petugas"];
+const NOT_BUILT_YET: string[] = [];
 
 describe("template editor keys (/admin/templat/?key=)", () => {
   const keys = schemaKeys();

@@ -14,6 +14,7 @@ import {
 import type { CSSProperties, ReactNode } from "react";
 import { CountdownLine, NoticeStamp } from "../shared/notice-stamp";
 import { KEBESARAN_EYEBROW, KebesaranBody } from "../shared/kebesaran";
+import { ROSTER_EYEBROW, RosterBody } from "../shared/roster";
 import type { TemplateComponents, TemplateLive } from "../types";
 import { Amiri, Caps, GoldRule, numStyle, useArea } from "./parts";
 import { C, F, archRadius } from "./tokens";
@@ -395,6 +396,11 @@ function HariKebesaran({ live }: P<"hari_kebesaran">) {
   return <KebesaranBody live={live?.islamicEvents} area={area} eyebrow={<Tag>{KEBESARAN_EYEBROW}</Tag>} s={{ ink: C.white, muted: C.soft, accent: C.gold, line: C.divider, center: area === "tall" }} />;
 }
 
+/** Jadual Imam & Bilal (PRD enhancements §6.4, contract rule 25): the shared roster body on the card. */
+function JadualPetugas({ live }: P<"jadual_petugas">) {
+  return <RosterBody live={live?.roster} area={useArea()} eyebrow={<Tag>{ROSTER_EYEBROW}</Tag>} s={{ ink: C.white, muted: C.soft, accent: C.gold, line: C.divider, todayFill: C.goldFill }} />;
+}
+
 export const serambiTemplates: TemplateComponents = {
   pengumuman: Pengumuman,
   kuliah: Kuliah,
@@ -408,4 +414,5 @@ export const serambiTemplates: TemplateComponents = {
   ucapan: Ucapan,
   penangguhan: Penangguhan,
   hari_kebesaran: HariKebesaran,
+  jadual_petugas: JadualPetugas,
 };

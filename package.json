@@ -16,6 +16,7 @@
     "og": "tsx scripts/og.ts",
     "sync:usage-model": "tsx scripts/sync-usage-model.ts",
     "qa:kebesaran": "node scripts/qa-kebesaran.mjs",
+    "qa:petugas": "node scripts/qa-petugas.mjs",
     "qa:notice": "node scripts/qa-notice.mjs",
     "qa:poster": "node scripts/qa-poster.mjs",
     "qa:theme": "node scripts/qa-theme.mjs"

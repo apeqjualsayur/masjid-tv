@@ -15,6 +15,8 @@ export const C = {
   divider: "rgba(255,255,255,0.18)",
   goldLine: "rgba(227,176,75,0.45)",
   goldRule: "rgba(227,176,75,0.6)",
+  /** A soft gold fill on the emerald panel (today's row in Jadual Imam & Bilal) */
+  goldFill: "rgba(227,176,75,0.16)",
   chipDark: "rgba(5,10,12,0.55)",
 } as const;
 

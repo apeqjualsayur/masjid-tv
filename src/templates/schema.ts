@@ -237,6 +237,15 @@ export const TEMPLATES: Record<TemplateKey, TemplateMeta> = {
       { key: "showMore", type: "number", label: T("Acara seterusnya dipaparkan", "Next events shown"), min: 0, max: 2, hint: T("0 hingga 2. Lalai 2.", "0 to 2. Default 2.") },
     ],
   },
+  // PRD enhancements §6.3. Hidden from the picker until E15 adds the live roster preview; the names come
+  // from the masjid's roster (Petugas page), never from the slide.
+  jadual_petugas: {
+    key: "jadual_petugas", code: "J&B", name: T("Jadual Imam & Bilal", "Imam & Bilal roster"), desc: T("Dari senarai Petugas", "From the Petugas page"), bg: "#EEE8F7", fg: "#5B3D8F",
+    fields: [
+      { key: "view", type: "select", label: T("Paparan", "View"), required: true, options: [{ value: "minggu", label: T("Mingguan", "Weekly") }, { value: "hari_ini", label: T("Hari ini (ikut waktu)", "Today (by prayer time)") }] },
+      { key: "title", type: "text", label: T("Tajuk", "Title"), max: 40, placeholder: T("Jadual Imam & Bilal", "Jadual Imam & Bilal") },
+    ],
+  },
 };
 
 /** Row label of a fixed table row (Imam & Bilal: the prayer name, BM as on the TV). */

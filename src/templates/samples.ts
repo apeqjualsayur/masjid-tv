@@ -1,5 +1,5 @@
 // One sample per template, placeholder text in brackets (PRD section 7, Phase 1).
-import { localDateKey, type IslamicEvent } from "@/core";
+import { localDateKey, type IslamicEvent, type Roster } from "@/core";
 import type { SlideView, TemplateFields, TemplateKey } from "./types";
 
 export const SAMPLE_FIELDS: TemplateFields = {
@@ -95,6 +95,36 @@ export const SAMPLE_FIELDS: TemplateFields = {
     note: "[Kami mohon maaf atas sebarang kesulitan.]",
   },
   hari_kebesaran: { leadDays: 60, showMore: 2 },
+  jadual_petugas: { view: "minggu", title: "Jadual Imam & Bilal" },
+};
+
+/**
+ * SAMPLE roster for the local display (?local=1, ?slide=jadual_petugas) only: invented names, NOT a
+ * real masjid's roster. Rabu (and Ahad) use two very long names, to check shrink-to-fit and the ellipsis;
+ * Khamis has an Isyak exception and Jumaat a Zohor (Jumaat) exception (scripts/qa-petugas.mjs).
+ */
+export const SAMPLE_ROSTER: Roster = {
+  petugas: [
+    { id: "s-zaki", name: "Ahmad Zaki", title: "Ust.", roles: ["imam"] },
+    { id: "s-hafiz", name: "Hafiz Rahman", title: "Hj.", roles: ["imam", "bilal"] },
+    { id: "s-rahim", name: "Rahim Osman", title: null, roles: ["bilal"] },
+    { id: "s-khairul", name: "Mohd Khairul Anuar bin Abdul Rahman", title: "Tuan Hj.", roles: ["imam"] },
+    { id: "s-syafiq", name: "Muhammad Syafiq Amirul Hakim bin Zulkifli", title: null, roles: ["bilal"] },
+  ],
+  slots: [
+    ...[1, 2, 4, 5].flatMap((day) => [
+      { day, waktu: null, role: "imam" as const, petugasId: "s-zaki" },
+      { day, waktu: null, role: "bilal" as const, petugasId: "s-rahim" },
+    ]),
+    { day: 3, waktu: null, role: "imam", petugasId: "s-khairul" },
+    { day: 3, waktu: null, role: "bilal", petugasId: "s-syafiq" },
+    { day: 4, waktu: "isyak", role: "imam", petugasId: "s-hafiz" },
+    { day: 5, waktu: "zohor", role: "imam", petugasId: "s-hafiz" },
+    { day: 6, waktu: null, role: "imam", petugasId: "s-hafiz" },
+    { day: 6, waktu: null, role: "bilal", petugasId: "s-rahim" },
+    { day: 7, waktu: null, role: "imam", petugasId: "s-khairul" },
+    { day: 7, waktu: null, role: "bilal", petugasId: "s-syafiq" },
+  ],
 };
 
 /**

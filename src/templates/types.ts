@@ -16,16 +16,20 @@ export type TemplateKey =
   | "ayat"
   | "ucapan"
   | "penangguhan"
-  | "hari_kebesaran";
+  | "hari_kebesaran"
+  | "jadual_petugas";
 
 export const TEMPLATE_KEYS: readonly TemplateKey[] = [
   "pengumuman", "kuliah", "kematian", "program", "infaq",
   "mesyuarat", "imam_bilal", "kewangan", "ayat", "ucapan",
-  "penangguhan", "hari_kebesaran",
+  "penangguhan", "hari_kebesaran", "jadual_petugas",
 ];
 
-/** Not offered in the admin template picker (they still render and stay editable). imam_bilal joins in E15 (PRD D9). */
-export const PICKER_HIDDEN: readonly TemplateKey[] = [];
+/**
+ * Not offered in the admin template picker (they still render and stay editable). jadual_petugas:
+ * until its editor (live roster preview) ships in E15, when imam_bilal is hidden instead (PRD D9).
+ */
+export const PICKER_HIDDEN: readonly TemplateKey[] = ["jadual_petugas"];
 
 /** A ?key= value (or a slides.template_key) as one of the template keys, or null when it is not one. */
 export function resolveTemplateKey(k: string | null | undefined): TemplateKey | null {
@@ -186,6 +190,14 @@ export interface HariKebesaranFields {
   showMore?: number;
 }
 
+/** Jadual Imam & Bilal slide (PRD enhancements §6.3). The names come from the masjid's roster (Petugas). */
+export interface JadualPetugasFields {
+  /** minggu (default) = the week; hari_ini = today's 5 waktu + tomorrow */
+  view?: "minggu" | "hari_ini";
+  /** Default "Jadual Imam & Bilal", ≤ 40 */
+  title?: string;
+}
+
 export interface TemplateFields {
   pengumuman: PengumumanFields;
   kuliah: KuliahFields & ActivityExtras;
@@ -199,6 +211,7 @@ export interface TemplateFields {
   ucapan: UcapanFields;
   penangguhan: PenangguhanFields;
   hari_kebesaran: HariKebesaranFields;
+  jadual_petugas: JadualPetugasFields;
 }
 
 /**

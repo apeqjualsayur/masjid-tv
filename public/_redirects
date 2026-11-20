@@ -1,0 +1,4 @@
+# Cloudflare Pages redirects (copied to out/_redirects by the build).
+# Short download link for the Android TV app (typed into the TV's Downloader app).
+/apk  /apk/masjidview-tv.apk  302
+/apk/  /apk/masjidview-tv.apk  302

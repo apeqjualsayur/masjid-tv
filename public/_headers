@@ -13,6 +13,13 @@
   Content-Type: application/manifest+json
   Cache-Control: no-cache
 
+# Android TV app (.github/workflows/android-tv.yml): always the newest file, downloaded (not opened).
+/apk/*
+  Cache-Control: no-cache
+/apk/*.apk
+  Content-Type: application/vnd.android.package-archive
+  Content-Disposition: attachment; filename="masjidview-tv.apk"
+
 # Hashed build files never change: cache for a year.
 /_next/static/*
   Cache-Control: public, max-age=31536000, immutable

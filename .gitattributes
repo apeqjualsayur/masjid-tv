@@ -5,3 +5,5 @@
 # Windows batch files need CRLF; the Gradle wrapper jar is binary.
 *.bat text eol=crlf
 *.jar binary
+*.apk binary
+*.aab binary

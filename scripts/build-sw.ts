@@ -9,6 +9,10 @@ const OUT = join(process.cwd(), "out");
 // from the network (it says whether a newer version is live), so it is not precached. The sounds
 // folder's README is a note for the owner, not an app file. Everything else in out/sounds/ is precached.
 const SKIP = new Set(["sw.js", "_headers", "_redirects", "version.json", "sounds/README.md"]);
+// The Android TV app download (apk/, published by .github/workflows/android-tv.yml): never precached
+// (a TV must not download a 2 MB APK it never uses) and not in the version hash (a new APK must not
+// make every TV update its service worker).
+const SKIP_DIRS = ["apk/"];
 
 function walk(dir: string): string[] {
   return readdirSync(dir).flatMap((name) => {
@@ -27,7 +31,7 @@ export function toUrl(file: string): string {
 
 function main() {
   const rel = (f: string) => relative(OUT, f).split(sep).join("/");
-  const files = walk(OUT).filter((f) => !SKIP.has(rel(f)) && !rel(f).startsWith("_not-found"));
+  const files = walk(OUT).filter((f) => !SKIP.has(rel(f)) && !rel(f).startsWith("_not-found") && !SKIP_DIRS.some((d) => rel(f).startsWith(d)));
   const hash = createHash("sha256");
   const urls: string[] = [];
   for (const f of files.sort()) {

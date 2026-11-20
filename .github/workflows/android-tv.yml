@@ -1,0 +1,165 @@
+name: Android TV app
+
+# Builds, signs and publishes the Android TV app (android-tv/, PRD enhancements §8.4):
+#   tag tv-v<VERSION_NAME> (or "Run workflow") → signed sideload APK + Play AAB → GitHub Release →
+#   public/apk/masjidview-tv.apk + public/apk/latest.json committed to main → Cloudflare Pages
+#   serves them at masjidview.my/apk. Secrets are only ever passed as environment variables.
+on:
+  push:
+    tags: ["tv-v*"]
+  workflow_dispatch:
+    inputs:
+      notes:
+        description: "What's new (shown in the TV's update prompt). Optional."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-tv-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Build, sign and publish the TV app
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      # Cloudflare Pages serves files up to 25 MiB each.
+      PAGES_MAX_BYTES: "26214400"
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # tags (release notes) and main (publish step)
+
+      - name: Version from android-tv/gradle.properties
+        id: v
+        run: |
+          code=$(grep -E '^VERSION_CODE=' android-tv/gradle.properties | cut -d= -f2 | tr -d '[:space:]')
+          name=$(grep -E '^VERSION_NAME=' android-tv/gradle.properties | cut -d= -f2 | tr -d '[:space:]')
+          if [[ ! "$code" =~ ^[0-9]+$ || -z "$name" ]]; then
+            echo "::error::VERSION_CODE / VERSION_NAME missing in android-tv/gradle.properties"; exit 1
+          fi
+          tag="tv-v$name"
+          if [[ "$GITHUB_REF_TYPE" == "tag" && "$GITHUB_REF_NAME" != "$tag" ]]; then
+            echo "::error::Tag $GITHUB_REF_NAME does not match VERSION_NAME $name (expected $tag)"; exit 1
+          fi
+          published=$( (git show origin/main:public/apk/latest.json 2>/dev/null || echo '{}') | jq -r '.versionCode // 0')
+          if (( code <= published )); then
+            echo "::error::VERSION_CODE $code must be higher than the published versionCode $published (TVs only install a higher one)"; exit 1
+          fi
+          echo "code=$code" >> "$GITHUB_OUTPUT"
+          echo "name=$name" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "Building Masjid View TV $name (versionCode $code, published: $published)"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Signing key from secrets
+        env:
+          ANDROID_KEYSTORE_B64: ${{ secrets.ANDROID_KEYSTORE_B64 }}
+        run: |
+          if [[ -z "$ANDROID_KEYSTORE_B64" ]]; then echo "::error::Secret ANDROID_KEYSTORE_B64 is not set"; exit 1; fi
+          printf '%s' "$ANDROID_KEYSTORE_B64" | tr -d '\r\n ' | base64 -d > "$RUNNER_TEMP/upload.jks"
+          echo "ANDROID_KEYSTORE_FILE=$RUNNER_TEMP/upload.jks" >> "$GITHUB_ENV"
+
+      - name: Build the sideload APK and the Play bundle (signed)
+        working-directory: android-tv
+        env:
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          for s in ANDROID_KEYSTORE_PASSWORD ANDROID_KEY_ALIAS ANDROID_KEY_PASSWORD; do
+            if [[ -z "${!s}" ]]; then echo "::error::Secret $s is not set"; exit 1; fi
+          done
+          chmod +x gradlew
+          ./gradlew assembleSideloadRelease bundlePlayRelease --no-daemon
+
+      - name: Check both files are signed
+        run: |
+          apk=android-tv/app/build/outputs/apk/sideload/release/app-sideload-release.apk
+          aab=android-tv/app/build/outputs/bundle/playRelease/app-play-release.aab
+          if [[ ! -f "$apk" ]]; then echo "::error::No signed APK (only an unsigned one?): check the 4 secrets"; ls -R android-tv/app/build/outputs; exit 1; fi
+          bt=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$bt/apksigner" verify --print-certs "$apk" | grep -E 'Signer #1 certificate (DN|SHA-256 digest)'
+          jarsigner -verify "$aab" | grep -q "jar verified" || { echo "::error::The Play bundle is not signed"; exit 1; }
+          rm -f "$RUNNER_TEMP/upload.jks"
+
+      - name: Files, checksum and size
+        id: f
+        env:
+          NAME: ${{ steps.v.outputs.name }}
+        run: |
+          mkdir -p dist
+          cp android-tv/app/build/outputs/apk/sideload/release/app-sideload-release.apk "dist/masjidview-tv-$NAME.apk"
+          cp android-tv/app/build/outputs/bundle/playRelease/app-play-release.aab "dist/masjidview-tv-$NAME-play.aab"
+          apk="dist/masjidview-tv-$NAME.apk"
+          bytes=$(stat -c %s "$apk")
+          sha=$(sha256sum "$apk" | cut -d' ' -f1)
+          if (( bytes > PAGES_MAX_BYTES )); then
+            echo "::error::The APK is $bytes bytes; Cloudflare Pages serves files up to $PAGES_MAX_BYTES bytes (25 MiB)"; exit 1
+          fi
+          echo "bytes=$bytes" >> "$GITHUB_OUTPUT"
+          echo "sha=$sha" >> "$GITHUB_OUTPUT"
+          echo "APK: $bytes bytes, sha256 $sha"
+
+      - name: Release notes and latest.json
+        env:
+          INPUT_NOTES: ${{ github.event.inputs.notes }}
+          CODE: ${{ steps.v.outputs.code }}
+          NAME: ${{ steps.v.outputs.name }}
+          BYTES: ${{ steps.f.outputs.bytes }}
+          SHA: ${{ steps.f.outputs.sha }}
+        run: |
+          notes="$INPUT_NOTES"
+          # A tag made with `git tag -a … -m "…"`: its message is the notes.
+          if [[ -z "${notes//[[:space:]]/}" && "$GITHUB_REF_TYPE" == "tag" && "$(git cat-file -t "$GITHUB_REF_NAME")" == "tag" ]]; then
+            notes=$(git tag -l --format='%(contents:subject)%0a%0a%(contents:body)' "$GITHUB_REF_NAME" | sed '/^-----BEGIN PGP/,$d')
+          fi
+          if [[ -z "${notes//[[:space:]]/}" ]]; then notes="Kemas kini Masjid View TV $NAME."; fi
+          printf '%s\n' "$notes" > dist/notes.txt
+          jq -n --argjson code "$CODE" --arg name "$NAME" --arg sha "$SHA" --argjson bytes "$BYTES" \
+            --arg date "$(date -u +%Y-%m-%dT%H:%M:%SZ)" --rawfile notes dist/notes.txt \
+            '{versionCode: $code, versionName: $name, sha256: $sha, bytes: $bytes, date: $date, notes: ($notes | rtrimstr("\n"))}' > dist/latest.json
+          cat dist/latest.json
+
+      - name: GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ steps.v.outputs.tag }}
+          NAME: ${{ steps.v.outputs.name }}
+        run: |
+          files=("dist/masjidview-tv-$NAME.apk" "dist/masjidview-tv-$NAME-play.aab" "dist/latest.json")
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" "${files[@]}" --clobber
+          else
+            gh release create "$TAG" "${files[@]}" --title "Masjid View TV $NAME" --notes-file dist/notes.txt --target "$GITHUB_SHA"
+          fi
+
+      - name: Publish to masjidview.my/apk (commit to main)
+        env:
+          NAME: ${{ steps.v.outputs.name }}
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git worktree add -B publish-apk "$RUNNER_TEMP/main" origin/main
+          cd "$RUNNER_TEMP/main"
+          mkdir -p public/apk
+          cp "$GITHUB_WORKSPACE/dist/masjidview-tv-$NAME.apk" public/apk/masjidview-tv.apk
+          cp "$GITHUB_WORKSPACE/dist/latest.json" public/apk/latest.json
+          git add public/apk
+          git commit -m "apk $NAME"
+          for attempt in 1 2 3; do
+            if git push origin HEAD:main; then exit 0; fi
+            git fetch origin main
+            git rebase origin/main
+          done
+          echo "::error::Could not push to main"; exit 1

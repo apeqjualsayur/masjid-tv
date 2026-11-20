@@ -15,6 +15,7 @@
  *   prayer API ....... network-first, fall back to the last cached response, marked x-sw-cache: hit
  *                      so the app knows it is offline (never reported as a fresh sync)
  *   /chrono .......... network only, never cached: a stale time would set a wrong clock offset
+ *   /apk, /apk/* ..... network only, never cached or precached: the Android TV app download
  */
 /* eslint-disable */
 const VERSION = "__VERSION__";
@@ -34,6 +35,7 @@ function classify(url, request) {
   if (u.hostname === API_HOST) return u.pathname === "/chrono" ? "passthrough" : "network-first";
   const isImage = request.destination === "image" || /\.(png|jpe?g|webp|gif|svg|avif)$/i.test(u.pathname);
   if (u.origin !== self.location.origin) return isImage ? "cache-first" : "passthrough";
+  if (u.pathname === "/apk" || u.pathname.startsWith("/apk/")) return "passthrough"; // TV app download + latest.json: always live (also when opened as a page)
   if (request.mode === "navigate") return "page";
   if (u.pathname === "/version.json") return "passthrough"; // always the live version, never cached
   if (u.pathname.startsWith("/_next/static/")) return "cache-first";

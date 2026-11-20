@@ -99,6 +99,15 @@ describe("routing", () => {
     expect(classify("https://other.example/x.js", r())).toBe("passthrough");
     expect(classify(`${ORIGIN}/config/screen.json`, r("cors", "", "POST"))).toBe("passthrough");
   });
+
+  it("the Android TV app download is never handled or cached (/apk, /apk/*)", () => {
+    const { classify } = loadSw();
+    const r = (mode = "cors") => ({ mode, destination: "", method: "GET" });
+    expect(classify(`${ORIGIN}/apk`, r("navigate"))).toBe("passthrough");
+    expect(classify(`${ORIGIN}/apk/masjidview-tv.apk`, r("navigate"))).toBe("passthrough");
+    expect(classify(`${ORIGIN}/apk/latest.json`, r())).toBe("passthrough");
+    expect(classify(`${ORIGIN}/apkfoo`, r())).toBe("network-first"); // only the apk folder
+  });
 });
 
 describe("install / activate", () => {
